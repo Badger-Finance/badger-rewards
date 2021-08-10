@@ -2,7 +2,7 @@ from helpers.constants import (
     DIGG,
 )
 
-from brownie import interface
+from brownie import *
 
 class DiggUtils:
     def __init__(self):
