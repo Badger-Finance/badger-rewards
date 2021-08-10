@@ -15,6 +15,7 @@ from helpers.constants import (
 from helpers.graphql import fetch_wallet_balances
 from helpers.time_utils import to_hours, to_utc_date
 
+from brownie import interface
 from collections import OrderedDict
 import json
 from rich.console import Console
@@ -258,9 +259,3 @@ def badger_boost(badger, currentBlock):
     )
 
     return badgerBoost, boostInfo
-
-def main():
-    # neeed to connect badger here
-    badger = "something"
-    currentBlock = 
-    pass
