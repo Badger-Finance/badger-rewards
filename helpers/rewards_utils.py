@@ -13,14 +13,17 @@ from rich.console import Console
 
 console = Console()
 
+
 def combine_balances(balances):
     allBalances = UserBalances()
     for userBalances in balances:
         allBalances = allBalances + userBalances
     return allBalances
 
+
 def filter_dust(balances):
     return UserBalances(list(filter(lambda user: user.balance > 1, balances)))
+
 
 def calc_union_addresses(diggSetts, badgerSetts, nonNativeSetts):
     return set.union(
@@ -30,6 +33,8 @@ def calc_union_addresses(diggSetts, badgerSetts, nonNativeSetts):
             {user.address for user in nonNativeSetts},
         ]
     )
+
+
 def calc_stake_ratio(address, diggSetts, badgerSetts, nonNativeSetts):
     diggBalance = getattr(diggSetts[address], "balance", 0)
     badgerBalance = getattr(badgerSetts[address], "balance", 0)
@@ -39,6 +44,7 @@ def calc_stake_ratio(address, diggSetts, badgerSetts, nonNativeSetts):
     else:
         stakeRatio = (diggBalance + badgerBalance) / nonNativeBalance
     return stakeRatio
+
 
 def calc_balances_from_geyser_events(geyserEvents):
     balances = {}
@@ -53,6 +59,7 @@ def calc_balances_from_geyser_events(geyserEvents):
     console.log("Sum of geyser balances: {}".format(sum(balances.values()) / 10 ** 18))
     console.log("Fetched {} geyser balances".format(len(balances)))
     return balances
+
 
 @lru_cache(maxsize=None)
 def calculate_sett_balances(badger, name, currentBlock):

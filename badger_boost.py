@@ -4,13 +4,19 @@ from classes.UserBalance import UserBalance, UserBalances
 from helpers.api import fetch_token_prices
 from helpers.aws import upload_boosts
 from helpers.calc_snapshot import calc_snapshot
-from helpers.rewards_utils import calculate_sett_balances, calc_stake_ratio, calc_union_addresses, combine_balances, filter_dust
+from helpers.rewards_utils import (
+    calculate_sett_balances,
+    calc_stake_ratio,
+    calc_union_addresses,
+    combine_balances,
+    filter_dust,
+)
 from helpers.constants import (
     DIGG,
     MAX_BOOST,
     SETT_BOOST_RATIOS,
     BADGER,
-    STAKE_RATIO_RANGES
+    STAKE_RATIO_RANGES,
 )
 from helpers.graphql import fetch_wallet_balances
 from helpers.time_utils import to_hours, to_utc_date
@@ -128,6 +134,7 @@ def calc_sett_rewards(badger, periodStartBlock, endBlock, cycle, unclaimedReward
 
     return rewards
 
+
 def convert_balances_to_usd(sett, name, userBalances):
     tokenAddress = sett.address
     price = prices[tokenAddress]
@@ -138,6 +145,7 @@ def convert_balances_to_usd(sett, name, userBalances):
         user.balance = (price_ratio * price * user.balance) / (pow(10, decimals))
 
     return userBalances
+
 
 def badger_boost(badger, currentBlock):
     console.log("Calculating boost ...")

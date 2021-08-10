@@ -4,6 +4,7 @@ from helpers.constants import (
 
 from brownie import *
 
+
 class DiggUtils:
     def __init__(self):
         self.digg = interface.IDigg(DIGG)

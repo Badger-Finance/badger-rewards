@@ -11,6 +11,7 @@ s3 = boto3.client(
     aws_secret_access_key=env_config.aws_secret_access_key,
 )
 
+
 def upload_boosts(test):
     fileName = "badger-boosts.json"
 

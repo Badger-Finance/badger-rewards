@@ -2,6 +2,7 @@ from helpers.constants import debug
 
 import os
 
+
 class EnvConfig:
     def __init__(self):
         self.aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
