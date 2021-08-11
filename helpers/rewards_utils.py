@@ -62,10 +62,8 @@ def calc_balances_from_geyser_events(geyserEvents):
 
 
 @lru_cache(maxsize=None)
-def calculate_sett_balances(badger, name, currentBlock):
+def calculate_sett_balances(name, currentBlock, underlyingToken, geyserAddr=""):
     console.log("Fetching {} sett balances".format(name))
-    sett = badger.getSett(name)
-    underlyingToken = sett.address
     settType = ["", ""]
     if "uni" in name or "sushi" in name:
         settType[0] = "halfLP"
@@ -82,7 +80,6 @@ def calculate_sett_balances(badger, name, currentBlock):
 
     if name not in NO_GEYSERS:
 
-        geyserAddr = badger.getGeyser(name).address.lower()
         geyserEvents = fetch_geyser_events(geyserAddr, currentBlock)
         geyserBalances = calc_balances_from_geyser_events(geyserEvents)
         settBalances[geyserAddr] = 0

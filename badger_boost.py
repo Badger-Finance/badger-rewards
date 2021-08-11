@@ -150,6 +150,7 @@ def convert_balances_to_usd(sett, name, userBalances):
 def badger_boost(badger, currentBlock):
     console.log("Calculating boost ...")
     allSetts = badger.sett_system.vaults
+    
     diggSetts = UserBalances()
     badgerSetts = UserBalances()
     nonNativeSetts = UserBalances()

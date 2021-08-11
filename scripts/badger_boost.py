@@ -1,3 +1,4 @@
+from classes.DiggUtils import diggUtils
 from classes.RewardsList import RewardsList
 from classes.UserBalance import UserBalance, UserBalances
 
@@ -21,6 +22,7 @@ from helpers.constants import (
 from helpers.graphql import fetch_wallet_balances
 from helpers.time_utils import to_hours, to_utc_date
 
+from brownie import *
 from collections import OrderedDict
 import json
 from rich.console import Console
@@ -146,9 +148,12 @@ def convert_balances_to_usd(sett, name, userBalances):
     return userBalances
 
 
-def badger_boost(badger, currentBlock):
+def badger_boost(currentBlock):
     console.log("Calculating boost ...")
-    allSetts = badger.sett_system.vaults
+    with open('system/ethdeploy.json') as f:
+        badger_deploy = json.load(f)
+    allSetts = badger_deploy.sett_system.vaults
+    allGeysers = badger_deploy.sett_system.geysers
     diggSetts = UserBalances()
     badgerSetts = UserBalances()
     nonNativeSetts = UserBalances()
@@ -163,7 +168,11 @@ def badger_boost(badger, currentBlock):
     for name, sett in allSetts.items():
         if name in noBoost:
             continue
-        balances = calculate_sett_balances(badger, name, currentBlock)
+
+        if name in allGeysers:
+            geyser = allGeysers[name]
+        
+        balances = calculate_sett_balances(name, currentBlock, sett, geyser or None)
         balances = convert_balances_to_usd(sett, name, balances)
         if name in ["native.uniDiggWbtc", "native.sushiDiggWbtc", "native.digg"]:
             diggSetts = combine_balances([diggSetts, balances])
@@ -176,9 +185,8 @@ def badger_boost(badger, currentBlock):
         else:
             nonNativeSetts = combine_balances([nonNativeSetts, balances])
 
-    sharesPerFragment = badger.digg.logic.UFragments._sharesPerFragment()
     badger_wallet_balances, digg_wallet_balances, _ = fetch_wallet_balances(
-        sharesPerFragment, currentBlock
+        diggUtils.sharesPerFragment, currentBlock
     )
 
     console.log(
@@ -269,8 +277,6 @@ def badger_boost(badger, currentBlock):
 
 
 def main():
-    # neeed to connect badger here
-    badger = "something"
-    currentBlock = 1
-    badger_boost(badger, currentBlock)
+    currentBlock = chain.height - 100
+    badger_boost(currentBlock)
     pass

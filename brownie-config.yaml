@@ -7,7 +7,7 @@ networks:
         cmd_settings:
             accounts: 50
             mnemonic: brownie
-            fork: https://eth-mainnet.alchemyapi.io/v2/$ALCHEMYAPI_TOKEN
+            fork: https://spring-delicate-paper.quiknode.pro/$QUICKNODE_TOKEN
             default_balance: 500 ether
             chain_id: 1
     bsc:
