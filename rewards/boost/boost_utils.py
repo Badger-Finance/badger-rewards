@@ -3,6 +3,7 @@ from rich.console import Console
 from rewards.classes.UserBalance import UserBalance, UserBalances
 from brownie import *
 from typing import Dict
+from collections import Counter
 from rewards.snapshot.utils import chain_snapshot
 from badger_api.prices import (
     fetch_token_prices,
@@ -54,22 +55,22 @@ def calc_boost_data(block: int):
     chains = ["eth"]
     ## Figure out how to map blocks, maybe  time -> block per chain
 
-    native = {}
-    nonNative = {}
+    native = Counter()
+    nonNative = Counter()
 
     for chain in chains:
         snapshot = chain_snapshot(chain, block)
         console.log("Taking token snapshot on {}".format(chain))
         tokens = token_snapshot_usd(chain, block)
         console.log("Converting balances to USD")
-        native = {**native, **tokens}
+        native = native + Counter(tokens)
         for sett, balances in snapshot.items():
             balances, settType = convert_balances_to_usd(balances, sett)
             if settType == "native":
-                native = {**native, **balances}
+                native = native + Counter(balances)
             elif settType == "nonNative":
-                nonNative = {**nonNative, **balances}
+                nonNative = nonNative + Counter(balances)
     
-    native = filter_dust(native, 1)
-    nonNative = filter_dust(nonNative, 1)
+    native = filter_dust(dict(native), 1)
+    nonNative = filter_dust(dict(nonNative), 1)
     return native, nonNative

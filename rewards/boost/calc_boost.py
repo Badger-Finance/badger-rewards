@@ -40,6 +40,8 @@ def badger_boost(currentBlock: int):
     """
     console.log("Calculating boost at block {} ...".format(currentBlock))
     nativeSetts, nonNativeSetts = calc_boost_data(currentBlock)
+    console.log(len(nativeSetts))
+    console.log(len(nonNativeSetts))
 
     allAddresses = calc_union_addresses(nativeSetts, nonNativeSetts)
     console.log("{} addresses fetched".format(len(allAddresses)))

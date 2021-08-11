@@ -139,7 +139,6 @@ def fetch_token_balances(client,sharesPerFragment, blockNumber):
 
     badger_balances = {}
     digg_balances = {}
-    ibbtc_balances = {}
     console.log(sharesPerFragment)
     while continueFetching:
         variables = {
@@ -162,7 +161,6 @@ def fetch_token_balances(client,sharesPerFragment, blockNumber):
                     if entry["token"]["symbol"] == "BADGER":
                         badger_balances[address] = amount / 1e18
                     if entry["token"]["symbol"] == "DIGG":
-                        # Speed this up
                         if entry["balance"] == 0:
                             fragmentBalance = 0
                         else:
@@ -188,7 +186,7 @@ def fetch_chain_balances(chain, block):
                         decimals
                     }
                 }
-                netDeposit
+                netShareDeposit
             }
         }
         """
@@ -199,26 +197,28 @@ def fetch_chain_balances(chain, block):
     while True:
         variables["lastId"] = {"id_gt": lastId}
         results = client.execute(query, variable_values=variables)
-        newBalances = {}
         balanceData = results["userSettBalances"]
         for result in balanceData:
-            account = result["user"]["id"]
-            deposit = float(result["netDeposit"])
+            account = result["user"]["id"].lower()
             decimals = int(result["sett"]["token"]["decimals"])
             sett = result["sett"]["id"]
+            if sett == "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a".lower():
+                decimals = 18
+            
+            deposit = float(result["netShareDeposit"])/ math.pow(10, decimals)
             if deposit > 0:
-                if sett not in newBalances:
-                    newBalances[sett] = {}
-                newBalances[sett][account.lower()] = deposit / math.pow(10, decimals)
+                if sett not in balances:
+                    balances[sett] = {}
+
+                if account not in balances[sett]:
+                    balances[sett][account] = deposit
+                else:
+                    balances[sett][account] += deposit
 
         if len(balanceData) == 0:
             break
         else:
             console.log("Fetching {} sett balances".format(len(balanceData)))
             lastId = balanceData[-1]["id"]
-            for settAddr, newBals in newBalances.items():
-                if settAddr not in balances:
-                    balances[settAddr] = {}
-                balances[settAddr] = {**balances[settAddr], **newBals}
     console.log("Fetched {} total sett balances".format(len(balances)))
     return balances

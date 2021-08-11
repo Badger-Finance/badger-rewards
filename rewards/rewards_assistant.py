@@ -38,7 +38,6 @@ console = Console()
 
 
 def calc_sett_rewards(
-    badger: BadgerSystem,
     startBlock: int,
     endBlock: int,
     cycle: int,
@@ -61,7 +60,7 @@ def calc_sett_rewards(
     rewards = []
     for sett, balances in balancesBySett.items():
         settRewards = calc_rewards(
-            badger, sett, balances, startBlock, endBlock, chain, boost
+           sett, balances, startBlock, endBlock, chain, boost
         )
         rewards.append(settRewards)
 
@@ -191,10 +190,9 @@ def generate_rewards_in_range(badger, startBlock, endBlock, pastRewards, saveLoc
         if BCVX in tokens or BCVXCRV in tokens:
             unclaimedAddresses.append(addr)
 
-    sushiRewards = calc_all_sushi_rewards(badger, startBlock, endBlock, nextCycle)
-    treeRewards = calc_tree_rewards(badger, startBlock, endBlock, nextCycle)
+    sushiRewards = calc_all_sushi_rewards(startBlock, endBlock, nextCycle)
+    treeRewards = calc_tree_rewards(startBlock, endBlock, nextCycle)
     settRewards = calc_sett_rewards(
-        badger,
         startBlock,
         endBlock,
         nextCycle,

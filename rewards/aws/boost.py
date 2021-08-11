@@ -1,3 +1,4 @@
+from re import A
 from rewards.aws.helpers import s3, get_bucket
 from rich.console import Console
 import json
@@ -27,8 +28,6 @@ def download_boosts(test: bool):
     bucket = get_bucket(test)
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boostsFileName)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
-    with open("badger-boosts.json", "w") as fp:
-        json.dump(data, fp)
     return data
 
 
@@ -42,18 +41,22 @@ def add_user_data(test: bool, userData):
     usersUpdated = 0
     for user, data in userData.items():
         if user in boosts["userData"]:
-            usersUpdated += 1
+            multipliers = boosts["userData"][user]["multipliers"]
             boosts["userData"][user] = {
                 "boost": data["boost"],
                 "nativeBalance": data["nativeBalance"],
                 "nonNativeBalance": data["nonNativeBalance"],
                 "stakeRatio": data["stakeRatio"],
-                "multipliers": boosts["userData"][user]["multipliers"],
+                "multipliers": multipliers
             }
+        else:
+            boosts["userData"][user] = {}
+
+        
 
     console.log("Updated {} users".format(usersUpdated))
     with open("badger-boosts.json", "w") as fp:
-        json.dump(boosts, fp)
+        json.dump(boosts, fp,indent=4)
 
     upload_boosts(test, boosts)
 
