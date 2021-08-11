@@ -9,4 +9,4 @@ console = Console()
 def main():
     currentBlock = chain.height
     boostData = badger_boost(currentBlock)
-    add_user_data(test=True, userData=boostData)
+    add_user_data(test=False, userData=boostData)

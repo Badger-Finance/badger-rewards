@@ -1,3 +1,4 @@
+from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rich.console import Console
 from rewards.classes.UserBalance import UserBalance, UserBalances
 from brownie import *
@@ -58,7 +59,10 @@ def calc_boost_data(block: int):
 
     for chain in chains:
         snapshot = chain_snapshot(chain, block)
+        console.log("Taking token snapshot on {}".format(chain))
+        tokens = token_snapshot_usd(chain, block)
         console.log("Converting balances to USD")
+        native = {**native, **tokens}
         for sett, balances in snapshot.items():
             balances, settType = convert_balances_to_usd(balances, sett)
             if settType == "native":

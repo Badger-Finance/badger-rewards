@@ -1,12 +1,9 @@
 from brownie import *
 from rich.console import Console
-import json
 from helpers.constants import (
     STAKE_RATIO_RANGES,
 )
 from typing import Dict
-from collections import OrderedDict
-from rewards.rewards_utils import combine_balances
 from tabulate import tabulate
 
 from rewards.boost.boost_utils import (
