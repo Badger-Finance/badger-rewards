@@ -1,3 +1,4 @@
+from logging import DEBUG
 from brownie import web3
 
 # Use debug for expanded console output
@@ -196,3 +197,8 @@ REWARDS_BLACKLIST = {
     "0x8b950f43fcac4931d408f1fcda55c6cb6cbf3096": "Cream bBadger",
     "0x0a54d4b378c8dbfc7bc93be50c85debafdb87439": "Sushiswap bBadger/Weth",
 }
+
+def get_api():
+    if DEBUG:
+        return 'https://staging-api.badger.finance/v2'
+    return 'https://api.badger.finance/v2'

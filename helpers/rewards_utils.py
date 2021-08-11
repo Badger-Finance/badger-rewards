@@ -3,11 +3,13 @@ from classes.UserBalance import UserBalance, UserBalances
 from helpers.constants import (
     NO_GEYSERS,
     REWARDS_BLACKLIST,
+    get_api,
 )
 from helpers.graphql import fetch_sett_balances, fetch_geyser_events
 
 from collections import Counter
 from functools import lru_cache
+import requests
 from rich.console import Console
 
 
@@ -61,6 +63,18 @@ def calc_balances_from_geyser_events(geyserEvents):
     return balances
 
 
+def fetch_unclaimed_balances(underlyingToken, settBalances):
+    api_url = get_api()
+    claimableBalances = {}
+    for addr in settBalances:
+        r = requests.get(f'{api_url}/accounts/{addr}')
+        rx = r.json()
+        for sett, balance in rx['claimableBalances']:
+            if underlyingToken == sett.lower():
+                claimableBalances[addr] = balance
+    return claimableBalances
+
+
 @lru_cache(maxsize=None)
 def calculate_sett_balances(name, currentBlock, underlyingToken, geyserAddr=""):
     console.log("Fetching {} sett balances".format(name))
@@ -75,17 +89,17 @@ def calculate_sett_balances(name, currentBlock, underlyingToken, geyserAddr=""):
         settType[1] = "native"
 
     settBalances = fetch_sett_balances(name, underlyingToken.lower(), currentBlock)
+    unclaimedBalances = fetch_unclaimed_balances(underlyingToken.lower(), settBalances)
     geyserBalances = {}
     creamBalances = {}
 
     if name not in NO_GEYSERS:
-
         geyserEvents = fetch_geyser_events(geyserAddr, currentBlock)
         geyserBalances = calc_balances_from_geyser_events(geyserEvents)
         settBalances[geyserAddr] = 0
 
     balances = {}
-    for b in [settBalances, geyserBalances, creamBalances]:
+    for b in [settBalances, geyserBalances, creamBalances, unclaimedBalances]:
         balances = dict(Counter(balances) + Counter(b))
 
     # Get rid of blacklisted and negative balances
