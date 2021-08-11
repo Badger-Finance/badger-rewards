@@ -10,7 +10,8 @@ console = Console()
 
 def main():
     currentBlock = chain.height
+    console.log(env_config)
     send_message_to_discord('**CALCULATING NEW BOOST**', 'Pulling data from the graph', [], 'keepers/boostBot')
     boostData = badger_boost(currentBlock)
-    add_user_data(env_config.test, userData=boostData)
+    add_user_data(userData=boostData)
 
