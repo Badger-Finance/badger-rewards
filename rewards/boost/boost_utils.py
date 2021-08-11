@@ -38,11 +38,9 @@ def convert_balances_to_usd(balances: UserBalances, sett: str):
     """
     price = prices[web3.toChecksumAddress(sett)]
     priceRatio = balances.settRatio
-    settToken = interface.IERC20(sett)
-    decimals = settToken.decimals()
     usdBalances = {}
     for user in balances:
-        usdBalances[user.address] = priceRatio * price * user.balance / pow(10, decimals)
+        usdBalances[user.address] = priceRatio * price * user.balance
 
     return usdBalances, balances.settType
 
@@ -67,7 +65,7 @@ def calc_boost_data(block: int):
                 native = {**native, **balances}
             elif settType == "nonNative":
                 nonNative = {**nonNative, **balances}
-
+    
     native = filter_dust(native, 1)
     nonNative = filter_dust(nonNative, 1)
     return native, nonNative

@@ -1,4 +1,3 @@
-from subgraph.client import fetch_wallet_balances
 import json
 from brownie import *
 from brownie.network.gas.strategies import GasNowStrategy

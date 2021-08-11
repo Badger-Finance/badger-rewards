@@ -9,7 +9,7 @@ from collections import OrderedDict
 from rewards.rewards_utils import combine_balances
 from tabulate import tabulate
 
-from rewards.boost.utils import (
+from rewards.boost.boost_utils import (
     calc_union_addresses,
     calc_boost_data,
 )
