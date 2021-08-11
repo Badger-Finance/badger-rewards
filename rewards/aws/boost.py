@@ -1,4 +1,4 @@
-from re import A
+from helpers.discord import send_message_to_discord
 from rewards.aws.helpers import s3, get_bucket
 from rich.console import Console
 import json
@@ -18,6 +18,12 @@ def upload_boosts(test: bool, boostData):
     console.log("Uploading file to s3://{}/{}".format(bucket, boostsFileName))
     s3.put_object(Body=str(json.dumps(boostData)), Bucket=bucket, Key=boostsFileName)
     console.log("✅ Uploaded file to s3://{}/{}".format(bucket, boostsFileName))
+    send_message_to_discord(
+        '**BADGER BOOST UPDATED**', 
+        f'✅ Uploaded file to s3://{bucket}/{boostsFileName}', 
+        [{'name': 'User Count', 'value': len(boostData), 'inline': True}], 
+        'keepers/boostBot'
+    )
 
 
 def download_boosts(test: bool):
