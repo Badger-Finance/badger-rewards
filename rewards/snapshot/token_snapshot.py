@@ -3,6 +3,7 @@ from subgraph.subgraph_utils import make_gql_client
 from helpers.digg_utils import diggUtils
 from helpers.constants import BADGER, DIGG
 from badger_api.prices import fetch_token_prices
+import json
 
 prices = fetch_token_prices()
 
@@ -23,10 +24,14 @@ def token_snapshot_usd(chain: str, block: int):
 
 def convert_tokens_to_usd(badger,digg):
     total = {}
+
     for addr, bal in badger.items():
-        total[addr] = bal * prices[BADGER]
+        total[addr.lower()] = bal * prices[BADGER]
+ 
     for addr, bal in digg.items():
-        total[addr] = bal * prices[DIGG]
+        if addr not in total:
+            total[addr.lower()] = 0
+        total[addr.lower()] += bal * prices[DIGG]
     return total
 
 
