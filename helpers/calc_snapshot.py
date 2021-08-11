@@ -16,6 +16,7 @@ from rich.console import Console
 
 console = Console()
 
+
 def parse_schedules(schedules):
     schedulesByToken = {}
     for s in schedules:
@@ -24,6 +25,7 @@ def parse_schedules(schedules):
             schedulesByToken[schedule.token] = []
         schedulesByToken[schedule.token].append(schedule)
     return schedulesByToken
+
 
 def calc_snapshot(
     badger, name, startBlock, endBlock, nextCycle, boosts, unclaimedBalances

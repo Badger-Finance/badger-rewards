@@ -44,5 +44,4 @@ class RewardsLog:
                     self.add_unlock_schedules(name, asdict(s))
 
 
-
 rewardsLog = RewardsLog()
