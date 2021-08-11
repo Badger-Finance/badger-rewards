@@ -1,7 +1,4 @@
-from brownie import web3
-
-# Use debug for expanded console output
-debug = False
+from brownie import *
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -10,9 +7,6 @@ EmptyBytes32 = "0x00000000000000000000000000000000000000000000000000000000000000
 DEFAULT_ADMIN_ROLE = (
     "0x0000000000000000000000000000000000000000000000000000000000000000"
 )
-
-
-urls = {"staging": "https://laiv44udi0.execute-api.us-west-1.amazonaws.com/staging/v2"}
 
 
 class RoleRegistry:
@@ -105,65 +99,17 @@ PEAK_ADDRESSES = [
     "0x41671BA1abcbA387b9b2B752c205e22e916BE6e3",
 ]
 
-MAX_BOOST = 3
 DIGG_SETTS = ["native.uniDiggWbtc", "native.sushiDiggWbtc", "native.digg"]
 BADGER_SETTS = ["native.badger", "native.uniBadgerWbtc", "native.sushiBadgerWbtc"]
 NATIVE_DIGG_SETTS = ["native.uniDiggWbtc", "native.sushiDiggWbtc"]
 
-NON_NATIVE_SETTS = [
-    "native.renCrv",
-    "native.sbtcCrv",
-    "native.tbtcCrv",
-    "native.sushiWbtcEth",
-    "harvest.renCrv",
-    "yearn.wbtc",
-    "experimental.sushiIBbtcWbtc",
-    "native.hbtcCrv",
-    "native.pbtcCrv",
-    "native.obtcCrv",
-    "native.bbtcCrv",
-    "native.tricrypto",
-    "native.tricrypto2",
-    "native.cvxCrv",
-    "native.cvx",
-]
 
-NO_GEYSERS = [
-    "native.digg",
-    "experimental.sushiIBbtcWbtc",
-    "experimental.digg",
-    "native.hbtcCrv",
-    "native.pbtcCrv",
-    "native.obtcCrv",
-    "native.bbtcCrv",
-    "native.tricrypto",
-    "native.tricrypto2",
-    "native.cvxCrv",
-    "native.cvx",
-]
 
-SETT_BOOST_RATIOS = {
-    "native.uniDiggWbtc": 0.5,
-    "native.sushiDiggWbtc": 0.5,
-    "native.uniBadgerWbtc": 0.5,
-    "native.sushiBadgerWbtc": 0.5,
-    "native.badger": 1,
-    "native.digg": 1,
-    "native.renCrv": 1,
-    "native.sbtcCrv": 1,
-    "native.tbtcCrv": 1,
-    "harvest.renCrv": 1,
-    "native.sushiWbtcEth": 1,
-    "yearn.wbtc": 1,
-    "experimental.sushiIBbtcWbtc": 1,
-    "native.hbtcCrv": 1,
-    "native.pbtcCrv": 1,
-    "native.obtcCrv": 1,
-    "native.bbtcCrv": 1,
-    "native.tricrypto": 1,
-    "native.tricrypto2": 1,
-    "native.cvxCrv": 1,
-    "native.cvx": 1,
+REWARDS_BLACKLIST = {
+    "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28": "Badger Vault",
+    "0xb65cef03b9b89f99517643226d76e286ee999e77": "Badger Dev Multisig",
+    "0x8b950f43fcac4931d408f1fcda55c6cb6cbf3096": "Cream bBadger",
+    "0x0a54d4b378c8dbfc7bc93be50c85debafdb87439": "Sushiswap bBadger/Weth",
 }
 
 STAKE_RATIO_RANGES = list(
@@ -190,9 +136,15 @@ STAKE_RATIO_RANGES = list(
         (1, 2000),
     ]
 )
-REWARDS_BLACKLIST = {
-    "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28": "Badger Vault",
-    "0xb65cef03b9b89f99517643226d76e286ee999e77": "Badger Dev Multisig",
-    "0x8b950f43fcac4931d408f1fcda55c6cb6cbf3096": "Cream bBadger",
-    "0x0a54d4b378c8dbfc7bc93be50c85debafdb87439": "Sushiswap bBadger/Weth",
+
+SETT_INFO = {
+    "0x19D97D8fA813EE2f51aD4B4e04EA08bAf4DFfC28": {
+        "type": "native",
+        "ratio": 1,
+    },
+    "0x235c9e24D3FB2FAFd58a2E49D454Fdcd2DBf7FF1": {"type": "native", "ratio": 0.5},
+    "0x1862A18181346EBd9EdAf800804f89190DeF24a5": {"type": "native", "ratio": 0.5},
+    "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a": {"type": "native", "ratio": 1},
+    "0xC17078FDd324CC473F8175Dc5290fae5f2E84714": {"type": "native", "ratio": 0.5},
+    "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6": {"type": "native", "ratio": 0.5},
 }
