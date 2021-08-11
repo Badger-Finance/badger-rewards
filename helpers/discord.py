@@ -1,9 +1,11 @@
 from discord import Webhook, RequestsWebhookAdapter, Embed
+from config.env_config import env_config
 from rewards.aws.helpers import get_secret
 
-def send_message_to_discord(title: str, description: str, fields: list, url: str, username: str):
+def send_message_to_discord(title: str, description: str, fields: list, username: str):
+
     webhook = Webhook.from_url(
-        get_secret(url, "DISCORD_WEBHOOK_URL"),
+        env_config.get_webhook_url(),
         adapter=RequestsWebhookAdapter(),
     )
 
