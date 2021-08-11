@@ -44,23 +44,26 @@ def add_user_data(userData):
     :param test:
     :param userData: user boost data
     """
-    boosts = download_boosts()
-    usersUpdated = 0
+    oldBoosts = download_boosts()
+    boosts = {
+        "userData":{},
+        "multiplierData": oldBoosts["multiplierData"]
+    }
     for user, data in userData.items():
-        if user in boosts["userData"]:
-            multipliers = boosts["userData"][user]["multipliers"]
-            boosts["userData"][user] = {
+        if user in oldBoosts["userData"]:
+            multipliers = oldBoosts["userData"][user]["multipliers"]
+        else:
+            multipliers = {}
+        
+        boosts["userData"][user] = {
                 "boost": data["boost"],
                 "nativeBalance": data["nativeBalance"],
                 "nonNativeBalance": data["nonNativeBalance"],
                 "stakeRatio": data["stakeRatio"],
                 "multipliers": multipliers
             }
-        else:
-            boosts["userData"][user] = {}
 
         
-    console.log("Updated {} users".format(usersUpdated))
     with open("badger-boosts.json", "w") as fp:
         json.dump(boosts, fp,indent=4)
 
