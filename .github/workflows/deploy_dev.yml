@@ -3,7 +3,7 @@ name: Pull Request - Build and Deploy to Development Environment
 # Pushing to development environment allows for validation.
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 
