@@ -246,5 +246,5 @@ def fetch_chain_balances(chain, block):
             }], 
             'keepers/boostBot',
         )
-        raise(e)
+        raise e
 
