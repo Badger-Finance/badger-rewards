@@ -1,10 +1,11 @@
+from math import cos
 from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
 from rewards.classes.UserBalance import UserBalances, UserBalance
 from subgraph.client import fetch_chain_balances
 from functools import lru_cache
 from rich.console import Console
 from typing import Dict
-from brownie import web3
+from brownie import web3, interface
 
 console = Console()
 
@@ -24,7 +25,8 @@ def chain_snapshot(chain: str, block: int):
 
     for settAddr, balances in list(chainBalances.items()):
         settBalances = parse_sett_balances(settAddr, balances, chain)
-        console.log("Fetched {} balances for sett {}".format(len(balances), settAddr))
+        token = interface.IERC20(settAddr)
+        console.log("Fetched {} balances for sett {}".format(len(balances), token.name()))
         balancesBySett[settAddr] = settBalances
 
     return balancesBySett
