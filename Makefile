@@ -2,7 +2,8 @@
 PORT = 80
 SERVICE_NAME = boost_bot
 DOCKER_COMPOSE_TAG = $(SERVICE_NAME)_1
-PYFILES=*.py classes/*.py helpers/*.py
+SRC_DIR := $(shell pwd)
+PYFILES := $(foreach sdir,$(SRC_DIR),$(wildcard $(sdir)/*.py))
 
 KUSTOMIZE_VERSION := $(shell test -e /usr/local/bin/kustomize && /usr/local/bin/kustomize version | cut -f2 -d/ | cut -f1 -d' ')
 KUBEVAL_VERSION := $(shell test -e /usr/local/bin/kubeval && /usr/local/bin/kubeval --version | grep Version | cut -f2 -d' ')
@@ -12,7 +13,6 @@ setup:
 	python -m pip install --upgrade pip
 	pip install pipenv
 	pip install -r requirements.txt
-	pip install -r requirements_dev.txt
 
 unit:
 	nose2 --output-buffer --pretty-assert --log-capture --verbose --with-coverage --coverage src --coverage-report term --coverage-report html --start-dir tests/unit
