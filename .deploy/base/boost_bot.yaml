@@ -15,12 +15,10 @@ spec:
           - name: boost-bot
             image: IMAGE_NAME
             imagePullPolicy: IfNotPresent
-            command: ["brownie", "run", "scripts/rewards/propose_boost.py", "--network=mainnet"]
+            command: ./start.sh
             env:
               - name: LOG_LEVEL
                 value: 'info'
               - name: TEST
                 value: 'True'
-              - name: WEB3_INFURA_PROJECT_ID
-                value: INFURA_ID
           restartPolicy: OnFailure
