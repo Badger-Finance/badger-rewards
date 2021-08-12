@@ -8,4 +8,4 @@ RUN apt-get install -y jq && apt-get install -y awscli
 RUN pip install -r requirements.txt
 
 COPY . .
-RUN [ "chmod" "+x" "start.sh" ]
+RUN [ "chmod", "+x", "start.sh" ]
