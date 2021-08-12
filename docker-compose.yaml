@@ -2,7 +2,7 @@ version: '3.3'
 services:
     boost-bot:
         image: boost-bot
-        command: brownie run scripts/rewards/propose_boost.py --network=mainnet
+        command: ./start.sh
         build: 
             context: .
             dockerfile: Dockerfile
