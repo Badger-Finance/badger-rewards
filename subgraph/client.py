@@ -146,7 +146,7 @@ def fetch_token_balances(client,sharesPerFragment, blockNumber):
             variables = {
                 "firstAmount": increment,
                 "lastID": lastID,
-                "blockNumber": {"number": blockNumber},
+                "blockNumber": {"number": blockNumber - 50},
             }
             nextPage = client.execute(query, variable_values=variables)
             if len(nextPage["tokenBalances"]) == 0:
@@ -179,6 +179,7 @@ def fetch_token_balances(client,sharesPerFragment, blockNumber):
             }], 
             'keepers/boostBot',
         )
+        raise e
 
     return badger_balances, digg_balances
 
@@ -199,7 +200,7 @@ def fetch_chain_balances(chain, block):
                         decimals
                     }
                 }
-                netDeposit
+                netShareDeposit
             }
         }
         """
@@ -218,7 +219,7 @@ def fetch_chain_balances(chain, block):
                 sett = result["sett"]["id"]
                 if sett == "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a".lower():
                     decimals = 18
-                deposit = float(result["netDeposit"])/ math.pow(10, decimals)
+                deposit = float(result["netShareDeposit"])/ math.pow(10, decimals)
                 if deposit > 0:
                     if sett not in balances:
                         balances[sett] = {}
@@ -245,4 +246,5 @@ def fetch_chain_balances(chain, block):
             }], 
             'keepers/boostBot',
         )
+        raise e
 
