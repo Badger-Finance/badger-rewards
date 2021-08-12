@@ -1,6 +1,5 @@
 from helpers.discord import send_message_to_discord
 from rewards.aws.helpers import s3, get_bucket
-from config.env_config import env_config
 from rich.console import Console
 import json
 

@@ -3,7 +3,6 @@ from subgraph.subgraph_utils import make_gql_client
 from helpers.digg_utils import diggUtils
 from helpers.constants import BADGER, DIGG
 from badger_api.prices import fetch_token_prices
-import json
 
 prices = fetch_token_prices()
 
