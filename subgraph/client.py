@@ -146,7 +146,7 @@ def fetch_token_balances(client,sharesPerFragment, blockNumber):
             variables = {
                 "firstAmount": increment,
                 "lastID": lastID,
-                "blockNumber": {"number": blockNumber},
+                "blockNumber": {"number": blockNumber - 50},
             }
             nextPage = client.execute(query, variable_values=variables)
             if len(nextPage["tokenBalances"]) == 0:
@@ -179,6 +179,7 @@ def fetch_token_balances(client,sharesPerFragment, blockNumber):
             }], 
             'keepers/boostBot',
         )
+        raise e
 
     return badger_balances, digg_balances
 
@@ -245,4 +246,5 @@ def fetch_chain_balances(chain, block):
             }], 
             'keepers/boostBot',
         )
+        raise(e)
 
