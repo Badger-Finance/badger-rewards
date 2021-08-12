@@ -234,6 +234,7 @@ def fetch_chain_balances(chain, block):
                         balances[settAddr] = {}
                     balances[settAddr] = {**balances[settAddr], **newBals}
         console.log("Fetched {} total sett balances".format(len(balances)))
+        console.log('sett balances:', balances)
         return balances
     except Exception as e:
         send_message_to_discord(

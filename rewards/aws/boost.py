@@ -21,7 +21,7 @@ def upload_boosts(test: bool, boostData):
     send_message_to_discord(
         '**BADGER BOOST UPDATED**', 
         f'✅ Uploaded file to s3://{bucket}/{boostsFileName}', 
-        [{'name': 'User Count', 'value': len(boostData), 'inline': True}], 
+        [{'name': 'User Count', 'value': len(boostData['userData']), 'inline': True}], 
         'keepers/boostBot'
     )
 
