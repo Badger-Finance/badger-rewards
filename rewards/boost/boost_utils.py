@@ -1,7 +1,7 @@
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rich.console import Console
 from rewards.classes.UserBalance import UserBalances
-from brownie import *
+import web3
 from typing import Dict
 from collections import Counter
 from rewards.snapshot.utils import chain_snapshot

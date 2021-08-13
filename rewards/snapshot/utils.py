@@ -1,11 +1,12 @@
-from math import cos
 from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
 from rewards.classes.UserBalance import UserBalances, UserBalance
 from subgraph.client import fetch_chain_balances
 from functools import lru_cache
 from rich.console import Console
 from typing import Dict
-from brownie import web3, interface
+import web3
+from web3.auto.infura import w3
+import json
 
 console = Console()
 
@@ -23,9 +24,12 @@ def chain_snapshot(chain: str, block: int):
     chainBalances = fetch_chain_balances(chain, block - 50)
     balancesBySett = {}
 
+    with open("abi/eth/ERC20.json") as f:
+        ERC20_ABI= json.dump(json.loads(f))
+
     for settAddr, balances in list(chainBalances.items()):
         settBalances = parse_sett_balances(settAddr, balances, chain)
-        token = interface.IERC20(settAddr)
+        token = w3.eth.contract(address=settAddr, abi=ERC20_ABI)
         console.log("Fetched {} balances for sett {}".format(len(balances), token.name()))
         balancesBySett[settAddr] = settBalances
 

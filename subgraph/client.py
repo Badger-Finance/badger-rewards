@@ -1,6 +1,5 @@
 from helpers.discord import send_message_to_discord
 from subgraph.subgraph_utils import make_gql_client
-from brownie import interface
 from rich.console import Console
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
