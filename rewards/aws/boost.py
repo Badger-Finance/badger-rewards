@@ -1,3 +1,4 @@
+import boto3
 from helpers.discord import send_message_to_discord
 from rewards.aws.helpers import s3, get_bucket
 from config.env_config import env_config
@@ -8,6 +9,7 @@ console = Console()
 
 boostsFileName = "badger-boosts.json"
 
+s3 = boto3.client("s3")
 
 def upload_boosts(boostData):
     """Upload boosts file to aws bucket
