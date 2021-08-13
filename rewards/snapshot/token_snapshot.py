@@ -13,6 +13,8 @@ def token_snapshot(chain: str, block: int):
 
 
 def token_snapshot_usd(chain: str, block: int):
+    if chain == "bsc":
+        return {}
     badger_balances, digg_balances = token_snapshot(chain, block)
     return convert_tokens_to_usd(badger_balances, digg_balances)
 

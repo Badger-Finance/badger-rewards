@@ -10,6 +10,7 @@ boostsFileName = "badger-boosts.json"
 
 s3 = boto3.client("s3")
 
+
 def upload_boosts(boostData):
     """Upload boosts file to aws bucket
 

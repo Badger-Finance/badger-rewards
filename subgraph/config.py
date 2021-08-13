@@ -6,7 +6,6 @@ subgraph_ids = {
 
 subgraph_urls = {
     "bsc": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-bsc",
-    "tokens-bsc": "https://bgraph-eth.badger.guru/subgraphs/name/swole/tokens",
     "eth": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao",
     "polygon": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-polygon",
     "xdai": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-xdai",

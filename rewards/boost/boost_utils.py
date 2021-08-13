@@ -56,15 +56,15 @@ def calc_boost_data(block: int):
     """
     chains = ["bsc", "eth"]
     blocksByChain = convert_from_eth(block)
-    ## Figure out how to map blocks, maybe  time -> block per chain
-
     native = Counter()
     nonNative = Counter()
     for chain in chains:
         chainBlock = blocksByChain[chain]
         console.log("Taking chain snapshot on {} \n".format(chain))
+
         snapshot = chain_snapshot(chain, chainBlock)
         console.log("Taking token snapshot on {}".format(chain))
+
         tokens = token_snapshot_usd(chain, chainBlock)
         native = native + Counter(tokens)
         for sett, balances in snapshot.items():

@@ -8,6 +8,7 @@ console = Console()
 
 s3 = boto3.client("s3")
 
+
 def download_latest_tree(test: bool, chain: str):
     """
     Download the latest merkle tree that was uploaded for a chain
@@ -16,7 +17,7 @@ def download_latest_tree(test: bool, chain: str):
 
     target = {
         "bucket": env_config.bucket,
-        "key": "badger-tree.json"
+        "key": "badger-tree.json",
     }  # badger-api production
 
     console.print("Downloading latest rewards file from s3: " + target["bucket"])

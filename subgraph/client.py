@@ -1,7 +1,6 @@
 from badger_api.prices import fetch_ppfs
 from helpers.discord import send_message_to_discord
 from subgraph.subgraph_utils import make_gql_client
-from brownie import interface
 from rich.console import Console
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
@@ -239,7 +238,7 @@ def fetch_chain_balances(chain, block):
             else:
                 console.log("Fetching {} sett balances".format(len(balanceData)))
                 lastId = balanceData[-1]["id"]
-        console.log("Fetched {} total sett balances".format(len(balances)))
+        console.log("Fetched {} total setts".format(len(balances)))
         return balances
     except Exception as e:
         send_message_to_discord(
