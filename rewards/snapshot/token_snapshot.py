@@ -1,3 +1,4 @@
+from toolz.itertoolz import cons
 from subgraph.client import fetch_token_balances
 from subgraph.subgraph_utils import make_gql_client
 from helpers.digg_utils import diggUtils

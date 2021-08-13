@@ -5,12 +5,10 @@ import os
 class EnvConfig:
     def __init__(self):
         self.graph_api_key = get_secret("boost-bot/graph-api-key-d", "GRAPH_API_KEY")
-        self.test_webhook_url = os.getenv(
-            "TEST_WEBHOOK_URL", ""
-        )  # get_secret("boost-bot/test-discord-url", "TEST_WEBHOOK_URL")
-        self.discord_webhook_url = os.getenv(
-            "DISCORD_WEBHOOK_URL", ""
-        )  # get_secret("DISCORD_WEBHOOK_URL", '')
+        self.test_webhook_url = get_secret(
+            "boost-bot/test-discord-url", "TEST_WEBHOOK_URL"
+        )
+        self.discord_webhook_url = get_secret("DISCORD_WEBHOOK_URL", "")
         self.test = os.getenv("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
         self.bucket = (
             "badger-staging-merkle-proofs" if self.test else "badger-merkle-proofs"
