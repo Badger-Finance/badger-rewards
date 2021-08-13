@@ -21,6 +21,4 @@ spec:
                 value: 'info'
               - name: TEST
                 value: 'True'
-              - name: WEB3_INFURA_PROJECT_ID
-                value: INFURA_ID
           restartPolicy: OnFailure

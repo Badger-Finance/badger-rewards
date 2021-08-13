@@ -1,5 +1,6 @@
 from helpers.discord import send_message_to_discord
 from rewards.aws.helpers import s3, get_bucket
+from config.env_config import env_config
 from rich.console import Console
 import json
 
@@ -14,7 +15,7 @@ def upload_boosts(boostData):
     :param test:
     :param boostData: calculated boost information
     """
-    bucket = get_bucket()
+    bucket = get_bucket(env_config.test)
     console.log("Uploading file to s3://{}/{}".format(bucket, boostsFileName))
     s3.put_object(Body=str(json.dumps(boostData)), Bucket=bucket, Key=boostsFileName)
     console.log("✅ Uploaded file to s3://{}/{}".format(bucket, boostsFileName))
@@ -31,7 +32,7 @@ def download_boosts():
 
     :param test:
     """
-    bucket = get_bucket()
+    bucket = get_bucket(env_config.test)
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boostsFileName)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
     return data
