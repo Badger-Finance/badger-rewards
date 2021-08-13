@@ -9,6 +9,7 @@ console = Console()
 
 s3 = boto3.client("s3")
 
+
 def download_latest_tree(test: bool, chain: str):
     """
     Download the latest merkle tree that was uploaded for a chain

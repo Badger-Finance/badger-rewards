@@ -10,10 +10,9 @@ class EnvConfig:
         self.test_webhook_url = get_secret(
             "boost-bot/test-discord-url", "TEST_WEBHOOK_URL"
         )
-        # TODO: use get_secret when we go to prod
-        self.discord_webhook_url = os.getenv(
-            "DISCORD_WEBHOOK_URL", ""
-        )  # get_secret("DISCORD_WEBHOOK_URL", '')
+        self.discord_webhook_url = get_secret(
+            "boost-bot/prod-discord-url", "DISCORD_WEBHOOK_URL"
+        )
         self.test = os.getenv("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
         self.web3 = Web3(
             Web3.HTTPProvider(get_secret("quiknode/eth-node-url", "NODE_URL"))
