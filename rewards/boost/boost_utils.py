@@ -1,4 +1,3 @@
-from toolz.itertoolz import cons
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rewards.boost.convert_blocks import convert_from_eth
 from rich.console import Console

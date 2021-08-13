@@ -1,15 +1,12 @@
-from math import cos
-from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
+from helpers.constants import INVALID_VAULTS, REWARDS_BLACKLIST, SETT_INFO
 from rewards.classes.UserBalance import UserBalances, UserBalance
 from subgraph.client import fetch_chain_balances
 from functools import lru_cache
 from rich.console import Console
 from typing import Dict
-from brownie import web3, interface
+from brownie import web3
 
 console = Console()
-
-skip = ["0xb6bd5ae3d5f78a6bb04bbb031e24fa9c2bbd090d"]
 
 
 @lru_cache(maxsize=128)
@@ -27,9 +24,8 @@ def chain_snapshot(chain: str, block: int):
 
     for settAddr, balances in list(chainBalances.items()):
         settBalances = parse_sett_balances(settAddr, balances)
-        # token = interface.IERC20(settAddr)
         console.log("Fetched {} balances for sett {}".format(len(balances), settAddr))
-        if settAddr.lower() in skip:
+        if settAddr.lower() in INVALID_VAULTS:
             continue
         balancesBySett[settAddr] = settBalances
 

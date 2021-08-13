@@ -147,3 +147,5 @@ SETT_INFO = {
     "0xC17078FDd324CC473F8175Dc5290fae5f2E84714": {"type": "native", "ratio": 0.5},
     "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6": {"type": "native", "ratio": 0.5},
 }
+
+INVALID_VAULTS = ["0xb6bd5ae3d5f78a6bb04bbb031e24fa9c2bbd090d"]
