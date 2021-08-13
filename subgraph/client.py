@@ -181,7 +181,7 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
                     "inline": True,
                 }
             ],
-            "keepers/boostBot",
+            "Boost Bot",
         )
         raise e
 
@@ -254,6 +254,6 @@ def fetch_chain_balances(chain, block):
                     "inline": True,
                 }
             ],
-            "keepers/boostBot",
+            "Boost Bot",
         )
         raise e

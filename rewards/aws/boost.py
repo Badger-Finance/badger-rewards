@@ -11,6 +11,7 @@ boostsFileName = "badger-boosts.json"
 
 s3 = boto3.client("s3")
 
+
 def upload_boosts(boostData):
     """Upload boosts file to aws bucket
 
@@ -25,7 +26,7 @@ def upload_boosts(boostData):
         "**BADGER BOOST UPDATED**",
         f"✅ Uploaded file to s3://{bucket}/{boostsFileName}",
         [{"name": "User Count", "value": len(boostData["userData"]), "inline": True}],
-        "keepers/boostBot",
+        "Boost Bot",
     )
 
 

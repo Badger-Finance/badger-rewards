@@ -20,5 +20,5 @@ spec:
               - name: LOG_LEVEL
                 value: 'info'
               - name: TEST
-                value: 'True'
+                value: 'False'
           restartPolicy: OnFailure
