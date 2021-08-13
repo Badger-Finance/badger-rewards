@@ -1,11 +1,11 @@
-from math import cos
+from config.env_config import env_config
 from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
 from rewards.classes.UserBalance import UserBalances, UserBalance
 from subgraph.client import fetch_chain_balances
 from functools import lru_cache
 from rich.console import Console
 from typing import Dict
-from brownie import web3, interface
+import json
 
 console = Console()
 
@@ -23,10 +23,19 @@ def chain_snapshot(chain: str, block: int):
     chainBalances = fetch_chain_balances(chain, block - 50)
     balancesBySett = {}
 
+    with open("abis/eth/ERC20.json") as f:
+        ERC20_ABI = json.load(f)
+
     for settAddr, balances in list(chainBalances.items()):
         settBalances = parse_sett_balances(settAddr, balances, chain)
-        token = interface.IERC20(settAddr)
-        console.log("Fetched {} balances for sett {}".format(len(balances), token.name()))
+        token = env_config.web3.eth.contract(
+            address=env_config.web3.toChecksumAddress(settAddr), abi=ERC20_ABI
+        )
+        console.log(
+            "Fetched {} balances for sett {}".format(
+                len(balances), token.functions.name().call()
+            )
+        )
         balancesBySett[settAddr] = settBalances
 
     return balancesBySett
@@ -62,6 +71,7 @@ def parse_sett_balances(settAddress: str, balances: Dict[str, int], chain: str):
 
 def get_sett_info(settAddress):
     info = SETT_INFO.get(
-        web3.toChecksumAddress(settAddress), {"type": "nonNative", "ratio": 1}
+        env_config.web3.toChecksumAddress(settAddress),
+        {"type": "nonNative", "ratio": 1},
     )
     return info["type"], info["ratio"]

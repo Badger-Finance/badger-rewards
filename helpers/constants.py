@@ -1,4 +1,4 @@
-from brownie import *
+from web3 import Web3
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -14,36 +14,36 @@ class RoleRegistry:
         self.roles = {}
 
     def add_role(self, name):
-        encoded = web3.keccak(text=name).hex()
+        encoded = Web3.keccak(text=name).hex()
         self.roles[name] = encoded
 
 
 # Approved Contract Roles
-APPROVED_STAKER_ROLE = web3.keccak(text="APPROVED_STAKER_ROLE").hex()
-APPROVED_SETT_ROLE = web3.keccak(text="APPROVED_SETT_ROLE").hex()
-APPROVED_STRATEGY_ROLE = web3.keccak(text="APPROVED_STRATEGY_ROLE").hex()
+APPROVED_STAKER_ROLE = Web3.keccak(text="APPROVED_STAKER_ROLE").hex()
+APPROVED_SETT_ROLE = Web3.keccak(text="APPROVED_SETT_ROLE").hex()
+APPROVED_STRATEGY_ROLE = Web3.keccak(text="APPROVED_STRATEGY_ROLE").hex()
 
-PAUSER_ROLE = web3.keccak(text="PAUSER_ROLE").hex()
-UNPAUSER_ROLE = web3.keccak(text="UNPAUSER_ROLE").hex()
-GUARDIAN_ROLE = web3.keccak(text="GUARDIAN_ROLE").hex()
+PAUSER_ROLE = Web3.keccak(text="PAUSER_ROLE").hex()
+UNPAUSER_ROLE = Web3.keccak(text="UNPAUSER_ROLE").hex()
+GUARDIAN_ROLE = Web3.keccak(text="GUARDIAN_ROLE").hex()
 
 # BadgerTree Roles
-ROOT_UPDATER_ROLE = web3.keccak(text="ROOT_UPDATER_ROLE").hex()
-ROOT_PROPOSER_ROLE = web3.keccak(text="ROOT_PROPOSER_ROLE").hex()
-ROOT_VALIDATOR_ROLE = web3.keccak(text="ROOT_VALIDATOR_ROLE").hex()
+ROOT_UPDATER_ROLE = Web3.keccak(text="ROOT_UPDATER_ROLE").hex()
+ROOT_PROPOSER_ROLE = Web3.keccak(text="ROOT_PROPOSER_ROLE").hex()
+ROOT_VALIDATOR_ROLE = Web3.keccak(text="ROOT_VALIDATOR_ROLE").hex()
 
 # UnlockSchedule Roles
-TOKEN_LOCKER_ROLE = web3.keccak(text="TOKEN_LOCKER_ROLE").hex()
+TOKEN_LOCKER_ROLE = Web3.keccak(text="TOKEN_LOCKER_ROLE").hex()
 
 # Keeper Roles
-KEEPER_ROLE = web3.keccak(text="KEEPER_ROLE").hex()
-EARNER_ROLE = web3.keccak(text="EARNER_ROLE").hex()
+KEEPER_ROLE = Web3.keccak(text="KEEPER_ROLE").hex()
+EARNER_ROLE = Web3.keccak(text="EARNER_ROLE").hex()
 
 # External Harvester Roles
-SWAPPER_ROLE = web3.keccak(text="SWAPPER_ROLE").hex()
-DISTRIBUTOR_ROLE = web3.keccak(text="DISTRIBUTOR_ROLE").hex()
+SWAPPER_ROLE = Web3.keccak(text="SWAPPER_ROLE").hex()
+DISTRIBUTOR_ROLE = Web3.keccak(text="DISTRIBUTOR_ROLE").hex()
 
-APPROVED_ACCOUNT_ROLE = web3.keccak(text="APPROVED_ACCOUNT_ROLE").hex()
+APPROVED_ACCOUNT_ROLE = Web3.keccak(text="APPROVED_ACCOUNT_ROLE").hex()
 
 role_registry = RoleRegistry()
 
@@ -102,7 +102,6 @@ PEAK_ADDRESSES = [
 DIGG_SETTS = ["native.uniDiggWbtc", "native.sushiDiggWbtc", "native.digg"]
 BADGER_SETTS = ["native.badger", "native.uniBadgerWbtc", "native.sushiBadgerWbtc"]
 NATIVE_DIGG_SETTS = ["native.uniDiggWbtc", "native.sushiDiggWbtc"]
-
 
 
 REWARDS_BLACKLIST = {

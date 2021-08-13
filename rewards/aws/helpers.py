@@ -3,6 +3,12 @@ import boto3
 from botocore.exceptions import ClientError
 import json
 
+s3 = boto3.client("s3")
+
+
+def get_bucket(test):
+    return "badger-staging-merkle-proofs" if test else "badger-merkle-proofs"
+
 
 def get_secret(
     secret_name: str, secret_key: str, region_name: str = "us-west-1"
