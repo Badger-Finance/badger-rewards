@@ -1,4 +1,5 @@
 #!/bin/bash
+mkdir ~/.aws
 echo "[default]\nregion=us-west-1\noutput=json" > ~/.aws/config
 echo "[profile sa]\nrole_arn=arn:aws:iam::342684350154:role/boost-bot" > ~/.aws/credentials
 export AWS_PROFILE=sa
