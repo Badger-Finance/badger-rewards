@@ -7,7 +7,10 @@ eth-abi==2.1.1
 eth-brownie==1.14.6
 eth-utils==1.10.0
 gql==3.0.0a5
+py-solc-ast==1.2.8
+py-solc-x==1.1.0
 python-decouple==3.3
 requests==2.25.1
 rich==9.3.0
 tabulate==0.8.7
+vyper==0.2.12

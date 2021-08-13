@@ -1,0 +1,24 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: boost-bot
+  labels:
+    app: boost-bot
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: boost-bot
+          containers:
+          - name: boost-bot
+            image: IMAGE_NAME
+            imagePullPolicy: IfNotPresent
+            command: ['./start.sh']
+            env:
+              - name: LOG_LEVEL
+                value: 'info'
+              - name: TEST
+                value: 'True'
+          restartPolicy: OnFailure

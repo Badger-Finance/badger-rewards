@@ -1,10 +1,12 @@
-from rewards.aws.helpers import s3, get_bucket
+import boto3
+from config.env_config import env_config
 from rich.console import Console
 import json
 from typing import Dict
 
 console = Console()
 
+s3 = boto3.client("s3")
 
 def download_latest_tree(test: bool, chain: str):
     """
@@ -13,8 +15,8 @@ def download_latest_tree(test: bool, chain: str):
     """
 
     target = {
-        "bucket": get_bucket(),
-        "key": "badger-tree.json",
+        "bucket": env_config.bucket,
+        "key": "badger-tree.json"
     }  # badger-api production
 
     console.print("Downloading latest rewards file from s3: " + target["bucket"])
@@ -46,7 +48,7 @@ def download_past_trees(test: bool, number: int):
     """
     trees = []
     key = "badger-tree.json"
-    bucket = get_bucket(test)
+    bucket = env_config.bucket
     response = s3.list_object_versions(Prefix=key, Bucket=bucket)
     versions = response["Versions"][:number]
     for version in versions:
