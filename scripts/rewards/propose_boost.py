@@ -11,7 +11,7 @@ def main():
     currentBlock = chain.height
     send_message_to_discord(
         "**CALCULATING NEW BOOST**",
-        "Pulling data from the graph (swole testing)",
+        "Pulling data from the graph (with bsc)",
         [],
         "keepers/boostBot",
     )
