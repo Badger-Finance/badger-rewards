@@ -13,4 +13,4 @@ python-decouple==3.3
 requests==2.25.1
 rich==9.3.0
 tabulate==0.8.7
-vyper==0.2.12
+vyper==0.2.11
