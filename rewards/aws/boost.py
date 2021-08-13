@@ -20,10 +20,10 @@ def upload_boosts(boostData):
     s3.put_object(Body=str(json.dumps(boostData)), Bucket=bucket, Key=boostsFileName)
     console.log("✅ Uploaded file to s3://{}/{}".format(bucket, boostsFileName))
     send_message_to_discord(
-        '**BADGER BOOST UPDATED**', 
-        f'✅ Uploaded file to s3://{bucket}/{boostsFileName}', 
-        [{'name': 'User Count', 'value': len(boostData["userData"]), 'inline': True}], 
-        'keepers/boostBot'
+        "**BADGER BOOST UPDATED**",
+        f"✅ Uploaded file to s3://{bucket}/{boostsFileName}",
+        [{"name": "User Count", "value": len(boostData["userData"]), "inline": True}],
+        "keepers/boostBot",
     )
 
 
@@ -45,27 +45,23 @@ def add_user_data(userData):
     :param userData: user boost data
     """
     oldBoosts = download_boosts()
-    boosts = {
-        "userData":{},
-        "multiplierData": oldBoosts["multiplierData"]
-    }
+    boosts = {"userData": {}, "multiplierData": oldBoosts["multiplierData"]}
     for user, data in userData.items():
         if user in oldBoosts["userData"]:
             multipliers = oldBoosts["userData"][user]["multipliers"]
         else:
             multipliers = {}
-        
-        boosts["userData"][user] = {
-                "boost": data["boost"],
-                "nativeBalance": data["nativeBalance"],
-                "nonNativeBalance": data["nonNativeBalance"],
-                "stakeRatio": data["stakeRatio"],
-                "multipliers": multipliers
-            }
 
-        
+        boosts["userData"][user] = {
+            "boost": data["boost"],
+            "nativeBalance": data["nativeBalance"],
+            "nonNativeBalance": data["nonNativeBalance"],
+            "stakeRatio": data["stakeRatio"],
+            "multipliers": multipliers,
+        }
+
     with open("badger-boosts.json", "w") as fp:
-        json.dump(boosts, fp,indent=4)
+        json.dump(boosts, fp, indent=4)
 
     upload_boosts(boosts)
 

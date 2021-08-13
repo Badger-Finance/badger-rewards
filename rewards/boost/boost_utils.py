@@ -70,7 +70,7 @@ def calc_boost_data(block: int):
                 native = native + Counter(balances)
             elif settType == "nonNative":
                 nonNative = nonNative + Counter(balances)
-    
+
     native = filter_dust(dict(native), 1)
     nonNative = filter_dust(dict(nonNative), 1)
     return native, nonNative

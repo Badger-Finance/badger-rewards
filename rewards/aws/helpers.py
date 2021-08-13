@@ -3,9 +3,7 @@ import boto3
 from botocore.exceptions import ClientError
 import json
 
-s3 = boto3.client(
-    "s3"
-)
+s3 = boto3.client("s3")
 
 
 def get_bucket(test):
