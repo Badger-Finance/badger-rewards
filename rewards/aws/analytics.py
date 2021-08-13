@@ -1,10 +1,10 @@
-from rewards.aws.helpers import s3
+import boto3
 from rich.console import Console
 import json
 
 console = Console()
 
-
+s3 = boto3.client("s3")
 analyticsBucket = "badger-analytics"
 
 
