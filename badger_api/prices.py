@@ -16,5 +16,12 @@ def fetch_token_prices():
     """
     Fetch token prices for lp tokens
     """
-    response = requests.get("{}/prices".format(urls["staging"])).json()
-    return response
+    chains = ["eth", "bsc"]
+    prices = {}
+    for chain in chains:
+        chain_prices = requests.get(
+            "{}/prices?chain={}".format(urls["staging"], chain)
+        ).json()
+        prices = {**prices, **chain_prices}
+
+    return prices

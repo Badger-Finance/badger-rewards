@@ -11,9 +11,14 @@ def subgraph_url(name):
         )
     elif name in subgraph_urls:
         return subgraph_urls[name]
+    else:
+        return ""
 
 
 def make_gql_client(name):
     url = subgraph_url(name)
-    transport = AIOHTTPTransport(url=url)
-    return Client(transport=transport, fetch_schema_from_transport=True)
+    if not url:
+        return None
+    else:
+        transport = AIOHTTPTransport(url=url)
+        return Client(transport=transport, fetch_schema_from_transport=True)

@@ -1,10 +1,12 @@
+from toolz.itertoolz import cons
 from rewards.snapshot.token_snapshot import token_snapshot_usd
+from rewards.boost.convert_blocks import convert_from_eth
 from rich.console import Console
 from rewards.classes.UserBalance import UserBalances
 from brownie import *
 from typing import Dict
 from collections import Counter
-from rewards.snapshot.utils import chain_snapshot
+from rewards.snapshot.chain_snapshot import chain_snapshot
 from badger_api.prices import (
     fetch_token_prices,
 )
@@ -52,17 +54,18 @@ def calc_boost_data(block: int):
     Calculate boost data required for boost calculation
     :param block: block to collect the boost data from
     """
-    chains = ["eth"]
+    chains = ["bsc", "eth"]
+    blocksByChain = convert_from_eth(block)
     ## Figure out how to map blocks, maybe  time -> block per chain
 
     native = Counter()
     nonNative = Counter()
-
     for chain in chains:
-        snapshot = chain_snapshot(chain, block)
+        chainBlock = blocksByChain[chain]
+        console.log("Taking chain snapshot on {} \n".format(chain))
+        snapshot = chain_snapshot(chain, chainBlock)
         console.log("Taking token snapshot on {}".format(chain))
-        tokens = token_snapshot_usd(chain, block)
-        console.log("Converting balances to USD")
+        tokens = token_snapshot_usd(chain, chainBlock)
         native = native + Counter(tokens)
         for sett, balances in snapshot.items():
             balances, settType = convert_balances_to_usd(balances, sett)
@@ -70,7 +73,7 @@ def calc_boost_data(block: int):
                 native = native + Counter(balances)
             elif settType == "nonNative":
                 nonNative = nonNative + Counter(balances)
-    
+
     native = filter_dust(dict(native), 1)
     nonNative = filter_dust(dict(nonNative), 1)
     return native, nonNative

@@ -1,7 +1,7 @@
 from brownie import *
 from rich.console import Console
 from rewards.classes.UserBalance import UserBalances
-from helpers.constants import (ROOT_PROPOSER_ROLE, ROOT_VALIDATOR_ROLE)
+from helpers.constants import ROOT_PROPOSER_ROLE, ROOT_VALIDATOR_ROLE
 
 
 console = Console()

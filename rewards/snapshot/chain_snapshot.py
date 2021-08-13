@@ -9,6 +9,8 @@ from brownie import web3, interface
 
 console = Console()
 
+skip = ["0xb6bd5ae3d5f78a6bb04bbb031e24fa9c2bbd090d"]
+
 
 @lru_cache(maxsize=128)
 def chain_snapshot(chain: str, block: int):
@@ -20,24 +22,26 @@ def chain_snapshot(chain: str, block: int):
     :param block: block at which to query
 
     """
-    chainBalances = fetch_chain_balances(chain, block - 50)
+    chainBalances = fetch_chain_balances(chain, block)
     balancesBySett = {}
 
     for settAddr, balances in list(chainBalances.items()):
-        settBalances = parse_sett_balances(settAddr, balances, chain)
-        token = interface.IERC20(settAddr)
-        console.log("Fetched {} balances for sett {}".format(len(balances), token.name()))
+        settBalances = parse_sett_balances(settAddr, balances)
+        # token = interface.IERC20(settAddr)
+        console.log("Fetched {} balances for sett {}".format(len(balances), settAddr))
+        if settAddr.lower() in skip:
+            continue
         balancesBySett[settAddr] = settBalances
 
     return balancesBySett
 
 
 @lru_cache(maxsize=128)
-def sett_snapshot(badger, chain, block, sett):
-    return chain_snapshot(badger, chain, block)[sett]
+def sett_snapshot(chain, block, sett):
+    return chain_snapshot(chain, block)[sett]
 
 
-def parse_sett_balances(settAddress: str, balances: Dict[str, int], chain: str):
+def parse_sett_balances(settAddress: str, balances: Dict[str, int]):
     """
     Blacklist balances and add metadata for boost
     :param balances: balances of users:

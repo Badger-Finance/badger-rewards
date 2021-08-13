@@ -1,3 +1,4 @@
+from badger_api.prices import fetch_ppfs
 from helpers.discord import send_message_to_discord
 from subgraph.subgraph_utils import make_gql_client
 from brownie import interface
@@ -50,7 +51,6 @@ def fetch_tree_distributions(startBlock, endBlock):
         if len(distData) > 0:
             lastDistId = distData[-1]["id"]
     return [td for td in treeDistributions if int(td["blockNumber"]) > int(startBlock)]
-
 
 
 def fetch_farm_harvest_events():
@@ -118,7 +118,7 @@ def fetch_sushi_harvest_events():
 
 
 @lru_cache(maxsize=None)
-def fetch_token_balances(client,sharesPerFragment, blockNumber):
+def fetch_token_balances(client, sharesPerFragment, blockNumber):
     increment = 1000
     query = gql(
         """
@@ -140,7 +140,6 @@ def fetch_token_balances(client,sharesPerFragment, blockNumber):
 
     badger_balances = {}
     digg_balances = {}
-    ibbtc_balances = {}
     try:
         while continueFetching:
             variables = {
@@ -171,13 +170,19 @@ def fetch_token_balances(client,sharesPerFragment, blockNumber):
                             digg_balances[address] = float(fragmentBalance) / 1e9
     except Exception as e:
         send_message_to_discord(
-            '**BADGER BOOST ERROR**', 
-            f':x: Error in Fetching Token Balance', 
-            [{
-                'name': 'Error Type', 'value': type(e), 'inline': True,
-                'name': 'Error Description', 'value': e.args, 'inline': True
-            }], 
-            'keepers/boostBot',
+            "**BADGER BOOST ERROR**",
+            f":x: Error in Fetching Token Balance",
+            [
+                {
+                    "name": "Error Type",
+                    "value": type(e),
+                    "inline": True,
+                    "name": "Error Description",
+                    "value": e.args,
+                    "inline": True,
+                }
+            ],
+            "keepers/boostBot",
         )
         raise e
 
@@ -219,7 +224,7 @@ def fetch_chain_balances(chain, block):
                 sett = result["sett"]["id"]
                 if sett == "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a".lower():
                     decimals = 18
-                deposit = float(result["netShareDeposit"])/ math.pow(10, decimals)
+                deposit = float(result["netShareDeposit"]) / math.pow(10, decimals)
                 if deposit > 0:
                     if sett not in balances:
                         balances[sett] = {}
@@ -238,13 +243,18 @@ def fetch_chain_balances(chain, block):
         return balances
     except Exception as e:
         send_message_to_discord(
-            '**BADGER BOOST ERROR**', 
-            f':x: Error in Fetching Token Balance', 
-            [{
-                'name': 'Error Type', 'value': type(e), 'inline': True,
-                'name': 'Error Description', 'value': e.args, 'inline': True
-            }], 
-            'keepers/boostBot',
+            "**BADGER BOOST ERROR**",
+            f":x: Error in Fetching Token Balance",
+            [
+                {
+                    "name": "Error Type",
+                    "value": type(e),
+                    "inline": True,
+                    "name": "Error Description",
+                    "value": e.args,
+                    "inline": True,
+                }
+            ],
+            "keepers/boostBot",
         )
         raise e
-
