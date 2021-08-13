@@ -1,5 +1,6 @@
 from rewards.aws.helpers import s3, get_bucket
 from rich.console import Console
+from config.env_config import env_config
 import json
 from typing import Dict
 
@@ -13,7 +14,7 @@ def download_latest_tree(test: bool, chain: str):
     """
 
     target = {
-        "bucket": get_bucket(),
+        "bucket": get_bucket(env_config.test),
         "key": "badger-tree.json"
     }  # badger-api production
 

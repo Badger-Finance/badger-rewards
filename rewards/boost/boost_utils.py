@@ -1,7 +1,7 @@
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rich.console import Console
+from config.env_config import env_config
 from rewards.classes.UserBalance import UserBalances
-import web3
 from typing import Dict
 from collections import Counter
 from rewards.snapshot.utils import chain_snapshot
@@ -38,7 +38,7 @@ def convert_balances_to_usd(balances: UserBalances, sett: str):
     Convert sett balance to usd and multiply by correct ratio
     :param balances: balances to convert to usd
     """
-    price = prices[web3.toChecksumAddress(sett)]
+    price = prices[env_config.web3.toChecksumAddress(sett)]
     priceRatio = balances.settRatio
     usdBalances = {}
     for user in balances:
