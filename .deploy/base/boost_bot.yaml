@@ -5,7 +5,7 @@ metadata:
   labels:
     app: boost-bot
 spec:
-  schedule: "*/10 * * * *"
+  schedule: "0 0 * * *"
   jobTemplate:
     spec:
       template:
