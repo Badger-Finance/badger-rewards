@@ -10,8 +10,7 @@ on:
 env:
   TARGET_ENVIRONMENT: 'dev'
   MANIFEST_RESPOSITORY: 'badger-finance/badger-kube-manifests'
-  IMAGE_NAME: '/badger/${{ github.event.repository.name }}:${{ github.event.pull_request.head.sha }}'
-  INFURA_ID: ${{ secrets.INFURA_ID }}
+  IMAGE_NAME: '/badger/${{ github.event.repository.name }}:${{ github.event.after }}'
 
 jobs:
   build:

@@ -1,6 +1,6 @@
 from rich.console import Console
 from rewards.classes.UserBalance import UserBalances
-import web3
+from web3 import Web3
 
 console = Console()
 
@@ -31,7 +31,7 @@ def get_claimed_for_token(data, token):
 
 
 def keccak(value):
-    return web3.toHex(web3.keccak(text=value))
+    return Web3.toHex(Web3.keccak(text=value))
 
 
 def combine_balances(balances):

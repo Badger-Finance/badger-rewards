@@ -1,16 +1,13 @@
 import base64
 import boto3
 from botocore.exceptions import ClientError
-from config.env_config import env_config
 import json
 
-s3 = boto3.client(
-    "s3"
-)
+s3 = boto3.client("s3")
 
 
-def get_bucket():
-    return "badger-staging-merkle-proofs" if env_config.test else "badger-merkle-proofs"
+def get_bucket(test):
+    return "badger-staging-merkle-proofs" if test else "badger-merkle-proofs"
 
 
 def get_secret(
