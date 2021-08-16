@@ -117,7 +117,7 @@ def fetch_sushi_harvest_events():
 
 @lru_cache(maxsize=None)
 def fetch_token_balances(client, sharesPerFragment, blockNumber):
-    increment = 1000
+    increment = 500
     query = gql(
         """
         query fetchWalletBalance($firstAmount: Int, $lastID: ID,$blockNumber:Block_height) {
@@ -132,7 +132,7 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
     """
     )
 
-    ## Paginate this for more than 1000 balances
+    ## Paginate this for more than 500 balances
     continueFetching = True
     lastID = "0x0000000000000000000000000000000000000000"
 
