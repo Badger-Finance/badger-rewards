@@ -10,6 +10,12 @@ class EnvConfig:
         self.test_webhook_url = get_secret(
             "boost-bot/test-discord-url", "TEST_WEBHOOK_URL"
         )
+        self.test_error_url = get_secret(
+            "boost-bot/test-error-discord-url", "TEST_WEBHOOK_URL"
+        )
+        self.discord_error_url = get_secret(
+            "boost-bot/test-error-discord-url", "TEST_WEBHOOK_URL"
+        )
         self.discord_webhook_url = get_secret(
             "boost-bot/prod-discord-url", "DISCORD_WEBHOOK_URL"
         )
@@ -18,10 +24,14 @@ class EnvConfig:
             Web3.HTTPProvider(get_secret("quiknode/eth-node-url", "NODE_URL"))
         )
 
-    def get_webhook_url(self):
+    def get_webhook_url(self, error):
         if self.test:
+            if error:
+                return self.test_error_url
             return self.test_webhook_url
         else:
+            if error:
+                return self.discord_error_url
             return self.discord_webhook_url
 
 
