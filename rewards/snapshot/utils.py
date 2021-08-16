@@ -1,7 +1,7 @@
 from config.env_config import env_config
 from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
 from rewards.classes.UserBalance import UserBalances, UserBalance
-from subgraph.client import fetch_chain_balances
+from subgraph.client import fetch_chain_balances, fetch_sett_balances
 from functools import lru_cache
 from rich.console import Console
 from typing import Dict
@@ -42,8 +42,9 @@ def chain_snapshot(chain: str, block: int):
 
 
 @lru_cache(maxsize=128)
-def sett_snapshot(badger, chain, block, sett):
-    return chain_snapshot(badger, chain, block)[sett]
+def sett_snapshot(chain, block, sett):
+    sett_balances = fetch_sett_balances(chain, block, sett)
+    return parse_sett_balances(sett, sett_balances)
 
 
 def parse_sett_balances(settAddress: str, balances: Dict[str, int], chain: str):
