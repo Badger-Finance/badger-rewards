@@ -14,9 +14,6 @@ console = Console()
 tokens_client = make_gql_client("tokens")
 harvests_client = make_gql_client("harvests")
 
-maximum_timeout = 35
-base_timeout = 10
-
 @lru_cache(maxsize=None)
 @backoff.on_exception(backoff.expo, asyncio.exceptions.TimeoutError, max_time=35)
 @backoff.on_exception(backoff.expo, asyncio.exceptions.CancelledError, max_time=35)
@@ -117,8 +114,7 @@ def fetch_chain_balances(chain, block):
         """
     )
     lastId = ""
-    attempt = 1
-    variables = {"blockHeight": {"number": block}, "timeout": base_timeout + 2^attempt}
+    variables = {"blockHeight": {"number": block}}
     balances = {}
 
     while True:
