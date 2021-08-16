@@ -14,7 +14,7 @@ class EnvConfig:
             "boost-bot/test-error-discord-url", "TEST_WEBHOOK_URL"
         )
         self.discord_error_url = get_secret(
-            "boost-bot/test-error-discord-url", "DISCORD_WEBHOOK_URL"
+            "boost-bot/prod-error-discord-url", "DISCORD_WEBHOOK_URL"
         )
         self.discord_webhook_url = get_secret(
             "boost-bot/prod-discord-url", "DISCORD_WEBHOOK_URL"
