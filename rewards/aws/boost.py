@@ -27,6 +27,7 @@ def upload_boosts(boostData):
         f"✅ Uploaded file to s3://{bucket}/{boostsFileName}",
         [{"name": "User Count", "value": len(boostData["userData"]), "inline": True}],
         "Boost Bot",
+        False
     )
 
 

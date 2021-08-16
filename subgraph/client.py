@@ -84,6 +84,7 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
                     }
                 ],
                 "Boost Bot",
+                True,
             )
             console.log(type(e))
             raise e
@@ -162,5 +163,6 @@ def fetch_chain_balances(chain, block):
                     }
                 ],
                 "Boost Bot",
+                True,
             )
             raise e
