@@ -141,8 +141,9 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
 
     badger_balances = {}
     digg_balances = {}
-    while continueFetching:
-        try:
+    try:
+
+        while continueFetching:
             variables = {
                 "firstAmount": increment,
                 "lastID": lastID,
@@ -169,27 +170,27 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
                             else:
                                 fragmentBalance = sharesPerFragment / amount
                             digg_balances[address] = float(fragmentBalance) / 1e9
-        except (asyncio.exceptions.TimeoutError, asyncio.exceptions.CancelledError):
+    except (asyncio.exceptions.TimeoutError, asyncio.exceptions.CancelledError):
             pass
-        except Exception as e:
-            send_message_to_discord(
-                "**BADGER BOOST ERROR**",
-                f":x: Error in Fetching Token Balance",
-                [
-                    {
-                        "name": "Error Type",
-                        "value": type(e),
-                        "inline": True,
-                        "name": "Error Description",
-                        "value": e.args,
-                        "inline": True,
-                    }
-                ],
-                "Boost Bot",
-                True,
-            )
-            console.log(type(e))
-            raise e
+    except Exception as e:
+        send_message_to_discord(
+            "**BADGER BOOST ERROR**",
+            f":x: Error in Fetching Token Balance",
+            [
+                {
+                    "name": "Error Type",
+                    "value": type(e),
+                    "inline": True,
+                    "name": "Error Description",
+                    "value": e.args,
+                    "inline": True,
+                }
+            ],
+            "Boost Bot",
+            True,
+        )
+        console.log(type(e))
+        raise e
 
     return badger_balances, digg_balances
 
