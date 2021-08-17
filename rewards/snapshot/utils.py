@@ -1,5 +1,6 @@
 from config.env_config import env_config
 from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
+from helpers.web3_utils import make_contract
 from rewards.classes.UserBalance import UserBalances, UserBalance
 from subgraph.client import fetch_chain_balances, fetch_sett_balances
 from functools import lru_cache
@@ -23,14 +24,9 @@ def chain_snapshot(chain: str, block: int):
     chainBalances = fetch_chain_balances(chain, block - 50)
     balancesBySett = {}
 
-    with open("abis/eth/ERC20.json") as f:
-        ERC20_ABI = json.load(f)
-
     for settAddr, balances in list(chainBalances.items()):
         settBalances = parse_sett_balances(settAddr, balances, chain)
-        token = env_config.web3.eth.contract(
-            address=env_config.web3.toChecksumAddress(settAddr), abi=ERC20_ABI
-        )
+        token = make_contract(settAddr, abiName="ERC20", chain=chain)
         console.log(
             "Fetched {} balances for sett {}".format(
                 len(balances), token.functions.name().call()
@@ -43,11 +39,17 @@ def chain_snapshot(chain: str, block: int):
 
 @lru_cache(maxsize=128)
 def sett_snapshot(chain, block, sett):
+    token = make_contract(sett, abiName="ERC20", chain=chain)
+    console.log(
+        "Taking snapshot on {} of {} at {}".format(
+            chain, sett, token.functions.name().call()
+        )
+    )
     sett_balances = fetch_sett_balances(chain, block, sett)
     return parse_sett_balances(sett, sett_balances)
 
 
-def parse_sett_balances(settAddress: str, balances: Dict[str, int], chain: str):
+def parse_sett_balances(settAddress: str, balances: Dict[str, int]):
     """
     Blacklist balances and add metadata for boost
     :param balances: balances of users:
@@ -72,7 +74,7 @@ def parse_sett_balances(settAddress: str, balances: Dict[str, int], chain: str):
 
 def get_sett_info(settAddress):
     info = SETT_INFO.get(
-        env_config.web3.toChecksumAddress(settAddress),
+        env_config.get_web3().toChecksumAddress(settAddress),
         {"type": "nonNative", "ratio": 1},
     )
     return info["type"], info["ratio"]

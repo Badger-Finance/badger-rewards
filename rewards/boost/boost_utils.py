@@ -38,7 +38,7 @@ def convert_balances_to_usd(balances: UserBalances, sett: str):
     Convert sett balance to usd and multiply by correct ratio
     :param balances: balances to convert to usd
     """
-    price = prices[env_config.web3.toChecksumAddress(sett)]
+    price = prices[env_config.get_web3().toChecksumAddress(sett)]
     priceRatio = balances.settRatio
     usdBalances = {}
     for user in balances:

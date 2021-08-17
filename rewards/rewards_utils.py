@@ -1,5 +1,6 @@
 from rich.console import Console
 from rewards.classes.UserBalance import UserBalances
+from rewards.classes.RewardsList import RewardsList
 from web3 import Web3
 
 console = Console()
@@ -39,3 +40,12 @@ def combine_balances(balances):
     for userBalances in balances:
         allBalances = allBalances + userBalances
     return allBalances
+
+
+def combine_rewards(rewardsList, cycle):
+    combinedRewards = RewardsList(cycle)
+    for rewards in rewardsList:
+        for user, claims in rewards.claims.items():
+            for token, claim in claims.items():
+                combinedRewards.increase_user_rewards(user, token, claim)
+    return combinedRewards

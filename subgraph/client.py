@@ -210,6 +210,22 @@ def balances_query():
     )
 
 
+def list_setts(chain):
+    client = make_gql_client(chain)
+    query = gql(
+        """
+    {
+	    setts(first:100) {
+            id
+            name
+        }
+    }
+    """
+    )
+    results = client.execute(query)
+    return list(map(lambda s: s["id"], results["setts"]))
+
+
 def fetch_chain_balances(chain, block):
     client = make_gql_client(chain)
     query = balances_query()
@@ -267,13 +283,24 @@ def send_error_to_discord(e, errorMsg):
     )
 
 
+def fetch_setts(chain):
+    query = gql(
+        """
+            query = gql(
+        """
+        """
+    )
+        """
+    )
+
+
 def fetch_sett_balances(chain, block, sett):
     client = make_gql_client(chain)
     query = balances_query()
     lastId = ""
     variables = {
         "blockHeight": {"number": block},
-        "lastId": {"id_gt": "", "sett": sett},
+        "lastId": {"id_gt": "", "sett": sett.lower()},
     }
     balances = {}
     try:
