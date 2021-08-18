@@ -54,12 +54,10 @@ def fetch_setts(chain: str):
     return [env_config.get_web3().toChecksumAddress(s) for s in filteredSetts]
 
 
-def fetch_current_tree(chain: str):
-    pass
 
 
 def process_cumulative_rewards(current, new: RewardsList):
-    result = RewardsList(new.cycle, new.badgerTree)
+    result = RewardsList(new.cycle)
 
     # Add new rewards
     for user, claims in new.claims.items():
@@ -85,13 +83,15 @@ def generate_rewards_in_range(chain: str, start: int, end: int):
 
     treeManager = TreeManager(chain, start, end)
 
-    rewardsManager = RewardsManager(chain, treeManager.cycle, start, end)
-    settRewards = rewardsManager.calculate_all_sett_rewards(setts, allSchedules, boosts)
-    pastRewards = treeManager.fetch_past_rewards()
+    rewardsManager = RewardsManager(chain, treeManager.nextCycle, start, end)
+    console.log("Calculating Sett Rewards")
+    settRewards = rewardsManager.calculate_all_sett_rewards(setts, allSchedules, boosts["userData"])
+    pastRewards = treeManager.fetch_current_tree()
 
     treeRewards = rewardsManager.calculate_tree_distributions()
-    newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle + 1)
+    newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle)
     cumulativeRewards = process_cumulative_rewards(pastRewards, newRewards)
+    
     merkleTree = treeManager.convert_to_merkle_tree(cumulativeRewards)
     verify_rewards(pastRewards, merkleTree)
     return merkleTree

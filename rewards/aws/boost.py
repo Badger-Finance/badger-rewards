@@ -40,9 +40,11 @@ def download_boosts():
 
     :param test:
     """
+    console.log("Downloading boosts ...")
     bucket = get_bucket(env_config.test)
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boostsFileName)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
+    console.log("Fetched {} boosts".format(len(data["userData"])))
     return data
 
 

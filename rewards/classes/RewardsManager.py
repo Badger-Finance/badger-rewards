@@ -1,3 +1,4 @@
+from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
 from rewards.classes.Schedule import Schedule
 from rewards.snapshot.utils import chain_snapshot, sett_snapshot
@@ -31,7 +32,7 @@ class RewardsManager:
     def calculate_sett_rewards(self, sett, schedulesByToken, boosts):
         startTime = self.web3.eth.getBlock(self.start)["timestamp"]
         endTime = self.web3.eth.getBlock(self.end)["timestamp"]
-        rewards = RewardsList(self.cycle + 1)
+        rewards = RewardsList(self.cycle)
         settBalances = self.fetch_sett_snapshot(self.end, sett)
         boostedSettBalances = self.boost_sett(boosts, sett, settBalances)
 
@@ -56,6 +57,10 @@ class RewardsManager:
     def calculate_all_sett_rewards(self, setts: List[str], allSchedules, boosts):
         allRewards = []
         for sett in setts:
+            token = make_contract(sett, "ERC20",self.chain)
+            console.log("Calculating rewards for {}".format(
+                token.functions.name().call()
+            ))
             allRewards.append(
                 self.calculate_sett_rewards(sett, allSchedules[sett], boosts)
             )
@@ -109,7 +114,7 @@ class RewardsManager:
                 preBoost[user.address] = snapshot.percentage_of_total(user.address)
 
             for user in snapshot:
-                boostInfo = boosts.get(user.address)
+                boostInfo = boosts.get(user.address,{})
                 boost = boostInfo.get("boost", 1)
                 user.boost_balance(boost)
 
@@ -123,6 +128,10 @@ class RewardsManager:
 
     def calculate_tree_distributions(self):
         treeDistributions = fetch_tree_distributions(self.start, self.end)
+        console.log("Fetched {} tree distributions between {} and {}".format(
+            self.start,
+            self.end
+        ))
         rewards = RewardsList(self.cycle + 1)
         for dist in treeDistributions:
             block = dist["blockNumber"]
@@ -141,5 +150,5 @@ class RewardsManager:
                 )
         return rewards
 
-    def calc_sushi_distributions(self, start, end):
+    def calc_sushi_distributions(self):
         pass

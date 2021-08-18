@@ -45,7 +45,7 @@ def sett_snapshot(chain, block, sett):
             chain, sett, token.functions.name().call()
         )
     )
-    sett_balances = fetch_sett_balances(chain, block, sett)
+    sett_balances = fetch_sett_balances(chain, block - 50, sett)
     return parse_sett_balances(sett, sett_balances)
 
 

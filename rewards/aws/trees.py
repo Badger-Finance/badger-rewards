@@ -1,7 +1,7 @@
 import boto3
 from config.env_config import env_config
 from rich.console import Console
-from config.env_config import env_config
+from rewards.aws.helpers import get_bucket
 import json
 from typing import Dict
 
