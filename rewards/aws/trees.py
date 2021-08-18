@@ -101,7 +101,10 @@ def upload_tree(
             "Uploading file to s3://" + target["bucket"] + "/" + target["key"]
         )
         s3.put_object(
-            Body=str(json.dumps(data)), Bucket=target["bucket"], Key=target["key"], ACL="bucket-owner-full-control"
+            Body=str(json.dumps(data)),
+            Bucket=target["bucket"],
+            Key=target["key"],
+            ACL="bucket-owner-full-control",
         )
         console.print(
             "✅ Uploaded file to s3://" + target["bucket"] + "/" + target["key"]

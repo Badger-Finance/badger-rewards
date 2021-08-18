@@ -10,4 +10,5 @@ subgraph_urls = {
     "eth": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao",
     "polygon": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-polygon",
     "xdai": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-xdai",
+    "fuse": "https://api.thegraph.com/subgraphs/name/platocrat/fuse-subgraph",
 }

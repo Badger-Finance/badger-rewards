@@ -6,6 +6,8 @@ from gql.transport.aiohttp import AIOHTTPTransport
 from decimal import *
 import math
 from functools import lru_cache
+from config.env_config import env_config
+import json
 
 getcontext().prec = 20
 console = Console()
@@ -120,7 +122,7 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
     increment = 1000
     query = gql(
         """
-        query fetchWalletBalance($firstAmount: Int, $lastID: ID,$blockNumber:Block_height) {
+        query fetchWalletBalance($firstAmount: Int, $lastID: ID, $blockNumber:Block_height) {
             tokenBalances(first: $firstAmount, where: { id_gt: $lastID  },block: $blockNumber) {
                 id
                 balance
@@ -210,7 +212,7 @@ def fetch_chain_balances(chain, block):
         """
     )
     lastId = ""
-    variables = {"blockHeight": {"number": block}}
+    variables = {"blockHeight": {"number": block - 50}}
     balances = {}
     try:
         while True:
@@ -240,6 +242,117 @@ def fetch_chain_balances(chain, block):
                 lastId = balanceData[-1]["id"]
         console.log("Fetched {} total sett balances".format(len(balances)))
         return balances
+    except Exception as e:
+        send_message_to_discord(
+            "**BADGER BOOST ERROR**",
+            f":x: Error in Fetching Token Balance",
+            [
+                {
+                    "name": "Error Type",
+                    "value": type(e),
+                    "inline": True,
+                    "name": "Error Description",
+                    "value": e.args,
+                    "inline": True,
+                }
+            ],
+            "Boost Bot",
+        )
+        raise e
+
+
+def fetch_fuse_pool_balances(client, chain, block):
+    if chain is not "eth":
+        console.log("Fuse pools are only active on ETH")
+        return None
+
+    ctoken_data = {
+        "fBDIGG-22": {
+            "underlying_contract": "0x7e7e112a68d8d2e221e11047a72ffc1065c38e1a",
+            "symbol": "fBDIGG-22",
+            "contract": "0x4b789c1a3124e9c7945e24d20a5034a85ffb7535",
+        },
+        "fBBADGER-22": {
+            "underlying_contract": "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28",
+            "symbol": "fBBADGER-22",
+            "contract": "0x8c2ab59d5a0cff6b1d00ef7dd70d85db88483671",
+        },
+    }
+
+    with open("abis/eth/CErc20Delegator.json") as f:
+        DELEGATOR_ABI = json.load(f)
+    with open("abis/eth/ERC20.json") as j:
+        ERC20_ABI = json.load(j)
+
+    for symbol, data in ctoken_data:
+        ftoken_contract = env_config.web3.eth.contract(
+            address=env_config.web3.toChecksumAddress(data["contract"]),
+            abi=DELEGATOR_ABI,
+        )
+        underlying_contract = env_config.web3.eth.contract(
+            address=env_config.web3.toChecksumAddress(data["underlying_contract"]),
+            abi=ERC20_ABI,
+        )
+        ctoken_data[symbol]["decimals"] = int(
+            ftoken_contract.functions.decimals().call()
+        )
+        underlying_decimals = int(underlying_contract.functions.decimals().call())
+        mantissa = 18 + underlying_decimals - ctoken_data[symbol]["decimals"]
+        ctoken_data[symbol]["exchange_rate"] = float(
+            ftoken_contract.functions.exchangeRateStored().call()
+        ) / math.pow(10, mantissa)
+
+    query = gql(
+        f"""
+        query fetch_fuse_pool_balances($skip_amount: Int, $block_number: Block_height) {{
+            accountCTokens(block: $block_number, skip: $skip_amount, first: 1000, where: {{ symbol_in:{list(ctoken_data.keys())} }}) {{
+                symbol
+                account{{
+                    id
+                }}
+                cTokenBalance
+            }}
+        }}
+        """
+    )
+
+    skip = 0
+    balances = {}
+
+    variables = {"block_number": {"number": block - 50}, "skip_amount": skip}
+
+    try:
+        while True:
+            variables["skip_amount"] = skip
+            results = client.execute(query, variable_values=variables)
+            for result in results:
+                symbol = result["symbol"]
+                ctoken_balance = float(result["cTokenBalance"])
+                balance = ctoken_balance * ctoken_data[symbol]["exchange_rate"]
+                account = result["account"]["id"].lower()
+
+                if balance <= 0:
+                    continue
+
+                sett = ctoken_data[symbol]["underlying_contract"]
+
+                if sett not in balances:
+                    balances[sett] = {}
+
+                    if account not in balances[sett]:
+                        balances[sett][account] = balance
+                    else:
+                        balances[sett][account] += balance
+
+            if len(results) == 0:
+                break
+            else:
+                console.log("Fetching {} fuse balances".format(len(results)))
+                skip += 1000
+
+        console.log("Fetched {} total fuse balances".format(len(balances)))
+        return balances
+
     except Exception as e:
         send_message_to_discord(
             "**BADGER BOOST ERROR**",
