@@ -85,10 +85,12 @@ def generate_rewards_in_range(chain: str, start: int, end: int):
 
     rewardsManager = RewardsManager(chain, treeManager.nextCycle, start, end)
     console.log("Calculating Sett Rewards")
+    
+    treeRewards = rewardsManager.calculate_tree_distributions()
     settRewards = rewardsManager.calculate_all_sett_rewards(setts, allSchedules, boosts["userData"])
+    
     pastRewards = treeManager.fetch_current_tree()
 
-    treeRewards = rewardsManager.calculate_tree_distributions()
     newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle)
     cumulativeRewards = process_cumulative_rewards(pastRewards, newRewards)
     

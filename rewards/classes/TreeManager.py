@@ -57,15 +57,15 @@ class TreeManager:
         return {
             "root": self.badgerTree.functions.merkleRoot().call(),
             "contentHash": self.badgerTree.functions.merkleContentHash().call(),
-            "lastUpdateTime": self.badgerTree.functions.lastPublishTimestamp.call(),
-            "blockNumber": int(self.badgerTree.functions.lastPublishBlockNumber.call())
+            "lastUpdateTime": self.badgerTree.functions.lastPublishTimestamp().call(),
+            "blockNumber": int(self.badgerTree.functions.lastPublishBlockNumber().call())
         }
     
     def fetch_pending_merkle_data(self):
          return {
             "root": self.badgerTree.functions.pendingMerkleRoot().call(),
             "contentHash": self.badgerTree.functions.pendingMerkleContentHash().call(),
-            "lastUpdateTime": self.badgerTree.functions.lastProposeTimestamp.call(),
-            "blockNumber": int(self.badgerTree.functions.lastProposeBlockNumber.call())
+            "lastUpdateTime": self.badgerTree.functions.lastProposeTimestamp().call(),
+            "blockNumber": int(self.badgerTree.functions.lastProposeBlockNumber().call())
         }
          
