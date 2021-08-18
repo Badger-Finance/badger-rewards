@@ -15,7 +15,7 @@ class EnvConfig:
         self.test = True
         polygon = Web3(Web3.HTTPProvider(config("POLYGON_NODE_URL")))
         polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
-        
+
         self.web3 = {
             "eth": Web3(Web3.HTTPProvider(config("ETH_NODE_URL"))),
             "bsc": Web3(Web3.HTTPProvider(config("BSC_NODE_URL"))),

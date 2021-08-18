@@ -57,10 +57,10 @@ class RewardsManager:
     def calculate_all_sett_rewards(self, setts: List[str], allSchedules, boosts):
         allRewards = []
         for sett in setts:
-            token = make_contract(sett, "ERC20",self.chain)
-            console.log("Calculating rewards for {}".format(
-                token.functions.name().call()
-            ))
+            token = make_contract(sett, "ERC20", self.chain)
+            console.log(
+                "Calculating rewards for {}".format(token.functions.name().call())
+            )
             allRewards.append(
                 self.calculate_sett_rewards(sett, allSchedules[sett], boosts)
             )
@@ -114,7 +114,7 @@ class RewardsManager:
                 preBoost[user.address] = snapshot.percentage_of_total(user.address)
 
             for user in snapshot:
-                boostInfo = boosts.get(user.address,{})
+                boostInfo = boosts.get(user.address, {})
                 boost = boostInfo.get("boost", 1)
                 user.boost_balance(boost)
 
@@ -128,10 +128,11 @@ class RewardsManager:
 
     def calculate_tree_distributions(self):
         treeDistributions = fetch_tree_distributions(self.start, self.end)
-        console.log("Fetched {} tree distributions between {} and {}".format(
-            self.start,
-            self.end
-        ))
+        console.log(
+            "Fetched {} tree distributions between {} and {}".format(
+                self.start, self.end
+            )
+        )
         rewards = RewardsList(self.cycle + 1)
         for dist in treeDistributions:
             block = dist["blockNumber"]

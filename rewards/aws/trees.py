@@ -19,7 +19,6 @@ def download_latest_tree(chain: str):
         key = "badger-tree.json"
     else:
         key = "badger-tree-{}.json".format(chain)
-        
 
     target = {
         "bucket": get_bucket(env_config.test),
@@ -41,7 +40,7 @@ def download_tree(fileName: str, chain: str):
         tree_bucket = "badger-json"
     else:
         tree_bucket = "badger-json-{}".format(chain)
-        
+
     tree_file_key = "rewards/" + fileName
 
     console.print("Downloading file from s3: " + tree_file_key)
@@ -73,7 +72,11 @@ def download_past_trees(test: bool, number: int):
 
 
 def upload_tree(
-    fileName: str, data: Dict, chain: str, bucket: str = "badger-json", publish: bool = True
+    fileName: str,
+    data: Dict,
+    chain: str,
+    bucket: str = "badger-json",
+    publish: bool = True,
 ):
     """
     Upload the badger tree to multiple buckets
@@ -85,7 +88,7 @@ def upload_tree(
             bucket = "badger-json"
         else:
             bucket = "badger-json-{}".format(chain)
-            
+
         upload_targets = [
             {
                 "bucket": bucket,
@@ -100,7 +103,7 @@ def upload_tree(
             key = "badger-tree.json"
         else:
             key = "badger-tree-{}.json".format(chain)
-            
+
         upload_targets.append(
             {
                 "bucket": "badger-staging-merkle-proofs",

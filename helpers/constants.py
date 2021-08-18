@@ -95,7 +95,7 @@ TOKENS_TO_CHECK = {
 
 BADGER_TREE = {
     "eth": "0x660802Fc641b154aBA66a62137e71f331B6d787A",
-    "polygon" :"0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b"
+    "polygon": "0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b",
 }
 
 PEAK_ADDRESSES = [
@@ -104,8 +104,7 @@ PEAK_ADDRESSES = [
 ]
 
 DIGG_SETTS = ["native.uniDiggWbtc", "native.sushiDiggWbtc", "native.digg"]
-BADGER_SETTS = ["native.badger",
-                "native.uniBadgerWbtc", "native.sushiBadgerWbtc"]
+BADGER_SETTS = ["native.badger", "native.uniBadgerWbtc", "native.sushiBadgerWbtc"]
 NATIVE_DIGG_SETTS = ["native.uniDiggWbtc", "native.sushiDiggWbtc"]
 
 

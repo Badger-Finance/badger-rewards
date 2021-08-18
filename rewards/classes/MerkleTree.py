@@ -15,6 +15,7 @@ Convert merkle_tree
 
 web3 = env_config.get_web3()
 
+
 class MerkleTree:
     def __init__(self, elements):
         self.elements = sorted(set(web3.keccak(hexstr=el) for el in elements))
@@ -60,7 +61,7 @@ class MerkleTree:
         return web3.keccak(b"".join(sorted([a, b])))
 
 
-def rewards_to_merkle_tree(rewards: RewardsList, startBlock, endBlock ):
+def rewards_to_merkle_tree(rewards: RewardsList, startBlock, endBlock):
     (nodes, encodedNodes, entries) = rewards.to_merkle_format()
 
     # For each user, encode their data into a node
