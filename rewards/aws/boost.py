@@ -20,7 +20,12 @@ def upload_boosts(boostData):
     """
     bucket = get_bucket(env_config.test)
     console.log("Uploading file to s3://{}/{}".format(bucket, boostsFileName))
-    s3.put_object(Body=str(json.dumps(boostData)), Bucket=bucket, Key=boostsFileName, ACL="bucket-owner-full-control")
+    s3.put_object(
+        Body=str(json.dumps(boostData)),
+        Bucket=bucket,
+        Key=boostsFileName,
+        ACL="bucket-owner-full-control",
+    )
     console.log("✅ Uploaded file to s3://{}/{}".format(bucket, boostsFileName))
     send_message_to_discord(
         "**BADGER BOOST UPDATED**",
