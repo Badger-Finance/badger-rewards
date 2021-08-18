@@ -10,15 +10,20 @@ console = Console()
 s3 = boto3.client("s3")
 
 
-def download_latest_tree(test: bool, chain: str):
+def download_latest_tree(chain: str):
     """
     Download the latest merkle tree that was uploaded for a chain
     :param chain: the chain from which to fetch the latest tree from
     """
+    if chain == "eth":
+        key = "badger-tree.json"
+    else:
+        key = "badger-tree-{}.json".format(chain)
+        
 
     target = {
         "bucket": get_bucket(env_config.test),
-        "key": "badger-tree.json",
+        "key": key,
     }  # badger-api production
 
     console.print("Downloading latest rewards file from s3: " + target["bucket"])
@@ -27,17 +32,21 @@ def download_latest_tree(test: bool, chain: str):
     return json.loads(s3_clientdata)
 
 
-def download_tree(fileName: str):
+def download_tree(fileName: str, chain: str):
     """
     Download a specific tree based on the merkle root of that tree
     :param fileName: fileName of tree to download
     """
-    upload_bucket = "badger-json"
-    upload_file_key = "rewards/" + fileName
+    if chain == "eth":
+        tree_bucket = "badger-json"
+    else:
+        tree_bucket = "badger-json-{}".format(chain)
+        
+    tree_file_key = "rewards/" + fileName
 
-    console.print("Downloading file from s3: " + upload_file_key)
+    console.print("Downloading file from s3: " + tree_file_key)
 
-    s3_clientobj = s3.get_object(Bucket=upload_bucket, Key=upload_file_key)
+    s3_clientobj = s3.get_object(Bucket=tree_bucket, Key=tree_file_key)
     s3_clientdata = s3_clientobj["Body"].read().decode("utf-8")
 
     return s3_clientdata
@@ -64,7 +73,7 @@ def download_past_trees(test: bool, number: int):
 
 
 def upload_tree(
-    fileName: str, data: Dict, bucket: str = "badger-json", publish: bool = True
+    fileName: str, data: Dict, chain: str, bucket: str = "badger-json", publish: bool = True
 ):
     """
     Upload the badger tree to multiple buckets
@@ -72,9 +81,14 @@ def upload_tree(
     :param data: the data to push
     """
     if not publish:
+        if chain == "eth":
+            bucket = "badger-json"
+        else:
+            bucket = "badger-json-{}".format(chain)
+            
         upload_targets = [
             {
-                "bucket": "badger-json",
+                "bucket": bucket,
                 "key": "rewards/" + fileName,
             },  # badger-json rewards api
         ]
@@ -82,17 +96,22 @@ def upload_tree(
     # enumeration of reward api dependency upload targets
     if publish:
         upload_targets = []
+        if chain == "eth":
+            key = "badger-tree.json"
+        else:
+            key = "badger-tree-{}.json".format(chain)
+            
         upload_targets.append(
             {
                 "bucket": "badger-staging-merkle-proofs",
-                "key": "badger-tree.json",
+                "key": key,
             }  # badger-api staging
         )
 
         upload_targets.append(
             {
                 "bucket": "badger-merkle-proofs",
-                "key": "badger-tree.json",
+                "key": key,
             }  # badger-api production
         )
 

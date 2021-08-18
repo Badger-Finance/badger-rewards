@@ -2,6 +2,7 @@ from config.env_config import env_config
 from helpers.discord import send_message_to_discord
 from rewards.calc_rewards import generate_rewards_in_range
 from rich.console import Console
+import json
 
 console = Console()
 
@@ -13,7 +14,7 @@ if __name__ == "__main__":
     send_message_to_discord(
         "**CALCULATING Rewards on {}**".format(chain), "Calculating rewards between {} and {}".format(startBlock,currentBlock), [], "Rewards Bot"
     )
-    generate_rewards_in_range(
+    tree = generate_rewards_in_range(
         chain,
         startBlock,
         currentBlock,

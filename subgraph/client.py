@@ -17,6 +17,7 @@ harvests_client = make_gql_client("harvests")
 
 
 def fetch_tree_distributions(startBlock, endBlock):
+    console.log(startBlock, endBlock)
     query = gql(
         """
         query tree_distributions(
