@@ -1,21 +1,16 @@
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
-from rewards.classes.Schedule import Schedule
-from rewards.snapshot.utils import chain_snapshot, sett_snapshot
+from rewards.snapshot.utils import sett_snapshot
 from subgraph.client import fetch_tree_distributions
 from rewards.classes.RewardsList import RewardsList
 from helpers.time_utils import to_utc_date, to_hours
+from helpers.constants import CONTROLLER
 from config.env_config import env_config
 from rich.console import Console
 
 from typing import List, Dict
 
 console = Console()
-
-
-def get_sett_from_strategy(strategy):
-    return ""
-
 
 class RewardsManager:
     def __init__(self, chain: str, cycle: int, start: int, end: int):
@@ -29,6 +24,15 @@ class RewardsManager:
     def fetch_sett_snapshot(self, block: int, sett: str):
         return sett_snapshot(self.chain, block, sett)
 
+    def get_sett_from_strategy(self, strat: str):
+        strategy = make_contract(strat, "BaseStrategy", self.chain)
+        controller = make_contract(
+            strategy.functions.controller().call(), "Controller", self.chain)
+        want = strategy.functions.want().call()
+        sett = controller.functions.vaults(want).call()
+        console.log(sett)
+        return sett
+
     def calculate_sett_rewards(self, sett, schedulesByToken, boosts):
         startTime = self.web3.eth.getBlock(self.start)["timestamp"]
         endTime = self.web3.eth.getBlock(self.end)["timestamp"]
@@ -37,8 +41,10 @@ class RewardsManager:
         boostedSettBalances = self.boost_sett(boosts, sett, settBalances)
 
         for token, schedules in schedulesByToken.items():
-            endDist = self.get_distributed_for_token_at(token, endTime, schedules)
-            startDist = self.get_distributed_for_token_at(token, startTime, schedules)
+            endDist = self.get_distributed_for_token_at(
+                token, endTime, schedules)
+            startDist = self.get_distributed_for_token_at(
+                token, startTime, schedules)
             tokenDistribution = int(endDist) - int(startDist)
             if tokenDistribution > 0:
                 total = sum([b.balance for b in boostedSettBalances])
@@ -59,7 +65,8 @@ class RewardsManager:
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
             console.log(
-                "Calculating rewards for {}".format(token.functions.name().call())
+                "Calculating rewards for {}".format(
+                    token.functions.name().call())
             )
             allRewards.append(
                 self.calculate_sett_rewards(sett, allSchedules[sett], boosts)
@@ -111,7 +118,8 @@ class RewardsManager:
         if snapshot.settType == "nonNative":
             preBoost = {}
             for user in snapshot:
-                preBoost[user.address] = snapshot.percentage_of_total(user.address)
+                preBoost[user.address] = snapshot.percentage_of_total(
+                    user.address)
 
             for user in snapshot:
                 boostInfo = boosts.get(user.address, {})
@@ -123,23 +131,27 @@ class RewardsManager:
                 if sett not in self.apyBoosts:
                     self.apyBoosts[sett] = {}
 
-                self.apyBoosts[sett][user.address] = postBoost / preBoost[user.address]
+                self.apyBoosts[sett][user.address] = postBoost / \
+                    preBoost[user.address]
         return snapshot
 
     def calculate_tree_distributions(self):
-        treeDistributions = fetch_tree_distributions(self.start, self.end)
+        treeDistributions = fetch_tree_distributions(
+            self.start, self.end, self.chain)
         console.log(
             "Fetched {} tree distributions between {} and {}".format(
-                self.start, self.end
+
+                len(treeDistributions), self.start, self.end
             )
         )
         rewards = RewardsList(self.cycle + 1)
         for dist in treeDistributions:
-            block = dist["blockNumber"]
-            token = dist["token"]["id"]
+            console.log(dist)
+            block = int(dist["blockNumber"])
+            token = dist["token"]["address"]
             strategy = dist["id"].split("-")[0]
-            sett = get_sett_from_strategy(strategy)
-            balances = sett_snapshot(self, block, sett)
+            sett = self.get_sett_from_strategy(strategy)
+            balances = self.fetch_sett_snapshot(block, sett)
             amount = int(dist["amount"])
             rewardsUnit = amount / sum([u.balance for u in balances])
             for user in balances:

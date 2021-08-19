@@ -10,13 +10,9 @@ from functools import lru_cache
 getcontext().prec = 20
 console = Console()
 
-tokens_client = make_gql_client("tokens")
-harvests_client = make_gql_client("harvests")
 
-## TODO: seperate files by chain/subgraph
-
-
-def fetch_tree_distributions(startBlock, endBlock):
+def fetch_tree_distributions(startBlock, endBlock, chain):
+    tree_client = make_gql_client("harvests-{}".format(chain))
     console.log(startBlock, endBlock)
     query = gql(
         """
@@ -41,7 +37,7 @@ def fetch_tree_distributions(startBlock, endBlock):
     treeDistributions = []
     while True:
         variables["lastDistId"] = {"id_gt": lastDistId}
-        results = harvests_client.execute(query, variable_values=variables)
+        results = tree_client.execute(query, variable_values=variables)
         distData = results["treeDistributions"]
         if len(distData) == 0:
             break

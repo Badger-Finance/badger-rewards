@@ -91,7 +91,13 @@ def propose_root(chain, start, end):
         return
 
     rewards_data = generate_rewards_in_range(chain, start, end)
+
     if not env_config.test:
+        console.log(
+            "\n==== Proposing root with rootHash {} ====\n".format(
+                rewards_data["rootHash"]
+            )
+        )
         treeManager.propose_root(rewards_data)
         upload_tree(rewards_data["fileName"], rewards_data["merkleTree"], publish=True)
 
@@ -103,6 +109,12 @@ def update_root(chain, start, end):
     else:
         rewards_data = generate_rewards_in_range(chain, start, end)
         if not env_config.test:
+            console.log(
+                "\n==== Approving root with rootHash {} ====\n".format(
+                    rewards_data["rootHash"]
+                )
+            )
+
             treeManager.approve_root(rewards_data)
             upload_tree(rewards_data["fileName"], rewards_data["merkleTree"], chain)
 
@@ -111,22 +123,26 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save=False):
     setts = fetch_setts(chain)
     console_and_discord("Generating rewards for {} setts".format(len(setts)))
     allSchedules = fetch_all_schedules(chain, setts)
-    boosts = download_boosts()
 
     treeManager = TreeManager(chain, start, end)
 
     rewardsManager = RewardsManager(chain, treeManager.nextCycle, start, end)
+    
+    console.log("Calculating Tree Rewards...") 
+    treeRewards = rewardsManager.calculate_tree_distributions()
+    
     console.log("Calculating Sett Rewards...")
 
+    boosts = download_boosts()
     settRewards = rewardsManager.calculate_all_sett_rewards(
         setts, allSchedules, boosts["userData"]
     )
+    
 
     pastRewards = treeManager.fetch_current_tree()
 
-    # treeRewards = rewardsManager.calculate_tree_distributions()
 
-    newRewards = combine_rewards([settRewards], rewardsManager.cycle)
+    newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle)
     cumulativeRewards = process_cumulative_rewards(pastRewards, newRewards)
 
     merkleTree = treeManager.convert_to_merkle_tree(cumulativeRewards)
