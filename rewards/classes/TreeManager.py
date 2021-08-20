@@ -1,35 +1,29 @@
+from eth_utils.hexadecimal import encode_hex
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.aws.trees import download_tree
-from helpers.constants import BADGER_TREE
-from helpers.web3_utils import make_contract
+from helpers.web3_utils import get_badger_tree
 from rewards.classes.RewardsList import RewardsList
-from helpers.web3_utils import make_contract
 from rich.console import Console
 import json
-from config.env_config import env_config
 
 console = Console()
 
 
 class TreeManager:
-    def __init__(self, chain: str, start: int, end: int):
+    def __init__(self, chain: str):
         self.chain = chain
-        self.start = start
-        self.end = end
-        self.badgerTree = make_contract(
-            BADGER_TREE[self.chain], abiName="BadgerTreeV2", chain=chain
-        )
+        self.badgerTree = get_badger_tree(chain)
         self.nextCycle = self.get_current_cycle() + 1
         self.rewardsList = RewardsList(self.nextCycle)
-
-    def convert_to_merkle_tree(self, rewardsList):
-        return rewards_to_merkle_tree(rewardsList, self.start, self.end)
+        
+    def convert_to_merkle_tree(self, rewardsList, start, end):
+        return rewards_to_merkle_tree(rewardsList, start, end)
 
     def approve_root(self, rewards):
         self.badgerTree.functions.approveRoot().call()
 
-    def propose_root(self):
-        pass
+    def propose_root(self,rewards):
+        self.badgerTree.functions.proposeRoot().call()
 
     def get_current_cycle(self):
         return self.badgerTree.functions.currentCycle().call()
@@ -40,6 +34,7 @@ class TreeManager:
     def fetch_tree(self, merkle):
         console.log(merkle)
         fileName = "rewards-1-{}.json".format(merkle["contentHash"])
+        console.log(fileName)
         tree = json.loads(download_tree(fileName, self.chain))
         self.validate_tree(merkle, tree)
         return tree
@@ -66,8 +61,8 @@ class TreeManager:
         root = self.badgerTree.functions.merkleRoot().call()
         contentHash = self.badgerTree.functions.merkleContentHash().call()
         return {
-            "root": env_config.get_web3().toHex(root),
-            "contentHash": env_config.get_web3().toHex(contentHash),
+            "root": encode_hex(root),
+            "contentHash": encode_hex(contentHash),
             "lastUpdateTime": self.badgerTree.functions.lastPublishTimestamp().call(),
             "blockNumber": int(
                 self.badgerTree.functions.lastPublishBlockNumber().call()
@@ -75,11 +70,11 @@ class TreeManager:
         }
 
     def fetch_pending_merkle_data(self):
-        root = self.badgerTree.functions.merkleRoot.call()
+        root = self.badgerTree.functions.merkleRoot().call()
         pendingContentHash = self.badgerTree.functions.pendingMerkleContentHash().call()
         return {
-            "root": env_config.get_web3().toHex(root),
-            "contentHash": env_config.get_web3().toHex(pendingContentHash),
+            "root": encode_hex(root),
+            "contentHash": encode_hex(pendingContentHash),
             "lastUpdateTime": self.badgerTree.functions.lastProposeTimestamp().call(),
             "blockNumber": int(
                 self.badgerTree.functions.lastProposeBlockNumber().call()

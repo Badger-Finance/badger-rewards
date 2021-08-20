@@ -6,7 +6,6 @@ from subgraph.client import fetch_chain_balances, fetch_sett_balances
 from functools import lru_cache
 from rich.console import Console
 from typing import Dict
-import json
 
 console = Console()
 

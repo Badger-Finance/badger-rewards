@@ -1,10 +1,7 @@
-from decimal import Decimal
 from dotmap import DotMap
 from rich.console import Console
 from eth_utils.hexadecimal import encode_hex
-from helpers.constants import BADGER
 from eth_abi import encode_abi
-from tabulate import tabulate
 
 console = Console()
 
@@ -144,7 +141,6 @@ class RewardsList:
         - Node entry = [cycle, user, index, token[], cumulativeAmount[]]
         """
         cycle = self.cycle
-        dict = self.claims.toDict()
 
         nodeEntries = []
         encodedEntries = []

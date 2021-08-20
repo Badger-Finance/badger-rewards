@@ -53,8 +53,6 @@ def calc_boost_data(block: int):
     :param block: block to collect the boost data from
     """
     chains = ["eth"]
-    ## Figure out how to map blocks, maybe  time -> block per chain
-
     native = Counter()
     nonNative = Counter()
 

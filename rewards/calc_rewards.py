@@ -1,5 +1,4 @@
 from rewards.aws.trees import upload_tree
-from toolz.itertoolz import cons
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager
 from rewards.classes.RewardsList import RewardsList
@@ -15,6 +14,8 @@ from typing import List
 from rich.console import Console
 from config.env_config import env_config
 from config.rewards_config import rewards_config
+
+from eth_utils.hexadecimal import encode_hex
 
 import json
 
@@ -77,8 +78,8 @@ def process_cumulative_rewards(current, new: RewardsList):
     return result
 
 
-def propose_root(chain, start, end):
-    treeManager = TreeManager(chain, start, end)
+def propose_root(chain, start, end, save=False):
+    treeManager = TreeManager(chain)
     pendingMerkleData = treeManager.fetch_pending_merkle_data()
     w3 = env_config.get_web3(chain)
     currentTime = w3.eth.getBlock(w3.eth.block_number)["timestamp"]
@@ -90,7 +91,7 @@ def propose_root(chain, start, end):
         )
         return
 
-    rewards_data = generate_rewards_in_range(chain, start, end)
+    rewards_data = generate_rewards_in_range(chain, start, end, save)
 
     if not env_config.test:
         console.log(
@@ -99,7 +100,8 @@ def propose_root(chain, start, end):
             )
         )
         treeManager.propose_root(rewards_data)
-        upload_tree(rewards_data["fileName"], rewards_data["merkleTree"], publish=True)
+        upload_tree(rewards_data["fileName"],
+                    rewards_data["merkleTree"], publish=True)
 
 
 def update_root(chain, start, end):
@@ -116,43 +118,44 @@ def update_root(chain, start, end):
             )
 
             treeManager.approve_root(rewards_data)
-            upload_tree(rewards_data["fileName"], rewards_data["merkleTree"], chain)
+            upload_tree(rewards_data["fileName"],
+                        rewards_data["merkleTree"], chain)
 
 
-def generate_rewards_in_range(chain: str, start: int, end: int, save=False):
+def generate_rewards_in_range(chain: str, start: int, end: int, save: bool):
     setts = fetch_setts(chain)
     console_and_discord("Generating rewards for {} setts".format(len(setts)))
     allSchedules = fetch_all_schedules(chain, setts)
 
-    treeManager = TreeManager(chain, start, end)
+    treeManager = TreeManager(chain)
 
     rewardsManager = RewardsManager(chain, treeManager.nextCycle, start, end)
-    
-    console.log("Calculating Tree Rewards...") 
+
+    console.log("Calculating Tree Rewards...")
     treeRewards = rewardsManager.calculate_tree_distributions()
-    
+
     console.log("Calculating Sett Rewards...")
 
     boosts = download_boosts()
     settRewards = rewardsManager.calculate_all_sett_rewards(
         setts, allSchedules, boosts["userData"]
     )
-    
 
     pastRewards = treeManager.fetch_current_tree()
 
-
-    newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle)
+    newRewards = combine_rewards(
+        [settRewards, treeRewards], rewardsManager.cycle)
     cumulativeRewards = process_cumulative_rewards(pastRewards, newRewards)
 
-    merkleTree = treeManager.convert_to_merkle_tree(cumulativeRewards)
+    merkleTree = treeManager.convert_to_merkle_tree(
+        cumulativeRewards, start, end)
     rootHash = rewardsManager.web3.keccak(text=merkleTree["merkleRoot"])
-    fileName = "rewards-1-{}.json".format(rootHash)
+    fileName = "rewards-1-{}.json".format(encode_hex(rootHash))
     verify_rewards(pastRewards, merkleTree)
 
     if save:
         with open(fileName, "w") as fp:
-            json.dumps(merkleTree, fp)
+            json.dump(merkleTree, fp)
 
     return {"merkleTree": merkleTree, "rootHash": rootHash, "fileName": fileName}
 

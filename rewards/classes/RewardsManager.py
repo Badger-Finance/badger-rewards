@@ -4,11 +4,9 @@ from rewards.snapshot.utils import sett_snapshot
 from subgraph.client import fetch_tree_distributions
 from rewards.classes.RewardsList import RewardsList
 from helpers.time_utils import to_utc_date, to_hours
-from helpers.constants import CONTROLLER
 from config.env_config import env_config
 from rich.console import Console
-
-from typing import List, Dict
+from typing import List
 
 console = Console()
 
@@ -79,7 +77,7 @@ class RewardsManager:
         for index, schedule in enumerate(schedules):
             if endTime < schedule.startTime:
                 toDistribute = 0
-                console.log("\nSchedule {} for {} completed\n".format(index))
+                console.log("\nSchedule {} for {} completed\n".format(index, token))
             else:
                 rangeDuration = endTime - schedule.startTime
                 toDistribute = min(

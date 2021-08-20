@@ -1,4 +1,3 @@
-from re import A
 from rewards.aws.helpers import get_secret
 import os
 from decouple import config
