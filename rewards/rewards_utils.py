@@ -1,12 +1,7 @@
 from rich.console import Console
 from rewards.classes.UserBalance import UserBalances
-<<<<<<< HEAD
-from helpers.constants import ROOT_PROPOSER_ROLE, ROOT_VALIDATOR_ROLE
-
-=======
 from rewards.classes.RewardsList import RewardsList
 from web3 import Web3
->>>>>>> emissions-calculation
 
 console = Console()
 

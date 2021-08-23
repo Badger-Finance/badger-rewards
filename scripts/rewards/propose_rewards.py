@@ -10,11 +10,11 @@ console = Console()
 
 
 def propose_rewards(chain):
-    
+
     currentBlock = env_config.get_web3(chain).eth.block_number - 50
     treeManager = TreeManager(chain)
     startBlock = treeManager.fetch_current_merkle_data()["blockNumber"]
-    
+
     console.log(
         "Generating rewards between {} and {} on {} chain".format(
             startBlock, currentBlock, chain
@@ -26,9 +26,4 @@ def propose_rewards(chain):
         [],
         "Rewards Bot",
     )
-    propose_root(
-        chain,
-        startBlock,
-        currentBlock,
-        save=True
-    )
+    propose_root(chain, startBlock, currentBlock, save=True)

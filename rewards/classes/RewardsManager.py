@@ -10,6 +10,7 @@ from typing import List
 
 console = Console()
 
+
 class RewardsManager:
     def __init__(self, chain: str, cycle: int, start: int, end: int):
         self.chain = chain
@@ -25,7 +26,8 @@ class RewardsManager:
     def get_sett_from_strategy(self, strat: str):
         strategy = make_contract(strat, "BaseStrategy", self.chain)
         controller = make_contract(
-            strategy.functions.controller().call(), "Controller", self.chain)
+            strategy.functions.controller().call(), "Controller", self.chain
+        )
         want = strategy.functions.want().call()
         sett = controller.functions.vaults(want).call()
         console.log(sett)
@@ -39,10 +41,8 @@ class RewardsManager:
         boostedSettBalances = self.boost_sett(boosts, sett, settBalances)
 
         for token, schedules in schedulesByToken.items():
-            endDist = self.get_distributed_for_token_at(
-                token, endTime, schedules)
-            startDist = self.get_distributed_for_token_at(
-                token, startTime, schedules)
+            endDist = self.get_distributed_for_token_at(token, endTime, schedules)
+            startDist = self.get_distributed_for_token_at(token, startTime, schedules)
             tokenDistribution = int(endDist) - int(startDist)
             if tokenDistribution > 0:
                 total = sum([b.balance for b in boostedSettBalances])
@@ -63,8 +63,7 @@ class RewardsManager:
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
             console.log(
-                "Calculating rewards for {}".format(
-                    token.functions.name().call())
+                "Calculating rewards for {}".format(token.functions.name().call())
             )
             allRewards.append(
                 self.calculate_sett_rewards(sett, allSchedules[sett], boosts)
@@ -116,8 +115,7 @@ class RewardsManager:
         if snapshot.settType == "nonNative":
             preBoost = {}
             for user in snapshot:
-                preBoost[user.address] = snapshot.percentage_of_total(
-                    user.address)
+                preBoost[user.address] = snapshot.percentage_of_total(user.address)
 
             for user in snapshot:
                 boostInfo = boosts.get(user.address, {})
@@ -129,16 +127,13 @@ class RewardsManager:
                 if sett not in self.apyBoosts:
                     self.apyBoosts[sett] = {}
 
-                self.apyBoosts[sett][user.address] = postBoost / \
-                    preBoost[user.address]
+                self.apyBoosts[sett][user.address] = postBoost / preBoost[user.address]
         return snapshot
 
     def calculate_tree_distributions(self):
-        treeDistributions = fetch_tree_distributions(
-            self.start, self.end, self.chain)
+        treeDistributions = fetch_tree_distributions(self.start, self.end, self.chain)
         console.log(
             "Fetched {} tree distributions between {} and {}".format(
-
                 len(treeDistributions), self.start, self.end
             )
         )

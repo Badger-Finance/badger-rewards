@@ -9,7 +9,7 @@ subgraph_urls = {
     "polygon": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-polygon",
     "xdai": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-xdai",
     "tokens-bsc": "https://bgraph-bsc.badger.guru/subgraphs/name/swole/badger-subgraph",
-    "tokens-polygon":"https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-polygon",
-    "harvests-polygon":"https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-polygon",
-    "harvests-eth": "https://bgraph-eth.badger.guru/subgraphs/name/swole/tree-rewards"
+    "tokens-polygon": "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-polygon",
+    "harvests-polygon": "https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-polygon",
+    "harvests-eth": "https://bgraph-eth.badger.guru/subgraphs/name/swole/tree-rewards",
 }

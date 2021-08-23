@@ -15,14 +15,14 @@ class TreeManager:
         self.badgerTree = get_badger_tree(chain)
         self.nextCycle = self.get_current_cycle() + 1
         self.rewardsList = RewardsList(self.nextCycle)
-        
+
     def convert_to_merkle_tree(self, rewardsList, start, end):
         return rewards_to_merkle_tree(rewardsList, start, end)
 
     def approve_root(self, rewards):
         self.badgerTree.functions.approveRoot().call()
 
-    def propose_root(self,rewards):
+    def propose_root(self, rewards):
         self.badgerTree.functions.proposeRoot().call()
 
     def get_current_cycle(self):

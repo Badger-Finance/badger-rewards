@@ -5,8 +5,8 @@ from rewards.aws.helpers import get_bucket
 import json
 from typing import Dict
 from rewards.aws.helpers import s3
-console = Console()
 
+console = Console()
 
 
 def download_latest_tree(chain: str):
