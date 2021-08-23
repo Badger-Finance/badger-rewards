@@ -7,17 +7,6 @@ from web3.middleware import geth_poa_middleware
 
 class EnvConfig:
     def __init__(self):
-<<<<<<< HEAD
-        self.graph_api_key = get_secret("boost-bot/graph-api-key-d", "GRAPH_API_KEY")
-        self.test_webhook_url = get_secret(
-            "boost-bot/test-discord-url", "TEST_WEBHOOK_URL"
-        )
-        self.discord_webhook_url = get_secret("DISCORD_WEBHOOK_URL", "")
-        self.test = os.getenv("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
-        self.bucket = (
-            "badger-staging-merkle-proofs" if self.test else "badger-merkle-proofs"
-        )
-=======
 
         self.graph_api_key = config("GRAPH_API_KEY")
         self.test_webhook_url = config("TEST_WEBHOOK_URL")
@@ -34,7 +23,6 @@ class EnvConfig:
 
     def get_web3(self, chain="eth"):
         return self.web3[chain]
->>>>>>> emissions-calculation
 
     def get_webhook_url(self):
         if self.test:

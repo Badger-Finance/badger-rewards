@@ -1,5 +1,5 @@
 import requests
-from brownie import web3
+from config.env_config import env_config
 
 urls = {"polygon": "https://api.polygonscan.com", "bsc": "https://api.bscscan.com"}
 
@@ -16,7 +16,7 @@ def convert_from_eth(block):
     """
     Convert block from eth to blocks on other chains
     """
-    timestamp = web3.eth.getBlock(block)["timestamp"]
+    timestamp = env_config.get_web3().eth.getBlock(block)["timestamp"]
     return {
         "eth": block,
         "bsc": get_block_by_timestamp("bsc", timestamp) - 1000,

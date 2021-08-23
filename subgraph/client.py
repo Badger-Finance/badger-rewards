@@ -1,14 +1,13 @@
-from badger_api.prices import fetch_ppfs
 from helpers.discord import send_message_to_discord
 from subgraph.subgraph_utils import make_gql_client
 from rich.console import Console
-from gql import gql, Client
-from gql.transport.aiohttp import AIOHTTPTransport
+from gql import gql
 from decimal import *
 import math
 from functools import lru_cache
 
 getcontext().prec = 20
+harvests_client = make_gql_client("harvests-eth")
 console = Console()
 
 
@@ -178,11 +177,7 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
                     "inline": True,
                 }
             ],
-<<<<<<< HEAD
-            "keepers/boostBot",
-=======
             "Boost Bot",
->>>>>>> emissions-calculation
         )
         raise e
 
@@ -262,24 +257,6 @@ def fetch_chain_balances(chain, block):
         console.log("Fetched {} total setts".format(len(balances)))
         return balances
     except Exception as e:
-<<<<<<< HEAD
-        send_message_to_discord(
-            "**BADGER BOOST ERROR**",
-            f":x: Error in Fetching Token Balance",
-            [
-                {
-                    "name": "Error Type",
-                    "value": type(e),
-                    "inline": True,
-                    "name": "Error Description",
-                    "value": e.args,
-                    "inline": True,
-                }
-            ],
-            "keepers/boostBot",
-        )
-        raise e
-=======
         send_error_to_discord(e, "Error in Fetching Sett Balance")
         raise e
 
@@ -351,4 +328,3 @@ def fetch_sett_balances(chain, block, sett):
     except Exception as e:
         send_error_to_discord(e, "Error in Fetching Sett Balance")
         raise e
->>>>>>> emissions-calculation

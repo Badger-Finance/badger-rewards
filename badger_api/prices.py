@@ -16,7 +16,7 @@ def fetch_token_prices():
     """
     Fetch token prices for lp tokens
     """
-    chains = ["eth", "bsc"]
+    chains = ["eth", "bsc", "matic"]
     prices = {}
     for chain in chains:
         chain_prices = requests.get(

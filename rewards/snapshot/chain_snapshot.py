@@ -24,7 +24,7 @@ def chain_snapshot(chain: str, block: int):
     balancesBySett = {}
 
     for settAddr, balances in list(chainBalances.items()):
-        settBalances = parse_sett_balances(settAddr, balances, chain)
+        settBalances = parse_sett_balances(settAddr, balances)
         token = make_contract(settAddr, abiName="ERC20", chain=chain)
         console.log(
             "Fetched {} balances for sett {}".format(
