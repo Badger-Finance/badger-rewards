@@ -1,8 +1,8 @@
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rewards.boost.convert_blocks import convert_from_eth
 from rich.console import Console
+from config.env_config import env_config
 from rewards.classes.UserBalance import UserBalances
-from brownie import *
 from typing import Dict
 from collections import Counter
 from rewards.snapshot.chain_snapshot import chain_snapshot
@@ -39,7 +39,7 @@ def convert_balances_to_usd(balances: UserBalances, sett: str):
     Convert sett balance to usd and multiply by correct ratio
     :param balances: balances to convert to usd
     """
-    price = prices[web3.toChecksumAddress(sett)]
+    price = prices[env_config.get_web3().toChecksumAddress(sett)]
     priceRatio = balances.settRatio
     usdBalances = {}
     for user in balances:
@@ -53,8 +53,12 @@ def calc_boost_data(block: int):
     Calculate boost data required for boost calculation
     :param block: block to collect the boost data from
     """
+<<<<<<< HEAD
     chains = ["bsc", "eth"]
     blocksByChain = convert_from_eth(block)
+=======
+    chains = ["eth"]
+>>>>>>> emissions-calculation
     native = Counter()
     nonNative = Counter()
     for chain in chains:

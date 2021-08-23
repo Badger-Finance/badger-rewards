@@ -1,12 +1,14 @@
-from brownie import *
+from config.env_config import env_config
 from helpers.constants import DIGG
+from helpers.web3_utils import make_contract
+import json
 
 
 class DiggUtils:
     def __init__(self):
-        self.digg = interface.IDigg(DIGG)
-        self.sharesPerFragment = self.digg._sharesPerFragment()
-        self.initialShares = self.digg._initialSharesPerFragment()
+        self.digg = make_contract(DIGG, abiName="Digg", chain="eth")
+        self.sharesPerFragment = self.digg.functions._sharesPerFragment().call()
+        self.initialShares = self.digg.functions._initialSharesPerFragment().call()
 
     def sharesToFragments(self, shares):
         if shares == 0:

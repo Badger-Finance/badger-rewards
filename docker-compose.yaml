@@ -2,7 +2,7 @@ version: '3.3'
 services:
     boost-bot:
         image: boost-bot
-        command: ./start.sh
+        command: python -m scripts.rewards.propose_boost
         build: 
             context: .
             dockerfile: Dockerfile

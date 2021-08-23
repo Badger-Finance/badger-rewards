@@ -1,5 +1,6 @@
 import boto3
 from helpers.discord import send_message_to_discord
+from rewards.aws.helpers import s3, get_bucket
 from config.env_config import env_config
 from rich.console import Console
 import json
@@ -17,15 +18,20 @@ def upload_boosts(boostData):
     :param test:
     :param boostData: calculated boost information
     """
-    bucket = env_config.bucket
+    bucket = get_bucket(env_config.test)
     console.log("Uploading file to s3://{}/{}".format(bucket, boostsFileName))
-    s3.put_object(Body=str(json.dumps(boostData)), Bucket=bucket, Key=boostsFileName)
+    s3.put_object(
+        Body=str(json.dumps(boostData)),
+        Bucket=bucket,
+        Key=boostsFileName,
+        ACL="bucket-owner-full-control",
+    )
     console.log("✅ Uploaded file to s3://{}/{}".format(bucket, boostsFileName))
     send_message_to_discord(
         "**BADGER BOOST UPDATED**",
         f"✅ Uploaded file to s3://{bucket}/{boostsFileName}",
         [{"name": "User Count", "value": len(boostData["userData"]), "inline": True}],
-        "keepers/boostBot",
+        "Boost Bot",
     )
 
 
@@ -34,9 +40,11 @@ def download_boosts():
 
     :param test:
     """
-    bucket = env_config.bucket
+    console.log("Downloading boosts ...")
+    bucket = get_bucket(env_config.test)
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boostsFileName)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
+    console.log("Fetched {} boosts".format(len(data["userData"])))
     return data
 
 

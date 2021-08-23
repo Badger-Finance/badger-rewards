@@ -1,10 +1,11 @@
-from helpers.constants import INVALID_VAULTS, REWARDS_BLACKLIST, SETT_INFO
+from config.env_config import env_config
+from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
+from helpers.web3_utils import make_contract
 from rewards.classes.UserBalance import UserBalances, UserBalance
-from subgraph.client import fetch_chain_balances
+from subgraph.client import fetch_chain_balances, fetch_sett_balances
 from functools import lru_cache
 from rich.console import Console
 from typing import Dict
-from brownie import web3
 
 console = Console()
 
@@ -23,10 +24,13 @@ def chain_snapshot(chain: str, block: int):
     balancesBySett = {}
 
     for settAddr, balances in list(chainBalances.items()):
-        settBalances = parse_sett_balances(settAddr, balances)
-        console.log("Fetched {} balances for sett {}".format(len(balances), settAddr))
-        if settAddr.lower() in INVALID_VAULTS:
-            continue
+        settBalances = parse_sett_balances(settAddr, balances, chain)
+        token = make_contract(settAddr, abiName="ERC20", chain=chain)
+        console.log(
+            "Fetched {} balances for sett {}".format(
+                len(balances), token.functions.name().call()
+            )
+        )
         balancesBySett[settAddr] = settBalances
 
     return balancesBySett
@@ -34,7 +38,14 @@ def chain_snapshot(chain: str, block: int):
 
 @lru_cache(maxsize=128)
 def sett_snapshot(chain, block, sett):
-    return chain_snapshot(chain, block)[sett]
+    token = make_contract(sett, abiName="ERC20", chain=chain)
+    console.log(
+        "Taking snapshot on {} of {} at {}".format(
+            chain, sett, token.functions.name().call()
+        )
+    )
+    sett_balances = fetch_sett_balances(chain, block - 50, sett)
+    return parse_sett_balances(sett, sett_balances)
 
 
 def parse_sett_balances(settAddress: str, balances: Dict[str, int]):
@@ -62,6 +73,7 @@ def parse_sett_balances(settAddress: str, balances: Dict[str, int]):
 
 def get_sett_info(settAddress):
     info = SETT_INFO.get(
-        web3.toChecksumAddress(settAddress), {"type": "nonNative", "ratio": 1}
+        env_config.get_web3().toChecksumAddress(settAddress),
+        {"type": "nonNative", "ratio": 1},
     )
     return info["type"], info["ratio"]

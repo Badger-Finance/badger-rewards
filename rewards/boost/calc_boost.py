@@ -1,4 +1,3 @@
-from brownie import *
 from rich.console import Console
 from helpers.constants import (
     STAKE_RATIO_RANGES,
