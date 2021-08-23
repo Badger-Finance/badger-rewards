@@ -1,3 +1,4 @@
+from helpers.constants import PROPOSER_ADDRESS
 from eth_utils.hexadecimal import encode_hex
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.aws.trees import download_tree
@@ -15,15 +16,27 @@ class TreeManager:
         self.badgerTree = get_badger_tree(chain)
         self.nextCycle = self.get_current_cycle() + 1
         self.rewardsList = RewardsList(self.nextCycle)
-        
+
     def convert_to_merkle_tree(self, rewardsList, start, end):
         return rewards_to_merkle_tree(rewardsList, start, end)
 
     def approve_root(self, rewards):
-        self.badgerTree.functions.approveRoot().call()
+        self.badgerTree.functions.approveRoot(
+            rewards["merkleTree"]["merkleRoot"],
+            rewards["rootHash"],
+            rewards["merkleTree"]["cycle"],
+            rewards["merkleTree"]["startBlock"],
+            rewards["merkleTree"]["endBlock"]
+        ).call({"from": PROPOSER_ADDRESS, "gasPrice": '200000000000'}))
 
-    def propose_root(self,rewards):
-        self.badgerTree.functions.proposeRoot().call()
+    def propose_root(self, rewards):
+        self.badgerTree.functions.proposeRoot(
+            rewards["merkleTree"]["merkleRoot"],
+            rewards["rootHash"],
+            rewards["merkleTree"]["cycle"],
+            rewards["merkleTree"]["startBlock"],
+            rewards["merkleTree"]["endBlock"]
+        ).call({"from": PROPOSER_ADDRESS, "gasPrice": '200000000000'})
 
     def get_current_cycle(self):
         return self.badgerTree.functions.currentCycle().call()

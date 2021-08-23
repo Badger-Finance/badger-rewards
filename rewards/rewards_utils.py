@@ -6,7 +6,7 @@ from web3 import Web3
 console = Console()
 
 
-def get_cumulative_claimable_for_token(claim, token):
+def get_cumulative_claimable_for_token(claim, token: str):
     tokens = claim["tokens"]
     amounts = claim["cumulativeAmounts"]
 
@@ -21,7 +21,7 @@ def get_cumulative_claimable_for_token(claim, token):
     return 0
 
 
-def get_claimed_for_token(data, token):
+def get_claimed_for_token(data, token: str) -> int:
     tokens = data[0]
     amounts = data[1]
 
@@ -31,11 +31,11 @@ def get_claimed_for_token(data, token):
             return amounts[i]
 
 
-def keccak(value):
+def keccak(value: str):
     return Web3.toHex(Web3.keccak(text=value))
 
 
-def combine_balances(balances):
+def combine_balances(balances) -> UserBalances:
     allBalances = UserBalances()
     for userBalances in balances:
         allBalances = allBalances + userBalances
