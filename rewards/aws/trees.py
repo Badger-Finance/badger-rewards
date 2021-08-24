@@ -1,7 +1,6 @@
-import boto3
 from config.env_config import env_config
 from rich.console import Console
-from rewards.aws.helpers import get_bucket
+from rewards.aws.helpers import get_bucket, s3
 import json
 from typing import Dict
 from rewards.aws.helpers import s3
@@ -82,6 +81,8 @@ def upload_tree(
     :param fileName: the filename of the uploaded bucket
     :param data: the data to push
     """
+    chainId = env_config.get_web3(chain).eth.chain_id
+    
     if not publish:
         if chain == "eth":
             bucket = "badger-json"
@@ -101,7 +102,7 @@ def upload_tree(
         if chain == "eth":
             key = "badger-tree.json"
         else:
-            key = "badger-tree-{}.json".format(chain)
+            key = "badger-tree-{}.json".format(chainId)
 
         upload_targets.append(
             {

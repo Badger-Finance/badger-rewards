@@ -4,7 +4,7 @@ from rewards.classes.TreeManager import TreeManager
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.rewards_utils import combine_rewards
-
+from rewards.rewards_checker import verify_rewards
 from rewards.aws.boost import download_boosts
 from helpers.web3_utils import make_contract
 from helpers.constants import DISABLED_VAULTS, REWARDS_LOGGER
@@ -14,20 +14,23 @@ from typing import List
 from rich.console import Console
 from config.env_config import env_config
 from config.rewards_config import rewards_config
-
 from eth_utils.hexadecimal import encode_hex
-
+from typing import List, Dict
 import json
 
 console = Console()
 
 
-def console_and_discord(msg):
+def console_and_discord(msg: str):
     console.log(msg)
     send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot")
 
 
-def parse_schedules(schedules):
+def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
+    """
+    Parse unlock shcedules
+    :param schedules: schedules to parse
+    """
     schedulesByToken = {}
     console.log("Fetching schedules...")
     for s in schedules:
@@ -38,7 +41,12 @@ def parse_schedules(schedules):
     return schedulesByToken
 
 
-def fetch_all_schedules(chain, setts: List[str]):
+def fetch_all_schedules(chain: str, setts: List[str]):
+    """
+    Fetch all schedules on a particular chain
+    :param chain: chain to fetch from
+    :param setts: setts from which schedule to pull
+    """
     logger = make_contract(REWARDS_LOGGER[chain], "RewardsLogger", chain)
     allSchedules = {}
     for sett in setts:
@@ -48,10 +56,9 @@ def fetch_all_schedules(chain, setts: List[str]):
     return allSchedules
 
 
-def fetch_setts(chain: str):
+def fetch_setts(chain: str) -> List[str]:
     """
     Fetch setts that are eligible for rewards
-
     :param chain:
     """
     setts = list_setts(chain)
@@ -60,6 +67,13 @@ def fetch_setts(chain: str):
 
 
 def process_cumulative_rewards(current, new: RewardsList):
+    """Combine past rewards with new rewards
+
+    :param current: current rewards
+    :param new: new rewards 
+    :return: [description]
+    :rtype: [type]
+    """
     result = RewardsList(new.cycle)
 
     # Add new rewards
@@ -78,7 +92,16 @@ def process_cumulative_rewards(current, new: RewardsList):
     return result
 
 
-def propose_root(chain, start, end, save=False):
+def propose_root(chain: str, start: int, end: int, save=False):
+    """
+    Propose a root on a chain
+
+    :param chain: chain to propose root
+    :param start: start block for rewards
+    :param end: end block for rewards
+    :param save: flag to save rewards file locally, defaults to False
+    :type save: bool, optional
+    """
     treeManager = TreeManager(chain)
     pendingMerkleData = treeManager.fetch_pending_merkle_data()
     w3 = env_config.get_web3(chain)
@@ -103,7 +126,13 @@ def propose_root(chain, start, end, save=False):
         upload_tree(rewards_data["fileName"], rewards_data["merkleTree"], publish=True)
 
 
-def update_root(chain, start, end):
+def approve_root(chain: str, start: int, end: int):
+    """Approve latest root on a chain
+
+    :param chain: chain to approve root
+    :param start: start block for rewards
+    :param end: end block for rewards
+    """
     treeManager = TreeManager(chain, start, end)
     if not treeManager.has_pending_root():
         return
@@ -121,6 +150,13 @@ def update_root(chain, start, end):
 
 
 def generate_rewards_in_range(chain: str, start: int, end: int, save: bool):
+    """Generate chain rewards for a chain within two blocks
+
+    :param chain: chain to generate rewards
+    :param start: start block for rewards
+    :param end: end block for rewards
+    :param save: flag to save file locally
+    """
     setts = fetch_setts(chain)
     console_and_discord("Generating rewards for {} setts".format(len(setts)))
     allSchedules = fetch_all_schedules(chain, setts)
@@ -154,7 +190,3 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool):
             json.dump(merkleTree, fp)
 
     return {"merkleTree": merkleTree, "rootHash": rootHash, "fileName": fileName}
-
-
-def verify_rewards(pastRewards, merkleTree):
-    return True

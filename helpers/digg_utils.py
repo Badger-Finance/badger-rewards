@@ -10,7 +10,7 @@ class DiggUtils:
         self.sharesPerFragment = self.digg.functions._sharesPerFragment().call()
         self.initialShares = self.digg.functions._initialSharesPerFragment().call()
 
-    def sharesToFragments(self, shares):
+    def sharesToFragments(self, shares: int) -> float:
         if shares == 0:
             return 0
         return self.sharesPerFragment / shares
