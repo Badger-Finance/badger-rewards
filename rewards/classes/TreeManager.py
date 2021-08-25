@@ -1,5 +1,8 @@
+from re import I
 from helpers.constants import PROPOSER_ADDRESS
 from eth_utils.hexadecimal import encode_hex
+from eth_utils import to_bytes
+from config.env_config import env_config
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.aws.trees import download_tree
 from helpers.web3_utils import get_badger_tree
@@ -21,21 +24,23 @@ class TreeManager:
         return rewards_to_merkle_tree(rewardsList, start, end)
 
     def approve_root(self, rewards):
+        console.log("Approving root")
         self.badgerTree.functions.approveRoot(
-            rewards["merkleTree"]["merkleRoot"],
-            rewards["rootHash"],
-            rewards["merkleTree"]["cycle"],
-            rewards["merkleTree"]["startBlock"],
-            rewards["merkleTree"]["endBlock"]
-        ).call({"from": PROPOSER_ADDRESS, "gasPrice": '200000000000'}))
+            to_bytes(hexstr=rewards["merkleTree"]["merkleRoot"]),
+            to_bytes(hexstr=rewards["rootHash"]),
+            int(rewards["merkleTree"]["cycle"]),
+            int(rewards["merkleTree"]["startBlock"]),
+            int(rewards["merkleTree"]["endBlock"])
+        ).call({"from": PROPOSER_ADDRESS, "gasPrice": '200000000000'})
 
     def propose_root(self, rewards):
+        console.log("Propose root")
         self.badgerTree.functions.proposeRoot(
-            rewards["merkleTree"]["merkleRoot"],
-            rewards["rootHash"],
-            rewards["merkleTree"]["cycle"],
-            rewards["merkleTree"]["startBlock"],
-            rewards["merkleTree"]["endBlock"]
+            to_bytes(hexstr=rewards["merkleTree"]["merkleRoot"]),
+            to_bytes(hexstr=rewards["rootHash"]),
+            int(rewards["merkleTree"]["cycle"]),
+            int(rewards["merkleTree"]["startBlock"]),
+            int(rewards["merkleTree"]["endBlock"])
         ).call({"from": PROPOSER_ADDRESS, "gasPrice": '200000000000'})
 
     def get_current_cycle(self):
@@ -45,9 +50,7 @@ class TreeManager:
         return self.badgerTree.functions.hasPendingRoot().call()
 
     def fetch_tree(self, merkle):
-        console.log(merkle)
         fileName = "rewards-1-{}.json".format(merkle["contentHash"])
-        console.log(fileName)
         tree = json.loads(download_tree(fileName, self.chain))
         self.validate_tree(merkle, tree)
         return tree

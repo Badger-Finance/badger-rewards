@@ -115,15 +115,18 @@ def propose_root(chain: str, start: int, end: int, save=False):
         return
 
     rewards_data = generate_rewards_in_range(chain, start, end, save)
+    
+    console.log("Generated rewards")
+    console.log(env_config.test)
 
-    if not env_config.test:
+    if True:
         console.log(
             "\n==== Proposing root with rootHash {} ====\n".format(
                 rewards_data["rootHash"]
             )
         )
         treeManager.propose_root(rewards_data)
-        upload_tree(rewards_data["fileName"], rewards_data["merkleTree"], publish=True)
+        upload_tree(rewards_data["fileName"], rewards_data["merkleTree"], chain, publish=True)
 
 
 def approve_root(chain: str, start: int, end: int):
@@ -174,19 +177,23 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool):
     settRewards = rewardsManager.calculate_all_sett_rewards(
         setts, allSchedules, boosts["userData"]
     )
-
+    console.log("Fetching current tree... \n")
     pastRewards = treeManager.fetch_current_tree()
 
     newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle)
+    
+    console.log("Combining cumulative rewards... \n")
     cumulativeRewards = process_cumulative_rewards(pastRewards, newRewards)
 
+    console.log("Converting to merkle tree... \n")
     merkleTree = treeManager.convert_to_merkle_tree(cumulativeRewards, start, end)
     rootHash = rewardsManager.web3.keccak(text=merkleTree["merkleRoot"])
     fileName = "rewards-1-{}.json".format(encode_hex(rootHash))
+    
     verify_rewards(pastRewards, merkleTree)
 
     if save:
         with open(fileName, "w") as fp:
             json.dump(merkleTree, fp)
 
-    return {"merkleTree": merkleTree, "rootHash": rootHash, "fileName": fileName}
+    return {"merkleTree": merkleTree, "rootHash": rootHash.hex(), "fileName": fileName}
