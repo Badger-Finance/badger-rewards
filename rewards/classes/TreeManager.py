@@ -31,17 +31,20 @@ class TreeManager:
             to_bytes(hexstr=rewards["rootHash"]),
             int(rewards["merkleTree"]["cycle"]),
             int(rewards["merkleTree"]["startBlock"]),
-            int(rewards["merkleTree"]["endBlock"])
+            int(rewards["merkleTree"]["endBlock"]),
         )
-        approveRootTx = approveRootFunc.buildTransaction({
-            'chainId': self.w3.eth.chain_id,
-            'gasPrice': self.w3.toWei('1', 'gwei'),
-            'gas': 200000,
-            'nonce': self.w3.eth.get_transaction_count(env_config.approveAccount.address)
-        })
+        approveRootTx = approveRootFunc.buildTransaction(
+            {
+                "chainId": self.w3.eth.chain_id,
+                "gasPrice": self.w3.toWei("30", "gwei"),
+                "gas": 300000,
+                "nonce": self.w3.eth.get_transaction_count(
+                    env_config.approveAccount.address
+                ),
+            }
+        )
         signedTx = self.w3.eth.account.sign_transaction(
-            approveRootTx,
-            private_key=env_config.approveAccount.key
+            approveRootTx, private_key=env_config.approveAccount.key
         )
         txHash = self.w3.eth.send_raw_transaction(signedTx.rawTransaction).hex()
         send_message_to_discord(
@@ -63,17 +66,20 @@ class TreeManager:
             to_bytes(hexstr=rewards["rootHash"]),
             int(rewards["merkleTree"]["cycle"]),
             int(rewards["merkleTree"]["startBlock"]),
-            int(rewards["merkleTree"]["endBlock"])
+            int(rewards["merkleTree"]["endBlock"]),
         )
-        proposeRootTx = proposeRootFunc.buildTransaction({
-            'chainId': self.w3.eth.chain_id,
-            'gasPrice': self.w3.toWei('1', 'gwei'),
-            'gas': 200000,
-            'nonce': self.w3.eth.get_transaction_count(env_config.proposeAccount.address)
-        })
+        proposeRootTx = proposeRootFunc.buildTransaction(
+            {
+                "chainId": self.w3.eth.chain_id,
+                "gasPrice": self.w3.toWei("30", "gwei"),
+                "gas": 200000,
+                "nonce": self.w3.eth.get_transaction_count(
+                    env_config.proposeAccount.address
+                ),
+            }
+        )
         signedTx = self.w3.eth.account.sign_transaction(
-            proposeRootTx,
-            private_key=env_config.proposeAccount.key
+            proposeRootTx, private_key=env_config.proposeAccount.key
         )
         txHash = self.w3.eth.send_raw_transaction(signedTx.rawTransaction).hex()
         console.log("Cycle proposed : {}".format(txHash))
@@ -91,21 +97,18 @@ class TreeManager:
 
     def get_current_cycle(self) -> str:
         return self.badgerTree.functions.currentCycle().call()
-    
+
     def get_claimable_for(self, user: str, tokens: List[str], cumAmounts: List[int]):
         return self.badgerTree.functions.getClaimableFor(
-            user,
-            tokens,
-            cumAmounts 
+            user, tokens, cumAmounts
         ).call()
-        
 
     def has_pending_root(self) -> bool:
         return self.badgerTree.functions.hasPendingRoot().call()
 
     def fetch_tree(self, merkle):
         chainId = self.w3.eth.chain_id
-        fileName = "rewards-{}-{}.json".format(chainId,merkle["contentHash"])
+        fileName = "rewards-{}-{}.json".format(chainId, merkle["contentHash"])
         tree = json.loads(download_tree(fileName, self.chain))
         self.validate_tree(merkle, tree)
         return tree
