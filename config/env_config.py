@@ -8,7 +8,11 @@ from eth_account import Account
 
 class EnvConfig:
     def __init__(self):
+<<<<<<< Updated upstream
         self.test = config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
+=======
+        self.test = os.getenv("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
+>>>>>>> Stashed changes
         self.graph_api_key = get_secret(
             "boost-bot/graph-api-key-d", "GRAPH_API_KEY", test=self.test
         )
@@ -24,8 +28,6 @@ class EnvConfig:
         self.approve_account = Account.from_key(
             get_secret("path", "APPROVE_PKEY", test=self.test)
         )
-
-        self.graph_api_key = get_secret("path", "GRAPH_API_KEY", test=self.test)
         polygon = Web3(
             Web3.HTTPProvider(get_secret("path", "POLYGON_NODE_URL", test=self.test))
         )

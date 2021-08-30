@@ -117,7 +117,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
     console.log(
         "\n==== Proposing root with rootHash {} ====\n".format(rewards_data["rootHash"])
     )
-    treeManager.propose_root(rewards_data)
+    treeManager.propose_root(chain, rewards_data)
     upload_tree(
         rewards_data["fileName"],
         rewards_data["merkleTree"],
