@@ -79,7 +79,7 @@ class TreeManager:
 
         try:
             tx_hash = self.build_function_and_send(
-                env_config.proposeAccount, gas=200000, func=proposeRootFunc
+                env_config.proposeAccount, gas=200000, func=propose_root_func
             )
             succeeded, msg = confirm_transaction(
                 self.w3,
