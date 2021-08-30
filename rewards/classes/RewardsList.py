@@ -47,24 +47,11 @@ class RewardsList:
         else:
             self.totals[token] = toAdd
 
-    def track_user_metadata(self, user, metadata):
-        if user in self.metadata:
-            self.metadata[user].shareSeconds += metadata[user]["shareSeconds"]
-            self.metadata[user].shareSecondsInRange += metadata[user][
-                "shareSecondsInRange"
-            ]
+    def hasToken(self, token):
+        if self.tokens[token]:
+            return self.tokens[token]
         else:
-            self.metadata[user] = DotMap()
-            self.metadata[user].shareSeconds = metadata[user]["shareSeconds"]
-            self.metadata[user].shareSecondsInRange = metadata[user][
-                "shareSecondsInRange"
-            ]
-
-        def hasToken(self, token):
-            if self.tokens[token]:
-                return self.tokens[token]
-            else:
-                return False
+            return False
 
     def getTokenRewards(self, user, token):
         if self.claims[user][token]:
@@ -77,7 +64,6 @@ class RewardsList:
         Use abi.encode() to encode data into the hex format used as raw node information in the tree
         This is the value that will be hashed to form the rest of the tree
         """
-        user_str = str(user).lower()
         nodeEntry = {
             "user": user,
             "tokens": [],

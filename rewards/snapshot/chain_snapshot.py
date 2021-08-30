@@ -5,13 +5,13 @@ from rewards.classes.UserBalance import UserBalances, UserBalance
 from subgraph.client import fetch_chain_balances, fetch_sett_balances
 from functools import lru_cache
 from rich.console import Console
-from typing import Dict
+from typing import Dict, Tuple
 
 console = Console()
 
 
 @lru_cache(maxsize=128)
-def chain_snapshot(chain: str, block: int):
+def chain_snapshot(chain: str, block: int) -> Dict[str, UserBalances]:
     """
     Take a snapshot of a chains sett balances at a certain block
 
@@ -37,7 +37,13 @@ def chain_snapshot(chain: str, block: int):
 
 
 @lru_cache(maxsize=128)
-def sett_snapshot(chain, block, sett):
+def sett_snapshot(chain: str, block: int, sett: str) -> UserBalances:
+    """
+    Take a snapshot of a sett on a chain at a certain block
+    :param chain:
+    :param block:
+    :param sett:
+    """
     token = make_contract(sett, abiName="ERC20", chain=chain)
     console.log(
         "Taking snapshot on {} of {} at {}".format(
@@ -48,7 +54,7 @@ def sett_snapshot(chain, block, sett):
     return parse_sett_balances(sett, sett_balances)
 
 
-def parse_sett_balances(settAddress: str, balances: Dict[str, int]):
+def parse_sett_balances(settAddress: str, balances: Dict[str, int]) -> UserBalances:
     """
     Blacklist balances and add metadata for boost
     :param balances: balances of users:
@@ -71,7 +77,7 @@ def parse_sett_balances(settAddress: str, balances: Dict[str, int]):
     return UserBalances(userBalances, settType, settRatio)
 
 
-def get_sett_info(settAddress):
+def get_sett_info(settAddress) -> Tuple[str,float]:
     info = SETT_INFO.get(
         env_config.get_web3().toChecksumAddress(settAddress),
         {"type": "nonNative", "ratio": 1},

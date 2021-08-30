@@ -1,10 +1,10 @@
 import requests
 from config.env_config import env_config
-
+from typing import Dict
 urls = {"polygon": "https://api.polygonscan.com", "bsc": "https://api.bscscan.com"}
 
 
-def get_block_by_timestamp(chain: str, timestamp: int):
+def get_block_by_timestamp(chain: str, timestamp: int) -> int:
     url = "api?module=block&action=getblocknobytime&timestamp={}&closest=before".format(
         timestamp
     )
@@ -12,7 +12,7 @@ def get_block_by_timestamp(chain: str, timestamp: int):
     return int(response["result"])
 
 
-def convert_from_eth(block):
+def convert_from_eth(block) -> Dict[str, int]:
     """
     Convert block from eth to blocks on other chains
     """

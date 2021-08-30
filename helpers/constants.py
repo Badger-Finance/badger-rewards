@@ -1,5 +1,4 @@
 from web3 import Web3
-
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
 EmptyBytes32 = "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -16,7 +15,6 @@ class RoleRegistry:
     def add_role(self, name):
         encoded = Web3.keccak(text=name).hex()
         self.roles[name] = encoded
-
 
 # Approved Contract Roles
 APPROVED_STAKER_ROLE = Web3.keccak(text="APPROVED_STAKER_ROLE").hex()
@@ -158,4 +156,3 @@ BADGER_TREE = {
 CONTROLLER = {"polygon": "0xc00e71719d1494886942d6277DAeA20494cf0EeC"}
 DISABLED_VAULTS = ["0xb6bd5ae3d5f78a6bb04bbb031e24fa9c2bbd090d"]
 
-PROPOSER_ADDRESS = "0x68de9E2b015904530593426d934CE608e117Fa7A"

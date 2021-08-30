@@ -3,6 +3,7 @@ from rewards.rewards_utils import combine_rewards
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from subgraph.client import fetch_tree_distributions
 from rewards.classes.RewardsList import RewardsList
+from rewards.classes.Schedule import Schedule
 from helpers.time_utils import to_utc_date, to_hours
 from config.env_config import env_config
 from rich.console import Console
@@ -23,17 +24,16 @@ class RewardsManager:
     def fetch_sett_snapshot(self, block: int, sett: str):
         return sett_snapshot(self.chain, block, sett)
 
-    def get_sett_from_strategy(self, strat: str):
+    def get_sett_from_strategy(self, strat: str) -> str:
         strategy = make_contract(strat, "BaseStrategy", self.chain)
         controller = make_contract(
             strategy.functions.controller().call(), "Controller", self.chain
         )
         want = strategy.functions.want().call()
         sett = controller.functions.vaults(want).call()
-        console.log(sett)
         return sett
 
-    def calculate_sett_rewards(self, sett, schedulesByToken, boosts):
+    def calculate_sett_rewards(self, sett, schedulesByToken, boosts) -> RewardsList:
         startTime = self.web3.eth.getBlock(self.start)["timestamp"]
         endTime = self.web3.eth.getBlock(self.end)["timestamp"]
         rewards = RewardsList(self.cycle)
@@ -58,7 +58,7 @@ class RewardsManager:
                     )
         return rewards
 
-    def calculate_all_sett_rewards(self, setts: List[str], allSchedules, boosts):
+    def calculate_all_sett_rewards(self, setts: List[str], allSchedules, boosts) -> RewardsList: 
         allRewards = []
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
@@ -71,7 +71,7 @@ class RewardsManager:
 
         return combine_rewards(allRewards, self.cycle + 1)
 
-    def get_distributed_for_token_at(self, token, endTime, schedules):
+    def get_distributed_for_token_at(self, token: str, endTime: int, schedules: List[Schedule]) -> float:
         totalToDistribute = 0
         for index, schedule in enumerate(schedules):
             if endTime < schedule.startTime:
@@ -130,7 +130,7 @@ class RewardsManager:
                 self.apyBoosts[sett][user.address] = postBoost / preBoost[user.address]
         return snapshot
 
-    def calculate_tree_distributions(self):
+    def calculate_tree_distributions(self) -> RewardsList:
         treeDistributions = fetch_tree_distributions(self.start, self.end, self.chain)
         console.log(
             "Fetched {} tree distributions between {} and {}".format(

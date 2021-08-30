@@ -3,6 +3,7 @@ import os
 from decouple import config
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
+from eth_account import Account
 
 
 class EnvConfig:
@@ -11,7 +12,9 @@ class EnvConfig:
         self.graph_api_key = config("GRAPH_API_KEY")
         self.test_webhook_url = config("TEST_WEBHOOK_URL")
         self.discord_webhook_url = config("DISCORD_WEBHOOK_URL")
-        self.test = True
+        self.proposeAccount = Account.from_key(config("PROPOSE_PKEY",''))
+        self.approveAccount = Account.from_key(config("APPROVE_PKEY",''))
+        self.test = False
         polygon = Web3(Web3.HTTPProvider(config("POLYGON_NODE_URL")))
         polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
 
@@ -24,7 +27,7 @@ class EnvConfig:
     def get_web3(self, chain="eth"):
         return self.web3[chain]
 
-    def get_webhook_url(self):
+    def get_webhook_url(self) -> str:
         if self.test:
             return self.test_webhook_url
         else:
