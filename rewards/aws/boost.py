@@ -7,6 +7,7 @@ import json
 console = Console()
 boostsFileName = "badger-boosts.json"
 
+
 def upload_boosts(boostData):
     """Upload boosts file to aws bucket
 

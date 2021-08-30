@@ -58,7 +58,9 @@ class RewardsManager:
                     )
         return rewards
 
-    def calculate_all_sett_rewards(self, setts: List[str], allSchedules, boosts) -> RewardsList: 
+    def calculate_all_sett_rewards(
+        self, setts: List[str], allSchedules, boosts
+    ) -> RewardsList:
         allRewards = []
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
@@ -71,7 +73,9 @@ class RewardsManager:
 
         return combine_rewards(allRewards, self.cycle + 1)
 
-    def get_distributed_for_token_at(self, token: str, endTime: int, schedules: List[Schedule]) -> float:
+    def get_distributed_for_token_at(
+        self, token: str, endTime: int, schedules: List[Schedule]
+    ) -> float:
         totalToDistribute = 0
         for index, schedule in enumerate(schedules):
             if endTime < schedule.startTime:

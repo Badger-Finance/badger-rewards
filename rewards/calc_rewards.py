@@ -70,7 +70,7 @@ def process_cumulative_rewards(current, new: RewardsList):
     """Combine past rewards with new rewards
 
     :param current: current rewards
-    :param new: new rewards 
+    :param new: new rewards
     :return: [description]
     :rtype: [type]
     """
@@ -117,12 +117,15 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
     console.log("Generated rewards")
 
     console.log(
-        "\n==== Proposing root with rootHash {} ====\n".format(
-                rewards_data["rootHash"]
-        )
+        "\n==== Proposing root with rootHash {} ====\n".format(rewards_data["rootHash"])
     )
     treeManager.propose_root(rewards_data)
-    upload_tree(rewards_data["fileName"], rewards_data["merkleTree"], chain, publish=env_config.test)
+    upload_tree(
+        rewards_data["fileName"],
+        rewards_data["merkleTree"],
+        chain,
+        publish=env_config.test,
+    )
 
 
 def approve_root(chain: str, start: int, end: int, currentRewards):
@@ -137,14 +140,21 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
     if not treeManager.has_pending_root():
         return
     else:
-        rewards_data = generate_rewards_in_range(chain, start, end, save=True,pastTree=currentRewards)
+        rewards_data = generate_rewards_in_range(
+            chain, start, end, save=True, pastTree=currentRewards
+        )
         console.log(
-                "\n==== Approving root with rootHash {} ====\n".format(
-                    rewards_data["rootHash"]
-                )
+            "\n==== Approving root with rootHash {} ====\n".format(
+                rewards_data["rootHash"]
+            )
         )
         treeManager.approve_root(rewards_data)
-        upload_tree(rewards_data["fileName"], rewards_data["merkleTree"], chain, publish=env_config.test)
+        upload_tree(
+            rewards_data["fileName"],
+            rewards_data["merkleTree"],
+            chain,
+            publish=env_config.test,
+        )
         return rewards_data
 
 
@@ -174,7 +184,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     )
 
     newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle)
-    
+
     console.log("Combining cumulative rewards... \n")
     cumulativeRewards = process_cumulative_rewards(pastTree, newRewards)
 
@@ -183,7 +193,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     rootHash = rewardsManager.web3.keccak(text=merkleTree["merkleRoot"])
     chainId = rewardsManager.web3.eth.chain_id
     fileName = "rewards-{}-{}.json".format(chainId, encode_hex(rootHash))
-    
+
     verify_rewards(pastTree, merkleTree)
 
     if save:

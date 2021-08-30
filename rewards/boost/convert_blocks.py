@@ -1,6 +1,7 @@
 import requests
 from config.env_config import env_config
 from typing import Dict
+
 urls = {"polygon": "https://api.polygonscan.com", "bsc": "https://api.bscscan.com"}
 
 

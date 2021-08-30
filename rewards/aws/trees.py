@@ -82,7 +82,7 @@ def upload_tree(
     :param data: the data to push
     """
     chainId = env_config.get_web3(chain).eth.chain_id
-    
+
     if not publish:
         if chain == "eth":
             bucket = "badger-json"
