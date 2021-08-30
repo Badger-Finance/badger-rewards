@@ -1,3 +1,4 @@
+from rewards.etherscan import etherscan_tx_url
 from helpers.discord import send_message_to_discord
 from eth_utils.hexadecimal import encode_hex
 from eth_utils import to_bytes
@@ -24,6 +25,21 @@ class TreeManager:
     def convert_to_merkle_tree(self, rewardsList: RewardsList, start: int, end: int):
         return rewards_to_merkle_tree(rewardsList, start, end)
 
+    def build_function_and_send(self, account, gas, func) -> str:
+        tx = func.buildTransaction(
+            {
+                "chainId": self.w3.eth.chain_id,
+                "gasPrice": self.w3.toWei("30", "gwei"),
+                "gas": gas,
+                "nonce": self.w3.eth.get_transaction_count(account.address),
+            }
+        )
+        signedTx = self.w3.eth.account.sign_transaction(
+            tx, private_key=env_config.approveAccount.key
+        )
+        txHash = self.w3.eth.send_raw_transaction(signedTx.rawTransaction).hex()
+        return txHash
+
     def approve_root(self, rewards) -> str:
         console.log("Approving root")
         approveRootFunc = self.badgerTree.functions.approveRoot(
@@ -33,26 +49,16 @@ class TreeManager:
             int(rewards["merkleTree"]["startBlock"]),
             int(rewards["merkleTree"]["endBlock"]),
         )
-        approveRootTx = approveRootFunc.buildTransaction(
-            {
-                "chainId": self.w3.eth.chain_id,
-                "gasPrice": self.w3.toWei("30", "gwei"),
-                "gas": 300000,
-                "nonce": self.w3.eth.get_transaction_count(
-                    env_config.approveAccount.address
-                ),
-            }
+        txHash = self.build_function_and_send(
+            env_config.approveAccount, gas=300000, func=approveRootFunc
         )
-        signedTx = self.w3.eth.account.sign_transaction(
-            approveRootTx, private_key=env_config.approveAccount.key
-        )
-        txHash = self.w3.eth.send_raw_transaction(signedTx.rawTransaction).hex()
+        console.log("Cycle approved :{}".format(txHash))
         send_message_to_discord(
             "**Approved Rewards on {}**".format(self.chain),
             "Calculated rewards between {} and {} \n TX Hash: {} ".format(
                 int(rewards["merkleTree"]["startBlock"]),
                 int(rewards["merkleTree"]["endBlock"]),
-                txHash,
+                etherscan_tx_url(self.chain, txHash),
             ),
             [],
             "Rewards Bot",
@@ -68,27 +74,16 @@ class TreeManager:
             int(rewards["merkleTree"]["startBlock"]),
             int(rewards["merkleTree"]["endBlock"]),
         )
-        proposeRootTx = proposeRootFunc.buildTransaction(
-            {
-                "chainId": self.w3.eth.chain_id,
-                "gasPrice": self.w3.toWei("30", "gwei"),
-                "gas": 200000,
-                "nonce": self.w3.eth.get_transaction_count(
-                    env_config.proposeAccount.address
-                ),
-            }
+        txHash = self.build_function_and_send(
+            env_config.approveAccount, gas=200000, func=proposeRootFunc
         )
-        signedTx = self.w3.eth.account.sign_transaction(
-            proposeRootTx, private_key=env_config.proposeAccount.key
-        )
-        txHash = self.w3.eth.send_raw_transaction(signedTx.rawTransaction).hex()
         console.log("Cycle proposed : {}".format(txHash))
         send_message_to_discord(
             "**Proposed Rewards on {}**".format(self.chain),
             "Calculated rewards between {} and {} \n TX Hash: {} ".format(
                 int(rewards["merkleTree"]["startBlock"]),
                 int(rewards["merkleTree"]["endBlock"]),
-                txHash,
+                etherscan_tx_url(self.chain, txHash),
             ),
             [],
             "Rewards Bot",
@@ -128,7 +123,7 @@ class TreeManager:
         assert tree["merkleRoot"] == merkle["root"]
         lastUpdatePublish = int(merkle["blockNumber"])
         lastUpdate = int(tree["endBlock"])
-        # assert lastUpdatePublish > lastUpdate
+        assert lastUpdatePublish > lastUpdate
         # Ensure file tracks block within 1 day of upload
         # assert abs(lastUpdate - lastUpdatePublish) < 6500
 

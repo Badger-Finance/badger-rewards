@@ -2,14 +2,15 @@ import requests
 from config.env_config import env_config
 from typing import Dict
 
-urls = {"polygon": "https://api.polygonscan.com", "bsc": "https://api.bscscan.com"}
+urls = {"polygon": "polygonscan.com", "bsc": "bscscan.com", "arbitrum": "arbiscan.io"}
 
 
 def get_block_by_timestamp(chain: str, timestamp: int) -> int:
+    chain_url = "https://api.{}".format(urls[chain])
     url = "api?module=block&action=getblocknobytime&timestamp={}&closest=before".format(
         timestamp
     )
-    response = requests.get("{}/{}".format(urls[chain], url)).json()
+    response = requests.get("{}/{}".format(chain_url, url)).json()
     return int(response["result"])
 
 
@@ -23,3 +24,7 @@ def convert_from_eth(block) -> Dict[str, int]:
         "bsc": get_block_by_timestamp("bsc", timestamp) - 1000,
         "polygon": get_block_by_timestamp("polygon", timestamp) - 1000,
     }
+
+
+def etherscan_tx_url(chain: str, txHash: str) -> str:
+    return "https://{}/tx/{}".format(urls[chain], txHash)
