@@ -104,7 +104,7 @@ class TreeManager:
                         },
                         {
                             "name": "Gas Cost",
-                            "value": etherscan_tx_url(self.chain, tx_hash),
+                            "value": get_gas_price_of_tx(self.w3, self.chain, tx_hash),
                             "inline": True,
                         },
                     ],
