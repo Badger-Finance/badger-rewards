@@ -8,11 +8,7 @@ from eth_account import Account
 
 class EnvConfig:
     def __init__(self):
-<<<<<<< Updated upstream
         self.test = config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
-=======
-        self.test = os.getenv("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
->>>>>>> Stashed changes
         self.graph_api_key = get_secret(
             "boost-bot/graph-api-key-d", "GRAPH_API_KEY", test=self.test
         )
