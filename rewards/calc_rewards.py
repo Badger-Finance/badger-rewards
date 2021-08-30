@@ -109,9 +109,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
     timeSinceLastUpdate = currentTime - currentMerkleData["lastUpdateTime"]
 
     if timeSinceLastUpdate < rewards_config.rootUpdateMinInterval:
-        console.log(
-            "[bold yellow]===== Last update too recent ({}) =====[/bold yellow]"
-        )
+        console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
         return
     rewards_data = generate_rewards_in_range(chain, start, end, True, pastRewards)
     console.log("Generated rewards")
