@@ -44,12 +44,12 @@ def get_gas_price_of_tx(
             address="0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
             abi=get_abi("eth", "ChainlinkOracle"),
         )
-    elif chain == "poly":
+    elif chain == "polygon":
         tx = web3.eth.get_transaction(tx_hash)
         gas_price_base = Decimal(tx.get("gasPrice", 0) / 10 ** 18)
         gas_oracle = web3.eth.contract(
             address="0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
-            abi=get_abi("poly", "ChainlinkOracle"),
+            abi=get_abi("polygon", "ChainlinkOracle"),
         )
     gas_usd = Decimal(
         gas_oracle.functions.latestAnswer().call()
@@ -82,7 +82,7 @@ def get_effective_gas_price(web3: Web3, chain: str = "eth") -> int:
         logger.info(f"avg priority fee: {priority_fee}")
         # max fee aka gas price enough to get included in next 6 blocks
         gas_price = 2 * base_fee + priority_fee
-    elif chain == "poly":
+    elif chain == "polygon":
         response = requests.get("https://gasstation-mainnet.matic.network").json()
         gas_price = web3.toWei(int(response.get("fast") * 1.1), "gwei")
     return gas_price
@@ -143,12 +143,3 @@ def confirm_transaction(
         msg = f"Error waiting for {tx_hash.hex()}. Error: {e}."
         logger.error(msg)
         return False, msg
-
-
-def get_explorer_url(chain: str, tx_hash: str) -> str:
-    if chain.lower() == "eth":
-        explorer_url = f"https://etherscan.io/tx/{tx_hash.hex()}"
-    elif chain.lower() == "poly":
-        explorer_url = f"https://polygonscan.com/tx/{tx_hash.hex()}"
-
-    return explorer_url

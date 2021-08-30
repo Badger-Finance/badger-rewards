@@ -33,10 +33,8 @@ class TreeManager:
         return rewards_to_merkle_tree(rewardsList, start, end)
 
     def build_function_and_send(self, account, gas, func) -> str:
-        tx = func.buildTransaction(self.get_tx_options(chain))
-        signed_tx = self.w3.eth.account.sign_transaction(
-            tx, private_key=account.key
-        )
+        tx = func.buildTransaction(self.get_tx_options())
+        signed_tx = self.w3.eth.account.sign_transaction(tx, private_key=account.key)
         tx_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
         return tx_hash
 
@@ -53,7 +51,7 @@ class TreeManager:
         txHash = self.build_function_and_send(
             env_config.approveAccount, gas=300000, func=approveRootFunc
         )
-    
+
         console.log("Cycle approved :{}".format(txHash))
         send_message_to_discord(
             "**Approved Rewards on {}**".format(self.chain),
@@ -67,7 +65,7 @@ class TreeManager:
         )
         return txHash
 
-    def propose_root(self, chain: str, rewards: dict) -> str:
+    def propose_root(self, rewards: dict) -> str:
         console.log("Propose root")
         propose_root_func = self.badgerTree.functions.proposeRoot(
             to_bytes(hexstr=rewards["merkleTree"]["merkleRoot"]),
@@ -93,7 +91,7 @@ class TreeManager:
             )
             console.log("Cycle proposed : {}".format(tx_hash))
             if succeeded:
-                gas_price_of_tx = get_gas_price_of_tx(self.w3, chain, tx_hash)
+                gas_price_of_tx = get_gas_price_of_tx(self.w3, self.chain, tx_hash)
                 console.log(f"got gas price of tx: {gas_price_of_tx}")
                 send_message_to_discord(
                     title,
@@ -101,12 +99,12 @@ class TreeManager:
                     [
                         {
                             "name": "Completed Transaction",
-                            "value": get_explorer_url(chain, tx_hash),
+                            "value": etherscan_tx_url(self.chain, tx_hash),
                             "inline": True,
                         },
                         {
                             "name": "Gas Cost",
-                            "value": get_explorer_url(chain, tx_hash),
+                            "value": etherscan_tx_url(self.chain, tx_hash),
                             "inline": True,
                         },
                     ],
@@ -119,7 +117,7 @@ class TreeManager:
                     [
                         {
                             "name": "Pending Transaction",
-                            "value": get_explorer_url(chain, tx_hash),
+                            "value": etherscan_tx_url(self.chain, tx_hash),
                             "inline": True,
                         }
                     ],
@@ -202,14 +200,14 @@ class TreeManager:
     def last_propose_start_block(self) -> int:
         return self.badgerTree.functions.lastProposeStartBlock().call()
 
-    def get_tx_options(self, chain: str) -> dict:
+    def get_tx_options(self) -> dict:
         options = {
             "nonce": self.w3.eth.get_transaction_count(
                 env_config.propose_account.address
             ),
             "from": env_config.propose_account.address,
         }
-        if chain == "eth":
+        if self.chain == "eth":
             options["maxPriorityFeePerGas"] = get_priority_fee(self.w3)
             options["maxFeePerGas"] = get_effective_gas_price(self.w3)
             options["gas"] = 200000
