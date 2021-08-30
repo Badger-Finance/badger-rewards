@@ -8,19 +8,38 @@ from eth_account import Account
 
 class EnvConfig:
     def __init__(self):
+        self.test = config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
+        self.graph_api_key = get_secret(
+            "boost-bot/graph-api-key-d", "GRAPH_API_KEY", test=self.test
+        )
+        self.test_webhook_url = get_secret(
+            "boost-bot/test-discord-url", "TEST_WEBHOOK_URL", test=self.test
+        )
+        self.discord_webhook_url = get_secret(
+            "boost-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=self.test
+        )
+        self.propose_account = Account.from_key(
+            get_secret("path", "PROPOSE_PKEY", test=self.test)
+        )
+        self.approve_account = Account.from_key(
+            get_secret("path", "APPROVE_PKEY", test=self.test)
+        )
 
-        self.graph_api_key = config("GRAPH_API_KEY")
-        self.test_webhook_url = config("TEST_WEBHOOK_URL")
-        self.discord_webhook_url = config("DISCORD_WEBHOOK_URL")
-        self.proposeAccount = Account.from_key(config("PROPOSE_PKEY", ""))
-        self.approveAccount = Account.from_key(config("APPROVE_PKEY", ""))
-        self.test = False
-        polygon = Web3(Web3.HTTPProvider(config("POLYGON_NODE_URL")))
+        self.graph_api_key = get_secret("path", "GRAPH_API_KEY", test=self.test)
+        polygon = Web3(
+            Web3.HTTPProvider(get_secret("path", "POLYGON_NODE_URL", test=self.test))
+        )
         polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
 
         self.web3 = {
-            "eth": Web3(Web3.HTTPProvider(config("ETH_NODE_URL"))),
-            "bsc": Web3(Web3.HTTPProvider(config("BSC_NODE_URL"))),
+            "eth": Web3(
+                Web3.HTTPProvider(
+                    get_secret("quiknode/eth-node-url", "NODE_URL", test=self.test)
+                )
+            ),
+            "bsc": Web3(
+                Web3.HTTPProvider(get_secret("path", "BSC_NODE_URL", test=self.test))
+            ),
             "polygon": polygon,
         }
 

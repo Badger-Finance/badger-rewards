@@ -35,7 +35,7 @@ class TreeManager:
             }
         )
         signedTx = self.w3.eth.account.sign_transaction(
-            tx, private_key=env_config.approveAccount.key
+            tx, private_key=account.key
         )
         txHash = self.w3.eth.send_raw_transaction(signedTx.rawTransaction).hex()
         return txHash
@@ -49,9 +49,11 @@ class TreeManager:
             int(rewards["merkleTree"]["startBlock"]),
             int(rewards["merkleTree"]["endBlock"]),
         )
+
         txHash = self.build_function_and_send(
             env_config.approveAccount, gas=300000, func=approveRootFunc
         )
+    
         console.log("Cycle approved :{}".format(txHash))
         send_message_to_discord(
             "**Approved Rewards on {}**".format(self.chain),
@@ -75,7 +77,7 @@ class TreeManager:
             int(rewards["merkleTree"]["endBlock"]),
         )
         txHash = self.build_function_and_send(
-            env_config.approveAccount, gas=200000, func=proposeRootFunc
+            env_config.proposeAccount, gas=200000, func=proposeRootFunc
         )
         console.log("Cycle proposed : {}".format(txHash))
         send_message_to_discord(
