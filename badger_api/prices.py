@@ -2,6 +2,7 @@ import requests
 from badger_api.config import urls
 from typing import Tuple, Dict
 
+
 def fetch_ppfs() -> Tuple[float, float]:
     """
     Fetch ppfs for bbadger and bdigg

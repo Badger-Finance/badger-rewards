@@ -1,4 +1,3 @@
-from rewards.classes.TreeManager import TreeManager
 from scripts.rewards.utils.propose_rewards import propose_rewards
 from scripts.rewards.utils.approve_rewards import approve_rewards
 

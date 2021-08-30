@@ -77,7 +77,7 @@ def parse_sett_balances(settAddress: str, balances: Dict[str, int]) -> UserBalan
     return UserBalances(userBalances, settType, settRatio)
 
 
-def get_sett_info(settAddress) -> Tuple[str,float]:
+def get_sett_info(settAddress) -> Tuple[str, float]:
     info = SETT_INFO.get(
         env_config.get_web3().toChecksumAddress(settAddress),
         {"type": "nonNative", "ratio": 1},

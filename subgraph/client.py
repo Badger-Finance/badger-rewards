@@ -322,7 +322,7 @@ def fetch_sett_balances(chain, block, sett):
             else:
                 console.log("Fetching {} sett balances".format(len(balanceData)))
                 lastId = balanceData[-1]["id"]
-                
+
         console.log("Fetched {} total sett balances".format(len(balances)))
         return balances
 
