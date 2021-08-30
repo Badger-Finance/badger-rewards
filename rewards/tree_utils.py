@@ -2,6 +2,7 @@ from rewards.classes.TreeManager import TreeManager
 from config.rewards_config import rewards_config
 from config.env_config import env_config
 
+
 def get_last_proposed_cycle(chain: str):
     treeManager = TreeManager(chain)
     # Fetch the appropriate file
@@ -13,10 +14,10 @@ def get_last_proposed_cycle(chain: str):
     # Sanity check: Ensure previous cycle was not too long
     print(lastClaimStart)
     print(lastClaimEnd)
-    #assert lastClaimStart > lastClaimEnd - rewards_config.maxStartBlockAge
+    # assert lastClaimStart > lastClaimEnd - rewards_config.maxStartBlockAge
 
     # Sanity check: Ensure previous end block is not too far in the past
-    #assert lastClaimEnd > chain.height - rewards_config.maxStartBlockAge
+    # assert lastClaimEnd > chain.height - rewards_config.maxStartBlockAge
 
     # Sanity check: Ensure start block is not too close to end block
     return (currentRewards, lastClaimStart, lastClaimEnd)

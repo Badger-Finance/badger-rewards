@@ -8,7 +8,7 @@ console = Console()
 
 def propose_rewards(chain):
 
-    pastRewards, startBlock , endBlock = calc_next_cycle_range(chain)
+    pastRewards, startBlock, endBlock = calc_next_cycle_range(chain)
     console.log(pastRewards)
 
     console.log(
