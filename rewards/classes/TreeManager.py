@@ -59,31 +59,74 @@ class TreeManager:
 
     def approve_root(self, rewards) -> str:
         console.log("Approving root")
-        approveRootFunc = self.badgerTree.functions.approveRoot(
+        approve_root_func = self.badgerTree.functions.approveRoot(
             to_bytes(hexstr=rewards["merkleTree"]["merkleRoot"]),
             to_bytes(hexstr=rewards["rootHash"]),
             int(rewards["merkleTree"]["cycle"]),
             int(rewards["merkleTree"]["startBlock"]),
             int(rewards["merkleTree"]["endBlock"]),
         )
-
-        txHash = self.build_function_and_send(
-            self.approve_account, gas=300000, func=approveRootFunc
-        )
-
-        console.log("Cycle approved :{}".format(txHash))
-        send_message_to_discord(
-            "**Approved Rewards on {}**".format(self.chain),
-            "Calculated rewards between {} and {} \n TX Hash: {} ".format(
+        tx_hash = HexBytes(0)
+        try:
+            tx_hash = self.build_function_and_send(
+                self.approve_account, gas=300000, func=approve_root_func
+            )
+            succeeded, msg = confirm_transaction(
+                self.w3,
+                tx_hash,
+            )
+            title = "**Approved Rewards on {}**".format(self.chain)
+            description = "Calculated rewards between {} and {} \n TX Hash: {} ".format(
                 int(rewards["merkleTree"]["startBlock"]),
                 int(rewards["merkleTree"]["endBlock"]),
-                get_explorer_url(self.chain, txHash),
-            ),
-            [],
-            "Rewards Bot",
-            url=self.discord_url,
-        )
-        return txHash
+                tx_hash,
+            )
+            console.log("Cycle approved : {}".format(tx_hash))
+            if succeeded:
+                gas_price_of_tx = get_gas_price_of_tx(self.w3, self.chain, tx_hash)
+                console.log(f"got gas price of tx: {gas_price_of_tx}")
+                send_message_to_discord(
+                    title,
+                    description,
+                    [
+                        {
+                            "name": "Completed Transaction",
+                            "value": get_explorer_url(self.chain, tx_hash),
+                            "inline": True,
+                        },
+                        {
+                            "name": "Gas Cost",
+                            "value": f"${round(get_gas_price_of_tx(self.w3, self.chain, tx_hash), 2)}",
+                            "inline": True,
+                        },
+                    ],
+                    "Rewards Bot",
+                    url=self.discord_url,
+                )
+            else:
+                send_message_to_discord(
+                    title,
+                    description,
+                    [
+                        {
+                            "name": "Pending Transaction",
+                            "value": get_explorer_url(self.chain, tx_hash),
+                            "inline": True,
+                        }
+                    ],
+                    "Rewards Bot",
+                    url=self.discord_url,
+                )
+        except Exception as e:
+            console.log(f"Error processing harvest tx: {e}")
+            send_message_to_discord(
+                "**FAILED Approve Rewards on {}**".format(self.chain),
+                e,
+                [],
+                "Rewards Bot",
+                url=self.discord_url,
+            )
+        return tx_hash
 
     def propose_root(self, rewards: dict) -> str:
         console.log("Propose root")
