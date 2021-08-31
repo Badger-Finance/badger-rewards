@@ -7,9 +7,12 @@ from rich.console import Console
 console = Console()
 
 if __name__ == "__main__":
-    currentBlock = env_config.web3.eth.block_number
+    currentBlock = env_config.get_web3().eth.block_number
     send_message_to_discord(
-        "**CALCULATING NEW BOOST**", "Pulling data from the graph", [], "Boost Bot"
+        "**CALCULATING NEW BOOST (BSC/Polygon)**",
+        "Pulling data from the graph",
+        [],
+        "Boost Bot",
     )
     boostData = badger_boost(currentBlock)
     add_user_data(userData=boostData)

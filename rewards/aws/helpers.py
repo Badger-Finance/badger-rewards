@@ -1,9 +1,17 @@
 import base64
 import boto3
 from botocore.exceptions import ClientError
+from decouple import config
 import json
 
-s3 = boto3.client("s3")
+if config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]:
+    s3 = boto3.client(
+        "s3",
+        aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"),
+    )
+else:
+    s3 = boto3.client("s3")
 
 
 def get_bucket(test):
@@ -11,7 +19,10 @@ def get_bucket(test):
 
 
 def get_secret(
-    secret_name: str, secret_key: str, region_name: str = "us-west-1"
+    secret_name: str,
+    secret_key: str,
+    region_name: str = "us-west-1",
+    test: bool = False,
 ) -> str:
     """Retrieves secret from AWS secretsmanager.
     Args:
@@ -27,6 +38,8 @@ def get_secret(
     Returns:
         str: secret value
     """
+    if test:
+        return config(secret_key, "")
 
     # Create a Secrets Manager client
     session = boto3.session.Session()
