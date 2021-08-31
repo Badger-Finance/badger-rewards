@@ -5,7 +5,7 @@ metadata:
   labels:
     app: propose-poly-cycle-bot
 spec:
-  schedule: "*/30 * * * *"
+  schedule: "*/15 * * * *"
   jobTemplate:
     spec:
       template:
