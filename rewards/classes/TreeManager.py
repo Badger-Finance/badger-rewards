@@ -124,7 +124,7 @@ class TreeManager:
                         },
                         {
                             "name": "Gas Cost",
-                            "value": get_gas_price_of_tx(self.w3, self.chain, tx_hash),
+                            "value": f"${round(get_gas_price_of_tx(self.w3, self.chain, tx_hash), 2)}",
                             "inline": True,
                         },
                     ],
