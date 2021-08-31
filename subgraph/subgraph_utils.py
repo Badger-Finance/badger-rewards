@@ -18,6 +18,4 @@ def subgraph_url(name):
 def make_gql_client(name):
     url = subgraph_url(name)
     transport = AIOHTTPTransport(url=url)
-    return Client(
-        transport=transport, fetch_schema_from_transport=True, execute_timeout=30
-    )
+    return Client(transport=transport, fetch_schema_from_transport=True, execute_timeout=30)
