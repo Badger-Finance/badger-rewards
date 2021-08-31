@@ -1,5 +1,6 @@
 from rewards.tree_utils import get_last_proposed_cycle
 from rewards.classes.TreeManager import TreeManager
+from rewards.aws.helpers import get_secret
 from config.env_config import env_config
 from helpers.discord import send_message_to_discord
 from rewards.calc_rewards import approve_root, propose_root
@@ -9,6 +10,9 @@ console = Console()
 
 
 def approve_rewards(chain):
+    self.discord_url = get_secret(
+        "cycle-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=env_config.test
+    )
 
     currentRewards, startBlock, endBlock = get_last_proposed_cycle(chain)
     console.log(
@@ -21,5 +25,6 @@ def approve_rewards(chain):
         "Calculating rewards between {} and {}".format(startBlock, endBlock),
         [],
         "Rewards Bot",
+        url=self.discord_url,
     )
     return approve_root(chain, startBlock, endBlock, currentRewards)
