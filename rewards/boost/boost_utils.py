@@ -1,6 +1,6 @@
 from helpers.constants import DISABLED_VAULTS
 from rewards.snapshot.token_snapshot import token_snapshot_usd
-from rewards.etherscan import convert_from_eth
+from rewards.explorer import convert_from_eth
 from rich.console import Console
 from config.env_config import env_config
 from rewards.classes.UserBalance import UserBalances

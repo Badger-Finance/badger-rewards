@@ -26,5 +26,5 @@ def convert_from_eth(block) -> Dict[str, int]:
     }
 
 
-def etherscan_tx_url(chain: str, txHash: str) -> str:
+def get_explorer_url(chain: str, txHash: str) -> str:
     return "https://{}/tx/{}".format(urls[chain], txHash)
