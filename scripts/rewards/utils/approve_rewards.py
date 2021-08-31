@@ -10,7 +10,7 @@ console = Console()
 
 
 def approve_rewards(chain):
-    self.discord_url = get_secret(
+    discord_url = get_secret(
         "cycle-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=env_config.test
     )
 
@@ -25,6 +25,6 @@ def approve_rewards(chain):
         "Calculating rewards between {} and {}".format(startBlock, endBlock),
         [],
         "Rewards Bot",
-        url=self.discord_url,
+        url=discord_url,
     )
     return approve_root(chain, startBlock, endBlock, currentRewards)

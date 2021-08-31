@@ -9,7 +9,7 @@ console = Console()
 
 
 def propose_rewards(chain):
-    self.discord_url = get_secret(
+    discord_url = get_secret(
         "cycle-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=env_config.test
     )
 
@@ -26,6 +26,6 @@ def propose_rewards(chain):
         "Calculating rewards between {} and {}".format(startBlock, endBlock),
         [],
         "Rewards Bot",
-        url=self.discord_url,
+        url=discord_url,
     )
     propose_root(chain, startBlock, endBlock, pastRewards, save=True)
