@@ -11,8 +11,6 @@ def subgraph_url(name):
         )
     elif name in subgraph_urls:
         return subgraph_urls[name]
-    else:
-        return ""
 
 
 def make_gql_client(name):

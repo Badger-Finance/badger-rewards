@@ -1,5 +1,4 @@
 from web3 import Web3
-from dotmap import DotMap
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -93,6 +92,7 @@ TOKENS_TO_CHECK = {
     "Bor": BOR,
 }
 
+BADGER_TREE = "0x660802Fc641b154aBA66a62137e71f331B6d787A"
 
 PEAK_ADDRESSES = [
     "0x825218beD8BE0B30be39475755AceE0250C50627",
@@ -147,22 +147,3 @@ SETT_INFO = {
     "0xC17078FDd324CC473F8175Dc5290fae5f2E84714": {"type": "native", "ratio": 0.5},
     "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6": {"type": "native", "ratio": 0.5},
 }
-
-EMISSIONS_CONTRACTS = {
-    "eth": DotMap(
-        {
-            "BadgerTree": "0x660802Fc641b154aBA66a62137e71f331B6d787A",
-            "RewardsLogger": "0x0A4F4e92C3334821EbB523324D09E321a6B0d8ec",
-            "GasOracle": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
-        }
-    ),
-    "polygon": DotMap(
-        {
-            "BadgerTree": "0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b",
-            "RewardsLogger": "0xd0EE2A5108b8800D688AbC834445fd03b3b2738e",
-            "GasOracle": "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
-        }
-    ),
-}
-
-DISABLED_VAULTS = ["0xb6bd5ae3d5f78a6bb04bbb031e24fa9c2bbd090d"]

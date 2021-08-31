@@ -38,7 +38,7 @@ def badger_boost(currentBlock: int):
     :param currentBlock: block to calculate boost at
     """
     console.log("Calculating boost at block {} ...".format(currentBlock))
-    nativeSetts, nonNativeSetts = calc_boost_data(currentBlock - 10)
+    nativeSetts, nonNativeSetts = calc_boost_data(currentBlock)
     console.log(len(nativeSetts))
     console.log(len(nonNativeSetts))
 
