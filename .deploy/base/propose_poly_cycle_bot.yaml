@@ -1,0 +1,24 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: propose-poly-cycle-bot
+  labels:
+    app: propose-poly-cycle-bot
+spec:
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: propose-poly-cycle-bot
+          containers:
+          - name: propose-poly-cycle-bot
+            image: IMAGE_NAME
+            imagePullPolicy: IfNotPresent
+            command: ["python", "-m", "scripts.rewards.polygon.propose_polygon"]
+            env:
+              - name: LOG_LEVEL
+                value: 'info'
+              - name: TEST
+                value: 'False'
+          restartPolicy: OnFailure
