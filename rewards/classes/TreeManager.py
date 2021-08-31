@@ -111,7 +111,7 @@ class TreeManager:
             )
             console.log("Cycle proposed : {}".format(tx_hash))
             if succeeded:
-                gas_price_of_tx = get_gas_price_of_tx(self.chain, tx_hash)
+                gas_price_of_tx = get_gas_price_of_tx(self.w3, self.chain, tx_hash)
                 console.log(f"got gas price of tx: {gas_price_of_tx}")
                 send_message_to_discord(
                     title,
@@ -124,7 +124,7 @@ class TreeManager:
                         },
                         {
                             "name": "Gas Cost",
-                            "value": get_gas_price_of_tx(self.chain, tx_hash),
+                            "value": get_gas_price_of_tx(self.w3, self.chain, tx_hash),
                             "inline": True,
                         },
                     ],
@@ -202,7 +202,7 @@ class TreeManager:
             "lastUpdateTime": self.badgerTree.functions.lastPublishTimestamp().call(),
             "blockNumber": int(
                 self.badgerTree.functions.lastPublishBlockNumber().call()
-            ),w
+            ),
         }
 
     def fetch_pending_merkle_data(self):
