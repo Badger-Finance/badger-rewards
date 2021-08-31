@@ -3,15 +3,10 @@ from config.env_config import env_config
 from rewards.aws.helpers import get_secret
 
 
-def send_message_to_discord(
-    title: str,
-    description: str,
-    fields: list,
-    username: str,
-    url: str = env_config.get_webhook_url(),
-):
+def send_message_to_discord(title: str, description: str, fields: list, username: str):
+
     webhook = Webhook.from_url(
-        url,
+        env_config.get_webhook_url(),
         adapter=RequestsWebhookAdapter(),
     )
 
