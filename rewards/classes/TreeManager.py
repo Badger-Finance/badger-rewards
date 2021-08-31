@@ -1,4 +1,4 @@
-from rewards.etherscan import etherscan_tx_url
+from rewards.explorer import get_explorer_url
 from helpers.discord import send_message_to_discord
 from eth_utils.hexadecimal import encode_hex
 from eth_utils import to_bytes
@@ -12,7 +12,6 @@ from rewards.tx_utils import (
     get_priority_fee,
     confirm_transaction,
     get_gas_price_of_tx,
-    get_explorer_url,
 )
 from rich.console import Console
 from typing import List
@@ -58,7 +57,7 @@ class TreeManager:
             "Calculated rewards between {} and {} \n TX Hash: {} ".format(
                 int(rewards["merkleTree"]["startBlock"]),
                 int(rewards["merkleTree"]["endBlock"]),
-                etherscan_tx_url(self.chain, txHash),
+                get_explorer_url(self.chain, txHash),
             ),
             [],
             "Rewards Bot",
@@ -91,7 +90,7 @@ class TreeManager:
             )
             console.log("Cycle proposed : {}".format(tx_hash))
             if succeeded:
-                gas_price_of_tx = get_gas_price_of_tx(self.w3, self.chain, tx_hash)
+                gas_price_of_tx = get_gas_price_of_tx(self.chain, tx_hash)
                 console.log(f"got gas price of tx: {gas_price_of_tx}")
                 send_message_to_discord(
                     title,
@@ -99,12 +98,12 @@ class TreeManager:
                     [
                         {
                             "name": "Completed Transaction",
-                            "value": etherscan_tx_url(self.chain, tx_hash),
+                            "value": get_explorer_url(self.chain, tx_hash),
                             "inline": True,
                         },
                         {
                             "name": "Gas Cost",
-                            "value": get_gas_price_of_tx(self.w3, self.chain, tx_hash),
+                            "value": get_gas_price_of_tx(self.chain, tx_hash),
                             "inline": True,
                         },
                     ],
@@ -117,7 +116,7 @@ class TreeManager:
                     [
                         {
                             "name": "Pending Transaction",
-                            "value": etherscan_tx_url(self.chain, tx_hash),
+                            "value": get_explorer_url(self.chain, tx_hash),
                             "inline": True,
                         }
                     ],

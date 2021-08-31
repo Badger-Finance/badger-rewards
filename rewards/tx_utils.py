@@ -1,9 +1,12 @@
 from decimal import Decimal
+from helpers.constants import EMISSIONS_CONTRACTS
 from hexbytes import HexBytes
 import json
 import logging
 import requests
-from web3 import Web3, contract, exceptions
+from web3 import Web3, exceptions
+from config.env_config import env_config
+from typing import Tuple
 
 logger = logging.getLogger("tx-utils")
 
@@ -34,23 +37,19 @@ def get_gas_price_of_tx(
         tx_receipt = web3.eth.get_transaction_receipt(tx_hash)
     except exceptions.TransactionNotFound:
         tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+        
     logger.info(f"tx: {tx_receipt}")
     total_gas_used = Decimal(tx_receipt.get("gasUsed", 0))
     logger.info(f"gas used: {total_gas_used}")
-
+    gas_oracle = web3.eth.contract(
+        EMISSIONS_CONTRACTS[chain]["GasOracle"],
+        abi=get_abi(chain, "ChainlinkOracle")    
+    )
     if chain == "eth":
         gas_price_base = Decimal(tx_receipt.get("effectiveGasPrice", 0) / 10 ** 18)
-        gas_oracle = web3.eth.contract(
-            address="0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
-            abi=get_abi("eth", "ChainlinkOracle"),
-        )
     elif chain == "polygon":
         tx = web3.eth.get_transaction(tx_hash)
         gas_price_base = Decimal(tx.get("gasPrice", 0) / 10 ** 18)
-        gas_oracle = web3.eth.contract(
-            address="0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
-            abi=get_abi("polygon", "ChainlinkOracle"),
-        )
     gas_usd = Decimal(
         gas_oracle.functions.latestAnswer().call()
         / 10 ** gas_oracle.functions.decimals().call()
@@ -116,7 +115,7 @@ def get_priority_fee(
 
 def confirm_transaction(
     web3: Web3, tx_hash: HexBytes, timeout: int = 60, max_block: int = None
-) -> tuple[bool, str]:
+) -> Tuple[bool, str]:
     """Waits for transaction to appear within a given timeframe or before a given block (if specified), and then times out.
 
     Args:

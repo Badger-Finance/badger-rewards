@@ -7,7 +7,7 @@ from rewards.rewards_utils import combine_rewards
 from rewards.rewards_checker import verify_rewards
 from rewards.aws.boost import download_boosts
 from helpers.web3_utils import make_contract
-from helpers.constants import DISABLED_VAULTS, REWARDS_LOGGER
+from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS
 from helpers.discord import send_message_to_discord
 from subgraph.client import list_setts
 from typing import List
@@ -47,7 +47,7 @@ def fetch_all_schedules(chain: str, setts: List[str]):
     :param chain: chain to fetch from
     :param setts: setts from which schedule to pull
     """
-    logger = make_contract(REWARDS_LOGGER[chain], "RewardsLogger", chain)
+    logger = make_contract(EMISSIONS_CONTRACTS[chain]["RewardsLogger"], "RewardsLogger", chain)
     allSchedules = {}
     for sett in setts:
         schedules = logger.functions.getAllUnlockSchedulesFor(sett).call()

@@ -1,4 +1,4 @@
-from helpers.constants import BADGER_TREE
+from helpers.constants import BADGER_TREE, EMISSIONS_CONTRACTS
 from config.env_config import env_config
 import json
 
@@ -12,4 +12,4 @@ def make_contract(address: str, abiName: str, chain: str):
 
 
 def get_badger_tree(chain: str):
-    return make_contract(BADGER_TREE[chain], abiName="BadgerTreeV2", chain=chain)
+    return make_contract(EMISSIONS_CONTRACTS[chain]["BadgerTree"], abiName="BadgerTreeV2", chain=chain)
