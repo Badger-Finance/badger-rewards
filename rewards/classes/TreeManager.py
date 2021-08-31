@@ -201,7 +201,7 @@ class TreeManager:
             "lastUpdateTime": self.badgerTree.functions.lastPublishTimestamp().call(),
             "blockNumber": int(
                 self.badgerTree.functions.lastPublishBlockNumber().call()
-            ),
+            ),w
         }
 
     def fetch_pending_merkle_data(self):
@@ -232,6 +232,6 @@ class TreeManager:
             options["maxFeePerGas"] = get_effective_gas_price(self.w3)
             options["gas"] = 200000
         else:
-            options["gasPrice"] = get_effective_gas_price()
+            options["gasPrice"] = get_effective_gas_price(self.w3)
 
         return options
