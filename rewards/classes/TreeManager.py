@@ -3,6 +3,7 @@ from rewards.explorer import get_explorer_url
 from helpers.discord import send_message_to_discord
 from eth_utils.hexadecimal import encode_hex
 from eth_utils import to_bytes
+from hexbytes import HexBytes
 from config.env_config import env_config
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.aws.helpers import get_secret
@@ -93,7 +94,7 @@ class TreeManager:
             int(rewards["merkleTree"]["startBlock"]),
             int(rewards["merkleTree"]["endBlock"]),
         )
-
+        tx_hash = HexBytes(0)
         try:
             tx_hash = self.build_function_and_send(
                 self.propose_account, gas=200000, func=propose_root_func
