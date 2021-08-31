@@ -18,12 +18,6 @@ class EnvConfig:
         self.discord_webhook_url = get_secret(
             "boost-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=self.test
         )
-        self.propose_account = Account.from_key(
-            get_secret("path", "PROPOSE_PKEY", test=self.test)
-        )
-        self.approve_account = Account.from_key(
-            get_secret("path", "APPROVE_PKEY", test=self.test)
-        )
         polygon = Web3(
             Web3.HTTPProvider(get_secret("path", "POLYGON_NODE_URL", test=self.test))
         )
