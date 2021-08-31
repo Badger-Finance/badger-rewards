@@ -1,22 +1,19 @@
 from helpers.discord import send_message_to_discord
 from subgraph.subgraph_utils import make_gql_client
 from rich.console import Console
-from gql import gql, Client
-from gql.transport.aiohttp import AIOHTTPTransport
+from gql import gql
 from decimal import *
 import math
 from functools import lru_cache
 
 getcontext().prec = 20
+harvests_client = make_gql_client("harvests-eth")
 console = Console()
 
-tokens_client = make_gql_client("tokens")
-harvests_client = make_gql_client("harvests")
 
-## TODO: seperate files by chain/subgraph
-
-
-def fetch_tree_distributions(startBlock, endBlock):
+def fetch_tree_distributions(startBlock, endBlock, chain):
+    tree_client = make_gql_client("harvests-{}".format(chain))
+    console.log(startBlock, endBlock)
     query = gql(
         """
         query tree_distributions(
@@ -40,7 +37,7 @@ def fetch_tree_distributions(startBlock, endBlock):
     treeDistributions = []
     while True:
         variables["lastDistId"] = {"id_gt": lastDistId}
-        results = harvests_client.execute(query, variable_values=variables)
+        results = tree_client.execute(query, variable_values=variables)
         distData = results["treeDistributions"]
         if len(distData) == 0:
             break
@@ -138,7 +135,6 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
 
     badger_balances = {}
     digg_balances = {}
-    ibbtc_balances = {}
     try:
         while continueFetching:
             variables = {
@@ -188,9 +184,8 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
     return badger_balances, digg_balances
 
 
-def fetch_chain_balances(chain, block):
-    client = make_gql_client(chain)
-    query = gql(
+def balances_query():
+    return gql(
         """
         query balances($blockHeight: Block_height,$lastId:UserSettBalance_filter) {
             userSettBalances(first: 1000, block: $blockHeight, where:$lastId) {
@@ -209,6 +204,27 @@ def fetch_chain_balances(chain, block):
         }
         """
     )
+
+
+def list_setts(chain):
+    client = make_gql_client(chain)
+    query = gql(
+        """
+    {
+	    setts(first:100) {
+            id
+            name
+        }
+    }
+    """
+    )
+    results = client.execute(query)
+    return list(map(lambda s: s["id"], results["setts"]))
+
+
+def fetch_chain_balances(chain, block):
+    client = make_gql_client(chain)
+    query = balances_query()
     lastId = ""
     variables = {"blockHeight": {"number": block}}
     balances = {}
@@ -238,22 +254,78 @@ def fetch_chain_balances(chain, block):
             else:
                 console.log("Fetching {} sett balances".format(len(balanceData)))
                 lastId = balanceData[-1]["id"]
-        console.log("Fetched {} total sett balances".format(len(balances)))
+        console.log("Fetched {} total setts".format(len(balances)))
         return balances
     except Exception as e:
-        send_message_to_discord(
-            "**BADGER BOOST ERROR**",
-            f":x: Error in Fetching Token Balance",
-            [
-                {
-                    "name": "Error Type",
-                    "value": type(e),
-                    "inline": True,
-                    "name": "Error Description",
-                    "value": e.args,
-                    "inline": True,
-                }
-            ],
-            "Boost Bot",
-        )
+        send_error_to_discord(e, "Error in Fetching Sett Balance")
+        raise e
+
+
+def send_error_to_discord(e, errorMsg):
+    send_message_to_discord(
+        "**BADGER BOOST ERROR**",
+        ":x: {}".format(errorMsg),
+        [
+            {
+                "name": "Error Type",
+                "value": type(e),
+                "inline": True,
+                "name": "Error Description",
+                "value": e.args,
+                "inline": True,
+            }
+        ],
+        "Boost Bot",
+    )
+
+
+def fetch_setts(chain):
+    query = gql(
+        """
+            query = gql(
+        """
+        """
+    )
+        """
+    )
+
+
+def fetch_sett_balances(chain, block, sett):
+    client = make_gql_client(chain)
+    query = balances_query()
+    lastId = ""
+    variables = {
+        "blockHeight": {"number": block},
+        "lastId": {"id_gt": "", "sett": sett.lower()},
+    }
+    balances = {}
+    try:
+        while True:
+            variables["lastId"]["id_gt"] = lastId
+            results = client.execute(query, variable_values=variables)
+            balanceData = results["userSettBalances"]
+            for result in balanceData:
+                account = result["user"]["id"].lower()
+                decimals = int(result["sett"]["token"]["decimals"])
+                sett = result["sett"]["id"]
+                if sett == "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a".lower():
+                    decimals = 18
+                deposit = float(result["netShareDeposit"]) / math.pow(10, decimals)
+                if deposit > 0:
+                    if account not in balances:
+                        balances[account] = deposit
+                    else:
+                        balances[account] += deposit
+
+            if len(balanceData) == 0:
+                break
+            else:
+                console.log("Fetching {} sett balances".format(len(balanceData)))
+                lastId = balanceData[-1]["id"]
+
+        console.log("Fetched {} total sett balances".format(len(balances)))
+        return balances
+
+    except Exception as e:
+        send_error_to_discord(e, "Error in Fetching Sett Balance")
         raise e

@@ -1,8 +1,9 @@
 import requests
 from badger_api.config import urls
+from typing import Tuple, Dict
 
 
-def fetch_ppfs():
+def fetch_ppfs() -> Tuple[float, float]:
     """
     Fetch ppfs for bbadger and bdigg
     """
@@ -12,9 +13,16 @@ def fetch_ppfs():
     return badger["ppfs"], digg["ppfs"]
 
 
-def fetch_token_prices():
+def fetch_token_prices() -> Dict[str, float]:
     """
-    Fetch token prices for lp tokens
+    Fetch token prices for sett tokens
     """
-    response = requests.get("{}/prices".format(urls["staging"])).json()
-    return response
+    chains = ["eth", "bsc", "matic"]
+    prices = {}
+    for chain in chains:
+        chain_prices = requests.get(
+            "{}/prices?chain={}".format(urls["staging"], chain)
+        ).json()
+        prices = {**prices, **chain_prices}
+
+    return prices

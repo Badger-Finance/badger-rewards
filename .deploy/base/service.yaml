@@ -12,3 +12,31 @@ spec:
     - name: http
       port: 9000
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: propose-poly-cycle-bot
+  labels:
+    app: propose-poly-cycle-bot
+    service: propose-poly-cycle-bot
+spec:
+  selector:
+    app: propose-poly-cycle-bot
+  ports:
+    - name: http
+      port: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: approve-poly-cycle-bot
+  labels:
+    app: approve-poly-cycle-bot
+    service: approve-poly-cycle-bot
+spec:
+  selector:
+    app: approve-poly-cycle-bot
+  ports:
+    - name: http
+      port: 9000
+---

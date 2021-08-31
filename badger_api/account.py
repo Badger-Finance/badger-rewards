@@ -22,7 +22,6 @@ def fetch_claimable_balances(addresses: List[str]):
     Fetch the claimable balances for a list of address
     by fetching in parallel
 
-
     :param addresses: list of addresses whose balances we want
     """
     results = {}
