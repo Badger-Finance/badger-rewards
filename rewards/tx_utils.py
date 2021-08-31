@@ -127,17 +127,17 @@ def confirm_transaction(
         bool: True if transaction was confirmed, False otherwise.
         msg: Log message.
     """
-    logger.info(f"tx_hash before confirm: {tx_hash.hex()}")
+    logger.info(f"tx_hash before confirm: {tx_hash}")
 
     try:
         web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)
-        msg = f"Transaction {tx_hash.hex()} succeeded!"
+        msg = f"Transaction {tx_hash} succeeded!"
         logger.info(msg)
         return True, msg
     except exceptions.TimeExhausted:
-        msg = f"Transaction {tx_hash.hex()} timed out, not included in block yet."
+        msg = f"Transaction {tx_hash} timed out, not included in block yet."
         return False, msg
     except Exception as e:
-        msg = f"Error waiting for {tx_hash.hex()}. Error: {e}."
+        msg = f"Error waiting for {tx_hash}. Error: {e}."
         logger.error(msg)
         return False, msg
