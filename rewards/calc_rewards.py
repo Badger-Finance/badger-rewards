@@ -6,6 +6,7 @@ from rewards.classes.Schedule import Schedule
 from rewards.rewards_utils import combine_rewards
 from rewards.rewards_checker import verify_rewards
 from rewards.aws.boost import download_boosts
+from rewards.aws.helpers import get_secret
 from helpers.web3_utils import make_contract
 from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS
 from helpers.discord import send_message_to_discord
@@ -22,8 +23,11 @@ console = Console()
 
 
 def console_and_discord(msg: str):
+    url = get_secret(
+        "cycle-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=env_config.test
+    )
     console.log(msg)
-    send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot")
+    send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
 
 
 def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
