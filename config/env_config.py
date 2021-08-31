@@ -19,7 +19,7 @@ class EnvConfig:
             "boost-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=self.test
         )
         polygon = Web3(
-            Web3.HTTPProvider(get_secret("path", "POLYGON_NODE_URL", test=self.test))
+            Web3.HTTPProvider(get_secret("quiknode/poly-node-url", "POLYGON_NODE_URL", test=self.test))
         )
         polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
 
@@ -30,7 +30,7 @@ class EnvConfig:
                 )
             ),
             "bsc": Web3(
-                Web3.HTTPProvider(get_secret("path", "BSC_NODE_URL", test=self.test))
+                Web3.HTTPProvider(get_secret("quiknode/bsc-node-url", "BSC_NODE_URL", test=self.test))
             ),
             "polygon": polygon,
         }
