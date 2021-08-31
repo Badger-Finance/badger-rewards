@@ -30,10 +30,21 @@ class TreeManager:
         self.nextCycle = self.get_current_cycle() + 1
         self.rewardsList = RewardsList(self.nextCycle)
         self.propose_account = Account.from_key(
-            get_secret(f"propose-cycle-bot/{self.chain}/pk", "PROPOSE_PKEY", test=env_config.test)
+            get_secret(
+                f"propose-cycle-bot/{self.chain}/pk",
+                "PROPOSE_PKEY",
+                test=env_config.test,
+            )
         )
         self.approve_account = Account.from_key(
-            get_secret(f"approve-cycle-bot/{self.chain}/pk", "APPROVE_PKEY", test=env_config.test)
+            get_secret(
+                f"approve-cycle-bot/{self.chain}/pk",
+                "APPROVE_PKEY",
+                test=env_config.test,
+            )
+        )
+        self.discord_url = get_secret(
+            "cycle-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=env_config.test
         )
 
     def convert_to_merkle_tree(self, rewardsList: RewardsList, start: int, end: int):
@@ -69,6 +80,7 @@ class TreeManager:
             ),
             [],
             "Rewards Bot",
+            url=self.discord_url,
         )
         return txHash
 
@@ -116,6 +128,7 @@ class TreeManager:
                         },
                     ],
                     "Rewards Bot",
+                    url=self.discord_url,
                 )
             else:
                 send_message_to_discord(
@@ -129,6 +142,7 @@ class TreeManager:
                         }
                     ],
                     "Rewards Bot",
+                    url=self.discord_url,
                 )
         except Exception as e:
             console.log(f"Error processing harvest tx: {e}")
@@ -137,6 +151,7 @@ class TreeManager:
                 e,
                 [],
                 "Rewards Bot",
+                url=self.discord_url,
             )
         return tx_hash
 
@@ -209,9 +224,7 @@ class TreeManager:
 
     def get_tx_options(self, account: Account) -> dict:
         options = {
-            "nonce": self.w3.eth.get_transaction_count(
-                account.address
-            ),
+            "nonce": self.w3.eth.get_transaction_count(account.address),
             "from": account.address,
         }
         if self.chain == "eth":

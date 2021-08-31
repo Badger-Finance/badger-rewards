@@ -149,16 +149,20 @@ SETT_INFO = {
 }
 
 EMISSIONS_CONTRACTS = {
-    "eth": DotMap({
-        "BadgerTree":"0x660802Fc641b154aBA66a62137e71f331B6d787A",
-        "RewardsLogger":"0x0A4F4e92C3334821EbB523324D09E321a6B0d8ec",
-        "GasOracle": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
-    }),
-    "polygon": DotMap({
-        "BadgerTree": "0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b",
-        "RewardsLogger": "0xd0EE2A5108b8800D688AbC834445fd03b3b2738e",
-        "GasOracle": "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0"
-    })
-}   
+    "eth": DotMap(
+        {
+            "BadgerTree": "0x660802Fc641b154aBA66a62137e71f331B6d787A",
+            "RewardsLogger": "0x0A4F4e92C3334821EbB523324D09E321a6B0d8ec",
+            "GasOracle": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
+        }
+    ),
+    "polygon": DotMap(
+        {
+            "BadgerTree": "0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b",
+            "RewardsLogger": "0xd0EE2A5108b8800D688AbC834445fd03b3b2738e",
+            "GasOracle": "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
+        }
+    ),
+}
 
 DISABLED_VAULTS = ["0xb6bd5ae3d5f78a6bb04bbb031e24fa9c2bbd090d"]

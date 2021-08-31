@@ -47,7 +47,9 @@ def fetch_all_schedules(chain: str, setts: List[str]):
     :param chain: chain to fetch from
     :param setts: setts from which schedule to pull
     """
-    logger = make_contract(EMISSIONS_CONTRACTS[chain]["RewardsLogger"], "RewardsLogger", chain)
+    logger = make_contract(
+        EMISSIONS_CONTRACTS[chain]["RewardsLogger"], "RewardsLogger", chain
+    )
     allSchedules = {}
     for sett in setts:
         schedules = logger.functions.getAllUnlockSchedulesFor(sett).call()
