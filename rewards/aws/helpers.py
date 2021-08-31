@@ -4,7 +4,7 @@ from botocore.exceptions import ClientError
 from decouple import config
 import json
 
-if config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]:
+if config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
     s3 = boto3.client(
         "s3",
         aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
