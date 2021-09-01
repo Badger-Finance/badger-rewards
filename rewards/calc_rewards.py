@@ -5,7 +5,7 @@ from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.rewards_utils import combine_rewards
 from rewards.rewards_checker import verify_rewards
-from rewards.aws.boost import download_boosts
+from rewards.aws.boost import add_multipliers, download_boosts
 from rewards.aws.helpers import get_secret
 from helpers.web3_utils import make_contract
 from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS
@@ -186,7 +186,6 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     settRewards = rewardsManager.calculate_all_sett_rewards(
         setts, allSchedules, boosts["userData"]
     )
-
     newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle)
 
     console.log("Combining cumulative rewards... \n")
@@ -196,6 +195,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     merkleTree = treeManager.convert_to_merkle_tree(cumulativeRewards, start, end)
     rootHash = rewardsManager.web3.keccak(text=merkleTree["merkleRoot"])
     chainId = rewardsManager.web3.eth.chain_id
+
     fileName = "rewards-{}-{}.json".format(chainId, encode_hex(rootHash))
 
     verify_rewards(pastTree, merkleTree)
@@ -204,4 +204,8 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
         with open(fileName, "w") as fp:
             json.dump(merkleTree, fp)
 
+    add_multipliers(
+        multiplierData=rewardsManager.get_sett_multipliers(),
+        userMultipliers=rewardsManager.get_user_multipliers(),
+    )
     return {"merkleTree": merkleTree, "rootHash": rootHash.hex(), "fileName": fileName}

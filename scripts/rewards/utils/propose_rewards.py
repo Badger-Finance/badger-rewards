@@ -14,7 +14,6 @@ def propose_rewards(chain):
     )
 
     pastRewards, startBlock, endBlock = calc_next_cycle_range(chain)
-    console.log(pastRewards)
 
     console.log(
         "Generating rewards between {} and {} on {} chain".format(
