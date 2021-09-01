@@ -126,7 +126,8 @@ class TreeManager:
                 "Rewards Bot",
                 url=self.discord_url,
             )
-        return tx_hash
+            return tx_hash, False
+        return tx_hash, True
 
     def propose_root(self, rewards: dict) -> str:
         console.log("Propose root")
@@ -197,7 +198,8 @@ class TreeManager:
                 "Rewards Bot",
                 url=self.discord_url,
             )
-        return tx_hash
+            return tx_hash, False
+        return tx_hash, True
 
     def get_current_cycle(self) -> str:
         return self.badgerTree.functions.currentCycle().call()
