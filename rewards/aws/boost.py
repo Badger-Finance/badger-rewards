@@ -80,6 +80,8 @@ def add_multipliers(multiplierData, userMultipliers):
     :param userMultipliers: user multipliers
     """
     boosts = download_boosts()
+    console.log(multiplierData)
+    console.log(userMultipliers)
     boosts["multiplierData"] = {**boosts["multiplierData"], **multiplierData}
     for user in list(boosts["userData"].keys()):
         if user in userMultipliers:

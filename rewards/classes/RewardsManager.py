@@ -73,6 +73,25 @@ class RewardsManager:
 
         return combine_rewards(allRewards, self.cycle + 1)
 
+    def get_sett_multipliers(self):
+        settMultipliers = {}
+        for sett, userApyBoosts in self.apyBoosts.items():
+            settMultipliers[sett] = {
+                "min": min(userApyBoosts.values()),
+                "max": max(userApyBoosts.values()),
+            }
+        return settMultipliers
+
+    def get_user_multipliers(self):
+        userMultipliers = {}
+        for sett, userApyMultipliers in self.apyBoosts.items():
+            for user, apyMultiplier in userApyMultipliers.items():
+                user = self.web3.toChecksumAddress(user)
+                if user not in userMultipliers:
+                    userMultipliers[user] = {}
+                userMultipliers[user][sett] = apyMultiplier
+        return userMultipliers
+
     def get_distributed_for_token_at(
         self, token: str, endTime: int, schedules: List[Schedule]
     ) -> float:
