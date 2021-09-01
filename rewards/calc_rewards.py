@@ -132,7 +132,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
             rewards_data["fileName"],
             rewards_data["merkleTree"],
             chain,
-            publish=env_config.test,
+            staging=env_config.test,
         )
 
 
@@ -165,7 +165,7 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
                 rewards_data["fileName"],
                 rewards_data["merkleTree"],
                 chain,
-                publish=env_config.test,
+                staging=env_config.test,
             )
             return rewards_data
 

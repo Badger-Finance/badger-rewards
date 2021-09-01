@@ -74,7 +74,7 @@ def upload_tree(
     data: Dict,
     chain: str,
     bucket: str = "badger-json",
-    publish: bool = True,
+    staging: bool = False,
 ):
     """
     Upload the badger tree to multiple buckets
@@ -83,32 +83,26 @@ def upload_tree(
     """
     chainId = env_config.get_web3(chain).eth.chain_id
 
-    if not publish:
-        if chain == "eth":
-            bucket = "badger-json"
-        else:
-            bucket = "badger-json-{}".format(chain)
+    if chain == "eth":
+        key = "badger-tree.json"
+        rewards_bucket = "badger-json"
+    else:
+        key = "badger-tree-{}.json".format(chainId)
+        rewards_bucket = "badger-json-{}".format(chain)
 
-        upload_targets = [
-            {
-                "bucket": bucket,
-                "key": "rewards/" + fileName,
-            },  # badger-json rewards api
-        ]
+    upload_targets = [
+        {
+            "bucket": "badger-staging-merkle-proofs",
+            "key": key,
+        }  # badger-api staging no matter what
+    ]
 
-    # enumeration of reward api dependency upload targets
-    if publish:
-        upload_targets = []
-        if chain == "eth":
-            key = "badger-tree.json"
-        else:
-            key = "badger-tree-{}.json".format(chainId)
-
+    if not staging:
         upload_targets.append(
             {
-                "bucket": "badger-staging-merkle-proofs",
-                "key": key,
-            }  # badger-api staging
+                "bucket": rewards_bucket,
+                "key": "rewards/" + fileName,
+            },  # badger-json rewards api
         )
 
         upload_targets.append(
