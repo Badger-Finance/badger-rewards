@@ -1,3 +1,4 @@
+from hexbytes import HexBytes
 from rewards.aws.trees import upload_tree
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager
@@ -117,19 +118,22 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
     if timeSinceLastUpdate < rewards_config.rootUpdateMinInterval:
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
         return
-    rewards_data = generate_rewards_in_range(chain, start, end, save=False, pastTree=pastRewards)
+    rewards_data = generate_rewards_in_range(
+        chain, start, end, save=False, pastTree=pastRewards
+    )
     console.log("Generated rewards")
 
     console.log(
         "\n==== Proposing root with rootHash {} ====\n".format(rewards_data["rootHash"])
     )
-    treeManager.propose_root(rewards_data)
-    upload_tree(
-        rewards_data["fileName"],
-        rewards_data["merkleTree"],
-        chain,
-        publish=env_config.test,
-    )
+    tx_hash, success = treeManager.propose_root(rewards_data)
+    if success:
+        upload_tree(
+            rewards_data["fileName"],
+            rewards_data["merkleTree"],
+            chain,
+            publish=env_config.test,
+        )
 
 
 def approve_root(chain: str, start: int, end: int, currentRewards):
@@ -152,14 +156,18 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
                 rewards_data["rootHash"]
             )
         )
-        treeManager.approve_root(rewards_data)
-        upload_tree(
-            rewards_data["fileName"],
-            rewards_data["merkleTree"],
-            chain,
-            publish=env_config.test,
-        )
-        return rewards_data
+        tx_hash, success = treeManager.approve_root(rewards_data)
+        if success:
+            add_multipliers(
+                rewards_data["multiplierData"], rewards_data["userMultipliers"]
+            )
+            upload_tree(
+                rewards_data["fileName"],
+                rewards_data["merkleTree"],
+                chain,
+                publish=env_config.test,
+            )
+            return rewards_data
 
 
 def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, pastTree):
@@ -204,8 +212,10 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
         with open(fileName, "w") as fp:
             json.dump(merkleTree, fp)
 
-    add_multipliers(
-        multiplierData=rewardsManager.get_sett_multipliers(),
-        userMultipliers=rewardsManager.get_user_multipliers(),
-    )
-    return {"merkleTree": merkleTree, "rootHash": rootHash.hex(), "fileName": fileName}
+    return {
+        "merkleTree": merkleTree,
+        "rootHash": rootHash.hex(),
+        "fileName": fileName,
+        "multiplierData": rewardsManager.get_sett_multipliers(),
+        "userMultipliers": rewardsManager.get_user_multipliers(),
+    }
