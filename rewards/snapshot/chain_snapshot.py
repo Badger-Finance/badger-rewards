@@ -1,17 +1,17 @@
-from math import cos
+from config.env_config import env_config
 from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
+from helpers.web3_utils import make_contract
 from rewards.classes.UserBalance import UserBalances, UserBalance
-from subgraph.client import fetch_chain_balances
+from subgraph.client import fetch_chain_balances, fetch_sett_balances
 from functools import lru_cache
 from rich.console import Console
-from typing import Dict
-from brownie import web3, interface
+from typing import Dict, Tuple
 
 console = Console()
 
 
 @lru_cache(maxsize=128)
-def chain_snapshot(chain: str, block: int):
+def chain_snapshot(chain: str, block: int) -> Dict[str, UserBalances]:
     """
     Take a snapshot of a chains sett balances at a certain block
 
@@ -20,24 +20,41 @@ def chain_snapshot(chain: str, block: int):
     :param block: block at which to query
 
     """
-    chainBalances = fetch_chain_balances(chain, block - 50)
+    chainBalances = fetch_chain_balances(chain, block)
     balancesBySett = {}
 
     for settAddr, balances in list(chainBalances.items()):
-        settBalances = parse_sett_balances(settAddr, balances, chain)
-        token = interface.IERC20(settAddr)
-        console.log("Fetched {} balances for sett {}".format(len(balances), token.name()))
+        settBalances = parse_sett_balances(settAddr, balances)
+        token = make_contract(settAddr, abiName="ERC20", chain=chain)
+        console.log(
+            "Fetched {} balances for sett {}".format(
+                len(balances), token.functions.name().call()
+            )
+        )
         balancesBySett[settAddr] = settBalances
 
     return balancesBySett
 
 
 @lru_cache(maxsize=128)
-def sett_snapshot(badger, chain, block, sett):
-    return chain_snapshot(badger, chain, block)[sett]
+def sett_snapshot(chain: str, block: int, sett: str) -> UserBalances:
+    """
+    Take a snapshot of a sett on a chain at a certain block
+    :param chain:
+    :param block:
+    :param sett:
+    """
+    token = make_contract(sett, abiName="ERC20", chain=chain)
+    console.log(
+        "Taking snapshot on {} of {} at {}".format(
+            chain, sett, token.functions.name().call()
+        )
+    )
+    sett_balances = fetch_sett_balances(chain, block - 50, sett)
+    return parse_sett_balances(sett, sett_balances)
 
 
-def parse_sett_balances(settAddress: str, balances: Dict[str, int], chain: str):
+def parse_sett_balances(settAddress: str, balances: Dict[str, int]) -> UserBalances:
     """
     Blacklist balances and add metadata for boost
     :param balances: balances of users:
@@ -60,8 +77,9 @@ def parse_sett_balances(settAddress: str, balances: Dict[str, int], chain: str):
     return UserBalances(userBalances, settType, settRatio)
 
 
-def get_sett_info(settAddress):
+def get_sett_info(settAddress) -> Tuple[str, float]:
     info = SETT_INFO.get(
-        web3.toChecksumAddress(settAddress), {"type": "nonNative", "ratio": 1}
+        env_config.get_web3().toChecksumAddress(settAddress),
+        {"type": "nonNative", "ratio": 1},
     )
     return info["type"], info["ratio"]

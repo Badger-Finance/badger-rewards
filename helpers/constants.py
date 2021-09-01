@@ -1,4 +1,5 @@
-from brownie import *
+from web3 import Web3
+from dotmap import DotMap
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -14,36 +15,36 @@ class RoleRegistry:
         self.roles = {}
 
     def add_role(self, name):
-        encoded = web3.keccak(text=name).hex()
+        encoded = Web3.keccak(text=name).hex()
         self.roles[name] = encoded
 
 
 # Approved Contract Roles
-APPROVED_STAKER_ROLE = web3.keccak(text="APPROVED_STAKER_ROLE").hex()
-APPROVED_SETT_ROLE = web3.keccak(text="APPROVED_SETT_ROLE").hex()
-APPROVED_STRATEGY_ROLE = web3.keccak(text="APPROVED_STRATEGY_ROLE").hex()
+APPROVED_STAKER_ROLE = Web3.keccak(text="APPROVED_STAKER_ROLE").hex()
+APPROVED_SETT_ROLE = Web3.keccak(text="APPROVED_SETT_ROLE").hex()
+APPROVED_STRATEGY_ROLE = Web3.keccak(text="APPROVED_STRATEGY_ROLE").hex()
 
-PAUSER_ROLE = web3.keccak(text="PAUSER_ROLE").hex()
-UNPAUSER_ROLE = web3.keccak(text="UNPAUSER_ROLE").hex()
-GUARDIAN_ROLE = web3.keccak(text="GUARDIAN_ROLE").hex()
+PAUSER_ROLE = Web3.keccak(text="PAUSER_ROLE").hex()
+UNPAUSER_ROLE = Web3.keccak(text="UNPAUSER_ROLE").hex()
+GUARDIAN_ROLE = Web3.keccak(text="GUARDIAN_ROLE").hex()
 
 # BadgerTree Roles
-ROOT_UPDATER_ROLE = web3.keccak(text="ROOT_UPDATER_ROLE").hex()
-ROOT_PROPOSER_ROLE = web3.keccak(text="ROOT_PROPOSER_ROLE").hex()
-ROOT_VALIDATOR_ROLE = web3.keccak(text="ROOT_VALIDATOR_ROLE").hex()
+ROOT_UPDATER_ROLE = Web3.keccak(text="ROOT_UPDATER_ROLE").hex()
+ROOT_PROPOSER_ROLE = Web3.keccak(text="ROOT_PROPOSER_ROLE").hex()
+ROOT_VALIDATOR_ROLE = Web3.keccak(text="ROOT_VALIDATOR_ROLE").hex()
 
 # UnlockSchedule Roles
-TOKEN_LOCKER_ROLE = web3.keccak(text="TOKEN_LOCKER_ROLE").hex()
+TOKEN_LOCKER_ROLE = Web3.keccak(text="TOKEN_LOCKER_ROLE").hex()
 
 # Keeper Roles
-KEEPER_ROLE = web3.keccak(text="KEEPER_ROLE").hex()
-EARNER_ROLE = web3.keccak(text="EARNER_ROLE").hex()
+KEEPER_ROLE = Web3.keccak(text="KEEPER_ROLE").hex()
+EARNER_ROLE = Web3.keccak(text="EARNER_ROLE").hex()
 
 # External Harvester Roles
-SWAPPER_ROLE = web3.keccak(text="SWAPPER_ROLE").hex()
-DISTRIBUTOR_ROLE = web3.keccak(text="DISTRIBUTOR_ROLE").hex()
+SWAPPER_ROLE = Web3.keccak(text="SWAPPER_ROLE").hex()
+DISTRIBUTOR_ROLE = Web3.keccak(text="DISTRIBUTOR_ROLE").hex()
 
-APPROVED_ACCOUNT_ROLE = web3.keccak(text="APPROVED_ACCOUNT_ROLE").hex()
+APPROVED_ACCOUNT_ROLE = Web3.keccak(text="APPROVED_ACCOUNT_ROLE").hex()
 
 role_registry = RoleRegistry()
 
@@ -92,7 +93,6 @@ TOKENS_TO_CHECK = {
     "Bor": BOR,
 }
 
-BADGER_TREE = "0x660802Fc641b154aBA66a62137e71f331B6d787A"
 
 PEAK_ADDRESSES = [
     "0x825218beD8BE0B30be39475755AceE0250C50627",
@@ -102,7 +102,6 @@ PEAK_ADDRESSES = [
 DIGG_SETTS = ["native.uniDiggWbtc", "native.sushiDiggWbtc", "native.digg"]
 BADGER_SETTS = ["native.badger", "native.uniBadgerWbtc", "native.sushiBadgerWbtc"]
 NATIVE_DIGG_SETTS = ["native.uniDiggWbtc", "native.sushiDiggWbtc"]
-
 
 
 REWARDS_BLACKLIST = {
@@ -148,3 +147,25 @@ SETT_INFO = {
     "0xC17078FDd324CC473F8175Dc5290fae5f2E84714": {"type": "native", "ratio": 0.5},
     "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6": {"type": "native", "ratio": 0.5},
 }
+
+EMISSIONS_CONTRACTS = {
+    "eth": DotMap(
+        {
+            "BadgerTree": "0x660802Fc641b154aBA66a62137e71f331B6d787A",
+            "RewardsLogger": "0x0A4F4e92C3334821EbB523324D09E321a6B0d8ec",
+            "GasOracle": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
+        }
+    ),
+    "polygon": DotMap(
+        {
+            "BadgerTree": "0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b",
+            "RewardsLogger": "0xd0EE2A5108b8800D688AbC834445fd03b3b2738e",
+            "GasOracle": "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
+        }
+    ),
+}
+
+DISABLED_VAULTS = [
+    "0xb6bd5ae3d5f78a6bb04bbb031e24fa9c2bbd090d",
+    "0x85e1cacae9a63429394d68db59e14af74143c61c",
+]
