@@ -6,6 +6,8 @@ metadata:
     app: boost-bot
 spec:
   schedule: "*/10 * * * *"
+  startingDeadlineSeconds: 180
+  suspend: true
   jobTemplate:
     spec:
       template:
