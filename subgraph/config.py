@@ -12,4 +12,5 @@ subgraph_urls = {
     "tokens-polygon": "https://bgraph-matic.badger.guru/subgraphs/name/swole/tokens-polygon",
     "harvests-polygon": "https://bgraph-matic.badger.guru/subgraphs/name/swole/tree-rewards-polygon",
     "harvests-eth": "https://bgraph-eth.badger.guru/subgraphs/name/swole/tree-rewards",
+    "fuse": "https://api.thegraph.com/subgraphs/name/platocrat/fuse-subgraph",
 }

@@ -1,10 +1,14 @@
+from helpers.constants import FUSE_POOL_DATA
 from helpers.discord import send_message_to_discord
 from subgraph.subgraph_utils import make_gql_client
 from rich.console import Console
+from helpers.web3_utils import make_contract
 from gql import gql
 from decimal import *
 import math
 from functools import lru_cache
+from config.env_config import env_config
+import json
 
 getcontext().prec = 20
 harvests_client = make_gql_client("harvests-eth")
@@ -117,7 +121,7 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
     increment = 1000
     query = gql(
         """
-        query fetchWalletBalance($firstAmount: Int, $lastID: ID,$blockNumber:Block_height) {
+        query fetchWalletBalance($firstAmount: Int, $lastID: ID, $blockNumber:Block_height) {
             tokenBalances(first: $firstAmount, where: { id_gt: $lastID  },block: $blockNumber) {
                 id
                 balance
@@ -226,7 +230,7 @@ def fetch_chain_balances(chain, block):
     client = make_gql_client(chain)
     query = balances_query()
     lastId = ""
-    variables = {"blockHeight": {"number": block}}
+    variables = {"blockHeight": {"number": block - 50}}
     balances = {}
     try:
         while True:
@@ -279,17 +283,6 @@ def send_error_to_discord(e, errorMsg):
     )
 
 
-def fetch_setts(chain):
-    query = gql(
-        """
-            query = gql(
-        """
-        """
-    )
-        """
-    )
-
-
 def fetch_sett_balances(chain, block, sett):
     client = make_gql_client(chain)
     query = balances_query()
@@ -328,4 +321,114 @@ def fetch_sett_balances(chain, block, sett):
 
     except Exception as e:
         send_error_to_discord(e, "Error in Fetching Sett Balance")
+        raise e
+
+
+def fetch_fuse_pool_balances(client, chain, block):
+    if chain != "eth":
+        console.log("Fuse pools are only active on ETH")
+        return {}
+
+    ctoken_data = {
+        "fBDIGG-22": {
+            "underlying_contract": "0x7e7e112a68d8d2e221e11047a72ffc1065c38e1a",
+            "symbol": "fBDIGG-22",
+            "contract": "0x4b789c1a3124e9c7945e24d20a5034a85ffb7535",
+        },
+        "fBBADGER-22": {
+            "underlying_contract": "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28",
+            "symbol": "fBBADGER-22",
+            "contract": "0x8c2ab59d5a0cff6b1d00ef7dd70d85db88483671",
+        },
+        "fBADGER-22": {
+            "underlying_contract": "0x3472A5A71965499acd81997a54BBA8D852C6E53d",
+            "symbol": "fBADGER-22",
+            "contract": "0x6780B4681aa8efE530d075897B3a4ff6cA5ed807",
+        },
+    }
+
+    for symbol, data in ctoken_data:
+        ftoken = make_contract(
+            env_config.get_web3().toChecksumAddress(data["contract"]),
+            abiName="CErc20Delegator",
+            chain=chain,
+        )
+        underlying = make_contract(
+            env_config.get_web3().toChecksumAddress(data["underlying_contract"]),
+            abiName="ERC20",
+            chain=chain,
+        )
+
+        ctoken_data[symbol]["decimals"] = int(ftoken.functions.decimals().call())
+        underlying_decimals = int(underlying.functions.decimals().call())
+        mantissa = 18 + underlying_decimals - ctoken_data[symbol]["decimals"]
+        ctoken_data[symbol]["exchange_rate"] = float(
+            ftoken.functions.exchangeRateStored().call()
+        ) / math.pow(10, mantissa)
+
+    query = gql(
+        f"""
+        query fetch_fuse_pool_balances($skip_amount: Int, $block_number: Block_height) {{
+            accountCTokens(block: $block_number, skip: $skip_amount, first: 1000, where: {{ symbol_in:{list(ctoken_data.keys())} }}) {{
+                symbol
+                account{{
+                    id
+                }}
+                cTokenBalance
+            }}
+        }}
+        """
+    )
+
+    skip = 0
+    balances = {}
+    variables = {"block_number": {"number": block - 50}, "skip_amount": skip}
+    try:
+        while True:
+            variables["skip_amount"] = skip
+            results = client.execute(query, variable_values=variables)
+            for result in results:
+                symbol = result["symbol"]
+                ctoken_balance = float(result["cTokenBalance"])
+                balance = ctoken_balance * ctoken_data[symbol]["exchange_rate"]
+                account = result["account"]["id"].lower()
+
+                if balance <= 0:
+                    continue
+
+                sett = ctoken_data[symbol]["underlying_contract"]
+
+                if sett not in balances:
+                    balances[sett] = {}
+
+                    if account not in balances[sett]:
+                        balances[sett][account] = balance
+                    else:
+                        balances[sett][account] += balance
+
+            if len(results) == 0:
+                break
+            else:
+                console.log("Fetching {} fuse balances".format(len(results)))
+                skip += 1000
+
+        console.log("Fetched {} total fuse balances".format(len(balances)))
+        return balances
+
+    except Exception as e:
+        send_message_to_discord(
+            "**BADGER BOOST ERROR**",
+            f":x: Error in Fetching Fuse Token Balance",
+            [
+                {
+                    "name": "Error Type",
+                    "value": type(e),
+                    "inline": True,
+                    "name": "Error Description",
+                    "value": e.args,
+                    "inline": True,
+                }
+            ],
+            "Boost Bot",
+        )
         raise e
