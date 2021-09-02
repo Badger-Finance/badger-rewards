@@ -76,10 +76,15 @@ class TreeManager:
                 tx_hash,
             )
             title = "**Approved Rewards on {}**".format(self.chain)
-            description = "Calculated rewards between {} and {} \n TX Hash: {} ".format(
+            approve_info = (
+                "TX Hash: {} \n\n Root: {} \n\n Content Hash: {} \n\n".format(
+                    tx_hash, rewards["merkleTree"]["merkleRoot"], rewards["rootHash"]
+                )
+            )
+            description = "Calculated rewards between {} and {} \n\n {} ".format(
                 int(rewards["merkleTree"]["startBlock"]),
                 int(rewards["merkleTree"]["endBlock"]),
-                tx_hash,
+                approve_info,
             )
             console.log("Cycle approved : {}".format(tx_hash))
             if succeeded:
@@ -147,11 +152,17 @@ class TreeManager:
                 self.w3,
                 tx_hash,
             )
+
             title = "**Proposed Rewards on {}**".format(self.chain)
-            description = "Calculated rewards between {} and {} \n TX Hash: {} ".format(
+            propose_info = (
+                "TX Hash: {} \n\n Root: {} \n\n Content Hash: {} \n\n".format(
+                    tx_hash, rewards["merkleTree"]["merkleRoot"], rewards["rootHash"]
+                )
+            )
+            description = "Calculated rewards between {} and {} \n\n {} ".format(
                 int(rewards["merkleTree"]["startBlock"]),
                 int(rewards["merkleTree"]["endBlock"]),
-                tx_hash,
+                propose_info,
             )
             console.log("Cycle proposed : {}".format(tx_hash))
             if succeeded:
