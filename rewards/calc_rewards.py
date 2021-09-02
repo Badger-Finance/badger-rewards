@@ -127,13 +127,13 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
         "\n==== Proposing root with rootHash {} ====\n".format(rewards_data["rootHash"])
     )
     tx_hash, success = treeManager.propose_root(rewards_data)
-    if success:
-        upload_tree(
-            rewards_data["fileName"],
-            rewards_data["merkleTree"],
-            chain,
-            staging=env_config.test,
-        )
+    # if success:
+    #     upload_tree(
+    #         rewards_data["fileName"],
+    #         rewards_data["merkleTree"],
+    #         chain,
+    #         staging=env_config.test,
+    #     )
 
 
 def approve_root(chain: str, start: int, end: int, currentRewards):
