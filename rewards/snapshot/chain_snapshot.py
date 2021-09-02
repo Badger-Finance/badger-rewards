@@ -2,7 +2,7 @@ from config.env_config import env_config
 from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
 from helpers.web3_utils import make_contract
 from rewards.classes.UserBalance import UserBalances, UserBalance
-from subgraph.client import fetch_chain_balances, fetch_sett_balances
+from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
 from functools import lru_cache
 from rich.console import Console
 from typing import Dict, Tuple

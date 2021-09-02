@@ -16,4 +16,4 @@ class DiggUtils:
         return self.sharesPerFragment / shares
 
 
-diggUtils = DiggUtils()
+digg_utils = DiggUtils()

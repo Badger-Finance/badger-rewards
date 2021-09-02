@@ -11,7 +11,7 @@ from rewards.aws.helpers import get_secret
 from helpers.web3_utils import make_contract
 from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS
 from helpers.discord import send_message_to_discord
-from subgraph.client import list_setts
+from subgraph.queries.setts import list_setts
 from typing import List
 from rich.console import Console
 from config.env_config import env_config

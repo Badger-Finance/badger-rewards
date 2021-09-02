@@ -1,7 +1,5 @@
-from toolz.itertoolz import cons
-from subgraph.client import fetch_token_balances
+from subgraph.queries.tokens import fetch_token_balances
 from subgraph.subgraph_utils import make_gql_client
-from helpers.digg_utils import diggUtils
 from helpers.constants import BADGER, DIGG
 from badger_api.prices import fetch_token_prices
 from typing import Dict, Tuple
@@ -11,7 +9,7 @@ prices = fetch_token_prices()
 
 def token_snapshot(chain: str, block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
     token_client = make_gql_client("tokens-{}".format(chain))
-    return fetch_token_balances(token_client, diggUtils.sharesPerFragment, block)
+    return fetch_token_balances(token_client, block)
 
 
 def token_snapshot_usd(chain: str, block: int) -> Dict[str, float]:

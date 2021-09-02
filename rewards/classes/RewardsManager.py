@@ -1,7 +1,7 @@
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
 from rewards.snapshot.chain_snapshot import sett_snapshot
-from subgraph.client import fetch_tree_distributions
+from subgraph.queries.harvests import fetch_tree_distributions
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from helpers.time_utils import to_utc_date, to_hours
