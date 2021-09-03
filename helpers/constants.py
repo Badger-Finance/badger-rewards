@@ -163,6 +163,12 @@ EMISSIONS_CONTRACTS = {
             "GasOracle": "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
         }
     ),
+    "arbitrum": DotMap(
+        {
+            "BadgerTree": "0x599D92B453C010b1050d31C364f6ee17E819f193",
+            "RewardsLogger": "0x663EfC293ca8d8DD6355AE6E99b71352BED9E895",
+        }
+    ),
 }
 
 DISABLED_VAULTS = [

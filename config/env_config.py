@@ -36,6 +36,15 @@ class EnvConfig:
                     get_secret("quiknode/bsc-node-url", "BSC_NODE_URL", test=self.test)
                 )
             ),
+            "arbitrum": Web3(
+                Web3.HTTPProvider(
+                    get_secret(
+                        "quiknode/arbitrum-node-url",
+                        "ARBITRUM_NODE_URL",
+                        test=self.test,
+                    )
+                )
+            ),
             "polygon": polygon,
         }
 
