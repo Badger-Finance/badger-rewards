@@ -57,7 +57,7 @@ def fetch_all_schedules(chain: str, setts: List[str]):
     )
     allSchedules = {}
     for sett in setts:
-        schedules = logger.functions.getAllUnlockSchedulesFor(sett).call()
+        schedules = logger.getAllUnlockSchedulesFor(sett).call()
         allSchedules[sett] = parse_schedules(schedules)
     console.log("Fetched {} schedules".format(len(allSchedules)))
     return allSchedules

@@ -32,10 +32,10 @@ class RewardsManager:
     def get_sett_from_strategy(self, strat: str) -> str:
         strategy = make_contract(strat, "BaseStrategy", self.chain)
         controller = make_contract(
-            strategy.functions.controller().call(), "Controller", self.chain
+            strategy.controller().call(), "Controller", self.chain
         )
-        want = strategy.functions.want().call()
-        sett = controller.functions.vaults(want).call()
+        want = strategy.want().call()
+        sett = controller.vaults(want).call()
         return sett
 
     def calculate_sett_rewards(self, sett, schedulesByToken, boosts) -> RewardsList:
