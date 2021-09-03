@@ -66,7 +66,7 @@ def fetch_farm_harvest_events():
     return results["farmHarvestEvents"]
 
 
-def fetch_sushi_harvest_events():
+def fetch_sushi_harvest_events(start_block, end_block):
     query = gql(
         """
         query fetch_harvest_events {
@@ -91,18 +91,20 @@ def fetch_sushi_harvest_events():
     for event in results["sushiHarvestEvents"]:
         event["rewardAmount"] = event.pop("toBadgerTree")
         strategy = event["id"].split("-")[0]
-        if strategy == "0x7a56d65254705b4def63c68488c0182968c452ce":
-            wbtcEthEvents.append(event)
-        elif strategy == "0x3a494d79aa78118795daad8aeff5825c6c8df7f1":
-            wbtcBadgerEvents.append(event)
-        elif strategy == "0xaa8dddfe7dfa3c3269f1910d89e4413dd006d08a":
-            wbtcDiggEvents.append(event)
-        elif strategy == "0xf4146a176b09c664978e03d28d07db4431525dad":
-            iBbtcWbtcEvents.append(event)
+        block_number = int(event["blockNumber"])
+        if block_number > start_block and block_number < end_block:
+            if strategy == "0x7a56d65254705b4def63c68488c0182968c452ce":
+                wbtcEthEvents.append(event)
+            elif strategy == "0x3a494d79aa78118795daad8aeff5825c6c8df7f1":
+                wbtcBadgerEvents.append(event)
+            elif strategy == "0xaa8dddfe7dfa3c3269f1910d89e4413dd006d08a":
+                wbtcDiggEvents.append(event)
+            elif strategy == "0xf4146a176b09c664978e03d28d07db4431525dad":
+                iBbtcWbtcEvents.append(event)
 
     return {
-        "wbtcEth": wbtcEthEvents,
-        "wbtcBadger": wbtcBadgerEvents,
-        "wbtcDigg": wbtcDiggEvents,
-        "iBbtcWbtc": iBbtcWbtcEvents,
+        "0x7a56d65254705b4def63c68488c0182968c452ce": wbtcEthEvents,
+        "0x3a494d79aa78118795daad8aeff5825c6c8df7f1": wbtcBadgerEvents,
+        "0xaa8dddfe7dfa3c3269f1910d89e4413dd006d08a": wbtcDiggEvents,
+        "0xf4146a176b09c664978e03d28d07db4431525dad": iBbtcWbtcEvents,
     }

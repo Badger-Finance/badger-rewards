@@ -1,7 +1,12 @@
+from helpers.constants import XSUSHI
+from rewards.calc_rewards import approve_root
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
 from rewards.snapshot.chain_snapshot import sett_snapshot
-from subgraph.queries.harvests import fetch_tree_distributions
+from subgraph.queries.harvests import (
+    fetch_sushi_harvest_events,
+    fetch_tree_distributions,
+)
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from helpers.time_utils import to_utc_date, to_hours
@@ -45,7 +50,7 @@ class RewardsManager:
             startDist = self.get_distributed_for_token_at(token, startTime, schedules)
             tokenDistribution = int(endDist) - int(startDist)
             if tokenDistribution > 0:
-                total = sum([b.balance for b in boostedSettBalances])
+                total = boostedSettBalances.total_balance()
                 rewardsUnit = tokenDistribution / total
                 for user in boostedSettBalances:
                     addr = self.web3.toChecksumAddress(user.address)
@@ -61,17 +66,17 @@ class RewardsManager:
     def calculate_all_sett_rewards(
         self, setts: List[str], allSchedules, boosts
     ) -> RewardsList:
-        allRewards = []
+        all_rewards = []
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
             console.log(
                 "Calculating rewards for {}".format(token.functions.name().call())
             )
-            allRewards.append(
+            all_rewards.append(
                 self.calculate_sett_rewards(sett, allSchedules[sett], boosts)
             )
 
-        return combine_rewards(allRewards, self.cycle + 1)
+        return combine_rewards(all_rewards, self.cycle + 1)
 
     def get_sett_multipliers(self):
         settMultipliers = {}
@@ -154,14 +159,14 @@ class RewardsManager:
         return snapshot
 
     def calculate_tree_distributions(self) -> RewardsList:
-        treeDistributions = fetch_tree_distributions(self.start, self.end, self.chain)
+        tree_distributions = fetch_tree_distributions(self.start, self.end, self.chain)
         console.log(
             "Fetched {} tree distributions between {} and {}".format(
-                len(treeDistributions), self.start, self.end
+                len(tree_distributions), self.start, self.end
             )
         )
-        rewards = RewardsList(self.cycle + 1)
-        for dist in treeDistributions:
+        rewards = RewardsList(self.cycle)
+        for dist in tree_distributions:
             console.log(dist)
             block = int(dist["blockNumber"])
             token = dist["token"]["address"]
@@ -169,15 +174,45 @@ class RewardsManager:
             sett = self.get_sett_from_strategy(strategy)
             balances = self.fetch_sett_snapshot(block, sett)
             amount = int(dist["amount"])
-            rewardsUnit = amount / sum([u.balance for u in balances])
+            rewards_unit = amount / balances.total_balance()
             for user in balances:
-                userRewards = rewardsUnit * user.balance
+                user_rewards = rewards_unit * user.balance
                 rewards.increase_user_rewards(
                     self.web3.toChecksumAddress(user.address),
                     self.web3.toChecksumAddress(token),
-                    int(userRewards),
+                    int(user_rewards),
                 )
         return rewards
 
     def calc_sushi_distributions(self):
-        pass
+        sushi_events = fetch_sushi_harvest_events(self.startBlock, self.endBlock)
+        all_from_events = 0
+        all_sushi_rewards = []
+        all_from_rewards = 0
+        for strategy, events in sushi_events.items():
+            rewards, from_rewards = self.calc_sushi_distribution(strategy, events)
+            all_from_events += sum(map(lambda e: e["rewardAmount"], events))
+            all_from_rewards += from_rewards
+            all_sushi_rewards.append(rewards)
+        assert abs(all_from_events - all_from_rewards) < 1e9
+        return combine_rewards(all_sushi_rewards, self.cycle)
+
+    def calc_sushi_distribution(self, strategy, events):
+        sett = self.get_sett_from_strategy(strategy)
+        rewards = RewardsList(self.cycle)
+        total_from_rewards = 0
+
+        for event in events:
+            block = int(event["blockNumber"])
+            reward_amount = int(event["rewardAmount"])
+            balances = self.fetch_sett_snapshot(block, sett)
+            rewards_unit = reward_amount / balances.total_balance()
+            for user in balances:
+                user_rewards = rewards_unit * user.balance
+                total_from_rewards += user_rewards
+                rewards.increase_user_rewards(
+                    self.web3.toChecksumAddress(user.address),
+                    self.web3.toChecksumAddress(XSUSHI),
+                    int(user_rewards),
+                )
+        return rewards, total_from_rewards
