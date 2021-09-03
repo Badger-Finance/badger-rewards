@@ -27,10 +27,10 @@ class RewardsManager:
     def get_sett_from_strategy(self, strat: str) -> str:
         strategy = make_contract(strat, "BaseStrategy", self.chain)
         controller = make_contract(
-            strategy.functions.controller().call(), "Controller", self.chain
+            strategy.controller().call(), "Controller", self.chain
         )
-        want = strategy.functions.want().call()
-        sett = controller.functions.vaults(want).call()
+        want = strategy.want().call()
+        sett = controller.vaults(want).call()
         return sett
 
     def calculate_sett_rewards(self, sett, schedulesByToken, boosts) -> RewardsList:
@@ -64,9 +64,7 @@ class RewardsManager:
         allRewards = []
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
-            console.log(
-                "Calculating rewards for {}".format(token.functions.name().call())
-            )
+            console.log("Calculating rewards for {}".format(token.name().call()))
             allRewards.append(
                 self.calculate_sett_rewards(sett, allSchedules[sett], boosts)
             )

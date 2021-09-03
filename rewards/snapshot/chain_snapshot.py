@@ -27,9 +27,7 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, UserBalances]:
         settBalances = parse_sett_balances(settAddr, balances)
         token = make_contract(settAddr, abiName="ERC20", chain=chain)
         console.log(
-            "Fetched {} balances for sett {}".format(
-                len(balances), token.functions.name().call()
-            )
+            "Fetched {} balances for sett {}".format(len(balances), token.name().call())
         )
         balancesBySett[settAddr] = settBalances
 
@@ -46,9 +44,7 @@ def sett_snapshot(chain: str, block: int, sett: str) -> UserBalances:
     """
     token = make_contract(sett, abiName="ERC20", chain=chain)
     console.log(
-        "Taking snapshot on {} of {} at {}".format(
-            chain, sett, token.functions.name().call()
-        )
+        "Taking snapshot on {} of {} at {}".format(chain, sett, token.name().call())
     )
     sett_balances = fetch_sett_balances(chain, block - 50, sett)
     return parse_sett_balances(sett, sett_balances)
