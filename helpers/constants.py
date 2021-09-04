@@ -168,4 +168,5 @@ EMISSIONS_CONTRACTS = {
 DISABLED_VAULTS = [
     "0xb6bd5ae3d5f78a6bb04bbb031e24fa9c2bbd090d",
     "0x85e1cacae9a63429394d68db59e14af74143c61c",
+    "0xaf5a1decfa95baf63e0084a35c62592b774a2a87"
 ]
