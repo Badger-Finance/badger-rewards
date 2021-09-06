@@ -60,7 +60,8 @@ def calc_boost_data(block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
     """
     chains = [
         "polygon",
-        "arbitrum" "eth",
+        "arbitrum",
+        "eth",
     ]
     blocksByChain = convert_from_eth(block)
     native = Counter()
