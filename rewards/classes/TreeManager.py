@@ -33,12 +33,14 @@ class TreeManager:
         self.propose_account = Account.from_key(
             get_secret(
                 "/botsquad/cycle_0/private",
+                "private",
                 test=env_config.test,
             )
         )
         self.approve_account = Account.from_key(
             get_secret(
                 "/botsquad/cycle_0/private",
+                "private",
                 test=env_config.test,
             )
         )
