@@ -20,7 +20,7 @@ def get_bucket(test):
 
 def get_secret(
     secret_name: str,
-    secret_key: str = None,
+    secret_key: str,
     region_name: str = "us-west-1",
     test: bool = False,
 ) -> str:
@@ -69,17 +69,10 @@ def get_secret(
         # Decrypts secret using the associated KMS CMK.
         # Depending on whether the secret is a string or binary, one of these fields will be populated.
         if "SecretString" in get_secret_value_response:
-            if secret_key:
-                return json.loads(get_secret_value_response["SecretString"]).get(
-                    secret_key
-                )
-            else:
-                return json.loads(get_secret_value_response["SecretString"])
-        elif secret_key:
+            return json.loads(get_secret_value_response["SecretString"]).get(secret_key)
+        else:
             return base64.b64decode(get_secret_value_response["SecretBinary"]).get(
                 secret_key
             )
-        else:
-            return base64.b64decode(get_secret_value_response["SecretBinary"])
 
     return None
