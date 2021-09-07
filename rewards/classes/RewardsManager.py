@@ -1,5 +1,4 @@
 from helpers.constants import XSUSHI
-from rewards.calc_rewards import approve_root
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
 from rewards.snapshot.chain_snapshot import sett_snapshot
@@ -70,7 +69,7 @@ class RewardsManager:
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
             console.log(
-                "Calculating rewards for {}".format(token.functions.name().call())
+                "Calculating rewards for {}".format(token.name().call())
             )
             all_rewards.append(
                 self.calculate_sett_rewards(sett, allSchedules[sett], boosts)

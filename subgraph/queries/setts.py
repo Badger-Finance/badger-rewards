@@ -98,7 +98,7 @@ def fetch_chain_balances(chain: str, block: int) -> Dict[str, Dict[str, int]]:
         raise e
 
 
-def fetch_sett_balances(chain: str, block: int, sett: str) -> Dict[str]:
+def fetch_sett_balances(chain: str, block: int, sett: str):
     """
     Fetch sett balance on a chain at a block
     :param chain:

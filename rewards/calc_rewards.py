@@ -55,12 +55,15 @@ def fetch_all_schedules(chain: str, setts: List[str]):
     logger = make_contract(
         EMISSIONS_CONTRACTS[chain]["RewardsLogger"], "RewardsLogger", chain
     )
-    allSchedules = {}
+    all_schedules = {}
+    setts_with_schedules = []
     for sett in setts:
         schedules = logger.getAllUnlockSchedulesFor(sett).call()
-        allSchedules[sett] = parse_schedules(schedules)
-    console.log("Fetched {} schedules".format(len(allSchedules)))
-    return allSchedules
+        if len(schedules) > 0:
+           setts_with_schedules.append(sett) 
+        all_schedules[sett] = parse_schedules(schedules)
+    console.log("Fetched {} schedules".format(len(all_schedules)))
+    return all_schedules, setts_with_schedules
 
 
 def fetch_setts(chain: str) -> List[str]:
@@ -117,7 +120,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
 
     if timeSinceLastUpdate < rewards_config.rootUpdateMinInterval:
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-        return
+        #return
     rewards_data = generate_rewards_in_range(
         chain, start, end, save=False, pastTree=pastRewards
     )
@@ -178,9 +181,9 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     :param end: end block for rewards
     :param save: flag to save file locally
     """
-    setts = fetch_setts(chain)
+    allSchedules, setts = fetch_all_schedules(chain, fetch_setts(chain))
+    
     console_and_discord("Generating rewards for {} setts".format(len(setts)))
-    allSchedules = fetch_all_schedules(chain, setts)
 
     treeManager = TreeManager(chain)
 
