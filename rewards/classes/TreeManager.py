@@ -32,14 +32,14 @@ class TreeManager:
         self.rewardsList = RewardsList(self.nextCycle)
         self.propose_account = Account.from_key(
             get_secret(
-                "/botsquad/cycle_0/private",
+                "arn:aws:secretsmanager:us-west-1:747584148381:secret:/oracle_approver/private",
                 "private",
                 test=env_config.test,
             )
         )
         self.approve_account = Account.from_key(
             get_secret(
-                "/botsquad/cycle_0/private",
+                "arn:aws:secretsmanager:us-west-1:747584148381:secret:/oracle_approver/private",
                 "private",
                 test=env_config.test,
             )
