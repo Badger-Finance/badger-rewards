@@ -20,7 +20,7 @@ def get_bucket(test):
 
 def get_secret(
     secret_name: str,
-    secret_key: str = None,
+    secret_key: str,
     region_name: str = "us-west-1",
     test: bool = False,
 ) -> str:
