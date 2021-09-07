@@ -32,15 +32,15 @@ class TreeManager:
         self.rewardsList = RewardsList(self.nextCycle)
         self.propose_account = Account.from_key(
             get_secret(
-                "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
-                "private",
+                f"propose-cycle-bot/{self.chain}/pk",
+                "PROPOSE_PKEY",
                 test=env_config.test,
             )
         )
         self.approve_account = Account.from_key(
             get_secret(
-                "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
-                "private",
+                f"approve-cycle-bot/{self.chain}/pk",
+                "APPROVE_PKEY",
                 test=env_config.test,
             )
         )
