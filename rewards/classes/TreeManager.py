@@ -32,15 +32,13 @@ class TreeManager:
         self.rewardsList = RewardsList(self.nextCycle)
         self.propose_account = Account.from_key(
             get_secret(
-                f"propose-cycle-bot/{self.chain}/pk",
-                "PROPOSE_PKEY",
+                "/botsquad/cycle_0/private",
                 test=env_config.test,
             )
         )
         self.approve_account = Account.from_key(
             get_secret(
-                f"approve-cycle-bot/{self.chain}/pk",
-                "APPROVE_PKEY",
+                "/botsquad/cycle_0/private",
                 test=env_config.test,
             )
         )
