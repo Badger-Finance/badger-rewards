@@ -20,3 +20,16 @@ Cadence: Every 10m
 # Testing
 
 Badger Boost calculation: `python -m scripts.rewards.propose_boost`
+
+# Development
+
+### Rewards
+In order to deploy on an EVM chain, the following is required
+
+- RPC endpoint for specific chain
+- Subgraph for tracking user balances (api subgraph)
+- Subgraph for tracking tree distribution events
+- Subgraph for tracking tokens
+- Gas estimation api for that chain
+- Badger Tree + Rewards Logger contracts
+- AWS bucket for storing merkle trees and initial empty tree file
