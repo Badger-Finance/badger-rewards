@@ -53,15 +53,18 @@ def get_secret(
             aws_access_key_id=credentials["AccessKeyId"],
             aws_secret_access_key=credentials["SecretAccessKey"],
         )
+        client = session.client(
+            service_name="secretsmanager",
+            region_name=region_name,
+            aws_access_key_id=credentials["AccessKeyId"],
+            aws_secret_access_key=credentials["SecretAccessKey"],
+        )
     else:
         session = boto3.session.Session()
-
-    client = session.client(
-        service_name="secretsmanager",
-        region_name=region_name,
-        aws_access_key_id=credentials["AccessKeyId"],
-        aws_secret_access_key=credentials["SecretAccessKey"],
-    )
+        client = session.client(
+            service_name="secretsmanager",
+            region_name=region_name,
+        )
 
     # In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
     # See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
