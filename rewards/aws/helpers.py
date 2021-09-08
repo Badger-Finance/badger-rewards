@@ -2,7 +2,10 @@ import base64
 import boto3
 from botocore.exceptions import ClientError
 from decouple import config
+import logging
 import json
+
+logger = logging.getLogger("aws-helpers")
 
 if config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]:
     s3 = boto3.client(
@@ -64,7 +67,9 @@ def get_secret(
 
     try:
         get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+        logger.info("get secret value response no error")
     except ClientError as e:
+        logger.error(f"get secret value response error: {e}")
         if e.response["Error"]["Code"] == "DecryptionFailureException":
             raise e
         elif e.response["Error"]["Code"] == "InternalServiceErrorException":
@@ -79,11 +84,11 @@ def get_secret(
         # Decrypts secret using the associated KMS CMK.
         # Depending on whether the secret is a string or binary, one of these fields will be populated.
         if "SecretString" in get_secret_value_response:
-            return json.loads(get_secret_value_response["SecretString"]).get(secret_key)
+            return json.loads(get_secret_value_response["SecretString"])[secret_key]
         else:
-            return base64.b64decode(get_secret_value_response["SecretBinary"]).get(
+            return base64.b64decode(get_secret_value_response["SecretBinary"])[
                 secret_key
-            )
+            ]
 
     return None
 
