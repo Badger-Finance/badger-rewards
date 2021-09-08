@@ -15,6 +15,7 @@ subgraph_urls = {
     "tokens-polygon": "https://bgraph-matic.badger.guru/subgraphs/name/swole/tokens-polygon",
     "tokens-arbitrum": "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-arbitrum",
     # Harvest graphs
-    "harvests-polygon": "https://bgraph-matic.badger.guru/subgraphs/name/swole/tree-rewards-polygon",
     "harvests-eth": "https://bgraph-eth.badger.guru/subgraphs/name/swole/tree-rewards",
+    "harvests-polygon": "https://bgraph-matic.badger.guru/subgraphs/name/swole/tree-rewards-polygon",
+    "harvests-arbitrum": "https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-arbitrum",
 }
