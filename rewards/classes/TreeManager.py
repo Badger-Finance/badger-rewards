@@ -1,4 +1,5 @@
 from eth_account import Account
+import traceback
 from rewards.explorer import get_explorer_url
 from helpers.discord import send_message_to_discord
 from eth_utils.hexadecimal import encode_hex
@@ -205,7 +206,7 @@ class TreeManager:
                     url=self.discord_url,
                 )
         except Exception as e:
-            console.log(f"Error processing harvest tx: {e}")
+            console.log(f"Error processing harvest tx: {e} \n {traceback.format_exc()}")
             send_message_to_discord(
                 "**FAILED Proposed Rewards on {}**".format(self.chain),
                 e,

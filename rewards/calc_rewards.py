@@ -141,7 +141,7 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
     if not treeManager.has_pending_root():
         return
     else:
-        console.log("Pending root found.. approving rewards")
+        console.log("Pending root found.. approving")
         rewards_data = generate_rewards_in_range(
             chain, start, end, save=False, pastTree=currentRewards
         )

@@ -49,6 +49,7 @@ def get_gas_price_of_tx(
     elif chain in ["polygon", "arbitrum"]:
         tx = web3.eth.get_transaction(tx_hash)
         gas_price_base = Decimal(tx.get("gasPrice", 0) / 10 ** 18)
+
     gas_usd = Decimal(
         gas_oracle.functions.latestAnswer().call()
         / 10 ** gas_oracle.functions.decimals().call()
