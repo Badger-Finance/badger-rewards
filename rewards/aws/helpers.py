@@ -47,7 +47,7 @@ def get_secret(
 
     # Create a Secrets Manager client
     if assume_role_arn:
-        logger.info("assume role given, try to get assume role creds")
+        logger.error("assume role given, try to get assume role creds")
         credentials = get_assume_role_credentials(assume_role_arn)
         # Use the temporary credentials that AssumeRole returns to create session
         session = boto3.session.Session(
@@ -75,7 +75,7 @@ def get_secret(
 
     try:
         get_secret_value_response = client.get_secret_value(SecretId=secret_name)
-        logger.info("get secret value response no error")
+        logger.error("get secret value response no error")
     except ClientError as e:
         logger.error(f"get secret value response error: {e}")
         if e.response["Error"]["Code"] == "DecryptionFailureException":
@@ -106,15 +106,15 @@ def get_assume_role_credentials(assume_role_arn: str):
 
     # Call the assume_role method of the STSConnection object and pass the role
     # ARN and a role session name.
-    logger.info("calling sts_client.assume_role")
+    logger.error("calling sts_client.assume_role")
     assumed_role_object = sts_client.assume_role(
         RoleArn=assume_role_arn, RoleSessionName="AssumeRoleSession1"
     )
-    logger.info(f"assumed role: {assumed_role_object}")
+    logger.error(f"assumed role: {assumed_role_object}")
 
     # From the response that contains the assumed role, get the temporary
     # credentials that can be used to make subsequent API calls
     credentials = assumed_role_object["Credentials"]
-    logger.info("successfully got assume role")
+    logger.error("successfully got assume role")
 
     return credentials
