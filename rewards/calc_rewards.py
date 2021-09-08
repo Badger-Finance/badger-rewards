@@ -116,7 +116,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
     currentTime = w3.eth.getBlock(w3.eth.block_number)["timestamp"]
     timeSinceLastUpdate = currentTime - currentMerkleData["lastUpdateTime"]
 
-    if timeSinceLastUpdate < rewards_config.rootUpdateMinInterval:
+    if timeSinceLastUpdate < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
         return
     rewards_data = generate_rewards_in_range(
