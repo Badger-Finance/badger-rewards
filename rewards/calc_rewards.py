@@ -112,6 +112,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
     treeManager = TreeManager(chain)
     currentMerkleData = treeManager.fetch_current_merkle_data()
     w3 = env_config.get_web3(chain)
+
     currentTime = w3.eth.getBlock(w3.eth.block_number)["timestamp"]
     timeSinceLastUpdate = currentTime - currentMerkleData["lastUpdateTime"]
 
@@ -119,7 +120,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
         return
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=False, pastTree=pastRewards
+        chain, start, end, save=True, pastTree=pastRewards
     )
     console.log("Generated rewards")
 
@@ -127,13 +128,6 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
         "\n==== Proposing root with rootHash {} ====\n".format(rewards_data["rootHash"])
     )
     tx_hash, success = treeManager.propose_root(rewards_data)
-    # if success:
-    #     upload_tree(
-    #         rewards_data["fileName"],
-    #         rewards_data["merkleTree"],
-    #         chain,
-    #         staging=env_config.test,
-    #     )
 
 
 def approve_root(chain: str, start: int, end: int, currentRewards):
@@ -144,10 +138,10 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
     :param end: end block for rewards
     """
     treeManager = TreeManager(chain)
-    console.log(treeManager.has_pending_root())
     if not treeManager.has_pending_root():
         return
     else:
+        console.log("Pending root found.. approving rewards")
         rewards_data = generate_rewards_in_range(
             chain, start, end, save=False, pastTree=currentRewards
         )

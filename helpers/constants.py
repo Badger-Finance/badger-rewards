@@ -165,8 +165,9 @@ EMISSIONS_CONTRACTS = {
     ),
     "arbitrum": DotMap(
         {
-            "BadgerTree": "0x599D92B453C010b1050d31C364f6ee17E819f193",
-            "RewardsLogger": "0x663EfC293ca8d8DD6355AE6E99b71352BED9E895",
+            "BadgerTree": "0x635EB2C39C75954bb53Ebc011BDC6AfAAcE115A6",
+            "RewardsLogger": "0x85E1cACAe9a63429394d68Db59E14af74143c61c",
+            "GasOracle": "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
         }
     ),
 }

@@ -48,7 +48,7 @@ class EnvConfig:
             "polygon": polygon,
         }
 
-    def get_web3(self, chain="eth"):
+    def get_web3(self, chain="eth") -> Web3:
         return self.web3[chain]
 
     def get_webhook_url(self) -> str:
