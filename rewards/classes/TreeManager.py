@@ -30,22 +30,15 @@ class TreeManager:
         self.badgerTree = get_badger_tree(chain)
         self.nextCycle = self.get_current_cycle() + 1
         self.rewardsList = RewardsList(self.nextCycle)
-        self.propose_account = Account.from_key(
-            get_secret(
-                "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
-                "private",
-                assume_role_arn="arn:aws:iam::747584148381:role/cycle20210908001427790200000001",
-                test=env_config.test,
-            )
+        cycle_key = get_secret(
+            "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
+            "private",
+            assume_role_arn="arn:aws:iam::747584148381:role/cycle20210908001427790200000001",
+            test=env_config.test,
         )
-        self.approve_account = Account.from_key(
-            get_secret(
-                "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
-                "private",
-                assume_role_arn="arn:aws:iam::747584148381:role/cycle20210908001427790200000001",
-                test=env_config.test,
-            )
-        )
+        console.print("successfully got cycle_key")
+        self.propose_account = Account.from_key(cycle_key)
+        self.approve_account = Account.from_key(cycle_key)
         self.discord_url = get_secret(
             "cycle-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=env_config.test
         )

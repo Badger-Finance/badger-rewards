@@ -79,11 +79,11 @@ def get_secret(
         # Decrypts secret using the associated KMS CMK.
         # Depending on whether the secret is a string or binary, one of these fields will be populated.
         if "SecretString" in get_secret_value_response:
-            return json.loads(get_secret_value_response["SecretString"]).get(secret_key)
+            return json.loads(get_secret_value_response["SecretString"])[secret_key]
         else:
-            return base64.b64decode(get_secret_value_response["SecretBinary"]).get(
+            return base64.b64decode(get_secret_value_response["SecretBinary"])[
                 secret_key
-            )
+            ]
 
     return None
 
