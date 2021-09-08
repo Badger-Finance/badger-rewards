@@ -59,6 +59,8 @@ def get_secret(
     client = session.client(
         service_name="secretsmanager",
         region_name=region_name,
+        aws_access_key_id=credentials["AccessKeyId"],
+        aws_secret_access_key=credentials["SecretAccessKey"],
     )
 
     # In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
@@ -101,6 +103,7 @@ def get_assume_role_credentials(assume_role_arn: str):
     assumed_role_object = sts_client.assume_role(
         RoleArn=assume_role_arn, RoleSessionName="AssumeRoleSession1"
     )
+    logger.info(f"assumed role: {assumed_role_object}")
 
     # From the response that contains the assumed role, get the temporary
     # credentials that can be used to make subsequent API calls
