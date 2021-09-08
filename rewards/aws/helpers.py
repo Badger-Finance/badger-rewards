@@ -47,11 +47,20 @@ def get_secret(
 
     # Create a Secrets Manager client
     if assume_role_arn:
+        logger.info("assume role given, try to get assume role creds")
         credentials = get_assume_role_credentials(assume_role_arn)
         # Use the temporary credentials that AssumeRole returns to create session
         session = boto3.session.Session(
             aws_access_key_id=credentials["AccessKeyId"],
             aws_secret_access_key=credentials["SecretAccessKey"],
+            aws_session_token=credentials["SessionToken"],
+        )
+        client = session.client(
+            service_name="secretsmanager",
+            region_name=region_name,
+            aws_access_key_id=credentials["AccessKeyId"],
+            aws_secret_access_key=credentials["SecretAccessKey"],
+            aws_session_token=credentials["SessionToken"],
         )
         client = session.client(
             service_name="secretsmanager",
@@ -103,6 +112,7 @@ def get_assume_role_credentials(assume_role_arn: str):
 
     # Call the assume_role method of the STSConnection object and pass the role
     # ARN and a role session name.
+    logger.info("calling sts_client.assume_role")
     assumed_role_object = sts_client.assume_role(
         RoleArn=assume_role_arn, RoleSessionName="AssumeRoleSession1"
     )
@@ -111,5 +121,6 @@ def get_assume_role_credentials(assume_role_arn: str):
     # From the response that contains the assumed role, get the temporary
     # credentials that can be used to make subsequent API calls
     credentials = assumed_role_object["Credentials"]
+    logger.info("successfully got assume role")
 
     return credentials
