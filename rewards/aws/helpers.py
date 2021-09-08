@@ -2,7 +2,10 @@ import base64
 import boto3
 from botocore.exceptions import ClientError
 from decouple import config
+import logging
 import json
+
+logger = logging.getLogger("aws-helpers")
 
 if config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]:
     s3 = boto3.client(
@@ -64,7 +67,9 @@ def get_secret(
 
     try:
         get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+        logger.info("get secret value response no error")
     except ClientError as e:
+        logger.error(f"get secret value response error: {e}")
         if e.response["Error"]["Code"] == "DecryptionFailureException":
             raise e
         elif e.response["Error"]["Code"] == "InternalServiceErrorException":
