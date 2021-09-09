@@ -69,9 +69,7 @@ class RewardsManager:
         all_rewards = []
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
-            console.log(
-                "Calculating rewards for {}".format(token.name().call())
-            )
+            console.log("Calculating rewards for {}".format(token.name().call()))
             all_rewards.append(
                 self.calculate_sett_rewards(sett, allSchedules[sett], boosts)
             )

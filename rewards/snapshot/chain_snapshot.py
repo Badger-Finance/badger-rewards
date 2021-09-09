@@ -44,7 +44,9 @@ def sett_snapshot(chain: str, block: int, sett: str) -> UserBalances:
     """
     token = make_contract(sett, abiName="ERC20", chain=chain)
     console.log(
-        "Taking snapshot on {} of {} at {}".format(chain, sett, token.name().call())
+        "Taking snapshot on {} of {} ({}) at {}\n".format(
+            chain, token.name().call(), sett, block
+        )
     )
     sett_balances = fetch_sett_balances(chain, block - 50, sett)
     return parse_sett_balances(sett, sett_balances)

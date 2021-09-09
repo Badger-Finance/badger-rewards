@@ -1,4 +1,3 @@
-from hexbytes import HexBytes
 from rewards.aws.trees import upload_tree
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager
@@ -60,7 +59,7 @@ def fetch_all_schedules(chain: str, setts: List[str]):
     for sett in setts:
         schedules = logger.getAllUnlockSchedulesFor(sett).call()
         if len(schedules) > 0:
-           setts_with_schedules.append(sett) 
+            setts_with_schedules.append(sett)
         all_schedules[sett] = parse_schedules(schedules)
     console.log("Fetched {} schedules".format(len(all_schedules)))
     return all_schedules, setts_with_schedules
@@ -120,16 +119,16 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
 
     if timeSinceLastUpdate < rewards_config.rootUpdateMinInterval:
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-        #return
+        return
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=True, pastTree=pastRewards
+        chain, start, end, save=save, pastTree=pastRewards
     )
     console.log("Generated rewards")
 
     console.log(
         "\n==== Proposing root with rootHash {} ====\n".format(rewards_data["rootHash"])
     )
-    #tx_hash, success = treeManager.propose_root(rewards_data)
+    # tx_hash, success = treeManager.propose_root(rewards_data)
     # if success:
     #     upload_tree(
     #         rewards_data["fileName"],
@@ -182,7 +181,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     :param save: flag to save file locally
     """
     allSchedules, setts = fetch_all_schedules(chain, fetch_setts(chain))
-    
+
     console_and_discord("Generating rewards for {} setts".format(len(setts)))
 
     treeManager = TreeManager(chain)
