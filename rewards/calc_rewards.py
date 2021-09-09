@@ -122,14 +122,14 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
         #return
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=False, pastTree=pastRewards
+        chain, start, end, save=True, pastTree=pastRewards
     )
     console.log("Generated rewards")
 
     console.log(
         "\n==== Proposing root with rootHash {} ====\n".format(rewards_data["rootHash"])
     )
-    tx_hash, success = treeManager.propose_root(rewards_data)
+    #tx_hash, success = treeManager.propose_root(rewards_data)
     # if success:
     #     upload_tree(
     #         rewards_data["fileName"],
@@ -186,18 +186,24 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     console_and_discord("Generating rewards for {} setts".format(len(setts)))
 
     treeManager = TreeManager(chain)
-
+    rewards_list = []
     rewardsManager = RewardsManager(chain, treeManager.nextCycle, start, end)
 
     console.log("Calculating Tree Rewards...")
     treeRewards = rewardsManager.calculate_tree_distributions()
+    rewards_list.append(treeRewards)
 
     console.log("Calculating Sett Rewards...")
     boosts = download_boosts()
     settRewards = rewardsManager.calculate_all_sett_rewards(
         setts, allSchedules, boosts["userData"]
     )
-    newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle)
+    rewards_list.append(settRewards)
+    if chain == "eth":
+        sushi_rewards = rewardsManager.calc_sushi_distributions()
+        rewards_list.append(sushi_rewards)
+
+    newRewards = combine_rewards(rewards_list, rewardsManager.cycle)
 
     console.log("Combining cumulative rewards... \n")
     cumulativeRewards = process_cumulative_rewards(pastTree, newRewards)
@@ -213,7 +219,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
 
     if save:
         with open(fileName, "w") as fp:
-            json.dump(merkleTree, fp)
+            json.dump(merkleTree, fp, indent=4)
 
     return {
         "merkleTree": merkleTree,

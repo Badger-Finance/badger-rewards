@@ -55,6 +55,7 @@ class RewardsManager:
                     addr = self.web3.toChecksumAddress(user.address)
                     token = self.web3.toChecksumAddress(token)
                     rewardAmount = user.balance * rewardsUnit
+                    assert rewardAmount > 0
                     rewards.increase_user_rewards(
                         self.web3.toChecksumAddress(addr),
                         self.web3.toChecksumAddress(token),
@@ -184,13 +185,13 @@ class RewardsManager:
         return rewards
 
     def calc_sushi_distributions(self):
-        sushi_events = fetch_sushi_harvest_events(self.startBlock, self.endBlock)
+        sushi_events = fetch_sushi_harvest_events(self.start, self.end)
         all_from_events = 0
         all_sushi_rewards = []
         all_from_rewards = 0
         for strategy, events in sushi_events.items():
             rewards, from_rewards = self.calc_sushi_distribution(strategy, events)
-            all_from_events += sum(map(lambda e: e["rewardAmount"], events))
+            all_from_events += sum(map(lambda e: int(e["rewardAmount"]), events))
             all_from_rewards += from_rewards
             all_sushi_rewards.append(rewards)
         assert abs(all_from_events - all_from_rewards) < 1e9
