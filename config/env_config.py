@@ -18,27 +18,21 @@ class EnvConfig:
         self.discord_webhook_url = get_secret(
             "boost-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=self.test
         )
-        polygon = Web3(
-            Web3.HTTPProvider(
-                get_secret("quiknode/poly-node-url", "POLYGON_NODE_URL", test=self.test)
-            )
-        )
+        polygon = self.make_provider("quiknode/poly-node-url", "POLYGON_NODE_URL")
         polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
 
         self.web3 = {
-            "eth": Web3(
-                Web3.HTTPProvider(
-                    get_secret("quiknode/eth-node-url", "NODE_URL", test=self.test)
-                )
-            ),
-            "bsc": Web3(
-                Web3.HTTPProvider(
-                    get_secret("quiknode/bsc-node-url", "BSC_NODE_URL", test=self.test)
-                )
-            ),
+            "eth": self.make_provider("quiknode/eth-node-url", "NODE_URL"),
+            "bsc": self.make_provider("quiknode/bsc-node-url", "BSC_NODE_URL"),
             "polygon": polygon,
         }
 
+    def make_provider(self,name, key):
+        return Web3(Web3.HTTPProvider(
+            endpoint_uri=get_secret(name,key, test=self.test),
+            request_kwargs={'timeout': 30}
+        ))
+        
     def get_web3(self, chain="eth"):
         return self.web3[chain]
 
