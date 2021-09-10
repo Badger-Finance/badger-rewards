@@ -27,12 +27,14 @@ class EnvConfig:
             "polygon": polygon,
         }
 
-    def make_provider(self,name, key):
-        return Web3(Web3.HTTPProvider(
-            endpoint_uri=get_secret(name,key, test=self.test),
-            request_kwargs={'timeout': 30}
-        ))
-        
+    def make_provider(self, name, key):
+        return Web3(
+            Web3.HTTPProvider(
+                endpoint_uri=get_secret(name, key, test=self.test),
+                request_kwargs={"timeout": 30},
+            )
+        )
+
     def get_web3(self, chain="eth"):
         return self.web3[chain]
 

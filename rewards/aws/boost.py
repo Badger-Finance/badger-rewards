@@ -1,3 +1,4 @@
+from toolz.itertoolz import get
 from helpers.discord import send_message_to_discord
 from rewards.aws.helpers import s3, get_bucket
 from config.env_config import env_config
@@ -14,21 +15,32 @@ def upload_boosts(boostData):
     :param test:
     :param boostData: calculated boost information
     """
-    bucket = get_bucket(env_config.test)
-    console.log("Uploading file to s3://{}/{}".format(bucket, boostsFileName))
-    s3.put_object(
-        Body=str(json.dumps(boostData)),
-        Bucket=bucket,
-        Key=boostsFileName,
-        ACL="bucket-owner-full-control",
-    )
-    console.log("✅ Uploaded file to s3://{}/{}".format(bucket, boostsFileName))
-    send_message_to_discord(
-        "**BADGER BOOST UPDATED**",
-        f"✅ Uploaded file to s3://{bucket}/{boostsFileName}",
-        [{"name": "User Count", "value": len(boostData["userData"]), "inline": True}],
-        "Boost Bot",
-    )
+
+    buckets = ["badger-staging-merkle-proofs"]
+    if not env_config:
+        buckets.append("badger-merkle-proofs")
+
+    for b in buckets:
+        console.log("Uploading file to s3://{}/{}".format(b, boostsFileName))
+        s3.put_object(
+            Body=str(json.dumps(boostData)),
+            Bucket=b,
+            Key=boostsFileName,
+            ACL="bucket-owner-full-control",
+        )
+        console.log("✅ Uploaded file to s3://{}/{}".format(b, boostsFileName))
+        send_message_to_discord(
+            "**BADGER BOOST UPDATED**",
+            f"✅ Uploaded file to s3://{b}/{boostsFileName}",
+            [
+                {
+                    "name": "User Count",
+                    "value": len(boostData["userData"]),
+                    "inline": True,
+                }
+            ],
+            "Boost Bot",
+        )
 
 
 def download_boosts():

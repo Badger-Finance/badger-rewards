@@ -14,5 +14,6 @@ class RewardsConfig:
 
     def root_update_interval(self, chain):
         return self.root_update_intervals[chain]
-    
+
+
 rewards_config = RewardsConfig()
