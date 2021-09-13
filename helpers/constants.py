@@ -176,3 +176,9 @@ DISABLED_VAULTS = [
     "0xb6bd5ae3d5f78a6bb04bbb031e24fa9c2bbd090d",
     "0x85e1cacae9a63429394d68db59e14af74143c61c",
 ]
+
+MONITORING_SECRET_NAMES = {
+    "eth": "none",
+    "polygon": "cycle-bot/prod-discord-url",
+    "arbitrum": "cycle-bot/arbitrum/prod-discord-url",
+}
