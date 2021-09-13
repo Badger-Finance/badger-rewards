@@ -120,7 +120,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
         return
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=True, pastTree=pastRewards
+        chain, start, end, save=False, pastTree=pastRewards
     )
     console.log("Generated rewards")
 
