@@ -1,5 +1,6 @@
 from rewards.tree_utils import calc_next_cycle_range
 from helpers.discord import send_message_to_discord
+from helpers.constants import MONITORING_SECRET_NAMES
 from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import propose_root
 from config.env_config import env_config
@@ -10,7 +11,7 @@ console = Console()
 
 def propose_rewards(chain):
     discord_url = get_secret(
-        "cycle-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=env_config.test
+        MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", test=env_config.test
     )
 
     pastRewards, startBlock, endBlock = calc_next_cycle_range(chain)
