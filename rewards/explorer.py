@@ -23,7 +23,7 @@ def convert_from_eth(block) -> Dict[str, int]:
         "eth": block,
         # "bsc": get_block_by_timestamp("bsc", timestamp) - 1000,
         "polygon": get_block_by_timestamp("polygon", timestamp) - 1000,
-        "arbitrum": get_block_by_timestamp("arbitrum", timestamp) - 1000,
+        "arbitrum": get_block_by_timestamp("arbitrum", timestamp) - 1500,
     }
 
 
