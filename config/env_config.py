@@ -39,7 +39,7 @@ class EnvConfig:
             "arbitrum": Web3(
                 Web3.HTTPProvider(
                     get_secret(
-                        "quiknode/arbitrum-node-url",
+                        "alchemy/arbitrum-node-url",
                         "ARBITRUM_NODE_URL",
                         test=self.test,
                     )
