@@ -1,0 +1,26 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: propose-arb-cycle-bot
+  labels:
+    app: propose-arb-cycle-bot
+spec:
+  schedule: "0 */2 * * *"
+  startingDeadlineSeconds: 180
+  suspend: true
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: propose-arb-cycle-bot
+          containers:
+          - name: propose-arb-cycle-bot
+            image: IMAGE_NAME
+            imagePullPolicy: IfNotPresent
+            command: ["python", "-m", "scripts.rewards.arbitrum.propose_arbitrum"]
+            env:
+              - name: LOG_LEVEL
+                value: 'info'
+              - name: TEST
+                value: 'False'
+          restartPolicy: OnFailure

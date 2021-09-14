@@ -10,6 +10,7 @@ from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_tree
 from helpers.web3_utils import get_badger_tree
+from helpers.constants import MONITORING_SECRET_NAMES
 from rewards.classes.RewardsList import RewardsList
 from rewards.tx_utils import (
     get_effective_gas_price,
@@ -41,7 +42,9 @@ class TreeManager:
         self.propose_account = Account.from_key(cycle_key)
         self.approve_account = Account.from_key(cycle_key)
         self.discord_url = get_secret(
-            "cycle-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=env_config.test
+            MONITORING_SECRET_NAMES.get(chain, ""),
+            "DISCORD_WEBHOOK_URL",
+            test=env_config.test,
         )
 
     def convert_to_merkle_tree(self, rewardsList: RewardsList, start: int, end: int):
