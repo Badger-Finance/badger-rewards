@@ -17,7 +17,7 @@ def fetch_token_prices() -> Dict[str, float]:
     """
     Fetch token prices for sett tokens
     """
-    chains = ["eth", "bsc", "matic"]
+    chains = ["eth", "bsc", "matic", "arbitrum"]
     prices = {}
     for chain in chains:
         chain_prices = requests.get(
