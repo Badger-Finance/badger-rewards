@@ -1,3 +1,6 @@
+from os import times
+from rewards.explorer import get_block_by_timestamp
+from eth_typing.evm import BlockNumber
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
 from rewards.snapshot.chain_snapshot import sett_snapshot
@@ -154,7 +157,11 @@ class RewardsManager:
         return snapshot
 
     def calculate_tree_distributions(self) -> RewardsList:
-        treeDistributions = fetch_tree_distributions(self.start, self.end, self.chain)
+        treeDistributions = fetch_tree_distributions(
+            self.web3.eth.getBlock(self.start)["timestamp"],
+            self.web3.eth.getBlock(self.end)["timestamp"],
+            self.chain,
+        )
         console.log(
             "Fetched {} tree distributions between {} and {}".format(
                 len(treeDistributions), self.start, self.end
@@ -162,8 +169,7 @@ class RewardsManager:
         )
         rewards = RewardsList(self.cycle + 1)
         for dist in treeDistributions:
-            console.log(dist)
-            block = int(dist["blockNumber"])
+            block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]["address"]
             strategy = dist["id"].split("-")[0]
             sett = self.get_sett_from_strategy(strategy)

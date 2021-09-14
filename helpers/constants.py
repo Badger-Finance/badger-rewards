@@ -163,9 +163,22 @@ EMISSIONS_CONTRACTS = {
             "GasOracle": "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
         }
     ),
+    "arbitrum": DotMap(
+        {
+            "BadgerTree": "0x635EB2C39C75954bb53Ebc011BDC6AfAAcE115A6",
+            "RewardsLogger": "0x85E1cACAe9a63429394d68Db59E14af74143c61c",
+            "GasOracle": "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
+        }
+    ),
 }
 
 DISABLED_VAULTS = [
     "0xb6bd5ae3d5f78a6bb04bbb031e24fa9c2bbd090d",
     "0x85e1cacae9a63429394d68db59e14af74143c61c",
 ]
+
+MONITORING_SECRET_NAMES = {
+    "eth": "none",
+    "polygon": "cycle-bot/prod-discord-url",
+    "arbitrum": "cycle-bot/arbitrum/prod-discord-url",
+}

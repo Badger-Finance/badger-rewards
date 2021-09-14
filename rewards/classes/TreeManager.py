@@ -1,4 +1,5 @@
 from eth_account import Account
+import traceback
 from rewards.explorer import get_explorer_url
 from helpers.discord import send_message_to_discord
 from eth_utils.hexadecimal import encode_hex
@@ -9,6 +10,7 @@ from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_tree
 from helpers.web3_utils import get_badger_tree
+from helpers.constants import MONITORING_SECRET_NAMES
 from rewards.classes.RewardsList import RewardsList
 from rewards.tx_utils import (
     get_effective_gas_price,
@@ -40,14 +42,18 @@ class TreeManager:
         self.propose_account = Account.from_key(cycle_key)
         self.approve_account = Account.from_key(cycle_key)
         self.discord_url = get_secret(
-            "cycle-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=env_config.test
+            MONITORING_SECRET_NAMES.get(chain, ""),
+            "DISCORD_WEBHOOK_URL",
+            test=env_config.test,
         )
 
     def convert_to_merkle_tree(self, rewardsList: RewardsList, start: int, end: int):
         return rewards_to_merkle_tree(rewardsList, start, end)
 
-    def build_function_and_send(self, account, gas, func) -> str:
-        tx = func.buildTransaction(self.get_tx_options(account))
+    def build_function_and_send(self, account, func) -> str:
+        options = self.get_tx_options(account)
+        console.log(options)
+        tx = func.buildTransaction(options)
         signed_tx = self.w3.eth.account.sign_transaction(tx, private_key=account.key)
         tx_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
         return tx_hash
@@ -64,7 +70,7 @@ class TreeManager:
         tx_hash = HexBytes(0)
         try:
             tx_hash = self.build_function_and_send(
-                self.approve_account, gas=300000, func=approve_root_func
+                self.approve_account, func=approve_root_func
             )
             succeeded, msg = confirm_transaction(
                 self.w3,
@@ -140,9 +146,11 @@ class TreeManager:
         )
         tx_hash = HexBytes(0)
         try:
+            print("propose root function")
             tx_hash = self.build_function_and_send(
-                self.propose_account, gas=200000, func=propose_root_func
+                self.propose_account, func=propose_root_func
             )
+            print(tx_hash)
             succeeded, msg = confirm_transaction(
                 self.w3,
                 tx_hash,
@@ -196,7 +204,7 @@ class TreeManager:
                     url=self.discord_url,
                 )
         except Exception as e:
-            console.log(f"Error processing harvest tx: {e}")
+            console.log(f"Error processing harvest tx: {e} \n {traceback.format_exc()}")
             send_message_to_discord(
                 "**FAILED Proposed Rewards on {}**".format(self.chain),
                 e,
@@ -281,9 +289,12 @@ class TreeManager:
         }
         if self.chain == "eth":
             options["maxPriorityFeePerGas"] = get_priority_fee(self.w3)
-            options["maxFeePerGas"] = get_effective_gas_price(self.w3)
+            options["maxFeePerGas"] = get_effective_gas_price(self.w3, self.chain)
             options["gas"] = 200000
+        if self.chain == "arbitrum":
+            options["gas"] = 3000000
+            # options["gasPrice"] = get_effective_gas_price(self.w3, self.chain)
         else:
-            options["gasPrice"] = get_effective_gas_price(self.w3)
-
+            options["gasPrice"] = get_effective_gas_price(self.w3, self.chain)
+        print(options)
         return options

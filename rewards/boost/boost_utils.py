@@ -60,7 +60,7 @@ def calc_boost_data(block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
     """
     chains = [
         "polygon",
-        # "bsc",
+        "arbitrum",
         "eth",
     ]
     blocksByChain = convert_from_eth(block)
