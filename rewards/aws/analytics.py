@@ -23,12 +23,12 @@ def upload_analytics(cycle: int, data):
     console.log("✅ Uploaded file to s3://" + analyticsBucket + "/" + jsonKey)
 
 
-def upload_schedules(data):
+def upload_schedules(chain: str, data):
     """
     Upload schedules to analytics bucket
     :param data: schedules to upload
     """
-    jsonKey = "schedules.json"
+    jsonKey = f"schedules-{chain}.json"
     console.log("Uploading file to s3://" + analyticsBucket + "/" + jsonKey)
     s3.put_object(
         Body=str(json.dumps(data)),
