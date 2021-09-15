@@ -373,7 +373,7 @@ def fetch_fuse_pool_balances(client, chain, block):
         }
     }
 
-    for symbol, data in ctoken_data:
+    for symbol, data in ctoken_data.items():
         ftoken = make_contract(
             env_config.get_web3().toChecksumAddress(data["contract"]),
             abiName="CErc20Delegator",
