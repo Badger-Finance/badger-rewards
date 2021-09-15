@@ -1,4 +1,3 @@
-from helpers.constants import FUSE_POOL_DATA
 from helpers.discord import send_message_to_discord
 from helpers.constants import MAIN_SUBGRAPH_IDS
 from subgraph.subgraph_utils import make_gql_client
