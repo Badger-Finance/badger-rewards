@@ -1,11 +1,14 @@
 import requests
 from config.env_config import env_config
 from typing import Dict
+import time
 
 urls = {"polygon": "polygonscan.com", "bsc": "bscscan.com", "arbitrum": "arbiscan.io"}
 
 
 def get_block_by_timestamp(chain: str, timestamp: int) -> int:
+
+    time.sleep(5)
     chain_url = "https://api.{}".format(urls[chain])
     url = "api?module=block&action=getblocknobytime&timestamp={}&closest=before".format(
         timestamp
