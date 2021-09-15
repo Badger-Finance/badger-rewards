@@ -370,7 +370,7 @@ def fetch_fuse_pool_balances(client, chain, block):
             "underlying_contract": "0x798D1bE841a82a273720CE31c822C61a67a601C3",
             "symbol": "fDIGG-22",
             "contract": "0x792a676dD661E2c182435aaEfC806F1d4abdC486",
-        }
+        },
     }
 
     for symbol, data in ctoken_data.items():
@@ -386,16 +386,20 @@ def fetch_fuse_pool_balances(client, chain, block):
         )
 
         ctoken_data[symbol]["decimals"] = int(ftoken.functions.decimals().call())
+        console.log(ctoken_data[symbol]["decimals"])
         underlying_decimals = int(underlying.functions.decimals().call())
         mantissa = 18 + underlying_decimals - ctoken_data[symbol]["decimals"]
         ctoken_data[symbol]["exchange_rate"] = float(
             ftoken.functions.exchangeRateStored().call()
         ) / math.pow(10, mantissa)
 
+    last_token_id = "0x0000000000000000000000000000000000000000"
+
     query = gql(
         f"""
-        query fetch_fuse_pool_balances($skip_amount: Int, $block_number: Block_height) {{
-            accountCTokens(block: $block_number, skip: $skip_amount, first: 1000, where: {{ symbol_in:{list(ctoken_data.keys())} }}) {{
+        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {{
+            accountCTokens(block: $block_number, where: $token_filter) {{
+                id
                 symbol
                 account{{
                     id
@@ -406,14 +410,20 @@ def fetch_fuse_pool_balances(client, chain, block):
         """
     )
 
-    skip = 0
     balances = {}
-    variables = {"block_number": {"number": block - 50}, "skip_amount": skip}
+    variables = {
+        "block_number": {"number": block - 50},
+        "token_filter": {"id_gt": last_token_id, "symbol_in": list(ctoken_data.keys())},
+    }
     try:
         while True:
-            variables["skip_amount"] = skip
+            variables["token_filter"]["id_gt"] = last_token_id
             results = client.execute(query, variable_values=variables)
-            for result in results:
+
+            for result in results["accountCTokens"]:
+
+                print(result)
+                last_token_id = result["id"]
                 symbol = result["symbol"]
                 ctoken_balance = float(result["cTokenBalance"])
                 balance = ctoken_balance * ctoken_data[symbol]["exchange_rate"]
@@ -432,11 +442,10 @@ def fetch_fuse_pool_balances(client, chain, block):
                     else:
                         balances[sett][account] += balance
 
-            if len(results) == 0:
+            if len(results["accountCTokens"]) == 0:
                 break
             else:
                 console.log("Fetching {} fuse balances".format(len(results)))
-                skip += 1000
 
         console.log("Fetched {} total fuse balances".format(len(balances)))
         return balances

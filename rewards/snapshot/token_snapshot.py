@@ -20,15 +20,16 @@ def fuse_snapshot(chain: str, block: int):
 def token_snapshot_usd(chain: str, block: int):
 
     badger_ppfs, digg_ppfs = fetch_ppfs()
+
+    fuse_balances = fuse_snapshot(chain, block)
     badger_balances, digg_balances = token_snapshot(chain, block)
     # Account for tokens loaned in fuse
-    fuse_balances = fuse_snapshot(chain, block)
     if fuse_balances:
-        fuse_balances[BBADGER] = {
-            k: v * badger_ppfs for k, v in fuse_balances[BBADGER].items()
-        }
-        fuse_badger = Counter(fuse_balances[BADGER]) + Counter(fuse_balances[BBADGER])
-        fuse_digg = {k: v * digg_ppfs for k, v in fuse_balances[BBADGER].items()}
+        # fuse_balances[BBADGER] = {
+        #    k: v * badger_ppfs for k, v in fuse_balances[BBADGER].items()
+        # }
+        fuse_badger = fuse_balances[BADGER]
+        fuse_digg = fuse_balances[DIGG]
         badger_balances = Counter(fuse_badger) + Counter(badger_balances)
         digg_balances = Counter(fuse_digg) + Counter(digg_balances)
 
