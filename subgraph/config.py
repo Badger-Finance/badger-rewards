@@ -18,5 +18,6 @@ subgraph_urls = {
     "harvests-eth": "https://bgraph-eth.badger.guru/subgraphs/name/swole/tree-rewards",
     "harvests-polygon": "https://bgraph-matic.badger.guru/subgraphs/name/swole/tree-rewards-polygon",
     "harvests-arbitrum": "https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-arbitrum",
+    "fuse": "https://api.thegraph.com/subgraphs/name/platocrat/fuse-subgraph",
     "thegraph": "https://api.thegraph.com/index-node/graphql",
 }
