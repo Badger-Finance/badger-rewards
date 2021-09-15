@@ -1,4 +1,5 @@
 from helpers.discord import send_message_to_discord
+from helpers.constants import MAIN_SUBGRAPH_IDS
 from subgraph.subgraph_utils import make_gql_client
 from config.env_config import env_config
 from rich.console import Console
@@ -7,7 +8,26 @@ import math
 from functools import lru_cache
 
 harvests_client = make_gql_client("harvests-eth")
+thegraph_client = make_gql_client("thegraph")
 console = Console()
+
+
+def last_synced_block(chain):
+    query = gql(
+        f"""
+        query last_block {{
+            indexingStatuses(subgraphs: ["{MAIN_SUBGRAPH_IDS[chain]}"]) {{
+                chains {{
+                    latestBlock {{
+                        number
+                    }}
+                }}
+            }}
+        }}
+    """
+    )
+    result = thegraph_client.execute(query)
+    return int(result["indexingStatuses"][0]["chains"][0]["latestBlock"]["number"])
 
 
 def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
@@ -131,7 +151,7 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
     """
     )
 
-    ## Paginate this for more than 1000 balances
+    # Paginate this for more than 1000 balances
     continueFetching = True
     lastID = "0x0000000000000000000000000000000000000000"
 
