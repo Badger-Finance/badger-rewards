@@ -182,3 +182,8 @@ MONITORING_SECRET_NAMES = {
     "polygon": "cycle-bot/prod-discord-url",
     "arbitrum": "cycle-bot/arbitrum/prod-discord-url",
 }
+MAIN_SUBGRAPH_IDS = {
+    "eth": "QmTEGLYf1jh4uUzpgSNT8nRjhiBmVJQxGommvHFenZcAY2",
+    "polygon": "QmbYRpDk4MQS8nTKGyXRcN1CX8zkos2XvGX32BZctzd9BB",
+    "arbitrum": "QmQ8qzpzZu5dep9xvnqncZrgXZS9dyEru6dozEA3TLufXo",
+}
