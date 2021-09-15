@@ -46,9 +46,10 @@ def get_gas_price_of_tx(
     )
     if chain == "eth":
         gas_price_base = Decimal(tx_receipt.get("effectiveGasPrice", 0) / 10 ** 18)
-    elif chain == "polygon":
+    elif chain in ["polygon", "arbitrum"]:
         tx = web3.eth.get_transaction(tx_hash)
         gas_price_base = Decimal(tx.get("gasPrice", 0) / 10 ** 18)
+
     gas_usd = Decimal(
         gas_oracle.functions.latestAnswer().call()
         / 10 ** gas_oracle.functions.decimals().call()
@@ -70,6 +71,10 @@ def get_latest_base_fee(web3: Web3, default=int(100e9)):  # default to 100 gwei
     return base_fee
 
 
+def get_latest_arbitrum_fee(web3: Web3, default=int(5e9)):  # default to 5 gwei
+    latest = web3.eth.getBlock("latest")
+
+
 def get_effective_gas_price(web3: Web3, chain: str = "eth") -> int:
     # TODO: Currently using max fee (per gas) that can be used for this tx. Maybe use base + priority (for average).
     if chain == "eth":
@@ -83,6 +88,8 @@ def get_effective_gas_price(web3: Web3, chain: str = "eth") -> int:
     elif chain == "polygon":
         response = requests.get("https://gasstation-mainnet.matic.network").json()
         gas_price = web3.toWei(int(response.get("fast") * 1.1), "gwei")
+    elif chain == "arbitrum":
+        gas_price = web3.eth.gas_price * 1.1
     return gas_price
 
 

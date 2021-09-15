@@ -2,7 +2,10 @@ import base64
 import boto3
 from botocore.exceptions import ClientError
 from decouple import config
+import logging
 import json
+
+logger = logging.getLogger("aws-helpers")
 
 if config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]:
     s3 = boto3.client(
@@ -22,6 +25,7 @@ def get_secret(
     secret_name: str,
     secret_key: str,
     region_name: str = "us-west-1",
+    assume_role_arn: str = None,
     test: bool = False,
 ) -> str:
     """Retrieves secret from AWS secretsmanager.
@@ -42,11 +46,28 @@ def get_secret(
         return config(secret_key, "")
 
     # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
-        service_name="secretsmanager",
-        region_name=region_name,
-    )
+    if assume_role_arn:
+        logger.error("assume role given, try to get assume role creds")
+        credentials = get_assume_role_credentials(assume_role_arn)
+        # Use the temporary credentials that AssumeRole returns to create session
+        session = boto3.session.Session(
+            aws_access_key_id=credentials["AccessKeyId"],
+            aws_secret_access_key=credentials["SecretAccessKey"],
+            aws_session_token=credentials["SessionToken"],
+        )
+        client = session.client(
+            service_name="secretsmanager",
+            region_name=region_name,
+            aws_access_key_id=credentials["AccessKeyId"],
+            aws_secret_access_key=credentials["SecretAccessKey"],
+            aws_session_token=credentials["SessionToken"],
+        )
+    else:
+        session = boto3.session.Session()
+        client = session.client(
+            service_name="secretsmanager",
+            region_name=region_name,
+        )
 
     # In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
     # See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
@@ -54,7 +75,9 @@ def get_secret(
 
     try:
         get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+        logger.error("get secret value response no error")
     except ClientError as e:
+        logger.error(f"get secret value response error: {e}")
         if e.response["Error"]["Code"] == "DecryptionFailureException":
             raise e
         elif e.response["Error"]["Code"] == "InternalServiceErrorException":
@@ -69,10 +92,26 @@ def get_secret(
         # Decrypts secret using the associated KMS CMK.
         # Depending on whether the secret is a string or binary, one of these fields will be populated.
         if "SecretString" in get_secret_value_response:
-            return json.loads(get_secret_value_response["SecretString"]).get(secret_key)
+            return json.loads(get_secret_value_response["SecretString"])[secret_key]
         else:
-            return base64.b64decode(get_secret_value_response["SecretBinary"]).get(
+            return base64.b64decode(get_secret_value_response["SecretBinary"])[
                 secret_key
-            )
+            ]
 
     return None
+
+
+def get_assume_role_credentials(assume_role_arn: str):
+    sts_client = boto3.client("sts")
+
+    # Call the assume_role method of the STSConnection object and pass the role
+    # ARN and a role session name.
+    assumed_role_object = sts_client.assume_role(
+        RoleArn=assume_role_arn, RoleSessionName="AssumeRoleSession1"
+    )
+
+    # From the response that contains the assumed role, get the temporary
+    # credentials that can be used to make subsequent API calls
+    credentials = assumed_role_object["Credentials"]
+
+    return credentials

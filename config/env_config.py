@@ -36,10 +36,19 @@ class EnvConfig:
                     get_secret("quiknode/bsc-node-url", "BSC_NODE_URL", test=self.test)
                 )
             ),
+            "arbitrum": Web3(
+                Web3.HTTPProvider(
+                    get_secret(
+                        "alchemy/arbitrum-node-url",
+                        "ARBITRUM_NODE_URL",
+                        test=self.test,
+                    )
+                )
+            ),
             "polygon": polygon,
         }
 
-    def get_web3(self, chain="eth"):
+    def get_web3(self, chain="eth") -> Web3:
         return self.web3[chain]
 
     def get_webhook_url(self) -> str:

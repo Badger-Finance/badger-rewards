@@ -1,30 +1,47 @@
 from helpers.constants import FUSE_POOL_DATA
 from helpers.discord import send_message_to_discord
+from helpers.constants import MAIN_SUBGRAPH_IDS
 from subgraph.subgraph_utils import make_gql_client
+from config.env_config import env_config
 from rich.console import Console
 from helpers.web3_utils import make_contract
 from gql import gql
-from decimal import *
 import math
 from functools import lru_cache
 from config.env_config import env_config
 import json
 
-getcontext().prec = 20
 harvests_client = make_gql_client("harvests-eth")
+thegraph_client = make_gql_client("thegraph")
 console = Console()
 
 
-def fetch_tree_distributions(startBlock, endBlock, chain):
+def last_synced_block(chain):
+    query = gql(
+        f"""
+        query last_block {{
+            indexingStatuses(subgraphs: ["{MAIN_SUBGRAPH_IDS[chain]}"]) {{
+                chains {{
+                    latestBlock {{
+                        number
+                    }}
+                }}
+            }}
+        }}
+    """
+    )
+    result = thegraph_client.execute(query)
+    return int(result["indexingStatuses"][0]["chains"][0]["latestBlock"]["number"])
+
+
+def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
     tree_client = make_gql_client("harvests-{}".format(chain))
-    console.log(startBlock, endBlock)
     query = gql(
         """
         query tree_distributions(
-            $blockHeight: Block_height
             $lastDistId: TreeDistribution_filter
             ) {
-            treeDistributions(block: $blockHeight, where: $lastDistId) {
+            treeDistributions(where: $lastDistId) {
                 id
                 token {
                     address
@@ -32,24 +49,29 @@ def fetch_tree_distributions(startBlock, endBlock, chain):
                 }
                 amount
                 blockNumber
+                timestamp
                 }
             }
         """
     )
-    lastDistId = "0x0000000000000000000000000000000000000000"
-    variables = {"blockHeight": {"number": endBlock}}
-    treeDistributions = []
+    last_dist_id = "0x0000000000000000000000000000000000000000"
+    variables = {}
+    tree_distributions = []
     while True:
-        variables["lastDistId"] = {"id_gt": lastDistId}
+        variables["lastDistId"] = {"id_gt": last_dist_id}
         results = tree_client.execute(query, variable_values=variables)
-        distData = results["treeDistributions"]
-        if len(distData) == 0:
+        dist_data = results["treeDistributions"]
+        if len(dist_data) == 0:
             break
         else:
-            treeDistributions = [*treeDistributions, *distData]
-        if len(distData) > 0:
-            lastDistId = distData[-1]["id"]
-    return [td for td in treeDistributions if int(td["blockNumber"]) > int(startBlock)]
+            tree_distributions = [*tree_distributions, *dist_data]
+        if len(dist_data) > 0:
+            last_dist_id = dist_data[-1]["id"]
+    return [
+        td
+        for td in tree_distributions
+        if start_timestamp < int(td["timestamp"]) <= end_timestamp
+    ]
 
 
 def fetch_farm_harvest_events():
@@ -133,7 +155,7 @@ def fetch_token_balances(client, sharesPerFragment, blockNumber):
     """
     )
 
-    ## Paginate this for more than 1000 balances
+    # Paginate this for more than 1000 balances
     continueFetching = True
     lastID = "0x0000000000000000000000000000000000000000"
 
