@@ -282,6 +282,11 @@ def fetch_fuse_pool_balances(client, chain, block):
             "symbol": "fBADGER-22",
             "contract": "0x6780B4681aa8efE530d075897B3a4ff6cA5ed807",
         },
+        "fDIGG-22": {
+            "underlying_contract": "0x798D1bE841a82a273720CE31c822C61a67a601C3",
+            "symbol": "fDIGG-22",
+            "contract": "0x792a676dD661E2c182435aaEfC806F1d4abdC486",
+        }
     }
 
     with open("abis/eth/CErc20Delegator.json") as f:
