@@ -59,9 +59,9 @@ def calc_boost_data(block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
     :param block: block to collect the boost data from
     """
     chains = [
+        "eth",
         "polygon",
         "arbitrum",
-        "eth",
     ]
     blocksByChain = convert_from_eth(block)
     native = Counter()
