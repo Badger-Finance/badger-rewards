@@ -11,4 +11,5 @@ if __name__ == "__main__":
         except Exception as e:
             console.print("[red]Error[/red]", e)
         finally:
-            time.sleep(10 * 60)
+            # Make sure that we run this often, we don't want boost to get out of date
+            time.sleep(60 * 5)
