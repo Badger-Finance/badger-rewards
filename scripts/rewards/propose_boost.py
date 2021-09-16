@@ -1,3 +1,4 @@
+from helpers.constants import BOOST_CHAINS
 from config.env_config import env_config
 from helpers.discord import send_message_to_discord
 from rewards.boost.calc_boost import badger_boost
@@ -8,8 +9,9 @@ console = Console()
 
 if __name__ == "__main__":
     currentBlock = env_config.get_web3().eth.block_number
+    chains = ",".join(BOOST_CHAINS)
     send_message_to_discord(
-        "**CALCULATING NEW BOOST (ETH + Polygon)**",
+        f"**CALCULATING NEW BOOST ({chains})**",
         "Pulling data from the graph",
         [],
         "Boost Bot",
