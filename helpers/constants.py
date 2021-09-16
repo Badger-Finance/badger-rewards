@@ -192,4 +192,5 @@ MAIN_SUBGRAPH_IDS = {
 BOOST_CHAINS = [
     "eth",
     "polygon",
+    "arbitrum"
 ]
