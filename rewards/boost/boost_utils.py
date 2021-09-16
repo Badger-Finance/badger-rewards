@@ -1,4 +1,4 @@
-from helpers.constants import DISABLED_VAULTS
+from helpers.constants import BOOST_CHAINS, DISABLED_VAULTS
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rewards.explorer import convert_from_eth
 from rich.console import Console
@@ -58,14 +58,11 @@ def calc_boost_data(block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
     Calculate boost data required for boost calculation
     :param block: block to collect the boost data from
     """
-    chains = [
-        "eth",
-        "polygon",
-    ]
+    
     blocksByChain = convert_from_eth(block)
     native = Counter()
     nonNative = Counter()
-    for chain in chains:
+    for chain in BOOST_CHAINS:
         chainBlock = blocksByChain[chain]
         console.log("Taking chain snapshot on {} \n".format(chain))
 
