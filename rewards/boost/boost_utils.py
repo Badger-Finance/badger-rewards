@@ -58,7 +58,7 @@ def calc_boost_data(block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
     Calculate boost data required for boost calculation
     :param block: block to collect the boost data from
     """
-    
+
     blocksByChain = convert_from_eth(block)
     native = Counter()
     nonNative = Counter()
