@@ -140,30 +140,27 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
     :param end: end block for rewards
     """
     treeManager = TreeManager(chain)
-    if not treeManager.has_pending_root():
-        return
-    else:
-        console.log("Pending root found.. approving")
-        rewards_data = generate_rewards_in_range(
-            chain, start, end, save=False, pastTree=currentRewards
+   
+    rewards_data = generate_rewards_in_range(
+        chain, start, end, save=False, pastTree=currentRewards
+    )
+    console.log(
+        "\n==== Approving root with rootHash {} ====\n".format(
+            rewards_data["rootHash"]
         )
-        console.log(
-            "\n==== Approving root with rootHash {} ====\n".format(
-                rewards_data["rootHash"]
-            )
+    )
+    tx_hash, success = treeManager.approve_root(rewards_data)
+    if success:
+        add_multipliers(
+            rewards_data["multiplierData"], rewards_data["userMultipliers"]
         )
-        tx_hash, success = treeManager.approve_root(rewards_data)
-        if success:
-            add_multipliers(
-                rewards_data["multiplierData"], rewards_data["userMultipliers"]
-            )
-            upload_tree(
-                rewards_data["fileName"],
-                rewards_data["merkleTree"],
-                chain,
-                staging=env_config.test,
-            )
-            return rewards_data
+        upload_tree(
+            rewards_data["fileName"],
+            rewards_data["merkleTree"],
+            chain,
+            staging=env_config.test,
+        )
+        return rewards_data
 
 
 def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, pastTree):
