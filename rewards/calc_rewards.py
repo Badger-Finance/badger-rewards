@@ -141,6 +141,7 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
     """
     treeManager = TreeManager(chain)
     if not treeManager.has_pending_root():
+        console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
         return
     else:
         console.log("Pending root found.. approving")
