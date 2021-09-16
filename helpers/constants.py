@@ -187,10 +187,6 @@ MONITORING_SECRET_NAMES = {
 MAIN_SUBGRAPH_IDS = {
     "eth": "QmTEGLYf1jh4uUzpgSNT8nRjhiBmVJQxGommvHFenZcAY2",
     "polygon": "QmbYRpDk4MQS8nTKGyXRcN1CX8zkos2XvGX32BZctzd9BB",
-    "arbitrum": "QmQ8qzpzZu5dep9xvnqncZrgXZS9dyEru6dozEA3TLufXo",
+    "arbitrum": "QmRQ3ArFBr5VwjyGA7xTjMjiLNeV2cWgu9eUgcFrDqEf1u",
 }
-BOOST_CHAINS = [
-    "eth",
-    "polygon",
-    "arbitrum"
-]
+BOOST_CHAINS = ["eth", "polygon", "arbitrum"]

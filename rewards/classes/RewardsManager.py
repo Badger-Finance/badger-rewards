@@ -176,7 +176,11 @@ class RewardsManager:
             sett = self.get_sett_from_strategy(strategy)
             balances = self.fetch_sett_snapshot(block, sett)
             amount = int(dist["amount"])
-            rewards_unit = amount / balances.total_balance()
+            total_balance = balances.total_balance()
+            if total_balance == 0:
+                rewards_unit = 0
+            else:
+                rewards_unit = amount / balances.total_balance()
             for user in balances:
                 user_rewards = rewards_unit * user.balance
                 rewards.increase_user_rewards(

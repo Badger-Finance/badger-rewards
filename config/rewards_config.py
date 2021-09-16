@@ -5,9 +5,9 @@ class RewardsConfig:
     def __init__(self):
         self.globalStakingStartBlock = 11252068
         self.root_update_intervals = {
-            "eth": hours(2),
+            "eth": hours(1.5),
             "polygon": hours(0.05),
-            "arbitrum": hours(2),
+            "arbitrum": hours(1.5),
         }
         self.maxStartBlockAge = 3200
         self.debug = False
