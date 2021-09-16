@@ -8,7 +8,11 @@ from rewards.rewards_checker import verify_rewards
 from rewards.aws.boost import add_multipliers, download_boosts
 from rewards.aws.helpers import get_secret
 from helpers.web3_utils import make_contract
-from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS
+from helpers.constants import (
+    DISABLED_VAULTS,
+    EMISSIONS_CONTRACTS,
+    MONITORING_SECRET_NAMES,
+)
 from helpers.discord import send_message_to_discord
 from subgraph.queries.setts import list_setts
 from typing import List
@@ -22,9 +26,9 @@ import json
 console = Console()
 
 
-def console_and_discord(msg: str):
+def console_and_discord(msg: str, chain: str):
     url = get_secret(
-        "cycle-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=env_config.test
+        MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", test=env_config.test
     )
     console.log(msg)
     send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
@@ -176,7 +180,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     """
     allSchedules, setts = fetch_all_schedules(chain, fetch_setts(chain))
 
-    console_and_discord("Generating rewards for {} setts".format(len(setts)))
+    console_and_discord("Generating rewards for {} setts".format(len(setts)), chain)
 
     treeManager = TreeManager(chain)
     rewards_list = []

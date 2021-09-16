@@ -180,7 +180,7 @@ DISABLED_VAULTS = [
 ]
 
 MONITORING_SECRET_NAMES = {
-    "eth": "none",
+    "eth": "cycle-bot/eth/prod-discord-url",
     "polygon": "cycle-bot/prod-discord-url",
     "arbitrum": "cycle-bot/arbitrum/prod-discord-url",
 }

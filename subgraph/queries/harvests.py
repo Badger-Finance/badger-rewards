@@ -6,6 +6,7 @@ console = Console()
 
 harvests_client = make_gql_client("harvests-eth")
 
+
 def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
     tree_client = make_gql_client("harvests-{}".format(chain))
     query = gql(

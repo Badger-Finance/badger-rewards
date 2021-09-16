@@ -5,6 +5,7 @@ resources:
   - approve_poly_cycle_bot.yaml
   - boost_bot.yaml
   - propose_arb_cycle_bot.yaml
+  - propose_eth_cycle_bot.yaml
   - propose_poly_cycle_bot.yaml
   - service.yaml
   - service_account.yaml
