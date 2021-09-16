@@ -6,17 +6,14 @@ console = Console()
 
 harvests_client = make_gql_client("harvests-eth")
 
-
-def fetch_tree_distributions(startBlock, endBlock, chain):
+def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
     tree_client = make_gql_client("harvests-{}".format(chain))
-    console.log(startBlock, endBlock)
     query = gql(
         """
         query tree_distributions(
-            $blockHeight: Block_height
             $lastDistId: TreeDistribution_filter
             ) {
-            treeDistributions(block: $blockHeight, where: $lastDistId) {
+            treeDistributions(where: $lastDistId) {
                 id
                 token {
                     address
@@ -24,24 +21,29 @@ def fetch_tree_distributions(startBlock, endBlock, chain):
                 }
                 amount
                 blockNumber
+                timestamp
                 }
             }
         """
     )
-    lastDistId = "0x0000000000000000000000000000000000000000"
-    variables = {"blockHeight": {"number": endBlock}}
-    treeDistributions = []
+    last_dist_id = "0x0000000000000000000000000000000000000000"
+    variables = {}
+    tree_distributions = []
     while True:
-        variables["lastDistId"] = {"id_gt": lastDistId}
+        variables["lastDistId"] = {"id_gt": last_dist_id}
         results = tree_client.execute(query, variable_values=variables)
-        distData = results["treeDistributions"]
-        if len(distData) == 0:
+        dist_data = results["treeDistributions"]
+        if len(dist_data) == 0:
             break
         else:
-            treeDistributions = [*treeDistributions, *distData]
-        if len(distData) > 0:
-            lastDistId = distData[-1]["id"]
-    return [td for td in treeDistributions if int(td["blockNumber"]) > int(startBlock)]
+            tree_distributions = [*tree_distributions, *dist_data]
+        if len(dist_data) > 0:
+            last_dist_id = dist_data[-1]["id"]
+    return [
+        td
+        for td in tree_distributions
+        if start_timestamp < int(td["timestamp"]) <= end_timestamp
+    ]
 
 
 def fetch_farm_harvest_events():

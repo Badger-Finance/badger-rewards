@@ -1,9 +1,7 @@
 from rewards.aws.helpers import get_secret
-import os
 from decouple import config
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
-from eth_account import Account
 
 
 class EnvConfig:
@@ -24,18 +22,18 @@ class EnvConfig:
         self.web3 = {
             "eth": self.make_provider("quicknode/eth-node-url", "NODE_URL"),
             "bsc": self.make_provider("quicknode/bsc-node-url", "BSC_NODE_URL"),
-            "arbitrum": self.make_provider("alchemy/arbitrum-node-url", "ARBITRUM_NODE_URL"),
+            "arbitrum": self.make_provider(
+                "alchemy/arbitrum-node-url", "ARBITRUM_NODE_URL"
+            ),
             "polygon": polygon,
         }
 
     def get_web3(self, chain: str = "eth") -> Web3:
         return self.web3[chain]
-    
-    def make_provider(self, secret_name: str, secret_key: str):
+
+    def make_provider(self, secret_name: str, secret_key: str) -> Web3:
         return Web3(
-            Web3.HTTPProvider(
-                get_secret(secret_name, secret_key, test=self.test)
-            )
+            Web3.HTTPProvider(get_secret(secret_name, secret_key, test=self.test))
         )
 
     def get_webhook_url(self) -> str:
