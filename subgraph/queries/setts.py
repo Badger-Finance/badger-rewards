@@ -4,9 +4,29 @@ from subgraph.subgraph_utils import make_gql_client
 from rich.console import Console
 from typing import List, Dict
 from helpers.discord import send_error_to_discord
+from helpers.constants import MAIN_SUBGRAPH_IDS
 import math
 
 console = Console()
+thegraph_client = make_gql_client("thegraph")
+
+
+def last_synced_block(chain):
+    query = gql(
+        f"""
+        query last_block {{
+            indexingStatuses(subgraphs: ["{MAIN_SUBGRAPH_IDS[chain]}"]) {{
+                chains {{
+                    latestBlock {{
+                        number
+                    }}
+                }}
+            }}
+        }}
+    """
+    )
+    result = thegraph_client.execute(query)
+    return int(result["indexingStatuses"][0]["chains"][0]["latestBlock"]["number"])
 
 
 def balances_query() -> DocumentNode:

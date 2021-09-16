@@ -9,7 +9,7 @@ console = Console()
 if __name__ == "__main__":
     currentBlock = env_config.get_web3().eth.block_number
     send_message_to_discord(
-        "**CALCULATING NEW BOOST (ETH + Polygon)**",
+        "**CALCULATING NEW BOOST (ETH + Polygon + Arbitrum)**",
         "Pulling data from the graph",
         [],
         "Boost Bot",

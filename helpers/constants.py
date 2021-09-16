@@ -80,6 +80,8 @@ BCVXCRV = "0x2B5455aac8d64C14786c3a29858E43b5945819C0"
 BCVX = "0x53C8E199eb2Cb7c01543C137078a038937a68E40"
 PNT = "0x89Ab32156e46F46D02ade3FEcbe5Fc4243B9AAeD"
 BOR = "0x3c9d6c1C73b31c837832c72E04D3152f051fc1A9"
+BBADGER = "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28"
+BDIGG = "0x7e7e112a68d8d2e221e11047a72ffc1065c38e1a"
 
 TOKENS_TO_CHECK = {
     "Badger": BADGER,
@@ -163,9 +165,27 @@ EMISSIONS_CONTRACTS = {
             "GasOracle": "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
         }
     ),
+    "arbitrum": DotMap(
+        {
+            "BadgerTree": "0x635EB2C39C75954bb53Ebc011BDC6AfAAcE115A6",
+            "RewardsLogger": "0x85E1cACAe9a63429394d68Db59E14af74143c61c",
+            "GasOracle": "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
+        }
+    ),
 }
 
 DISABLED_VAULTS = [
     "0xb6bd5ae3d5f78a6bb04bbb031e24fa9c2bbd090d",
     "0x85e1cacae9a63429394d68db59e14af74143c61c",
 ]
+
+MONITORING_SECRET_NAMES = {
+    "eth": "none",
+    "polygon": "cycle-bot/prod-discord-url",
+    "arbitrum": "cycle-bot/arbitrum/prod-discord-url",
+}
+MAIN_SUBGRAPH_IDS = {
+    "eth": "QmTEGLYf1jh4uUzpgSNT8nRjhiBmVJQxGommvHFenZcAY2",
+    "polygon": "QmbYRpDk4MQS8nTKGyXRcN1CX8zkos2XvGX32BZctzd9BB",
+    "arbitrum": "QmQ8qzpzZu5dep9xvnqncZrgXZS9dyEru6dozEA3TLufXo",
+}

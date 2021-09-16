@@ -1,3 +1,4 @@
+from subgraph.queries.setts import last_synced_block
 from rewards.classes.TreeManager import TreeManager
 from config.rewards_config import rewards_config
 from config.env_config import env_config
@@ -31,8 +32,8 @@ def calc_next_cycle_range(chain: str):
     lastClaimEnd = treeManager.last_propose_end_block()
     startBlock = lastClaimEnd + 1
 
-    # Claim at current block, minus a buffer for thegraph
-    endBlock = env_config.get_web3(chain).eth.block_number - 100
+    # Claim at last synced block
+    endBlock = last_synced_block(chain)
 
     # Sanity check: Ensure start block is not too far in the past
     # assert startBlock > endBlock - rewards_config.maxStartBlockAge

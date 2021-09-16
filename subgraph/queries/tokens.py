@@ -65,3 +65,127 @@ def fetch_token_balances(client, blockNumber) -> Tuple[Dict[str, int], Dict[str,
         raise e
 
     return badger_balances, digg_balances
+
+
+def fetch_fuse_pool_balances(client, chain, block):
+    if chain != "eth":
+        console.log("Fuse pools are only active on ETH")
+        return {}
+
+    ctoken_data = {
+        "fBDIGG-22": {
+            "underlying_contract": "0x7e7e112a68d8d2e221e11047a72ffc1065c38e1a",
+            "symbol": "fBDIGG-22",
+            "contract": "0x4b789c1a3124e9c7945e24d20a5034a85ffb7535",
+        },
+        "fBBADGER-22": {
+            "underlying_contract": "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28",
+            "symbol": "fBBADGER-22",
+            "contract": "0x8c2ab59d5a0cff6b1d00ef7dd70d85db88483671",
+        },
+        "fBADGER-22": {
+            "underlying_contract": "0x3472A5A71965499acd81997a54BBA8D852C6E53d",
+            "symbol": "fBADGER-22",
+            "contract": "0x6780B4681aa8efE530d075897B3a4ff6cA5ed807",
+        },
+        "fDIGG-22": {
+            "underlying_contract": "0x798D1bE841a82a273720CE31c822C61a67a601C3",
+            "symbol": "fDIGG-22",
+            "contract": "0x792a676dD661E2c182435aaEfC806F1d4abdC486",
+        },
+    }
+
+    for symbol, data in ctoken_data.items():
+        ftoken = make_contract(
+            env_config.get_web3().toChecksumAddress(data["contract"]),
+            abiName="CErc20Delegator",
+            chain=chain,
+        )
+        underlying = make_contract(
+            env_config.get_web3().toChecksumAddress(data["underlying_contract"]),
+            abiName="ERC20",
+            chain=chain,
+        )
+
+        ctoken_data[symbol]["decimals"] = int(ftoken.functions.decimals().call())
+        console.log(ctoken_data[symbol]["decimals"])
+        underlying_decimals = int(underlying.functions.decimals().call())
+        mantissa = 18 + underlying_decimals - ctoken_data[symbol]["decimals"]
+        ctoken_data[symbol]["exchange_rate"] = float(
+            ftoken.functions.exchangeRateStored().call()
+        ) / math.pow(10, mantissa)
+
+    last_token_id = "0x0000000000000000000000000000000000000000"
+
+    query = gql(
+        f"""
+        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {{
+            accountCTokens(block: $block_number, where: $token_filter) {{
+                id
+                symbol
+                account{{
+                    id
+                }}
+                cTokenBalance
+            }}
+        }}
+        """
+    )
+
+    balances = {}
+    variables = {
+        "block_number": {"number": block - 50},
+        "token_filter": {"id_gt": last_token_id, "symbol_in": list(ctoken_data.keys())},
+    }
+    try:
+        while True:
+            variables["token_filter"]["id_gt"] = last_token_id
+            results = client.execute(query, variable_values=variables)
+
+            for result in results["accountCTokens"]:
+
+                print(result)
+                last_token_id = result["id"]
+                symbol = result["symbol"]
+                ctoken_balance = float(result["cTokenBalance"])
+                balance = ctoken_balance * ctoken_data[symbol]["exchange_rate"]
+                account = result["account"]["id"].lower()
+
+                if balance <= 0:
+                    continue
+
+                sett = ctoken_data[symbol]["underlying_contract"]
+
+                if sett not in balances:
+                    balances[sett] = {}
+
+                    if account not in balances[sett]:
+                        balances[sett][account] = balance
+                    else:
+                        balances[sett][account] += balance
+
+            if len(results["accountCTokens"]) == 0:
+                break
+            else:
+                console.log("Fetching {} fuse balances".format(len(results)))
+
+        console.log("Fetched {} total fuse balances".format(len(balances)))
+        return balances
+
+    except Exception as e:
+        send_message_to_discord(
+            "**BADGER BOOST ERROR**",
+            f":x: Error in Fetching Fuse Token Balance",
+            [
+                {
+                    "name": "Error Type",
+                    "value": type(e),
+                    "inline": True,
+                    "name": "Error Description",
+                    "value": e.args,
+                    "inline": True,
+                }
+            ],
+            "Boost Bot",
+        )
+        raise e

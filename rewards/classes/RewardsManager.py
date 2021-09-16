@@ -1,4 +1,5 @@
 from helpers.constants import XSUSHI
+from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
 from rewards.snapshot.chain_snapshot import sett_snapshot
@@ -157,16 +158,19 @@ class RewardsManager:
         return snapshot
 
     def calculate_tree_distributions(self) -> RewardsList:
-        tree_distributions = fetch_tree_distributions(self.start, self.end, self.chain)
+        tree_distributions = fetch_tree_distributions(
+            self.web3.eth.getBlock(self.start)["timestamp"],
+            self.web3.eth.getBlock(self.end)["timestamp"],
+            self.chain,
+        )
         console.log(
             "Fetched {} tree distributions between {} and {}".format(
                 len(tree_distributions), self.start, self.end
             )
         )
-        rewards = RewardsList(self.cycle)
+        rewards = RewardsList(self.cycle + 1)
         for dist in tree_distributions:
-            console.log(dist)
-            block = int(dist["blockNumber"])
+            block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]["address"]
             strategy = dist["id"].split("-")[0]
             sett = self.get_sett_from_strategy(strategy)
