@@ -6,6 +6,7 @@ from rich.console import Console
 
 console = Console()
 
+
 def get_last_proposed_cycle(chain: str):
     treeManager = TreeManager(chain)
     if not treeManager.has_pending_root():
@@ -13,7 +14,7 @@ def get_last_proposed_cycle(chain: str):
         return ({}, 0, 0)
 
     console.log("Pending root found.. approving")
-        
+
     # Fetch the appropriate file
     currentRewards = treeManager.fetch_current_tree()
 
@@ -42,9 +43,10 @@ def calc_next_cycle_range(chain: str):
 
     # Claim at last synced block
     endBlock = last_synced_block(chain)
+    print(endBlock)
 
     # Sanity check: Ensure start block is not too far in the past
-    # assert startBlock > endBlock - rewards_config.maxStartBlockAge
+    assert startBlock < endBlock
 
     # Sanity check: Ensure start block is not too close to end block
     return (currentRewards, startBlock, endBlock)
