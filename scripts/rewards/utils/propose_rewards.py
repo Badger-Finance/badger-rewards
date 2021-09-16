@@ -28,4 +28,4 @@ def propose_rewards(chain):
         "Rewards Bot",
         url=discord_url,
     )
-    propose_root(chain, startBlock, endBlock, pastRewards, save=True)
+    propose_root(chain, startBlock, endBlock, pastRewards, save=False)

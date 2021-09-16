@@ -60,7 +60,7 @@ class TreeManager:
 
     def approve_root(self, rewards) -> str:
         console.log("Approving root")
-        approve_root_func = self.badgerTree.functions.approveRoot(
+        approve_root_func = self.badgerTree.approveRoot(
             to_bytes(hexstr=rewards["merkleTree"]["merkleRoot"]),
             to_bytes(hexstr=rewards["rootHash"]),
             int(rewards["merkleTree"]["cycle"]),
@@ -137,7 +137,7 @@ class TreeManager:
 
     def propose_root(self, rewards: dict) -> str:
         console.log("Propose root")
-        propose_root_func = self.badgerTree.functions.proposeRoot(
+        propose_root_func = self.badgerTree.proposeRoot(
             to_bytes(hexstr=rewards["merkleTree"]["merkleRoot"]),
             to_bytes(hexstr=rewards["rootHash"]),
             int(rewards["merkleTree"]["cycle"]),
@@ -216,15 +216,13 @@ class TreeManager:
         return tx_hash, True
 
     def get_current_cycle(self) -> str:
-        return self.badgerTree.functions.currentCycle().call()
+        return self.badgerTree.currentCycle().call()
 
     def get_claimable_for(self, user: str, tokens: List[str], cumAmounts: List[int]):
-        return self.badgerTree.functions.getClaimableFor(
-            user, tokens, cumAmounts
-        ).call()
+        return self.badgerTree.getClaimableFor(user, tokens, cumAmounts).call()
 
     def has_pending_root(self) -> bool:
-        return self.badgerTree.functions.hasPendingRoot().call()
+        return self.badgerTree.hasPendingRoot().call()
 
     def fetch_tree(self, merkle):
         chainId = self.w3.eth.chain_id
@@ -253,34 +251,30 @@ class TreeManager:
         # assert abs(lastUpdate - lastUpdatePublish) < 6500
 
     def fetch_current_merkle_data(self):
-        root = self.badgerTree.functions.merkleRoot().call()
-        contentHash = self.badgerTree.functions.merkleContentHash().call()
+        root = self.badgerTree.merkleRoot().call()
+        contentHash = self.badgerTree.merkleContentHash().call()
         return {
             "root": encode_hex(root),
             "contentHash": encode_hex(contentHash),
-            "lastUpdateTime": self.badgerTree.functions.lastPublishTimestamp().call(),
-            "blockNumber": int(
-                self.badgerTree.functions.lastPublishBlockNumber().call()
-            ),
+            "lastUpdateTime": self.badgerTree.lastPublishTimestamp().call(),
+            "blockNumber": int(self.badgerTree.lastPublishBlockNumber().call()),
         }
 
     def fetch_pending_merkle_data(self):
-        root = self.badgerTree.functions.pendingMerkleRoot().call()
-        pendingContentHash = self.badgerTree.functions.pendingMerkleContentHash().call()
+        root = self.badgerTree.pendingMerkleRoot().call()
+        pendingContentHash = self.badgerTree.pendingMerkleContentHash().call()
         return {
             "root": encode_hex(root),
             "contentHash": encode_hex(pendingContentHash),
-            "lastUpdateTime": self.badgerTree.functions.lastProposeTimestamp().call(),
-            "blockNumber": int(
-                self.badgerTree.functions.lastProposeBlockNumber().call()
-            ),
+            "lastUpdateTime": self.badgerTree.lastProposeTimestamp().call(),
+            "blockNumber": int(self.badgerTree.lastProposeBlockNumber().call()),
         }
 
     def last_propose_end_block(self) -> int:
-        return self.badgerTree.functions.lastProposeEndBlock().call()
+        return self.badgerTree.lastProposeEndBlock().call()
 
     def last_propose_start_block(self) -> int:
-        return self.badgerTree.functions.lastProposeStartBlock().call()
+        return self.badgerTree.lastProposeStartBlock().call()
 
     def get_tx_options(self, account: Account) -> dict:
         options = {

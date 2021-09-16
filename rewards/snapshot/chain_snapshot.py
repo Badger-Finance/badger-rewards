@@ -2,7 +2,7 @@ from config.env_config import env_config
 from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
 from helpers.web3_utils import make_contract
 from rewards.classes.UserBalance import UserBalances, UserBalance
-from subgraph.client import fetch_chain_balances, fetch_sett_balances
+from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
 from functools import lru_cache
 from rich.console import Console
 from typing import Dict, Tuple
@@ -27,9 +27,7 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, UserBalances]:
         settBalances = parse_sett_balances(settAddr, balances)
         token = make_contract(settAddr, abiName="ERC20", chain=chain)
         console.log(
-            "Fetched {} balances for sett {}".format(
-                len(balances), token.functions.name().call()
-            )
+            "Fetched {} balances for sett {}".format(len(balances), token.name().call())
         )
         balancesBySett[settAddr] = settBalances
 
@@ -46,8 +44,8 @@ def sett_snapshot(chain: str, block: int, sett: str) -> UserBalances:
     """
     token = make_contract(sett, abiName="ERC20", chain=chain)
     console.log(
-        "Taking snapshot on {} of {} at {}".format(
-            chain, sett, token.functions.name().call()
+        "Taking snapshot on {} of {} ({}) at {}\n".format(
+            chain, token.name().call(), sett, block
         )
     )
     sett_balances = fetch_sett_balances(chain, block - 50, sett)

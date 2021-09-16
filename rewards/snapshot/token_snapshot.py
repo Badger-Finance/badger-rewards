@@ -1,15 +1,14 @@
-from subgraph.client import fetch_fuse_pool_balances, fetch_token_balances
+from subgraph.queries.tokens import fetch_token_balances, fetch_fuse_pool_balances
 from subgraph.subgraph_utils import make_gql_client
-from helpers.digg_utils import diggUtils
-from helpers.constants import BADGER, DIGG, BBADGER, BDIGG
-from badger_api.prices import fetch_ppfs, fetch_token_prices
+from helpers.constants import BADGER, DIGG
+from badger_api.prices import fetch_token_prices, fetch_ppfs
 from collections import Counter
 from typing import Dict, Tuple
 
 
 def token_snapshot(chain: str, block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
     token_client = make_gql_client("tokens-{}".format(chain))
-    return fetch_token_balances(token_client, diggUtils.sharesPerFragment, block)
+    return fetch_token_balances(token_client, block)
 
 
 def fuse_snapshot(chain: str, block: int):

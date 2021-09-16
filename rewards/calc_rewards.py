@@ -1,4 +1,3 @@
-from hexbytes import HexBytes
 from rewards.aws.trees import upload_tree
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager
@@ -11,7 +10,7 @@ from rewards.aws.helpers import get_secret
 from helpers.web3_utils import make_contract
 from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS
 from helpers.discord import send_message_to_discord
-from subgraph.client import list_setts
+from subgraph.queries.setts import list_setts
 from typing import List
 from rich.console import Console
 from config.env_config import env_config
@@ -55,12 +54,15 @@ def fetch_all_schedules(chain: str, setts: List[str]):
     logger = make_contract(
         EMISSIONS_CONTRACTS[chain]["RewardsLogger"], "RewardsLogger", chain
     )
-    allSchedules = {}
+    all_schedules = {}
+    setts_with_schedules = []
     for sett in setts:
-        schedules = logger.functions.getAllUnlockSchedulesFor(sett).call()
-        allSchedules[sett] = parse_schedules(schedules)
-    console.log("Fetched {} schedules".format(len(allSchedules)))
-    return allSchedules
+        schedules = logger.getAllUnlockSchedulesFor(sett).call()
+        if len(schedules) > 0:
+            setts_with_schedules.append(sett)
+        all_schedules[sett] = parse_schedules(schedules)
+    console.log("Fetched {} schedules".format(len(all_schedules)))
+    return all_schedules, setts_with_schedules
 
 
 def fetch_setts(chain: str) -> List[str]:
@@ -120,7 +122,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
         return
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=False, pastTree=pastRewards
+        chain, start, end, save=save, pastTree=pastRewards
     )
     console.log("Generated rewards")
 
@@ -172,23 +174,29 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     :param end: end block for rewards
     :param save: flag to save file locally
     """
-    setts = fetch_setts(chain)
+    allSchedules, setts = fetch_all_schedules(chain, fetch_setts(chain))
+
     console_and_discord("Generating rewards for {} setts".format(len(setts)))
-    allSchedules = fetch_all_schedules(chain, setts)
 
     treeManager = TreeManager(chain)
-
+    rewards_list = []
     rewardsManager = RewardsManager(chain, treeManager.nextCycle, start, end)
 
     console.log("Calculating Tree Rewards...")
     treeRewards = rewardsManager.calculate_tree_distributions()
+    rewards_list.append(treeRewards)
 
     console.log("Calculating Sett Rewards...")
     boosts = download_boosts()
     settRewards = rewardsManager.calculate_all_sett_rewards(
         setts, allSchedules, boosts["userData"]
     )
-    newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle)
+    rewards_list.append(settRewards)
+    if chain == "eth":
+        sushi_rewards = rewardsManager.calc_sushi_distributions()
+        rewards_list.append(sushi_rewards)
+
+    newRewards = combine_rewards(rewards_list, rewardsManager.cycle)
 
     console.log("Combining cumulative rewards... \n")
     cumulativeRewards = process_cumulative_rewards(pastTree, newRewards)
@@ -204,7 +212,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
 
     if save:
         with open(fileName, "w") as fp:
-            json.dump(merkleTree, fp)
+            json.dump(merkleTree, fp, indent=4)
 
     return {
         "merkleTree": merkleTree,

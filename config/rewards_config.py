@@ -7,9 +7,8 @@ class RewardsConfig:
         self.root_update_intervals = {
             "eth": hours(2),
             "polygon": hours(0.05),
-            "arbitrum": hours(0.5),
+            "arbitrum": hours(2),
         }
-        self.rootUpdateMinInterval = hours(0.05)
         self.maxStartBlockAge = 3200
         self.debug = False
 
