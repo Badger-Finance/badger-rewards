@@ -22,30 +22,21 @@ class EnvConfig:
         polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
 
         self.web3 = {
-            "eth": Web3(
-                Web3.HTTPProvider(
-                    get_secret("quiknode/eth-node-url", "NODE_URL", test=self.test)
-                )
-            ),
-            "bsc": Web3(
-                Web3.HTTPProvider(
-                    get_secret("quiknode/bsc-node-url", "BSC_NODE_URL", test=self.test)
-                )
-            ),
-            "arbitrum": Web3(
-                Web3.HTTPProvider(
-                    get_secret(
-                        "alchemy/arbitrum-node-url",
-                        "ARBITRUM_NODE_URL",
-                        test=self.test,
-                    )
-                )
-            ),
+            "eth": self.make_provider("quicknode/eth-node-url", "NODE_URL"),
+            "bsc": self.make_provider("quicknode/bsc-node-url", "BSC_NODE_URL"),
+            "arbitrum": self.make_provider("alchemy/arbitrum-node-url", "ARBITRUM_NODE_URL"),
             "polygon": polygon,
         }
 
-    def get_web3(self, chain="eth") -> Web3:
+    def get_web3(self, chain: str = "eth") -> Web3:
         return self.web3[chain]
+    
+    def make_provider(self, secret_name: str, secret_key: str):
+        return Web3(
+            Web3.HTTPProvider(
+                get_secret(secret_name, secret_key, test=self.test)
+            )
+        )
 
     def get_webhook_url(self) -> str:
         if self.test:

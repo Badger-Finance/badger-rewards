@@ -1,9 +1,12 @@
 from gql import gql
 from subgraph.subgraph_utils import make_gql_client
+from config.env_config import env_config
+import math
 from rich.console import Console
 from typing import Dict, Tuple
 from helpers.discord import send_error_to_discord, send_message_to_discord
 from helpers.digg_utils import digg_utils
+from helpers.web3_utils import make_contract
 from functools import lru_cache
 
 console = Console()
@@ -107,12 +110,12 @@ def fetch_fuse_pool_balances(client, chain, block):
             chain=chain,
         )
 
-        ctoken_data[symbol]["decimals"] = int(ftoken.functions.decimals().call())
+        ctoken_data[symbol]["decimals"] = int(ftoken.decimals().call())
         console.log(ctoken_data[symbol]["decimals"])
-        underlying_decimals = int(underlying.functions.decimals().call())
+        underlying_decimals = int(underlying.decimals().call())
         mantissa = 18 + underlying_decimals - ctoken_data[symbol]["decimals"]
         ctoken_data[symbol]["exchange_rate"] = float(
-            ftoken.functions.exchangeRateStored().call()
+            ftoken.exchangeRateStored().call()
         ) / math.pow(10, mantissa)
 
     last_token_id = "0x0000000000000000000000000000000000000000"
