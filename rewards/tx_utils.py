@@ -1,4 +1,5 @@
 from decimal import Decimal
+from helpers.web3_utils import make_contract
 from helpers.constants import EMISSIONS_CONTRACTS
 from hexbytes import HexBytes
 import json
@@ -9,11 +10,6 @@ from config.env_config import env_config
 from typing import Tuple
 
 logger = logging.getLogger("tx-utils")
-
-
-def get_abi(chain: str, contract_id: str):
-    with open(f"./abis/{chain}/{contract_id}.json") as f:
-        return json.load(f)
 
 
 def get_gas_price_of_tx(
@@ -41,9 +37,10 @@ def get_gas_price_of_tx(
     logger.info(f"tx: {tx_receipt}")
     total_gas_used = Decimal(tx_receipt.get("gasUsed", 0))
     logger.info(f"gas used: {total_gas_used}")
-    gas_oracle = web3.eth.contract(
-        EMISSIONS_CONTRACTS[chain]["GasOracle"], abi=get_abi(chain, "ChainlinkOracle")
+    gas_oracle = make_contract(
+        EMISSIONS_CONTRACTS[chain]["GasOracle"], abiName="ChainlinkOracle", chain=chain
     )
+
     if chain == "eth":
         gas_price_base = Decimal(tx_receipt.get("effectiveGasPrice", 0) / 10 ** 18)
     elif chain in ["polygon", "arbitrum"]:
@@ -51,8 +48,7 @@ def get_gas_price_of_tx(
         gas_price_base = Decimal(tx.get("gasPrice", 0) / 10 ** 18)
 
     gas_usd = Decimal(
-        gas_oracle.functions.latestAnswer().call()
-        / 10 ** gas_oracle.functions.decimals().call()
+        gas_oracle.latestAnswer().call() / 10 ** gas_oracle.decimals().call()
     )
 
     gas_price_of_tx = total_gas_used * gas_price_base * gas_usd

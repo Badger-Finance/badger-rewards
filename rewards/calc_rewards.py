@@ -1,4 +1,3 @@
-from hexbytes import HexBytes
 from rewards.aws.trees import upload_tree
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager
@@ -9,9 +8,13 @@ from rewards.rewards_checker import verify_rewards
 from rewards.aws.boost import add_multipliers, download_boosts
 from rewards.aws.helpers import get_secret
 from helpers.web3_utils import make_contract
-from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS
+from helpers.constants import (
+    DISABLED_VAULTS,
+    EMISSIONS_CONTRACTS,
+    MONITORING_SECRET_NAMES,
+)
 from helpers.discord import send_message_to_discord
-from subgraph.client import list_setts
+from subgraph.queries.setts import list_setts
 from typing import List
 from rich.console import Console
 from config.env_config import env_config
@@ -23,9 +26,9 @@ import json
 console = Console()
 
 
-def console_and_discord(msg: str):
+def console_and_discord(msg: str, chain: str):
     url = get_secret(
-        "cycle-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=env_config.test
+        MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", test=env_config.test
     )
     console.log(msg)
     send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
@@ -55,12 +58,15 @@ def fetch_all_schedules(chain: str, setts: List[str]):
     logger = make_contract(
         EMISSIONS_CONTRACTS[chain]["RewardsLogger"], "RewardsLogger", chain
     )
-    allSchedules = {}
+    all_schedules = {}
+    setts_with_schedules = []
     for sett in setts:
-        schedules = logger.functions.getAllUnlockSchedulesFor(sett).call()
-        allSchedules[sett] = parse_schedules(schedules)
-    console.log("Fetched {} schedules".format(len(allSchedules)))
-    return allSchedules
+        schedules = logger.getAllUnlockSchedulesFor(sett).call()
+        if len(schedules) > 0:
+            setts_with_schedules.append(sett)
+        all_schedules[sett] = parse_schedules(schedules)
+    console.log("Fetched {} schedules".format(len(all_schedules)))
+    return all_schedules, setts_with_schedules
 
 
 def fetch_setts(chain: str) -> List[str]:
@@ -120,7 +126,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
         return
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=False, pastTree=pastRewards
+        chain, start, end, save=save, pastTree=pastRewards
     )
     console.log("Generated rewards")
 
@@ -138,30 +144,27 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
     :param end: end block for rewards
     """
     treeManager = TreeManager(chain)
-    if not treeManager.has_pending_root():
-        return
-    else:
-        console.log("Pending root found.. approving")
-        rewards_data = generate_rewards_in_range(
-            chain, start, end, save=False, pastTree=currentRewards
+   
+    rewards_data = generate_rewards_in_range(
+        chain, start, end, save=False, pastTree=currentRewards
+    )
+    console.log(
+        "\n==== Approving root with rootHash {} ====\n".format(
+            rewards_data["rootHash"]
         )
-        console.log(
-            "\n==== Approving root with rootHash {} ====\n".format(
-                rewards_data["rootHash"]
-            )
+    )
+    tx_hash, success = treeManager.approve_root(rewards_data)
+    if success:
+        add_multipliers(
+            rewards_data["multiplierData"], rewards_data["userMultipliers"]
         )
-        tx_hash, success = treeManager.approve_root(rewards_data)
-        if success:
-            add_multipliers(
-                rewards_data["multiplierData"], rewards_data["userMultipliers"]
-            )
-            upload_tree(
-                rewards_data["fileName"],
-                rewards_data["merkleTree"],
-                chain,
-                staging=env_config.test,
-            )
-            return rewards_data
+        upload_tree(
+            rewards_data["fileName"],
+            rewards_data["merkleTree"],
+            chain,
+            staging=env_config.test,
+        )
+        return rewards_data
 
 
 def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, pastTree):
@@ -172,23 +175,29 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     :param end: end block for rewards
     :param save: flag to save file locally
     """
-    setts = fetch_setts(chain)
-    console_and_discord("Generating rewards for {} setts".format(len(setts)))
-    allSchedules = fetch_all_schedules(chain, setts)
+    allSchedules, setts = fetch_all_schedules(chain, fetch_setts(chain))
+
+    console_and_discord("Generating rewards for {} setts".format(len(setts)), chain)
 
     treeManager = TreeManager(chain)
-
+    rewards_list = []
     rewardsManager = RewardsManager(chain, treeManager.nextCycle, start, end)
 
     console.log("Calculating Tree Rewards...")
     treeRewards = rewardsManager.calculate_tree_distributions()
+    rewards_list.append(treeRewards)
 
     console.log("Calculating Sett Rewards...")
     boosts = download_boosts()
     settRewards = rewardsManager.calculate_all_sett_rewards(
         setts, allSchedules, boosts["userData"]
     )
-    newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle)
+    rewards_list.append(settRewards)
+    if chain == "eth":
+        sushi_rewards = rewardsManager.calc_sushi_distributions()
+        rewards_list.append(sushi_rewards)
+
+    newRewards = combine_rewards(rewards_list, rewardsManager.cycle)
 
     console.log("Combining cumulative rewards... \n")
     cumulativeRewards = process_cumulative_rewards(pastTree, newRewards)
@@ -204,7 +213,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
 
     if save:
         with open(fileName, "w") as fp:
-            json.dump(merkleTree, fp)
+            json.dump(merkleTree, fp, indent=4)
 
     return {
         "merkleTree": merkleTree,

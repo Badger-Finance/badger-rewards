@@ -16,6 +16,9 @@ def approve_rewards(chain):
     )
 
     currentRewards, startBlock, endBlock = get_last_proposed_cycle(chain)
+    if not currentRewards:
+        return
+    
     console.log(
         "Generating rewards between {} and {} on {} chain".format(
             startBlock, endBlock, chain

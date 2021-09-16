@@ -180,7 +180,7 @@ DISABLED_VAULTS = [
 ]
 
 MONITORING_SECRET_NAMES = {
-    "eth": "none",
+    "eth": "cycle-bot/eth/prod-discord-url",
     "polygon": "cycle-bot/prod-discord-url",
     "arbitrum": "cycle-bot/arbitrum/prod-discord-url",
 }
@@ -189,3 +189,8 @@ MAIN_SUBGRAPH_IDS = {
     "polygon": "QmbYRpDk4MQS8nTKGyXRcN1CX8zkos2XvGX32BZctzd9BB",
     "arbitrum": "QmQ8qzpzZu5dep9xvnqncZrgXZS9dyEru6dozEA3TLufXo",
 }
+BOOST_CHAINS = [
+    "eth",
+    "polygon",
+    "arbitrum"
+]

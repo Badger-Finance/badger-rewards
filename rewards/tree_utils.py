@@ -1,11 +1,19 @@
-from subgraph.client import last_synced_block
+from subgraph.queries.setts import last_synced_block
 from rewards.classes.TreeManager import TreeManager
 from config.rewards_config import rewards_config
 from config.env_config import env_config
+from rich.console import Console
 
+console = Console()
 
 def get_last_proposed_cycle(chain: str):
     treeManager = TreeManager(chain)
+    if not treeManager.has_pending_root():
+        console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
+        return ({}, 0, 0)
+
+    console.log("Pending root found.. approving")
+        
     # Fetch the appropriate file
     currentRewards = treeManager.fetch_current_tree()
 

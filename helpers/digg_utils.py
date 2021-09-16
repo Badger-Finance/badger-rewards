@@ -7,8 +7,8 @@ import json
 class DiggUtils:
     def __init__(self):
         self.digg = make_contract(DIGG, abiName="Digg", chain="eth")
-        self.sharesPerFragment = self.digg.functions._sharesPerFragment().call()
-        self.initialShares = self.digg.functions._initialSharesPerFragment().call()
+        self.sharesPerFragment = self.digg._sharesPerFragment().call()
+        self.initialShares = self.digg._initialSharesPerFragment().call()
 
     def sharesToFragments(self, shares: int) -> float:
         if shares == 0:
@@ -16,4 +16,4 @@ class DiggUtils:
         return self.sharesPerFragment / shares
 
 
-diggUtils = DiggUtils()
+digg_utils = DiggUtils()
