@@ -9,9 +9,9 @@ console = Console()
 
 def get_last_proposed_cycle(chain: str):
     treeManager = TreeManager(chain)
-    if not treeManager.has_pending_root():
-        console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
-        return ({}, 0, 0)
+    # if not treeManager.has_pending_root():
+    #    console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
+    #    return ({}, 0, 0)
 
     console.log("Pending root found.. approving")
 
