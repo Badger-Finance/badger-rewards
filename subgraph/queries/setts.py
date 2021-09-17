@@ -4,7 +4,6 @@ from subgraph.subgraph_utils import make_gql_client
 from rich.console import Console
 from typing import List, Dict
 from helpers.discord import send_error_to_discord
-from helpers.constants import MAIN_SUBGRAPH_IDS
 import math
 
 console = Console()
@@ -12,10 +11,11 @@ thegraph_client = make_gql_client("thegraph")
 
 
 def last_synced_block(chain):
+    deployment_id = fetch_deployment_id(chain)
     query = gql(
         f"""
         query last_block {{
-            indexingStatuses(subgraphs: ["{MAIN_SUBGRAPH_IDS[chain]}"]) {{
+            indexingStatuses(subgraphs: ["{deployment_id}"]) {{
                 chains {{
                     latestBlock {{
                         number
@@ -27,6 +27,25 @@ def last_synced_block(chain):
     )
     result = thegraph_client.execute(query)
     return int(result["indexingStatuses"][0]["chains"][0]["latestBlock"]["number"])
+
+
+def fetch_deployment_id(chain: str) -> str:
+    client = make_gql_client(chain)
+    query = gql(
+        """
+        {
+          _meta{
+              deployment
+                
+          }
+    
+        }
+        
+        """
+    )
+    result = client.execute(query)
+    console.log(result)
+    return result["_meta"]["deployment"]
 
 
 def balances_query() -> DocumentNode:
