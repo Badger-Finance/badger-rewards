@@ -7,6 +7,7 @@ from rewards.rewards_utils import combine_rewards
 from rewards.rewards_checker import verify_rewards
 from rewards.aws.boost import add_multipliers, download_boosts
 from rewards.aws.helpers import get_secret
+from rewards.classes.CycleLogger import cycle_logger
 from helpers.web3_utils import make_contract
 from helpers.constants import (
     DISABLED_VAULTS,
@@ -122,7 +123,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
     currentTime = w3.eth.getBlock(w3.eth.block_number)["timestamp"]
     timeSinceLastUpdate = currentTime - currentMerkleData["lastUpdateTime"]
 
-    if timeSinceLastUpdate < rewards_config.root_update_interval(chain):
+    if timeSinceLastUpdate < rewards_config.rootUpdateMinInterval:
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
         return
     rewards_data = generate_rewards_in_range(
@@ -144,19 +145,24 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
     :param end: end block for rewards
     """
     treeManager = TreeManager(chain)
-   
+
     rewards_data = generate_rewards_in_range(
         chain, start, end, save=False, pastTree=currentRewards
     )
     console.log(
-        "\n==== Approving root with rootHash {} ====\n".format(
-            rewards_data["rootHash"]
-        )
+        "\n==== Approving root with rootHash {} ====\n".format(rewards_data["rootHash"])
     )
+
+    cycle_logger.set_start_block(start)
+    cycle_logger.set_end_block(end)
     tx_hash, success = treeManager.approve_root(rewards_data)
+    cycle_logger.set_content_hash(rewards_data["rootHash"])
+    cycle_logger.set_merkle_root(rewards_data["merkleTree"]["merkleRoot"])
     if success:
-        add_multipliers(
-            rewards_data["multiplierData"], rewards_data["userMultipliers"]
+        add_multipliers(rewards_data["multiplierData"], rewards_data["userMultipliers"])
+        cycle_logger.save(
+            treeManager.nextCycle,
+            chain
         )
         upload_tree(
             rewards_data["fileName"],
@@ -198,6 +204,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
         rewards_list.append(sushi_rewards)
 
     newRewards = combine_rewards(rewards_list, rewardsManager.cycle)
+    newRewards = combine_rewards([settRewards, treeRewards], rewardsManager.cycle)
 
     console.log("Combining cumulative rewards... \n")
     cumulativeRewards = process_cumulative_rewards(pastTree, newRewards)

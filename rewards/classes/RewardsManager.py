@@ -9,7 +9,11 @@ from subgraph.queries.harvests import (
 )
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
+from rewards.classes.CycleLogger import cycle_logger
 from helpers.time_utils import to_utc_date, to_hours
+from helpers.web3_utils import make_contract
+from helpers.constants import DIGG
+from helpers.digg_utils import digg_utils
 from config.env_config import env_config
 from rich.console import Console
 from typing import List
@@ -44,11 +48,22 @@ class RewardsManager:
         rewards = RewardsList(self.cycle)
         settBalances = self.fetch_sett_snapshot(self.end, sett)
         boostedSettBalances = self.boost_sett(boosts, sett, settBalances)
-
         for token, schedules in schedulesByToken.items():
-            endDist = self.get_distributed_for_token_at(token, endTime, schedules)
-            startDist = self.get_distributed_for_token_at(token, startTime, schedules)
+            endDist = self.get_distributed_for_token_at(token, endTime, schedules, sett)
+            startDist = self.get_distributed_for_token_at(
+                token, startTime, schedules, sett
+            )
+            for schedule in schedules:
+                if schedule.startTime <= endTime and schedule.endTime >= endTime:
+                    cycle_logger.add_schedule(sett, schedule)
             tokenDistribution = int(endDist) - int(startDist)
+            if token == DIGG:
+                cycle_logger.add_sett_token_data(
+                    sett, token, digg_utils.sharesToFragments(tokenDistribution)
+                )
+            else:
+                cycle_logger.add_sett_token_data(sett, token, tokenDistribution)
+
             if tokenDistribution > 0:
                 total = boostedSettBalances.total_balance()
                 rewardsUnit = tokenDistribution / total
@@ -70,6 +85,7 @@ class RewardsManager:
         all_rewards = []
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
+
             console.log("Calculating rewards for {}".format(token.name().call()))
             all_rewards.append(
                 self.calculate_sett_rewards(sett, allSchedules[sett], boosts)
@@ -97,7 +113,7 @@ class RewardsManager:
         return userMultipliers
 
     def get_distributed_for_token_at(
-        self, token: str, endTime: int, schedules: List[Schedule]
+        self, token: str, endTime: int, schedules: List[Schedule], sett: str
     ) -> float:
         totalToDistribute = 0
         for index, schedule in enumerate(schedules):
@@ -116,7 +132,8 @@ class RewardsManager:
                 )
                 if schedule.startTime <= endTime and schedule.endTime >= endTime:
                     console.log(
-                        "Tokens distributed by schedule {} at {} are {}% of total\n".format(
+                        "Token {} distributed by schedule {} at {} are {}% of total\n".format(
+                            token,
                             index,
                             to_utc_date(schedule.startTime),
                             (
@@ -181,6 +198,8 @@ class RewardsManager:
                 rewards_unit = 0
             else:
                 rewards_unit = amount / balances.total_balance()
+
+            cycle_logger.add_tree_distribution(sett, dist)
             for user in balances:
                 user_rewards = rewards_unit * user.balance
                 rewards.increase_user_rewards(
@@ -209,6 +228,16 @@ class RewardsManager:
         total_from_rewards = 0
 
         for event in events:
+            cycle_logger.add_tree_distribution(
+                sett,
+                {
+                    "id": event["id"],
+                    "blockNumber": event["blockNumber"],
+                    "timestamp": event["timestamp"],
+                    "token": {"address": XSUSHI, "symbol": "xSushi"},
+                    "amount": event["rewardAmouht"],
+                },
+            )
             block = int(event["blockNumber"])
             reward_amount = int(event["rewardAmount"])
             balances = self.fetch_sett_snapshot(block, sett)

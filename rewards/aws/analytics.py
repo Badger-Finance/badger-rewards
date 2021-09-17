@@ -6,13 +6,13 @@ console = Console()
 analyticsBucket = "badger-analytics"
 
 
-def upload_analytics(cycle: int, data):
+def upload_analytics(chain: str, cycle: int, data):
     """
     Upload analytics data to analytics bucket
     :param cycle: which cycle to upload
     :param data: cycle information
     """
-    jsonKey = "logs/{}.json".format(cycle)
+    jsonKey = f"logs/{chain}/{cycle}.json"
     console.log("Uploading file to s3://" + analyticsBucket + "/" + jsonKey)
     s3.put_object(
         Body=str(json.dumps(data)),
