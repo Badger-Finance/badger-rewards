@@ -40,3 +40,45 @@ spec:
     - name: http
       port: 9000
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: propose-arb-cycle-bot
+  labels:
+    app: propose-arb-cycle-bot
+    service: propose-arb-cycle-bot
+spec:
+  selector:
+    app: propose-arb-cycle-bot
+  ports:
+    - name: http
+      port: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: approve-arb-cycle-bot
+  labels:
+    app: approve-arb-cycle-bot
+    service: approve-arb-cycle-bot
+spec:
+  selector:
+    app: approve-arb-cycle-bot
+  ports:
+    - name: http
+      port: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: propose-eth-cycle-bot
+  labels:
+    app: propose-eth-cycle-bot
+    service: propose-eth-cycle-bot
+spec:
+  selector:
+    app: propose-eth-cycle-bot
+  ports:
+    - name: http
+      port: 9000
+---

@@ -106,15 +106,12 @@ def get_assume_role_credentials(assume_role_arn: str):
 
     # Call the assume_role method of the STSConnection object and pass the role
     # ARN and a role session name.
-    logger.error("calling sts_client.assume_role")
     assumed_role_object = sts_client.assume_role(
         RoleArn=assume_role_arn, RoleSessionName="AssumeRoleSession1"
     )
-    logger.error(f"assumed role: {assumed_role_object}")
 
     # From the response that contains the assumed role, get the temporary
     # credentials that can be used to make subsequent API calls
     credentials = assumed_role_object["Credentials"]
-    logger.error("successfully got assume role")
 
     return credentials

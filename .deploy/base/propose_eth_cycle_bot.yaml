@@ -1,23 +1,23 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: approve-poly-cycle-bot
+  name: propose-eth-cycle-bot
   labels:
-    app: approve-poly-cycle-bot
+    app: propose-eth-cycle-bot
 spec:
-  schedule: "10 */2 * * *"
+  schedule: "5 */2 * * *"
   startingDeadlineSeconds: 180
-  suspend: false
+  suspend: true
   jobTemplate:
     spec:
       template:
         spec:
-          serviceAccountName: approve-poly-cycle-bot
+          serviceAccountName: propose-eth-cycle-bot
           containers:
-          - name: approve-poly-cycle-bot
+          - name: propose-eth-cycle-bot
             image: IMAGE_NAME
             imagePullPolicy: IfNotPresent
-            command: ["python", "-m", "scripts.rewards.polygon.approve_polygon"]
+            command: ["python", "-m", "scripts.rewards.eth.propose_eth"]
             env:
               - name: LOG_LEVEL
                 value: 'info'

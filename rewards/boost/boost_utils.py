@@ -1,4 +1,5 @@
-from helpers.constants import DISABLED_VAULTS
+from helpers.constants import BOOST_CHAINS, DISABLED_VAULTS
+from helpers.discord import send_message_to_discord
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rewards.explorer import convert_from_eth
 from rich.console import Console
@@ -44,7 +45,18 @@ def convert_balances_to_usd(
     Convert sett balance to usd and multiply by correct ratio
     :param balances: balances to convert to usd
     """
-    price = prices[env_config.get_web3().toChecksumAddress(sett)]
+    sett = env_config.get_web3().toChecksumAddress(sett)
+    if sett not in prices:
+        price = 0
+        send_message_to_discord(
+            "**BADGER BOOST ERROR**",
+            f"Cannot find pricing for f{sett}",
+            [],
+            "Boost Bot",
+        )
+    else:
+        price = prices[sett]
+
     priceRatio = balances.settRatio
     usdBalances = {}
     for user in balances:
@@ -58,15 +70,11 @@ def calc_boost_data(block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
     Calculate boost data required for boost calculation
     :param block: block to collect the boost data from
     """
-    chains = [
-        "polygon",
-        # "bsc",
-        "eth",
-    ]
+
     blocksByChain = convert_from_eth(block)
     native = Counter()
     nonNative = Counter()
-    for chain in chains:
+    for chain in BOOST_CHAINS:
         chainBlock = blocksByChain[chain]
         console.log("Taking chain snapshot on {} \n".format(chain))
 
