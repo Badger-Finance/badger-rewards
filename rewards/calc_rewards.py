@@ -125,7 +125,7 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
 
     if timeSinceLastUpdate < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-        return
+        #return
     rewards_data = generate_rewards_in_range(
         chain, start, end, save=save, pastTree=pastRewards
     )
@@ -159,17 +159,15 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
     cycle_logger.set_content_hash(rewards_data["rootHash"])
     cycle_logger.set_merkle_root(rewards_data["merkleTree"]["merkleRoot"])
     if success:
-        add_multipliers(rewards_data["multiplierData"], rewards_data["userMultipliers"])
-        cycle_logger.save(
-            treeManager.nextCycle,
-            chain
-        )
         upload_tree(
             rewards_data["fileName"],
             rewards_data["merkleTree"],
             chain,
             staging=env_config.test,
-        )
+         )
+
+        add_multipliers(rewards_data["multiplierData"], rewards_data["userMultipliers"])
+        cycle_logger.save(treeManager.nextCycle, chain)
         return rewards_data
 
 
