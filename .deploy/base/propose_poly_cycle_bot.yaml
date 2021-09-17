@@ -5,7 +5,7 @@ metadata:
   labels:
     app: propose-poly-cycle-bot
 spec:
-  schedule: "7 */2 * * *"
+  schedule: "8 */2 * * *"
   startingDeadlineSeconds: 180
   suspend: false
   jobTemplate:
