@@ -21,7 +21,6 @@ class EnvConfig:
 
         self.web3 = {
             "eth": self.make_provider("quiknode/eth-node-url", "NODE_URL"),
-            "bsc": self.make_provider("quiknode/bsc-node-url", "BSC_NODE_URL"),
             "arbitrum": self.make_provider(
                 "alchemy/arbitrum-node-url", "ARBITRUM_NODE_URL"
             ),
