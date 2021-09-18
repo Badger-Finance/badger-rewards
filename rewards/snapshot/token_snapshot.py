@@ -27,8 +27,8 @@ def token_snapshot_usd(chain: str, block: int):
         # fuse_balances[BBADGER] = {
         #    k: v * badger_ppfs for k, v in fuse_balances[BBADGER].items()
         # }
-        fuse_badger = fuse_balances[BADGER]
-        fuse_digg = fuse_balances[DIGG]
+        fuse_badger = fuse_balances.get(BADGER, {})
+        fuse_digg = fuse_balances.get(DIGG, {})
         badger_balances = Counter(fuse_badger) + Counter(badger_balances)
         digg_balances = Counter(fuse_digg) + Counter(digg_balances)
 
