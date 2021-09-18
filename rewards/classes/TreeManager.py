@@ -226,10 +226,10 @@ class TreeManager:
 
     def fetch_tree(self, merkle):
         chainId = self.w3.eth.chain_id
-        # fileName = "rewards-{}-{}.json".format(chainId, merkle["contentHash"])
-        # tree = json.loads(download_tree(fileName, self.chain))
-        # self.validate_tree(merkle, tree)
-        return json.load(open("badger-tree-arbitrum.json"))
+        fileName = "rewards-{}-{}.json".format(chainId, merkle["contentHash"])
+        tree = json.loads(download_tree(fileName, self.chain))
+        self.validate_tree(merkle, tree)
+        return tree
 
     def fetch_current_tree(self):
         currentMerkle = self.fetch_current_merkle_data()
