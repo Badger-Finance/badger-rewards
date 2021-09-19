@@ -38,7 +38,7 @@ def calc_next_cycle_range(chain: str):
     # Fetch the appropriate file
     currentRewards = treeManager.fetch_current_tree()
 
-    lastClaimEnd = treeManager.last_propose_end_block()
+    lastClaimEnd = treeManager.last_publish_end_block()
     startBlock = lastClaimEnd + 1
 
     # Claim at last synced block

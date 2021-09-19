@@ -273,6 +273,9 @@ class TreeManager:
     def last_propose_end_block(self) -> int:
         return self.badgerTree.lastProposeEndBlock().call()
 
+    def last_publish_end_block(self) -> int:
+        return self.badgerTree.lastPublishEndBlock().call()
+
     def last_propose_start_block(self) -> int:
         return self.badgerTree.lastProposeStartBlock().call()
 
