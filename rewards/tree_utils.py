@@ -7,19 +7,18 @@ from rich.console import Console
 console = Console()
 
 
-def get_last_proposed_cycle(chain: str):
-    treeManager = TreeManager(chain)
-    if not treeManager.has_pending_root():
+def get_last_proposed_cycle(chain: str, tree_manager: TreeManager):
+    if not tree_manager.has_pending_root():
         console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
         return ({}, 0, 0)
 
     console.log("Pending root found.. approving")
 
     # Fetch the appropriate file
-    currentRewards = treeManager.fetch_current_tree()
+    currentRewards = tree_manager.fetch_current_tree()
 
-    lastClaimEnd = treeManager.last_propose_end_block()
-    lastClaimStart = treeManager.last_propose_start_block()
+    lastClaimEnd = tree_manager.last_propose_end_block()
+    lastClaimStart = tree_manager.last_propose_start_block()
 
     # Sanity check: Ensure previous cycle was not too long
     print(lastClaimStart)
@@ -33,12 +32,11 @@ def get_last_proposed_cycle(chain: str):
     return (currentRewards, lastClaimStart, lastClaimEnd)
 
 
-def calc_next_cycle_range(chain: str):
-    treeManager = TreeManager(chain)
+def calc_next_cycle_range(chain: str, tree_manager: TreeManager):
     # Fetch the appropriate file
-    currentRewards = treeManager.fetch_current_tree()
+    currentRewards = tree_manager.fetch_current_tree()
 
-    lastClaimEnd = treeManager.last_publish_end_block()
+    lastClaimEnd = tree_manager.last_publish_end_block()
     startBlock = lastClaimEnd + 1
 
     # Claim at last synced block
