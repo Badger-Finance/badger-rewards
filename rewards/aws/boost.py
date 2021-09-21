@@ -12,7 +12,7 @@ def upload_boosts(boost_data):
     """Upload boosts file to aws bucket
 
     :param test:
-    :param boostData: calculated boost information
+    :param boost_data: calculated boost information
     """
 
     buckets = ["badger-staging-merkle-proofs"]
@@ -55,17 +55,17 @@ def download_boosts():
     return data
 
 
-def add_user_data(userData):
+def add_user_data(user_data):
     """Upload users boost information
 
     :param test:
-    :param userData: user boost data
+    :param user_data: user boost data
     """
-    oldBoosts = download_boosts()
-    boosts = {"userData": {}, "multiplierData": oldBoosts["multiplierData"]}
-    for user, data in userData.items():
-        if user in oldBoosts["userData"]:
-            multipliers = oldBoosts["userData"][user]["multipliers"]
+    old_boosts = download_boosts()
+    boosts = {"userData": {}, "multiplierData": old_boosts["multiplierData"]}
+    for user, data in user_data.items():
+        if user in old_boosts["userData"]:
+            multipliers = old_boosts["userData"][user]["multipliers"]
         else:
             multipliers = {}
 

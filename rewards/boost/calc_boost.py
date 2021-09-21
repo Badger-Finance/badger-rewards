@@ -19,8 +19,8 @@ def calc_stake_ratio(
     """
     Calculate the stake ratio for an address
     :param address: address to find stake ratio for
-    :param nativeSetts: native balances
-    :param nonNativeSetts: non native balances
+    :param native_setts: native balances
+    :param non_native_setts: non native balances
     """
     native_balance = native_setts.get(address.lower(), 0)
     non_native_balance = non_native_setts.get(address.lower(), 0)
@@ -34,8 +34,7 @@ def calc_stake_ratio(
 def badger_boost(current_block: int):
     """
     Calculate badger boost multipliers based on stake ratios
-    :param badger: badger system
-    :param currentBlock: block to calculate boost at
+    :param current_block: block to calculate boost at
     """
     console.log(f"Calculating boost at block {current_block} ...")
     native_setts, non_native_setts = calc_boost_balances(current_block - 10)
@@ -55,11 +54,11 @@ def badger_boost(current_block: int):
     for addr in all_addresses:
         boost_info[addr] = {"nativeBalance": 0, "nonNativeBalance": 0, "stakeRatio": 0}
 
-    for user, nativeUsd in native_setts.items():
-        boost_info[user.lower()]["nativeBalance"] = nativeUsd
+    for user, native_usd in native_setts.items():
+        boost_info[user.lower()]["nativeBalance"] = native_usd
 
-    for user, nonNativeUsd in non_native_setts.items():
-        boost_info[user.lower()]["nonNativeBalance"] = nonNativeUsd
+    for user, non_native_usd in non_native_setts.items():
+        boost_info[user.lower()]["nonNativeBalance"] = non_native_usd
 
     for addr, ratio in stake_ratios.items():
         boost_info[addr.lower()]["stakeRatio"] = ratio
@@ -70,15 +69,15 @@ def badger_boost(current_block: int):
         if stake_ratio == 0:
             badger_boost[addr] = 1
         else:
-            userBoost = 1
-            userStakeRange = 0
-            for stakeRange, multiplier in STAKE_RATIO_RANGES:
-                if stake_ratio > stakeRange:
-                    userBoost = multiplier
-                    userStakeRange = stakeRange
+            user_boost = 1
+            user_stake_range = 0
+            for stake_range, multiplier in STAKE_RATIO_RANGES:
+                if stake_ratio > stake_range:
+                    user_boost = multiplier
+                    user_stake_range = stake_range
 
-            stake_data[userStakeRange] = stake_data.get(userStakeRange, 0) + 1
-            badger_boost[addr] = userBoost
+            stake_data[user_stake_range] = stake_data.get(user_stake_range, 0) + 1
+            badger_boost[addr] = user_boost
 
     for addr, boost in badger_boost.items():
         boost_metadata = boost_info.get(addr, {})

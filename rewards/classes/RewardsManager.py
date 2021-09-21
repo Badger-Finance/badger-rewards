@@ -46,20 +46,22 @@ class RewardsManager:
         return sett
 
     def calculate_sett_rewards(self, sett, schedules_by_token, boosts) -> RewardsList:
-        startTime = self.web3.eth.getBlock(self.start)["timestamp"]
-        endTime = self.web3.eth.getBlock(self.end)["timestamp"]
+        start_time = self.web3.eth.getBlock(self.start)["timestamp"]
+        end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         rewards = RewardsList(self.cycle)
         sett_balances = self.fetch_sett_snapshot(self.end, sett)
         boosted_sett_balances = self.boost_sett(boosts, sett, sett_balances)
         for token, schedules in schedules_by_token.items():
-            endDist = self.get_distributed_for_token_at(token, endTime, schedules, sett)
-            startDist = self.get_distributed_for_token_at(
-                token, startTime, schedules, sett
+            end_dist = self.get_distributed_for_token_at(
+                token, end_time, schedules, sett
+            )
+            start_dist = self.get_distributed_for_token_at(
+                token, start_time, schedules, sett
             )
             for schedule in schedules:
-                if schedule.startTime <= endTime and schedule.endTime >= endTime:
+                if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     cycle_logger.add_schedule(sett, schedule)
-            token_distribution = int(endDist) - int(startDist)
+            token_distribution = int(end_dist) - int(start_dist)
             if token == DIGG:
                 cycle_logger.add_sett_token_data(
                     sett, token, digg_utils.shares_to_fragments(token_distribution)

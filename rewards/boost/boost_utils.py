@@ -21,8 +21,8 @@ def calc_union_addresses(
 ) -> List[str]:
     """
     Combine addresses from native setts and non native setts
-    :param nativeSetts: native setts
-    :param nonNativeSetts: non native setts
+    :param native_setts: native setts
+    :param non_native_setts: non native setts
     """
     native_addresses = list(native_setts.keys())
     non_native_addresses = list(non_native_setts.keys())
@@ -33,7 +33,7 @@ def filter_dust(balances: Dict[str, int], dust_amount: int) -> Dict[str, float]:
     """
     Filter out dust values from user balances
     :param balances: balances to filter
-    :param dustAmount: dollar amount to filter by
+    :param dust_amount: dollar amount to filter by
     """
     return {addr: value for addr, value in balances.items() if value > dust_amount}
 
@@ -75,13 +75,13 @@ def calc_boost_balances(block: int) -> Tuple[Dict[str, float], Dict[str, float]]
     native = Counter()
     non_native = Counter()
     for chain in BOOST_CHAINS:
-        chainBlock = blocks_by_chain[chain]
+        chain_block = blocks_by_chain[chain]
         console.log(f"Taking chain snapshot on {chain} \n")
 
-        snapshot = chain_snapshot(chain, chainBlock)
+        snapshot = chain_snapshot(chain, chain_block)
         console.log(f"Taking token snapshot on {chain}")
 
-        tokens = token_snapshot_usd(chain, chainBlock)
+        tokens = token_snapshot_usd(chain, chain_block)
         native = native + Counter(tokens)
         for sett, balances in snapshot.items():
             if sett in DISABLED_VAULTS:

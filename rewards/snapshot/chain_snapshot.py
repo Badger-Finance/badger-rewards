@@ -61,10 +61,10 @@ def parse_sett_balances(sett_address: str, balances: Dict[str, int]) -> UserBala
 
     sett_type, sett_ratio = get_sett_info(sett_address)
     console.log(f"Sett {sett_address} has type {sett_type} and Ratio {sett_ratio} \n")
-    userBalances = [
+    user_balances = [
         UserBalance(addr, bal, sett_address) for addr, bal in balances.items()
     ]
-    return UserBalances(userBalances, sett_type, sett_ratio)
+    return UserBalances(user_balances, sett_type, sett_ratio)
 
 
 def get_sett_info(sett_address: str) -> Tuple[str, float]:

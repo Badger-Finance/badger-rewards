@@ -1,8 +1,5 @@
-from logging import root
 from eth_account import Account
-import traceback
-
-from web3 import contract
+from web3.contract import ContractFunction
 from rewards.explorer import get_explorer_url
 from helpers.discord import send_message_to_discord
 from eth_utils.hexadecimal import encode_hex
@@ -62,13 +59,13 @@ class TreeManager:
 
     def approve_root(self, rewards) -> Tuple[str, bool]:
         console.log("Approving root")
-        return self.manage_root(rewards, self.badgerTree.approveRoot, approve=True)
+        return self.manage_root(rewards, self.badgerTree.approveRoot, action="Approve")
 
     def propose_root(self, rewards):
         console.log("Proposing root")
-        return self.manage_root(rewards, self.badgerTree.proposeRoot, approve=False)
+        return self.manage_root(rewards, self.badgerTree.proposeRoot, action="Propose")
 
-    def manage_root(self, rewards, contract_function, approve):
+    def manage_root(self, rewards, contract_function: ContractFunction, action):
         root_hash = rewards["rootHash"]
         merkle_root = rewards["merkleTree"]["merkleRoot"]
         start_block = rewards["merkleTree"]["startBlock"]
@@ -88,7 +85,6 @@ class TreeManager:
                 self.w3,
                 tx_hash,
             )
-            action = "Approved" if approve else "Proposed"
             title = f"**{action} Rewards on {self.chain}**"
             approve_info = f"TX Hash: {tx_hash} \n\n Root: {merkle_root} \n\n Content Hash: {root_hash} \n\n"
             description = f"Calculated rewards between {start_block} and {end_block} \n\n {approve_info} "
@@ -151,47 +147,47 @@ class TreeManager:
         return self.badgerTree.hasPendingRoot().call()
 
     def fetch_tree(self, merkle):
-        chainId = self.w3.eth.chain_id
-        fileName = f"rewards-{chainId}-{merkle['contentHash']}.json"
-        tree = json.loads(download_tree(fileName, self.chain))
+        chain_id = self.w3.eth.chain_id
+        file_name = f"rewards-{chain_id}-{merkle['contentHash']}.json"
+        tree = json.loads(download_tree(file_name, self.chain))
         self.validate_tree(merkle, tree)
         return tree
 
     def fetch_current_tree(self):
-        currentMerkle = self.fetch_current_merkle_data()
-        console.log(f"Current Merkle \n {currentMerkle}")
-        return self.fetch_tree(currentMerkle)
+        current_merkle = self.fetch_current_merkle_data()
+        console.log(f"Current Merkle \n {current_merkle}")
+        return self.fetch_tree(current_merkle)
 
     def fetch_pending_tree(self):
-        pendingMerkle = self.fetch_pending_merkle_data()
-        console.log(f"Pending Merkle \n {pendingMerkle}")
-        return self.fetch_tree(pendingMerkle)
+        pending_merkle = self.fetch_pending_merkle_data()
+        console.log(f"Pending Merkle \n {pending_merkle}")
+        return self.fetch_tree(pending_merkle)
 
     def validate_tree(self, merkle, tree):
         # Invariant: merkle should have same root as latest
         assert tree["merkleRoot"] == merkle["root"]
-        lastUpdatePublish = int(merkle["blockNumber"])
-        lastUpdate = int(tree["endBlock"])
-        assert lastUpdatePublish > lastUpdate
+        last_update_publish = int(merkle["blockNumber"])
+        last_update = int(tree["endBlock"])
+        assert last_update_publish > last_update
         # Ensure file tracks block within 1 day of upload
         # assert abs(lastUpdate - lastUpdatePublish) < 6500
 
     def fetch_current_merkle_data(self):
         root = self.badgerTree.merkleRoot().call()
-        contentHash = self.badgerTree.merkleContentHash().call()
+        content_hash = self.badgerTree.merkleContentHash().call()
         return {
             "root": encode_hex(root),
-            "contentHash": encode_hex(contentHash),
+            "contentHash": encode_hex(content_hash),
             "lastUpdateTime": self.badgerTree.lastPublishTimestamp().call(),
             "blockNumber": int(self.badgerTree.lastPublishBlockNumber().call()),
         }
 
     def fetch_pending_merkle_data(self):
         root = self.badgerTree.pendingMerkleRoot().call()
-        pendingContentHash = self.badgerTree.pendingMerkleContentHash().call()
+        pending_content_hash = self.badgerTree.pendingMerkleContentHash().call()
         return {
             "root": encode_hex(root),
-            "contentHash": encode_hex(pendingContentHash),
+            "contentHash": encode_hex(pending_content_hash),
             "lastUpdateTime": self.badgerTree.lastProposeTimestamp().call(),
             "blockNumber": int(self.badgerTree.lastProposeBlockNumber().call()),
         }

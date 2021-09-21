@@ -17,4 +17,4 @@ if __name__ == "__main__":
         "Boost Bot",
     )
     boost_data = badger_boost(current_block)
-    add_user_data(userData=boost_data)
+    add_user_data(user_data=boost_data)
