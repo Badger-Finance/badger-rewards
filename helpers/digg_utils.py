@@ -6,7 +6,7 @@ import json
 
 class DiggUtils:
     def __init__(self):
-        self.digg = make_contract(DIGG, abiName="Digg", chain="eth")
+        self.digg = make_contract(DIGG, abi_name="Digg", chain="eth")
         self.shares_per_fragment = self.digg._sharesPerFragment().call()
         self.initial_shares = self.digg._initialSharesPerFragment().call()
 

@@ -62,7 +62,7 @@ class RewardsManager:
             token_distribution = int(endDist) - int(startDist)
             if token == DIGG:
                 cycle_logger.add_sett_token_data(
-                    sett, token, digg_utils.sharesToFragments(token_distribution)
+                    sett, token, digg_utils.shares_to_fragments(token_distribution)
                 )
             else:
                 cycle_logger.add_sett_token_data(sett, token, token_distribution)
@@ -146,11 +146,9 @@ class RewardsManager:
                     )
 
                     console.log(
-                        (
-                            f"Total duration of schedule elapsed is {to_hours(range_duration)}"
-                            f"hours out of {to_hours(schedule.duration)} hours",
-                            f"or {range_duration/schedule.duration * 100}% of total duration.\n",
-                        )
+                        f"Total duration of schedule elapsed is {to_hours(range_duration)}"
+                        f" hours out of {to_hours(schedule.duration)} hours"
+                        f" or {range_duration/schedule.duration * 100}% of total duration.",
                     )
             total_to_distribute += to_distribute
 

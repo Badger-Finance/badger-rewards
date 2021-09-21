@@ -14,5 +14,5 @@ def make_contract(address: str, abi_name: str, chain: str) -> ContractFunctions:
 
 def get_badger_tree(chain: str) -> ContractFunctions:
     return make_contract(
-        EMISSIONS_CONTRACTS[chain]["BadgerTree"], abiName="BadgerTreeV2", chain=chain
+        EMISSIONS_CONTRACTS[chain]["BadgerTree"], abi_name="BadgerTreeV2", chain=chain
     )

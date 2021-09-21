@@ -99,12 +99,12 @@ def fetch_fuse_pool_balances(client, chain, block):
     for symbol, data in ctoken_data.items():
         ftoken = make_contract(
             env_config.get_web3().toChecksumAddress(data["contract"]),
-            abiName="CErc20Delegator",
+            abi_name="CErc20Delegator",
             chain=chain,
         )
         underlying = make_contract(
             env_config.get_web3().toChecksumAddress(data["underlying_contract"]),
-            abiName="ERC20",
+            abi_name="ERC20",
             chain=chain,
         )
 
