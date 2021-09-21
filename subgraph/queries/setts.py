@@ -101,15 +101,15 @@ def fetch_chain_balances(chain: str, block: int) -> Dict[str, Dict[str, int]]:
     """
     client = make_gql_client(chain)
     query = balances_query()
-    lastId = ""
+    last_id = ""
     variables = {"blockHeight": {"number": block}}
     balances = {}
     try:
         while True:
-            variables["lastId"] = {"id_gt": lastId}
+            variables["lastId"] = {"id_gt": last_id}
             results = client.execute(query, variable_values=variables)
-            balanceData = results["userSettBalances"]
-            for result in balanceData:
+            balance_data = results["userSettBalances"]
+            for result in balance_data:
                 account = result["user"]["id"].lower()
                 decimals = int(result["sett"]["token"]["decimals"])
                 sett = result["sett"]["id"]
@@ -125,12 +125,12 @@ def fetch_chain_balances(chain: str, block: int) -> Dict[str, Dict[str, int]]:
                     else:
                         balances[sett][account] += deposit
 
-            if len(balanceData) == 0:
+            if len(balance_data) == 0:
                 break
             else:
-                console.log("Fetching {} sett balances".format(len(balanceData)))
-                lastId = balanceData[-1]["id"]
-        console.log("Fetched {} total setts".format(len(balances)))
+                console.log(f"Fetching {len(balance_data)} sett balances")
+                last_id = balance_data[-1]["id"]
+        console.log(f"Fetched {len(balances)} total setts")
         return balances
     except Exception as e:
         send_error_to_discord(e, "Error in Fetching Sett Balance")
@@ -146,7 +146,7 @@ def fetch_sett_balances(chain: str, block: int, sett: str):
     """
     client = make_gql_client(chain)
     query = balances_query()
-    lastId = ""
+    last_id = ""
     variables = {
         "blockHeight": {"number": block},
         "lastId": {"id_gt": "", "sett": sett.lower()},
@@ -154,10 +154,10 @@ def fetch_sett_balances(chain: str, block: int, sett: str):
     balances = {}
     try:
         while True:
-            variables["lastId"]["id_gt"] = lastId
+            variables["lastId"]["id_gt"] = last_id
             results = client.execute(query, variable_values=variables)
-            balanceData = results["userSettBalances"]
-            for result in balanceData:
+            balance_data = results["userSettBalances"]
+            for result in balance_data:
                 account = result["user"]["id"].lower()
                 decimals = int(result["sett"]["token"]["decimals"])
                 sett = result["sett"]["id"]
@@ -170,13 +170,13 @@ def fetch_sett_balances(chain: str, block: int, sett: str):
                     else:
                         balances[account] += deposit
 
-            if len(balanceData) == 0:
+            if len(balance_data) == 0:
                 break
             else:
-                console.log("Fetching {} sett balances".format(len(balanceData)))
-                lastId = balanceData[-1]["id"]
+                console.log(f"Fetching {len(balance_data)} sett balances")
+                lastId = balance_data[-1]["id"]
 
-        console.log("Fetched {} total sett balances".format(len(balances)))
+        console.log(f"Fetched {len(balances)} total sett balances")
         return balances
 
     except Exception as e:

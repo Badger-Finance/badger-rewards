@@ -8,7 +8,7 @@ from rich.console import Console
 console = Console()
 
 if __name__ == "__main__":
-    currentBlock = env_config.get_web3().eth.block_number
+    current_block = env_config.get_web3().eth.block_number
     chains = ",".join(BOOST_CHAINS)
     send_message_to_discord(
         f"**CALCULATING NEW BOOST ({chains})**",
@@ -16,5 +16,5 @@ if __name__ == "__main__":
         [],
         "Boost Bot",
     )
-    boostData = badger_boost(currentBlock)
-    add_user_data(userData=boostData)
+    boost_data = badger_boost(current_block)
+    add_user_data(userData=boost_data)

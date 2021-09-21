@@ -1,5 +1,8 @@
+from logging import root
 from eth_account import Account
 import traceback
+
+from web3 import contract
 from rewards.explorer import get_explorer_url
 from helpers.discord import send_message_to_discord
 from eth_utils.hexadecimal import encode_hex
@@ -19,7 +22,7 @@ from rewards.tx_utils import (
     get_gas_price_of_tx,
 )
 from rich.console import Console
-from typing import List
+from typing import List, Tuple
 import json
 
 console = Console()
@@ -52,42 +55,45 @@ class TreeManager:
 
     def build_function_and_send(self, account, func) -> str:
         options = self.get_tx_options(account)
-        console.log(options)
         tx = func.buildTransaction(options)
         signed_tx = self.w3.eth.account.sign_transaction(tx, private_key=account.key)
         tx_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
         return tx_hash
 
-    def approve_root(self, rewards) -> str:
+    def approve_root(self, rewards) -> Tuple[str, bool]:
         console.log("Approving root")
-        approve_root_func = self.badgerTree.approveRoot(
-            to_bytes(hexstr=rewards["merkleTree"]["merkleRoot"]),
-            to_bytes(hexstr=rewards["rootHash"]),
+        return self.manage_root(rewards, self.badgerTree.approveRoot, approve=True)
+
+    def propose_root(self, rewards):
+        console.log("Proposing root")
+        return self.manage_root(rewards, self.badgerTree.proposeRoot, approve=False)
+
+    def manage_root(self, rewards, contract_function, approve):
+        root_hash = rewards["rootHash"]
+        merkle_root = rewards["merkleTree"]["merkleRoot"]
+        start_block = rewards["merkleTree"]["startBlock"]
+        end_block = rewards["merkleTree"]["endBlock"]
+        root_func = contract_function(
+            to_bytes(hexstr=merkle_root),
+            to_bytes(hexstr=root_hash),
             int(rewards["merkleTree"]["cycle"]),
-            int(rewards["merkleTree"]["startBlock"]),
-            int(rewards["merkleTree"]["endBlock"]),
+            int(start_block),
+            int(end_block),
         )
+
         tx_hash = HexBytes(0)
         try:
-            tx_hash = self.build_function_and_send(
-                self.approve_account, func=approve_root_func
-            )
+            tx_hash = self.build_function_and_send(self.approve_account, func=root_func)
             succeeded, msg = confirm_transaction(
                 self.w3,
                 tx_hash,
             )
-            title = "**Approved Rewards on {}**".format(self.chain)
-            approve_info = (
-                "TX Hash: {} \n\n Root: {} \n\n Content Hash: {} \n\n".format(
-                    tx_hash, rewards["merkleTree"]["merkleRoot"], rewards["rootHash"]
-                )
-            )
-            description = "Calculated rewards between {} and {} \n\n {} ".format(
-                int(rewards["merkleTree"]["startBlock"]),
-                int(rewards["merkleTree"]["endBlock"]),
-                approve_info,
-            )
-            console.log("Cycle approved : {}".format(tx_hash))
+            action = "Approved" if approve else "Proposed"
+            title = f"**{action} Rewards on {self.chain}**"
+            approve_info = f"TX Hash: {tx_hash} \n\n Root: {merkle_root} \n\n Content Hash: {root_hash} \n\n"
+            description = f"Calculated rewards between {start_block} and {end_block} \n\n {approve_info} "
+            console.log(f"Cycle {action.lower()} : {tx_hash}")
+
             if succeeded:
                 gas_price_of_tx = get_gas_price_of_tx(self.w3, self.chain, tx_hash)
                 console.log(f"got gas price of tx: {gas_price_of_tx}")
@@ -126,87 +132,7 @@ class TreeManager:
         except Exception as e:
             console.log(f"Error processing harvest tx: {e}")
             send_message_to_discord(
-                "**FAILED Approve Rewards on {}**".format(self.chain),
-                e,
-                [],
-                "Rewards Bot",
-                url=self.discord_url,
-            )
-            return tx_hash, False
-        return tx_hash, True
-
-    def propose_root(self, rewards: dict) -> str:
-        console.log("Propose root")
-        propose_root_func = self.badgerTree.proposeRoot(
-            to_bytes(hexstr=rewards["merkleTree"]["merkleRoot"]),
-            to_bytes(hexstr=rewards["rootHash"]),
-            int(rewards["merkleTree"]["cycle"]),
-            int(rewards["merkleTree"]["startBlock"]),
-            int(rewards["merkleTree"]["endBlock"]),
-        )
-        tx_hash = HexBytes(0)
-        try:
-            print("propose root function")
-            tx_hash = self.build_function_and_send(
-                self.propose_account, func=propose_root_func
-            )
-            print(tx_hash)
-            succeeded, msg = confirm_transaction(
-                self.w3,
-                tx_hash,
-            )
-
-            title = "**Proposed Rewards on {}**".format(self.chain)
-            propose_info = (
-                "TX Hash: {} \n\n Root: {} \n\n Content Hash: {} \n\n".format(
-                    tx_hash, rewards["merkleTree"]["merkleRoot"], rewards["rootHash"]
-                )
-            )
-            description = "Calculated rewards between {} and {} \n\n {} ".format(
-                int(rewards["merkleTree"]["startBlock"]),
-                int(rewards["merkleTree"]["endBlock"]),
-                propose_info,
-            )
-            console.log("Cycle proposed : {}".format(tx_hash))
-            if succeeded:
-                gas_price_of_tx = get_gas_price_of_tx(self.w3, self.chain, tx_hash)
-                console.log(f"got gas price of tx: {gas_price_of_tx}")
-                send_message_to_discord(
-                    title,
-                    description,
-                    [
-                        {
-                            "name": "Completed Transaction",
-                            "value": get_explorer_url(self.chain, tx_hash),
-                            "inline": True,
-                        },
-                        {
-                            "name": "Gas Cost",
-                            "value": f"${round(get_gas_price_of_tx(self.w3, self.chain, tx_hash), 2)}",
-                            "inline": True,
-                        },
-                    ],
-                    "Rewards Bot",
-                    url=self.discord_url,
-                )
-            else:
-                send_message_to_discord(
-                    title,
-                    description,
-                    [
-                        {
-                            "name": "Pending Transaction",
-                            "value": get_explorer_url(self.chain, tx_hash),
-                            "inline": True,
-                        }
-                    ],
-                    "Rewards Bot",
-                    url=self.discord_url,
-                )
-        except Exception as e:
-            console.log(f"Error processing harvest tx: {e} \n {traceback.format_exc()}")
-            send_message_to_discord(
-                "**FAILED Proposed Rewards on {}**".format(self.chain),
+                f"**FAILED {action} Rewards on {self.chain}**",
                 e,
                 [],
                 "Rewards Bot",
@@ -226,19 +152,19 @@ class TreeManager:
 
     def fetch_tree(self, merkle):
         chainId = self.w3.eth.chain_id
-        fileName = "rewards-{}-{}.json".format(chainId, merkle["contentHash"])
+        fileName = f"rewards-{chainId}-{merkle['contentHash']}.json"
         tree = json.loads(download_tree(fileName, self.chain))
         self.validate_tree(merkle, tree)
         return tree
 
     def fetch_current_tree(self):
         currentMerkle = self.fetch_current_merkle_data()
-        console.log("Current Merkle \n {}".format(currentMerkle))
+        console.log(f"Current Merkle \n {currentMerkle}")
         return self.fetch_tree(currentMerkle)
 
     def fetch_pending_tree(self):
         pendingMerkle = self.fetch_pending_merkle_data()
-        console.log("Pending Merkle \n {}".format(pendingMerkle))
+        console.log(f"Pending Merkle \n {pendingMerkle}")
         return self.fetch_tree(pendingMerkle)
 
     def validate_tree(self, merkle, tree):
@@ -293,5 +219,4 @@ class TreeManager:
             # options["gasPrice"] = get_effective_gas_price(self.w3, self.chain)
         else:
             options["gasPrice"] = get_effective_gas_price(self.w3, self.chain)
-        print(options)
         return options

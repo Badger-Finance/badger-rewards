@@ -19,13 +19,11 @@ def approve_rewards(chain):
         return
 
     console.log(
-        "Generating rewards between {} and {} on {} chain".format(
-            startBlock, endBlock, chain
-        )
+        f"Generating rewards between {startBlock} and {endBlock} on {chain} chain"
     )
     send_message_to_discord(
-        "**Approving Rewards on {}**".format(chain),
-        "Calculating rewards between {} and {}".format(startBlock, endBlock),
+        f"**Approving Rewards on {chain}**",
+        f"Calculating rewards between {startBlock} and {endBlock}",
         [],
         "Rewards Bot",
         url=discord_url,

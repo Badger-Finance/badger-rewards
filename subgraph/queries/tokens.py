@@ -14,7 +14,7 @@ console = Console()
 
 @lru_cache(maxsize=None)
 def fetch_token_balances(client, blockNumber) -> Tuple[Dict[str, int], Dict[str, int]]:
-    sharesPerFragment = digg_utils.sharesPerFragment
+    shares_per_fragment = digg_utils.shares_per_fragment
     increment = 1000
     query = gql(
         """
@@ -47,9 +47,7 @@ def fetch_token_balances(client, blockNumber) -> Tuple[Dict[str, int], Dict[str,
                 continueFetching = False
             else:
                 lastID = nextPage["tokenBalances"][-1]["id"]
-                console.log(
-                    "Fetching {} token balances".format(len(nextPage["tokenBalances"]))
-                )
+                console.log(f"Fetching {len(nextPage['tokenBalances'])} token balances")
                 for entry in nextPage["tokenBalances"]:
                     address = entry["id"].split("-")[0]
                     amount = float(entry["balance"])
@@ -61,7 +59,7 @@ def fetch_token_balances(client, blockNumber) -> Tuple[Dict[str, int], Dict[str,
                             if entry["balance"] == 0:
                                 fragmentBalance = 0
                             else:
-                                fragmentBalance = sharesPerFragment / amount
+                                fragmentBalance = shares_per_fragment / amount
                             digg_balances[address] = float(fragmentBalance) / 1e9
     except Exception as e:
         send_error_to_discord(e, "Error in Fetching Token Balance")
@@ -170,9 +168,9 @@ def fetch_fuse_pool_balances(client, chain, block):
             if len(results["accountCTokens"]) == 0:
                 break
             else:
-                console.log("Fetching {} fuse balances".format(len(results)))
+                console.log(f"Fetching {len(results)} fuse balances")
 
-        console.log("Fetched {} total fuse balances".format(len(balances)))
+        console.log(f"Fetched {len(balances)} total fuse balances")
         return balances
 
     except Exception as e:

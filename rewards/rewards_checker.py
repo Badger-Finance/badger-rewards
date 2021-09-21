@@ -27,16 +27,16 @@ def assert_claims_increase(past_tree, new_tree):
 
 
 def val(amount, decimals=18):
-    return "{:,.18f}".format(amount / 10 ** decimals)
+    return f"{amount / 10 ** decimals:,.18f}"
 
 
 def print_token_diff_table(name, before, after, sanity_diff, decimals=18):
     diff = after - before
-    console.print("Diff for {} \n".format(name))
+    console.print(f"Diff for {name} \n")
     table = []
-    table.append(["{} before".format(name), val(before, decimals=decimals)])
-    table.append(["{} after".format(name), val(after, decimals=decimals)])
-    table.append(["{} diff".format(name), val(diff, decimals=decimals)])
+    table.append([f"{name} before", val(before, decimals=decimals)])
+    table.append([f"{name} after", val(after, decimals=decimals)])
+    table.append([f"{name} diff", val(diff, decimals=decimals)])
     print(tabulate(table, headers=["key", "value"]))
 
     assert diff <= sanity_diff

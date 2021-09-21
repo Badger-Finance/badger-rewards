@@ -14,18 +14,16 @@ def propose_rewards(chain):
         MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", test=env_config.test
     )
 
-    pastRewards, startBlock, endBlock = calc_next_cycle_range(chain)
+    past_rewards, start_block, end_block = calc_next_cycle_range(chain)
 
     console.log(
-        "Generating rewards between {} and {} on {} chain".format(
-            startBlock, endBlock, chain
-        )
+        f"Generating rewards between {start_block} and {end_block} on {chain} chain"
     )
     send_message_to_discord(
-        "**Proposing Rewards on {}**".format(chain),
-        "Calculating rewards between {} and {}".format(startBlock, endBlock),
+        f"**Proposing Rewards on {chain}**",
+        f"Calculating rewards between {start_block} and {end_block}",
         [],
         "Rewards Bot",
         url=discord_url,
     )
-    propose_root(chain, startBlock, endBlock, pastRewards, save=False)
+    propose_root(chain, start_block, end_block, past_rewards, save=False)

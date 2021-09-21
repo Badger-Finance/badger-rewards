@@ -7,7 +7,7 @@ from typing import Dict, Tuple
 
 
 def token_snapshot(chain: str, block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
-    token_client = make_gql_client("tokens-{}".format(chain))
+    token_client = make_gql_client(f"tokens-{chain}")
     return fetch_token_balances(token_client, block)
 
 
@@ -20,17 +20,17 @@ def token_snapshot_usd(chain: str, block: int):
 
     badger_ppfs, digg_ppfs = fetch_ppfs()
 
-    #fuse_balances = fuse_snapshot(chain, block)
+    # fuse_balances = fuse_snapshot(chain, block)
     badger_balances, digg_balances = token_snapshot(chain, block)
     # Account for tokens loaned in fuse
-    #if fuse_balances:
-        # fuse_balances[BBADGER] = {
-        #    k: v * badger_ppfs for k, v in fuse_balances[BBADGER].items()
-        # }
-        #fuse_badger = fuse_balances[BADGER]
-        #fuse_digg = fuse_balances[DIGG]
-        #badger_balances = Counter(fuse_badger) + Counter(badger_balances)
-        #digg_balances = Counter(fuse_digg) + Counter(digg_balances)
+    # if fuse_balances:
+    # fuse_balances[BBADGER] = {
+    #    k: v * badger_ppfs for k, v in fuse_balances[BBADGER].items()
+    # }
+    # fuse_badger = fuse_balances[BADGER]
+    # fuse_digg = fuse_balances[DIGG]
+    # badger_balances = Counter(fuse_badger) + Counter(badger_balances)
+    # digg_balances = Counter(fuse_digg) + Counter(digg_balances)
 
     return convert_tokens_to_usd(badger_balances, digg_balances)
 

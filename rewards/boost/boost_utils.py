@@ -17,25 +17,25 @@ prices = fetch_token_prices()
 
 
 def calc_union_addresses(
-    nativeSetts: Dict[str, int], nonNativeSetts: Dict[str, int]
+    native_setts: Dict[str, int], non_native_setts: Dict[str, int]
 ) -> List[str]:
     """
     Combine addresses from native setts and non native setts
     :param nativeSetts: native setts
     :param nonNativeSetts: non native setts
     """
-    nativeAddresses = list(nativeSetts.keys())
-    nonNativeAddresses = list(nonNativeSetts.keys())
-    return list(set(nativeAddresses + nonNativeAddresses))
+    native_addresses = list(native_setts.keys())
+    non_native_addresses = list(non_native_setts.keys())
+    return list(set(native_addresses + non_native_addresses))
 
 
-def filter_dust(balances: Dict[str, int], dustAmount: int) -> Dict[str, float]:
+def filter_dust(balances: Dict[str, int], dust_amount: int) -> Dict[str, float]:
     """
     Filter out dust values from user balances
     :param balances: balances to filter
     :param dustAmount: dollar amount to filter by
     """
-    return {addr: value for addr, value in balances.items() if value > dustAmount}
+    return {addr: value for addr, value in balances.items() if value > dust_amount}
 
 
 def convert_balances_to_usd(
@@ -57,41 +57,41 @@ def convert_balances_to_usd(
     else:
         price = prices[sett]
 
-    priceRatio = balances.settRatio
-    usdBalances = {}
+    price_ratio = balances.sett_ratio
+    usd_balances = {}
     for user in balances:
-        usdBalances[user.address] = priceRatio * price * user.balance
+        usd_balances[user.address] = price_ratio * price * user.balance
 
-    return usdBalances, balances.settType
+    return usd_balances, balances.sett_type
 
 
-def calc_boost_data(block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
+def calc_boost_balances(block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
     """
     Calculate boost data required for boost calculation
     :param block: block to collect the boost data from
     """
 
-    blocksByChain = convert_from_eth(block)
+    blocks_by_chain = convert_from_eth(block)
     native = Counter()
-    nonNative = Counter()
+    non_native = Counter()
     for chain in BOOST_CHAINS:
-        chainBlock = blocksByChain[chain]
-        console.log("Taking chain snapshot on {} \n".format(chain))
+        chainBlock = blocks_by_chain[chain]
+        console.log(f"Taking chain snapshot on {chain} \n")
 
         snapshot = chain_snapshot(chain, chainBlock)
-        console.log("Taking token snapshot on {}".format(chain))
+        console.log(f"Taking token snapshot on {chain}")
 
         tokens = token_snapshot_usd(chain, chainBlock)
         native = native + Counter(tokens)
         for sett, balances in snapshot.items():
             if sett in DISABLED_VAULTS:
                 continue
-            balances, settType = convert_balances_to_usd(balances, sett)
-            if settType == "native":
+            balances, sett_type = convert_balances_to_usd(balances, sett)
+            if sett_type == "native":
                 native = native + Counter(balances)
-            elif settType == "nonNative":
-                nonNative = nonNative + Counter(balances)
+            elif sett_type == "nonNative":
+                non_native = non_native + Counter(balances)
 
     native = filter_dust(dict(native), 1)
-    nonNative = filter_dust(dict(nonNative), 1)
-    return native, nonNative
+    non_native = filter_dust(dict(non_native), 1)
+    return native, non_native

@@ -7,14 +7,14 @@ from tabulate import tabulate
 
 from rewards.boost.boost_utils import (
     calc_union_addresses,
-    calc_boost_data,
+    calc_boost_balances,
 )
 
 console = Console()
 
 
 def calc_stake_ratio(
-    address: str, nativeSetts: Dict[str, int], nonNativeSetts: Dict[str, int]
+    address: str, native_setts: Dict[str, int], non_native_setts: Dict[str, int]
 ):
     """
     Calculate the stake ratio for an address
@@ -22,82 +22,79 @@ def calc_stake_ratio(
     :param nativeSetts: native balances
     :param nonNativeSetts: non native balances
     """
-    nativeBalance = nativeSetts.get(address.lower(), 0)
-    nonNativeBalance = nonNativeSetts.get(address.lower(), 0)
-    if nonNativeBalance == 0 or nativeBalance == 0:
-        stakeRatio = 0
+    native_balance = native_setts.get(address.lower(), 0)
+    non_native_balance = non_native_setts.get(address.lower(), 0)
+    if non_native_balance == 0 or native_balance == 0:
+        stake_ratio = 0
     else:
-        stakeRatio = (nativeBalance) / nonNativeBalance
-    return stakeRatio
+        stake_ratio = (native_balance) / non_native_balance
+    return stake_ratio
 
 
-def badger_boost(currentBlock: int):
+def badger_boost(current_block: int):
     """
     Calculate badger boost multipliers based on stake ratios
     :param badger: badger system
     :param currentBlock: block to calculate boost at
     """
-    console.log("Calculating boost at block {} ...".format(currentBlock))
-    nativeSetts, nonNativeSetts = calc_boost_data(currentBlock - 10)
-    console.log(len(nativeSetts))
-    console.log(len(nonNativeSetts))
+    console.log(f"Calculating boost at block {current_block} ...")
+    native_setts, non_native_setts = calc_boost_balances(current_block - 10)
 
-    allAddresses = calc_union_addresses(nativeSetts, nonNativeSetts)
-    console.log("{} addresses fetched".format(len(allAddresses)))
-    badgerBoost = {}
-    boostInfo = {}
-    boostData = {}
+    all_addresses = calc_union_addresses(native_setts, non_native_setts)
+    console.log(f"{len(all_addresses)} addresses fetched")
+    badger_boost = {}
+    boost_info = {}
+    boost_data = {}
 
-    stakeRatiosList = [
-        calc_stake_ratio(addr, nativeSetts, nonNativeSetts) for addr in allAddresses
+    stake_ratios_list = [
+        calc_stake_ratio(addr, native_setts, non_native_setts) for addr in all_addresses
     ]
 
-    stakeRatios = dict(zip(allAddresses, stakeRatiosList))
+    stake_ratios = dict(zip(all_addresses, stake_ratios_list))
 
-    boostInfo = {}
-    for addr in allAddresses:
-        boostInfo[addr] = {"nativeBalance": 0, "nonNativeBalance": 0, "stakeRatio": 0}
+    for addr in all_addresses:
+        boost_info[addr] = {"nativeBalance": 0, "nonNativeBalance": 0, "stakeRatio": 0}
 
-    for user, nativeUsd in nativeSetts.items():
-        boostInfo[user.lower()]["nativeBalance"] = nativeUsd
+    for user, nativeUsd in native_setts.items():
+        boost_info[user.lower()]["nativeBalance"] = nativeUsd
 
-    for user, nonNativeUsd in nonNativeSetts.items():
-        boostInfo[user.lower()]["nonNativeBalance"] = nonNativeUsd
+    for user, nonNativeUsd in non_native_setts.items():
+        boost_info[user.lower()]["nonNativeBalance"] = nonNativeUsd
 
-    for addr, ratio in stakeRatios.items():
-        boostInfo[addr.lower()]["stakeRatio"] = ratio
+    for addr, ratio in stake_ratios.items():
+        boost_info[addr.lower()]["stakeRatio"] = ratio
 
-    stakeData = {}
+    stake_data = {}
     console.log(STAKE_RATIO_RANGES)
-    for addr, stakeRatio in stakeRatios.items():
-        if stakeRatio == 0:
-            badgerBoost[addr] = 1
+    for addr, stake_ratio in stake_ratios.items():
+        if stake_ratio == 0:
+            badger_boost[addr] = 1
         else:
             userBoost = 1
             userStakeRange = 0
             for stakeRange, multiplier in STAKE_RATIO_RANGES:
-                if stakeRatio > stakeRange:
+                if stake_ratio > stakeRange:
                     userBoost = multiplier
                     userStakeRange = stakeRange
 
-            stakeData[userStakeRange] = stakeData.get(userStakeRange, 0) + 1
-            badgerBoost[addr] = userBoost
+            stake_data[userStakeRange] = stake_data.get(userStakeRange, 0) + 1
+            badger_boost[addr] = userBoost
 
-    for addr, boost in badgerBoost.items():
-        boostMetaData = boostInfo.get(addr, {})
-        boostData[addr] = {
+    for addr, boost in badger_boost.items():
+        boost_metadata = boost_info.get(addr, {})
+        boost_data[addr] = {
             "boost": boost,
-            "nativeBalance": boostMetaData.get("nativeBalance", 0),
-            "nonNativeBalance": boostMetaData.get("nonNativeBalance", 0),
-            "stakeRatio": boostMetaData.get("stakeRatio", 0),
+            "nativeBalance": boost_metadata.get("nativeBalance", 0),
+            "nonNativeBalance": boost_metadata.get("nonNativeBalance", 0),
+            "stakeRatio": boost_metadata.get("stakeRatio", 0),
             "multipliers": {},
         }
 
     print(
         tabulate(
-            [[rng, amount] for rng, amount in stakeData.items()],
+            [[rng, amount] for rng, amount in stake_data.items()],
             headers=["range", "amount of users"],
         )
     )
 
-    return boostData
+    return boost_data

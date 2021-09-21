@@ -6,7 +6,7 @@ from rewards.aws.helpers import get_secret
 def send_error_to_discord(e, errorMsg):
     send_message_to_discord(
         "**BADGER BOOST ERROR**",
-        ":x: {}".format(errorMsg),
+        f":x: {errorMsg}",
         [
             {
                 "name": "Error Type",

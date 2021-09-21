@@ -66,7 +66,7 @@ def fetch_all_schedules(chain: str, setts: List[str]):
         if len(schedules) > 0:
             setts_with_schedules.append(sett)
         all_schedules[sett] = parse_schedules(schedules)
-    console.log("Fetched {} schedules".format(len(all_schedules)))
+    console.log(f"Fetched {len(all_schedules)} schedules")
     return all_schedules, setts_with_schedules
 
 
@@ -125,14 +125,14 @@ def propose_root(chain: str, start: int, end: int, pastRewards, save=False):
 
     if timeSinceLastUpdate < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-        #return
+        # return
     rewards_data = generate_rewards_in_range(
         chain, start, end, save=save, pastTree=pastRewards
     )
     console.log("Generated rewards")
 
     console.log(
-        "\n==== Proposing root with rootHash {} ====\n".format(rewards_data["rootHash"])
+        f"\n==== Proposing root with rootHash {rewards_data['rootHash']} ====\n"
     )
     tx_hash, success = treeManager.propose_root(rewards_data)
 
@@ -150,7 +150,7 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
         chain, start, end, save=False, pastTree=currentRewards
     )
     console.log(
-        "\n==== Approving root with rootHash {} ====\n".format(rewards_data["rootHash"])
+        f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
     )
 
     cycle_logger.set_start_block(start)
@@ -164,7 +164,7 @@ def approve_root(chain: str, start: int, end: int, currentRewards):
             rewards_data["merkleTree"],
             chain,
             staging=env_config.test,
-         )
+        )
 
         add_multipliers(rewards_data["multiplierData"], rewards_data["userMultipliers"])
         cycle_logger.save(treeManager.nextCycle, chain)
@@ -181,7 +181,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     """
     allSchedules, setts = fetch_all_schedules(chain, fetch_setts(chain))
 
-    console_and_discord("Generating rewards for {} setts".format(len(setts)), chain)
+    console_and_discord(f"Generating rewards for {len(setts)} setts", chain)
 
     treeManager = TreeManager(chain)
     rewards_list = []
@@ -212,7 +212,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
     rootHash = rewardsManager.web3.keccak(text=merkleTree["merkleRoot"])
     chainId = rewardsManager.web3.eth.chain_id
 
-    fileName = "rewards-{}-{}.json".format(chainId, encode_hex(rootHash))
+    fileName = f"rewards-{chainId}-{encode_hex(rootHash)}.json"
 
     verify_rewards(pastTree, merkleTree)
 

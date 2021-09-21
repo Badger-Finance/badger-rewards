@@ -14,11 +14,11 @@ urls = {
 def get_block_by_timestamp(chain: str, timestamp: int) -> int:
 
     time.sleep(5)
-    chain_url = "https://api.{}".format(urls[chain])
-    url = "api?module=block&action=getblocknobytime&timestamp={}&closest=before".format(
-        timestamp
+    chain_url = f"https://api.{urls[chain]}"
+    url = (
+        f"api?module=block&action=getblocknobytime&timestamp={timestamp}&closest=before"
     )
-    response = requests.get("{}/{}".format(chain_url, url)).json()
+    response = requests.get(f"{chain_url}/{url}").json()
     return int(response["result"])
 
 
@@ -36,4 +36,4 @@ def convert_from_eth(block) -> Dict[str, int]:
 
 
 def get_explorer_url(chain: str, txHash: str) -> str:
-    return "https://{}/tx/{}".format(urls[chain], txHash)
+    return f"https://{urls[chain]}/tx/{txHash}"
