@@ -1,13 +1,14 @@
 from helpers.constants import BOOST_CHAINS, DISABLED_VAULTS
 from helpers.discord import send_message_to_discord
-from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rewards.explorer import convert_from_eth
 from rich.console import Console
 from config.env_config import env_config
 from rewards.classes.UserBalance import UserBalances
 from typing import Dict, List, Tuple
 from collections import Counter
-from rewards.snapshot.chain_snapshot import chain_snapshot
+from rewards.snapshot.chain_snapshot import chain_snapshot_usd
+from rewards.snapshot.token_snapshot import token_snapshot_usd
+from rewards.snapshot.claims_snapshot import claims_snapshot_usd
 from badger_api.prices import (
     fetch_token_prices,
 )
@@ -78,19 +79,20 @@ def calc_boost_balances(block: int) -> Tuple[Dict[str, float], Dict[str, float]]
         chain_block = blocks_by_chain[chain]
         console.log(f"Taking chain snapshot on {chain} \n")
 
-        snapshot = chain_snapshot(chain, chain_block)
+        native_setts, non_native_setts = chain_snapshot_usd(chain, chain_block)
+
         console.log(f"Taking token snapshot on {chain}")
 
         tokens = token_snapshot_usd(chain, chain_block)
-        native = native + Counter(tokens)
-        for sett, balances in snapshot.items():
-            if sett in DISABLED_VAULTS:
-                continue
-            balances, sett_type = convert_balances_to_usd(balances, sett)
-            if sett_type == "native":
-                native = native + Counter(balances)
-            elif sett_type == "nonNative":
-                non_native = non_native + Counter(balances)
+
+        native_claimable, non_native_claimable = claims_snapshot_usd()
+
+        native = (
+            native + Counter(tokens) + Counter(native_setts) + Counter(native_claimable)
+        )
+        non_native = (
+            non_native + Counter(non_native_setts) + Counter(non_native_claimable)
+        )
 
     native = filter_dust(dict(native), 1)
     non_native = filter_dust(dict(non_native), 1)

@@ -31,5 +31,4 @@ def fetch_all_claimable_balances():
         for future in concurrent.futures.as_completed(futures):
             data = future.result()["rewards"]
             results = {**results, **data}
-    print(results)
     return results

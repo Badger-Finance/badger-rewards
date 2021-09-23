@@ -1,11 +1,14 @@
 from config.env_config import env_config
-from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
+from helpers.constants import REWARDS_BLACKLIST, SETT_INFO, DISABLED_VAULTS
 from helpers.web3_utils import make_contract
+from helpers.discord import send_message_to_discord
 from rewards.classes.UserBalance import UserBalances, UserBalance
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
 from functools import lru_cache
 from rich.console import Console
 from typing import Dict, Tuple
+from collections import Counter
+from badger_api import fetch_token_prices
 
 console = Console()
 
@@ -73,3 +76,48 @@ def get_sett_info(sett_address: str) -> Tuple[str, float]:
         {"type": "nonNative", "ratio": 1},
     )
     return info["type"], info["ratio"]
+
+
+def claim_snapshot_usd(chain: str, block: int):
+    snapshot = claims_snapshot(chain, block)
+    native = Counter()
+    non_native = Counter()
+    for sett, balances in snapshot.items():
+        if sett in DISABLED_VAULTS:
+            continue
+        balances, sett_type = convert_balances_to_usd(balances, sett)
+        if sett_type == "native":
+            native = native + Counter(balances)
+        elif sett_type == "nonNative":
+            non_native = non_native + Counter(balances)
+
+    return native, non_native
+
+
+def convert_balances_to_usd(
+    balances: UserBalances, sett: str
+) -> Tuple[Dict[str, float], str]:
+    """
+    Convert sett balance to usd and multiply by correct ratio
+    :param balances: balances to convert to usd
+    """
+
+    price = fetch_token_prices()
+    sett = env_config.get_web3().toChecksumAddress(sett)
+    if sett not in prices:
+        price = 0
+        send_message_to_discord(
+            "**BADGER BOOST ERROR**",
+            f"Cannot find pricing for f{sett}",
+            [],
+            "Boost Bot",
+        )
+    else:
+        price = prices[sett]
+
+    price_ratio = balances.sett_ratio
+    usd_balances = {}
+    for user in balances:
+        usd_balances[user.address] = price_ratio * price * user.balance
+
+    return usd_balances, balances.sett_type
