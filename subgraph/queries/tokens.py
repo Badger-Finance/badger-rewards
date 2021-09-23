@@ -30,7 +30,7 @@ def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str
     """
     )
 
-    continueFetching = True
+    continue_fetching = True
     last_id = "0x0000000000000000000000000000000000000000"
 
     badger_balances = {}
@@ -43,11 +43,13 @@ def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str
                 "blockNumber": {"number": block_number - 50},
             }
             next_page = client.execute(query, variable_values=variables)
-            if len(nextPage["tokenBalances"]) == 0:
+            if len(next_page["tokenBalances"]) == 0:
                 continue_fetching = False
             else:
                 last_id = next_page["tokenBalances"][-1]["id"]
-                console.log(f"Fetching {len(nextPage['tokenBalances'])} token balances")
+                console.log(
+                    f"Fetching {len(next_page['tokenBalances'])} token balances"
+                )
                 for entry in next_page["tokenBalances"]:
                     address = entry["id"].split("-")[0]
                     amount = float(entry["balance"])

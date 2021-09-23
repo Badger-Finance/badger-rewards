@@ -19,8 +19,12 @@ class EnvConfig:
 
         self.explorer_api_keys = {
             "eth": get_secret("keepers/etherscan", "ETHERSCAN_TOKEN", test=self.test),
-            "polygon": get_secret("keepers/polygonscan", "POLYGONSCAN_TOKEN", test=self.test),
-            "arbitrum": get_secret("keepers/arbiscan", "ARBISCAN_TOKEN", test=self.test),
+            "polygon": get_secret(
+                "keepers/polygonscan", "POLYGONSCAN_TOKEN", test=self.test
+            ),
+            "arbitrum": get_secret(
+                "keepers/arbiscan", "ARBISCAN_TOKEN", test=self.test
+            ),
         }
         polygon = self.make_provider("quiknode/poly-node-url", "POLYGON_NODE_URL")
         polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
