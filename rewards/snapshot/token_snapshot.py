@@ -19,6 +19,7 @@ def fuse_snapshot(chain: str, block: int):
 def token_snapshot_usd(chain: str, block: int):
 
     fuse_balances = fuse_snapshot(chain, block)
+    print(fuse_balances)
     badger_balances, digg_balances = token_snapshot(chain, block)
     # Account for tokens loaned in fuse
     if fuse_balances:

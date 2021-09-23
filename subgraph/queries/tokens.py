@@ -146,6 +146,7 @@ def fetch_fuse_pool_balances(client, chain, block):
             results = client.execute(query, variable_values=variables)
 
             for result in results["accountCTokens"]:
+                console.log(result)
 
                 last_token_id = result["id"]
                 symbol = result["symbol"]
@@ -161,15 +162,15 @@ def fetch_fuse_pool_balances(client, chain, block):
                 if sett not in balances:
                     balances[sett] = {}
 
-                    if account not in balances[sett]:
-                        balances[sett][account] = balance
-                    else:
-                        balances[sett][account] += balance
+                if account not in balances[sett]:
+                    balances[sett][account] = balance
+                else:
+                    balances[sett][account] += balance
 
             if len(results["accountCTokens"]) == 0:
                 break
             else:
-                console.log(f"Fetching {len(results)} fuse balances")
+                console.log(f"Fetching {len(results['accountCTokens'])} fuse balances")
 
         console.log(f"Fetched {len(balances)} total fuse balances")
         return balances
