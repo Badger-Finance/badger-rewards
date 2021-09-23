@@ -77,16 +77,18 @@ def calc_boost_balances(block: int) -> Tuple[Dict[str, float], Dict[str, float]]
     non_native = Counter()
     for chain in BOOST_CHAINS:
         chain_block = blocks_by_chain[chain]
-        console.log(f"Taking chain snapshot on {chain} \n")
 
+        native_claimable, non_native_claimable = claims_snapshot_usd()
+
+
+        console.log(f"Taking chain snapshot on {chain} \n")
         native_setts, non_native_setts = chain_snapshot_usd(chain, chain_block)
 
         console.log(f"Taking token snapshot on {chain}")
 
         tokens = token_snapshot_usd(chain, chain_block)
 
-        native_claimable, non_native_claimable = claims_snapshot_usd()
-
+        
         native = (
             native + Counter(tokens) + Counter(native_setts) + Counter(native_claimable)
         )

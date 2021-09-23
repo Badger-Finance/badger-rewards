@@ -1,7 +1,7 @@
 import requests
 from badger_api.config import urls
 from typing import Tuple, Dict
-from functools import cache
+from functools import lru_cache
 
 
 def fetch_ppfs() -> Tuple[float, float]:
@@ -14,7 +14,7 @@ def fetch_ppfs() -> Tuple[float, float]:
     return badger["ppfs"], digg["ppfs"]
 
 
-@cache
+@lru_cache(maxsize=None)
 def fetch_token_prices() -> Dict[str, float]:
     """
     Fetch token prices for sett tokens

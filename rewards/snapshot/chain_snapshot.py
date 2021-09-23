@@ -8,7 +8,7 @@ from functools import lru_cache
 from rich.console import Console
 from typing import Dict, Tuple
 from collections import Counter
-from badger_api import fetch_token_prices
+from badger_api.prices import fetch_token_prices
 
 console = Console()
 
@@ -78,8 +78,8 @@ def get_sett_info(sett_address: str) -> Tuple[str, float]:
     return info["type"], info["ratio"]
 
 
-def claim_snapshot_usd(chain: str, block: int):
-    snapshot = claims_snapshot(chain, block)
+def chain_snapshot_usd(chain: str, block: int):
+    snapshot = chain_snapshot(chain, block)
     native = Counter()
     non_native = Counter()
     for sett, balances in snapshot.items():
@@ -102,7 +102,7 @@ def convert_balances_to_usd(
     :param balances: balances to convert to usd
     """
 
-    price = fetch_token_prices()
+    prices = fetch_token_prices()
     sett = env_config.get_web3().toChecksumAddress(sett)
     if sett not in prices:
         price = 0
