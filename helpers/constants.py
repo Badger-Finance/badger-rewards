@@ -185,4 +185,4 @@ MONITORING_SECRET_NAMES = {
     "arbitrum": "cycle-bot/arbitrum/prod-discord-url",
 }
 
-BOOST_CHAINS = ["eth", "polygon"]
+BOOST_CHAINS = ["eth", "polygon", "arbitrum"]
