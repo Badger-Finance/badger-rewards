@@ -8,45 +8,42 @@ console = Console()
 
 
 def get_last_proposed_cycle(chain: str):
-    treeManager = TreeManager(chain)
-    if not treeManager.has_pending_root():
+    tree_manager = TreeManager(chain)
+    if not tree_manager.has_pending_root():
         console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
         return ({}, 0, 0)
 
     console.log("Pending root found.. approving")
 
     # Fetch the appropriate file
-    currentRewards = treeManager.fetch_current_tree()
+    current_rewards = tree_manager.fetch_current_tree()
 
-    lastClaimEnd = treeManager.last_propose_end_block()
-    lastClaimStart = treeManager.last_propose_start_block()
+    last_claim_end = tree_manager.last_propose_end_block()
+    last_claim_start = tree_manager.last_propose_start_block()
 
     # Sanity check: Ensure previous cycle was not too long
-    print(lastClaimStart)
-    print(lastClaimEnd)
     # assert lastClaimStart > lastClaimEnd - rewards_config.maxStartBlockAge
 
     # Sanity check: Ensure previous end block is not too far in the past
     # assert lastClaimEnd > chain.height - rewards_config.maxStartBlockAge
 
     # Sanity check: Ensure start block is not too close to end block
-    return (currentRewards, lastClaimStart, lastClaimEnd)
+    return (current_rewards, last_claim_start, last_claim_end)
 
 
 def calc_next_cycle_range(chain: str):
-    treeManager = TreeManager(chain)
+    tree_manager = TreeManager(chain)
     # Fetch the appropriate file
-    currentRewards = treeManager.fetch_current_tree()
+    current_rewards = tree_manager.fetch_current_tree()
 
-    lastClaimEnd = treeManager.last_publish_end_block()
-    startBlock = lastClaimEnd + 1
+    last_claim_end = tree_manager.last_publish_end_block()
+    start_block = last_claim_end + 1
 
     # Claim at last synced block
-    endBlock = last_synced_block(chain)
-    print(endBlock)
+    end_block = last_synced_block(chain)
 
     # Sanity check: Ensure start block is not too far in the past
-    assert startBlock < endBlock
+    assert start_block < end_block
 
     # Sanity check: Ensure start block is not too close to end block
-    return (currentRewards, startBlock, endBlock)
+    return (current_rewards, start_block, end_block)

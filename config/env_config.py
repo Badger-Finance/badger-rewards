@@ -16,6 +16,16 @@ class EnvConfig:
         self.discord_webhook_url = get_secret(
             "boost-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=self.test
         )
+
+        self.explorer_api_keys = {
+            "eth": get_secret("keepers/etherscan", "ETHERSCAN_TOKEN", test=self.test),
+            "polygon": get_secret(
+                "keepers/polygonscan", "POLYGONSCAN_TOKEN", test=self.test
+            ),
+            "arbitrum": get_secret(
+                "keepers/arbiscan", "ARBISCAN_TOKEN", test=self.test
+            ),
+        }
         polygon = self.make_provider("quiknode/poly-node-url", "POLYGON_NODE_URL")
         polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
 
@@ -29,6 +39,9 @@ class EnvConfig:
 
     def get_web3(self, chain: str = "eth") -> Web3:
         return self.web3[chain]
+
+    def get_explorer_api_key(self, chain: str) -> str:
+        return self.explorer_api_keys[chain]
 
     def make_provider(self, secret_name: str, secret_key: str) -> Web3:
         return Web3(

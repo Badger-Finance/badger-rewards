@@ -13,8 +13,8 @@ console = Console()
 
 
 @lru_cache(maxsize=None)
-def fetch_token_balances(client, blockNumber) -> Tuple[Dict[str, int], Dict[str, int]]:
-    sharesPerFragment = digg_utils.sharesPerFragment
+def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str, int]]:
+    shares_per_fragment = digg_utils.shares_per_fragment
     increment = 1000
     query = gql(
         """
@@ -30,27 +30,27 @@ def fetch_token_balances(client, blockNumber) -> Tuple[Dict[str, int], Dict[str,
     """
     )
 
-    continueFetching = True
-    lastID = "0x0000000000000000000000000000000000000000"
+    continue_fetching = True
+    last_id = "0x0000000000000000000000000000000000000000"
 
     badger_balances = {}
     digg_balances = {}
     try:
-        while continueFetching:
+        while continue_fetching:
             variables = {
                 "firstAmount": increment,
-                "lastID": lastID,
-                "blockNumber": {"number": blockNumber - 50},
+                "lastID": last_id,
+                "blockNumber": {"number": block_number - 50},
             }
-            nextPage = client.execute(query, variable_values=variables)
-            if len(nextPage["tokenBalances"]) == 0:
-                continueFetching = False
+            next_page = client.execute(query, variable_values=variables)
+            if len(next_page["tokenBalances"]) == 0:
+                continue_fetching = False
             else:
-                lastID = nextPage["tokenBalances"][-1]["id"]
+                last_id = next_page["tokenBalances"][-1]["id"]
                 console.log(
-                    "Fetching {} token balances".format(len(nextPage["tokenBalances"]))
+                    f"Fetching {len(next_page['tokenBalances'])} token balances"
                 )
-                for entry in nextPage["tokenBalances"]:
+                for entry in next_page["tokenBalances"]:
                     address = entry["id"].split("-")[0]
                     amount = float(entry["balance"])
                     if amount > 0:
@@ -59,10 +59,10 @@ def fetch_token_balances(client, blockNumber) -> Tuple[Dict[str, int], Dict[str,
                         if entry["token"]["symbol"] == "DIGG":
                             # Speed this up
                             if entry["balance"] == 0:
-                                fragmentBalance = 0
+                                fragment_balance = 0
                             else:
-                                fragmentBalance = sharesPerFragment / amount
-                            digg_balances[address] = float(fragmentBalance) / 1e9
+                                fragment_balance = shares_per_fragment / amount
+                            digg_balances[address] = float(fragment_balance) / 1e9
     except Exception as e:
         send_error_to_discord(e, "Error in Fetching Token Balance")
         raise e
@@ -101,12 +101,12 @@ def fetch_fuse_pool_balances(client, chain, block):
     for symbol, data in ctoken_data.items():
         ftoken = make_contract(
             env_config.get_web3().toChecksumAddress(data["contract"]),
-            abiName="CErc20Delegator",
+            abi_name="CErc20Delegator",
             chain=chain,
         )
         underlying = make_contract(
             env_config.get_web3().toChecksumAddress(data["underlying_contract"]),
-            abiName="ERC20",
+            abi_name="ERC20",
             chain=chain,
         )
 
@@ -147,7 +147,6 @@ def fetch_fuse_pool_balances(client, chain, block):
 
             for result in results["accountCTokens"]:
 
-                print(result)
                 last_token_id = result["id"]
                 symbol = result["symbol"]
                 ctoken_balance = float(result["cTokenBalance"])
@@ -170,9 +169,9 @@ def fetch_fuse_pool_balances(client, chain, block):
             if len(results["accountCTokens"]) == 0:
                 break
             else:
-                console.log("Fetching {} fuse balances".format(len(results)))
+                console.log(f"Fetching {len(results)} fuse balances")
 
-        console.log("Fetched {} total fuse balances".format(len(balances)))
+        console.log(f"Fetched {len(balances)} total fuse balances")
         return balances
 
     except Exception as e:

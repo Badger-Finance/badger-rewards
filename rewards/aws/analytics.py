@@ -3,7 +3,7 @@ from rewards.aws.helpers import s3
 import json
 
 console = Console()
-analyticsBucket = "badger-analytics"
+analytics_bucket = "badger-analytics"
 
 
 def upload_analytics(chain: str, cycle: int, data):
@@ -12,15 +12,15 @@ def upload_analytics(chain: str, cycle: int, data):
     :param cycle: which cycle to upload
     :param data: cycle information
     """
-    jsonKey = f"logs/{chain}/{cycle}.json"
-    console.log("Uploading file to s3://" + analyticsBucket + "/" + jsonKey)
+    json_key = f"logs/{chain}/{cycle}.json"
+    console.log("Uploading file to s3://" + analytics_bucket + "/" + json_key)
     s3.put_object(
         Body=str(json.dumps(data)),
-        Bucket=analyticsBucket,
-        Key=jsonKey,
+        Bucket=analytics_bucket,
+        Key=json_key,
         ACL="bucket-owner-full-control",
     )
-    console.log("✅ Uploaded file to s3://" + analyticsBucket + "/" + jsonKey)
+    console.log("✅ Uploaded file to s3://" + analytics_bucket + "/" + json_key)
 
 
 def upload_schedules(chain: str, data):
@@ -28,12 +28,12 @@ def upload_schedules(chain: str, data):
     Upload schedules to analytics bucket
     :param data: schedules to upload
     """
-    jsonKey = f"schedules-{chain}.json"
-    console.log("Uploading file to s3://" + analyticsBucket + "/" + jsonKey)
+    json_key = f"schedules-{chain}.json"
+    console.log("Uploading file to s3://" + analytics_bucket + "/" + json_key)
     s3.put_object(
         Body=str(json.dumps(data)),
-        Bucket=analyticsBucket,
-        Key=jsonKey,
+        Bucket=analytics_bucket,
+        Key=json_key,
         ACL="bucket-owner-full-control",
     )
-    console.log("✅ Uploaded file to s3://" + analyticsBucket + "/" + jsonKey)
+    console.log("✅ Uploaded file to s3://" + analytics_bucket + "/" + json_key)

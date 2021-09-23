@@ -5,14 +5,14 @@ from rich.console import Console
 import json
 
 console = Console()
-boostsFileName = "badger-boosts.json"
+boost_file_name = "badger-boosts.json"
 
 
-def upload_boosts(boostData):
+def upload_boosts(boost_data):
     """Upload boosts file to aws bucket
 
     :param test:
-    :param boostData: calculated boost information
+    :param boost_data: calculated boost information
     """
 
     buckets = ["badger-staging-merkle-proofs"]
@@ -20,21 +20,21 @@ def upload_boosts(boostData):
         buckets.append("badger-merkle-proofs")
 
     for b in buckets:
-        console.log("Uploading file to s3://{}/{}".format(b, boostsFileName))
+        console.log(f"Uploading file to s3://{b}/{boost_file_name}")
         s3.put_object(
-            Body=str(json.dumps(boostData)),
+            Body=str(json.dumps(boost_data)),
             Bucket=b,
-            Key=boostsFileName,
+            Key=boost_file_name,
             ACL="bucket-owner-full-control",
         )
-        console.log("✅ Uploaded file to s3://{}/{}".format(b, boostsFileName))
+        console.log(f"✅ Uploaded file to s3://{b}/{boost_file_name}")
         send_message_to_discord(
             "**BADGER BOOST UPDATED**",
-            f"✅ Uploaded file to s3://{b}/{boostsFileName}",
+            f"✅ Uploaded file to s3://{b}/{boost_file_name}",
             [
                 {
                     "name": "User Count",
-                    "value": len(boostData["userData"]),
+                    "value": len(boost_data["userData"]),
                     "inline": True,
                 }
             ],
@@ -49,23 +49,23 @@ def download_boosts():
     """
     console.log("Downloading boosts ...")
     bucket = get_bucket(env_config.test)
-    s3ClientObj = s3.get_object(Bucket=bucket, Key=boostsFileName)
+    s3ClientObj = s3.get_object(Bucket=bucket, Key=boost_file_name)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
-    console.log("Fetched {} boosts".format(len(data["userData"])))
+    console.log(f"Fetched {len(data['userData'])} boosts")
     return data
 
 
-def add_user_data(userData):
+def add_user_data(user_data):
     """Upload users boost information
 
     :param test:
-    :param userData: user boost data
+    :param user_data: user boost data
     """
-    oldBoosts = download_boosts()
-    boosts = {"userData": {}, "multiplierData": oldBoosts["multiplierData"]}
-    for user, data in userData.items():
-        if user in oldBoosts["userData"]:
-            multipliers = oldBoosts["userData"][user]["multipliers"]
+    old_boosts = download_boosts()
+    boosts = {"userData": {}, "multiplierData": old_boosts["multiplierData"]}
+    for user, data in user_data.items():
+        if user in old_boosts["userData"]:
+            multipliers = old_boosts["userData"][user]["multipliers"]
         else:
             multipliers = {}
 
@@ -83,19 +83,17 @@ def add_user_data(userData):
     upload_boosts(boosts)
 
 
-def add_multipliers(multiplierData, userMultipliers):
+def add_multipliers(multiplier_data, user_multipliers):
     """Upload sett and user multipliers
 
     :param test:
-    :param multiplierData: sett multipliers
-    :param userMultipliers: user multipliers
+    :param multiplier_data: sett multipliers
+    :param user_multipliers: user multipliers
     """
     boosts = download_boosts()
-    console.log(multiplierData)
-    console.log(userMultipliers)
-    boosts["multiplierData"] = {**boosts["multiplierData"], **multiplierData}
+    boosts["multiplierData"] = {**boosts["multiplierData"], **multiplier_data}
     for user in list(boosts["userData"].keys()):
-        if user in userMultipliers:
-            boosts["userData"][user]["multipliers"] = userMultipliers[user]
+        if user in user_multipliers:
+            boosts["userData"][user]["multipliers"] = user_multipliers[user]
 
     upload_boosts(boosts)

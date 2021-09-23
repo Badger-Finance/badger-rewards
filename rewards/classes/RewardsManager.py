@@ -1,4 +1,5 @@
 from itertools import cycle
+from rewards.classes.UserBalance import UserBalance
 from helpers.constants import XSUSHI
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
@@ -9,6 +10,7 @@ from subgraph.queries.harvests import (
     fetch_tree_distributions,
 )
 from rewards.classes.RewardsList import RewardsList
+from rewards.classes.UserBalance import UserBalances
 from rewards.classes.Schedule import Schedule
 from rewards.classes.CycleLogger import cycle_logger
 from helpers.time_utils import to_utc_date, to_hours
@@ -29,7 +31,7 @@ class RewardsManager:
         self.cycle = cycle
         self.start = int(start)
         self.end = int(end)
-        self.apyBoosts = {}
+        self.apy_boosts = {}
 
     def fetch_sett_snapshot(self, block: int, sett: str):
         return sett_snapshot(self.chain, block, sett)
@@ -43,136 +45,136 @@ class RewardsManager:
         sett = controller.vaults(want).call()
         return sett
 
-    def calculate_sett_rewards(self, sett, schedulesByToken, boosts) -> RewardsList:
-        startTime = self.web3.eth.getBlock(self.start)["timestamp"]
-        endTime = self.web3.eth.getBlock(self.end)["timestamp"]
+    def calculate_sett_rewards(self, sett, schedules_by_token, boosts) -> RewardsList:
+        start_time = self.web3.eth.getBlock(self.start)["timestamp"]
+        end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         rewards = RewardsList(self.cycle)
-        settBalances = self.fetch_sett_snapshot(self.end, sett)
-        boostedSettBalances = self.boost_sett(boosts, sett, settBalances)
-        for token, schedules in schedulesByToken.items():
-            endDist = self.get_distributed_for_token_at(token, endTime, schedules, sett)
-            startDist = self.get_distributed_for_token_at(
-                token, startTime, schedules, sett
+        sett_balances = self.fetch_sett_snapshot(self.end, sett)
+        boosted_sett_balances = self.boost_sett(boosts, sett, sett_balances)
+        for token, schedules in schedules_by_token.items():
+            end_dist = self.get_distributed_for_token_at(
+                token, end_time, schedules, sett
+            )
+            start_dist = self.get_distributed_for_token_at(
+                token, start_time, schedules, sett
             )
             for schedule in schedules:
-                if schedule.startTime <= endTime and schedule.endTime >= endTime:
+                if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     cycle_logger.add_schedule(sett, schedule)
-            tokenDistribution = int(endDist) - int(startDist)
+            token_distribution = int(end_dist) - int(start_dist)
             if token == DIGG:
                 cycle_logger.add_sett_token_data(
-                    sett, token, digg_utils.sharesToFragments(tokenDistribution)
+                    sett, token, digg_utils.shares_to_fragments(token_distribution)
                 )
             else:
-                cycle_logger.add_sett_token_data(sett, token, tokenDistribution)
+                cycle_logger.add_sett_token_data(sett, token, token_distribution)
 
-            if tokenDistribution > 0:
-                total = boostedSettBalances.total_balance()
-                rewardsUnit = tokenDistribution / total
-                for user in boostedSettBalances:
+            if token_distribution > 0:
+                total = boosted_sett_balances.total_balance()
+                rewards_unit = token_distribution / total
+                for user in boosted_sett_balances:
                     addr = self.web3.toChecksumAddress(user.address)
                     token = self.web3.toChecksumAddress(token)
-                    rewardAmount = user.balance * rewardsUnit
-                    assert rewardAmount > 0
+                    reward_amount = user.balance * rewards_unit
+                    assert reward_amount >= 0
                     rewards.increase_user_rewards(
                         self.web3.toChecksumAddress(addr),
                         self.web3.toChecksumAddress(token),
-                        int(rewardAmount),
+                        int(reward_amount),
                     )
         return rewards
 
     def calculate_all_sett_rewards(
-        self, setts: List[str], allSchedules, boosts
+        self, setts: List[str], all_schedules, boosts
     ) -> RewardsList:
         all_rewards = []
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
 
-            console.log("Calculating rewards for {}".format(token.name().call()))
+            console.log(f"Calculating rewards for {token.name().call()}")
             all_rewards.append(
-                self.calculate_sett_rewards(sett, allSchedules[sett], boosts)
+                self.calculate_sett_rewards(sett, all_schedules[sett], boosts)
             )
 
         return combine_rewards(all_rewards, self.cycle + 1)
 
     def get_sett_multipliers(self):
-        settMultipliers = {}
-        for sett, userApyBoosts in self.apyBoosts.items():
-            settMultipliers[sett] = {
-                "min": min(userApyBoosts.values()),
-                "max": max(userApyBoosts.values()),
+        sett_multipliers = {}
+        for sett, user_apy_boosts in self.apy_boosts.items():
+            sett_multipliers[sett] = {
+                "min": min(user_apy_boosts.values()),
+                "max": max(user_apy_boosts.values()),
             }
-        return settMultipliers
+        return sett_multipliers
 
     def get_user_multipliers(self):
-        userMultipliers = {}
-        for sett, userApyMultipliers in self.apyBoosts.items():
-            for user, apyMultiplier in userApyMultipliers.items():
+        user_multipliers = {}
+        for sett, user_apy_multipliers in self.apy_boosts.items():
+            for user, apy_multipliers in user_apy_multipliers.items():
                 user = self.web3.toChecksumAddress(user)
-                if user not in userMultipliers:
-                    userMultipliers[user] = {}
-                userMultipliers[user][sett] = apyMultiplier
-        return userMultipliers
+                if user not in user_multipliers:
+                    user_multipliers[user] = {}
+                user_multipliers[user][sett] = apy_multipliers
+        return user_multipliers
 
     def get_distributed_for_token_at(
-        self, token: str, endTime: int, schedules: List[Schedule], sett: str
+        self, token: str, end_time: int, schedules: List[Schedule], sett: str
     ) -> float:
-        totalToDistribute = 0
+        total_to_distribute = 0
         for index, schedule in enumerate(schedules):
-            if endTime < schedule.startTime:
-                toDistribute = 0
-                console.log("\nSchedule {} for {} completed\n".format(index, token))
+            if end_time < schedule.startTime:
+                to_distribute = 0
+                console.log(f"\nSchedule {index} for {token} completed\n")
             else:
-                rangeDuration = endTime - schedule.startTime
-                toDistribute = min(
+                range_duration = end_time - schedule.startTime
+                to_distribute = min(
                     schedule.initialTokensLocked,
                     int(
                         schedule.initialTokensLocked
-                        * rangeDuration
+                        * range_duration
                         // schedule.duration
                     ),
                 )
-                if schedule.startTime <= endTime and schedule.endTime >= endTime:
+                if schedule.startTime <= end_time and schedule.endTime >= end_time:
+                    percentage_out_of_total = (
+                        int(to_distribute) / int(schedule.initialTokensLocked) * 100
+                    )
                     console.log(
-                        "Token {} distributed by schedule {} at {} are {}% of total\n".format(
-                            token,
-                            index,
-                            to_utc_date(schedule.startTime),
-                            (
-                                int(toDistribute)
-                                / int(schedule.initialTokensLocked)
-                                * 100
-                            ),
+                        (
+                            f"Token {token} distributed by schedule {index}"
+                            f"at {to_utc_date(schedule.startTime)}"
+                            f"are {percentage_out_of_total}% of total\n"
                         )
                     )
 
                     console.log(
-                        "Total duration of schedule elapsed is {} hours out of {} hours, or {}% of total duration.\n".format(
-                            to_hours(rangeDuration),
-                            to_hours(schedule.duration),
-                            rangeDuration / schedule.duration * 100,
-                        )
+                        f"Total duration of schedule elapsed is {to_hours(range_duration)}"
+                        f" hours out of {to_hours(schedule.duration)} hours"
+                        f" or {range_duration/schedule.duration * 100}% of total duration.",
                     )
-            totalToDistribute += toDistribute
+            total_to_distribute += to_distribute
 
-        return totalToDistribute
+        return total_to_distribute
 
-    def boost_sett(self, boosts, sett, snapshot):
-        if snapshot.settType == "nonNative":
-            preBoost = {}
+    def boost_sett(self, boosts, sett, snapshot: UserBalances):
+        if snapshot.sett_type == "nonNative":
+            pre_boost = {}
             for user in snapshot:
-                preBoost[user.address] = snapshot.percentage_of_total(user.address)
+                pre_boost[user.address] = snapshot.percentage_of_total(user.address)
 
             for user in snapshot:
-                boostInfo = boosts.get(user.address, {})
-                boost = boostInfo.get("boost", 1)
+                boost_info = boosts.get(user.address, {})
+                boost = boost_info.get("boost", 1)
                 user.boost_balance(boost)
 
             for user in snapshot:
-                postBoost = snapshot.percentage_of_total(user.address)
-                if sett not in self.apyBoosts:
-                    self.apyBoosts[sett] = {}
+                post_boost = snapshot.percentage_of_total(user.address)
+                if sett not in self.apy_boosts:
+                    self.apy_boosts[sett] = {}
 
-                self.apyBoosts[sett][user.address] = postBoost / preBoost[user.address]
+                self.apy_boosts[sett][user.address] = (
+                    post_boost / pre_boost[user.address]
+                )
         return snapshot
 
     def calculate_tree_distributions(self) -> RewardsList:
@@ -182,9 +184,7 @@ class RewardsManager:
             self.chain,
         )
         console.log(
-            "Fetched {} tree distributions between {} and {}".format(
-                len(tree_distributions), self.start, self.end
-            )
+            f"Fetched {len(tree_distributions)} tree distributions between {self.start} and {self.end}"
         )
         rewards = RewardsList(self.cycle + 1)
         for dist in tree_distributions:

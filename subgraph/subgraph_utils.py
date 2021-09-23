@@ -6,9 +6,9 @@ from config.env_config import env_config
 
 def subgraph_url(name):
     if name in subgraph_ids:
-        return "https://gateway.thegraph.com/api/{}/subgraphs/id/{}".format(
-            env_config.graph_api_key, subgraph_ids[name]
-        )
+        api_key = env_config.graph_api_key
+        id = subgraph_ids[name]
+        return f"https://gateway.thegraph.com/api/{api_key}/subgraphs/id/{id}"
     elif name in subgraph_urls:
         return subgraph_urls[name]
     else:
