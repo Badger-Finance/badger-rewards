@@ -29,9 +29,8 @@ class TreeManager:
     def __init__(self, chain: str):
         self.chain = chain
         self.w3 = env_config.get_web3(chain)
-        self.badgerTree = get_badger_tree(chain)
-        self.nextCycle = self.get_current_cycle() + 1
-        self.rewardsList = RewardsList(self.nextCycle)
+        self.badger_tree = get_badger_tree(chain)
+        self.next_cycle = self.get_current_cycle() + 1
         cycle_key = get_secret(
             "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
             "private",
@@ -59,11 +58,11 @@ class TreeManager:
 
     def approve_root(self, rewards) -> Tuple[str, bool]:
         console.log("Approving root")
-        return self.manage_root(rewards, self.badgerTree.approveRoot, action="Approve")
+        return self.manage_root(rewards, self.badger_tree.approveRoot, action="Approve")
 
     def propose_root(self, rewards):
         console.log("Proposing root")
-        return self.manage_root(rewards, self.badgerTree.proposeRoot, action="Propose")
+        return self.manage_root(rewards, self.badger_tree.proposeRoot, action="Propose")
 
     def manage_root(self, rewards, contract_function: ContractFunction, action):
         root_hash = rewards["rootHash"]
@@ -138,13 +137,13 @@ class TreeManager:
         return tx_hash, True
 
     def get_current_cycle(self) -> str:
-        return self.badgerTree.currentCycle().call()
+        return self.badger_tree.currentCycle().call()
 
     def get_claimable_for(self, user: str, tokens: List[str], cumAmounts: List[int]):
-        return self.badgerTree.getClaimableFor(user, tokens, cumAmounts).call()
+        return self.badger_tree.getClaimableFor(user, tokens, cumAmounts).call()
 
     def has_pending_root(self) -> bool:
-        return self.badgerTree.hasPendingRoot().call()
+        return self.badger_tree.hasPendingRoot().call()
 
     def fetch_tree(self, merkle):
         chain_id = self.w3.eth.chain_id
@@ -173,33 +172,33 @@ class TreeManager:
         # assert abs(lastUpdate - lastUpdatePublish) < 6500
 
     def fetch_current_merkle_data(self):
-        root = self.badgerTree.merkleRoot().call()
-        content_hash = self.badgerTree.merkleContentHash().call()
+        root = self.badger_tree.merkleRoot().call()
+        content_hash = self.badger_tree.merkleContentHash().call()
         return {
             "root": encode_hex(root),
             "contentHash": encode_hex(content_hash),
-            "lastUpdateTime": self.badgerTree.lastPublishTimestamp().call(),
-            "blockNumber": int(self.badgerTree.lastPublishBlockNumber().call()),
+            "lastUpdateTime": self.badger_tree.lastPublishTimestamp().call(),
+            "blockNumber": int(self.badger_tree.lastPublishBlockNumber().call()),
         }
 
     def fetch_pending_merkle_data(self):
-        root = self.badgerTree.pendingMerkleRoot().call()
-        pending_content_hash = self.badgerTree.pendingMerkleContentHash().call()
+        root = self.badger_tree.pendingMerkleRoot().call()
+        pending_content_hash = self.badger_tree.pendingMerkleContentHash().call()
         return {
             "root": encode_hex(root),
             "contentHash": encode_hex(pending_content_hash),
-            "lastUpdateTime": self.badgerTree.lastProposeTimestamp().call(),
-            "blockNumber": int(self.badgerTree.lastProposeBlockNumber().call()),
+            "lastUpdateTime": self.badger_tree.lastProposeTimestamp().call(),
+            "blockNumber": int(self.badger_tree.lastProposeBlockNumber().call()),
         }
 
     def last_propose_end_block(self) -> int:
-        return self.badgerTree.lastProposeEndBlock().call()
+        return self.badger_tree.lastProposeEndBlock().call()
 
     def last_publish_end_block(self) -> int:
-        return self.badgerTree.lastPublishEndBlock().call()
+        return self.badger_tree.lastPublishEndBlock().call()
 
     def last_propose_start_block(self) -> int:
-        return self.badgerTree.lastProposeStartBlock().call()
+        return self.badger_tree.lastProposeStartBlock().call()
 
     def get_tx_options(self, account: Account) -> dict:
         options = {
