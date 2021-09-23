@@ -16,7 +16,6 @@ from helpers.constants import (
 )
 from helpers.discord import send_message_to_discord
 from subgraph.queries.setts import list_setts
-from typing import List
 from rich.console import Console
 from config.env_config import env_config
 from config.rewards_config import rewards_config
@@ -45,9 +44,9 @@ def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
     for s in schedules:
         schedule = Schedule(s[0], s[1], s[2], s[3], s[4], s[5])
         if schedule.token not in schedules_by_token:
-            schedule_by_token[schedule.token] = []
-        schedule_by_token[schedule.token].append(schedule)
-    return schedule_by_token
+            schedules_by_token[schedule.token] = []
+        schedules_by_token[schedule.token].append(schedule)
+    return schedules_by_token
 
 
 def fetch_all_schedules(chain: str, setts: List[str]):
@@ -77,7 +76,7 @@ def fetch_setts(chain: str) -> List[str]:
     """
     setts = list_setts(chain)
     filtered_setts = list(filter(lambda x: x not in DISABLED_VAULTS, setts))
-    return [env_config.get_web3().toChecksumAddress(s) for s in filteredSetts]
+    return [env_config.get_web3().toChecksumAddress(s) for s in filtered_setts]
 
 
 def process_cumulative_rewards(current, new: RewardsList):
@@ -96,7 +95,7 @@ def process_cumulative_rewards(current, new: RewardsList):
             result.increase_user_rewards(user, token, claim)
 
     # Add existing rewards
-    for user, userData in current["claims"].items():
+    for user, user_data in current["claims"].items():
         for i in range(len(user_data["tokens"])):
             token = user_data["tokens"][i]
             amount = user_data["cumulativeAmounts"][i]
@@ -117,7 +116,7 @@ def propose_root(chain: str, start: int, end: int, past_rewards, save=False):
     :type save: bool, optional
     """
     tree_manager = TreeManager(chain)
-    current_merkle_data = treeManager.fetch_current_merkle_data()
+    current_merkle_data = tree_manager.fetch_current_merkle_data()
     w3 = env_config.get_web3(chain)
 
     current_time = w3.eth.getBlock(w3.eth.block_number)["timestamp"]
@@ -127,7 +126,7 @@ def propose_root(chain: str, start: int, end: int, past_rewards, save=False):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
         # return
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=save, past_rewards=past_tree
+        chain, start, end, save=save, past_tree=past_rewards
     )
     console.log("Generated rewards")
 
@@ -155,7 +154,7 @@ def approve_root(chain: str, start: int, end: int, current_rewards):
 
     cycle_logger.set_start_block(start)
     cycle_logger.set_end_block(end)
-    tx_hash, success = treeManager.approve_root(rewards_data)
+    tx_hash, success = tree_manager.approve_root(rewards_data)
     cycle_logger.set_content_hash(rewards_data["rootHash"])
     cycle_logger.set_merkle_root(rewards_data["merkleTree"]["merkleRoot"])
     if success:
@@ -167,7 +166,7 @@ def approve_root(chain: str, start: int, end: int, current_rewards):
         )
 
         add_multipliers(rewards_data["multiplierData"], rewards_data["userMultipliers"])
-        cycle_logger.save(tree_manager.nextCycle, chain)
+        cycle_logger.save(tree_manager.next_cycle, chain)
         return rewards_data
 
 
@@ -185,7 +184,7 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
 
     tree_manager = TreeManager(chain)
     rewards_list = []
-    rewards_manager = RewardsManager(chain, tree_manager.nextCycle, start, end)
+    rewards_manager = RewardsManager(chain, tree_manager.next_cycle, start, end)
 
     console.log("Calculating Tree Rewards...")
     tree_rewards = rewards_manager.calculate_tree_distributions()
@@ -209,15 +208,15 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
 
     console.log("Converting to merkle tree... \n")
     merkle_tree = tree_manager.convert_to_merkle_tree(cumulative_rewards, start, end)
-    root_hash = rewardsManager.web3.keccak(text=merkleTree["merkleRoot"])
-    chain_id = rewardsManager.web3.eth.chain_id
+    root_hash = rewards_manager.web3.keccak(text=merkle_tree["merkleRoot"])
+    chain_id = rewards_manager.web3.eth.chain_id
 
-    file_name = f"rewards-{chainId}-{encode_hex(rootHash)}.json"
+    file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
 
     verify_rewards(past_tree, merkle_tree)
 
     if save:
-        with open(fileName, "w") as fp:
+        with open(file_name, "w") as fp:
             json.dump(merkle_tree, fp, indent=4)
 
     return {
