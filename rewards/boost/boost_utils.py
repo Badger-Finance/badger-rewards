@@ -77,8 +77,10 @@ def calc_boost_balances(block: int) -> Tuple[Dict[str, float], Dict[str, float]]
     for chain in BOOST_CHAINS:
         chain_block = blocks_by_chain[chain]
         console.log(f"Taking chain snapshot on {chain} \n")
-
-        snapshot = chain_snapshot(chain, chain_block)
+        if chain == "polygon":
+            snapshot = {}
+        else:
+            snapshot = chain_snapshot(chain, chain_block)
         console.log(f"Taking token snapshot on {chain}")
 
         tokens = token_snapshot_usd(chain, chain_block)
