@@ -10,7 +10,7 @@ def fetch_account_data(address: str):
     :param address: address whose information is required
     """
     data = (
-        requests.get("{}/accounts/{}".format(urls["staging"], address))
+        requests.get(f"{urls['staging']}/accounts/{address}")
         .json()
         .get("claimableBalances", [])
     )

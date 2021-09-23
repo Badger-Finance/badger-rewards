@@ -3,10 +3,10 @@ from config.env_config import env_config
 from rewards.aws.helpers import get_secret
 
 
-def send_error_to_discord(e, errorMsg):
+def send_error_to_discord(e, error_msg):
     send_message_to_discord(
         "**BADGER BOOST ERROR**",
-        ":x: {}".format(errorMsg),
+        f":x: {error_msg}",
         [
             {
                 "name": "Error Type",

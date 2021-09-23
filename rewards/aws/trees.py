@@ -16,7 +16,7 @@ def download_latest_tree(chain: str):
     if chain == "eth":
         key = "badger-tree.json"
     else:
-        key = "badger-tree-{}.json".format(chain)
+        key = f"badger-tree-{chain}.json"
 
     target = {
         "bucket": get_bucket(env_config.test),
@@ -29,17 +29,17 @@ def download_latest_tree(chain: str):
     return json.loads(s3_clientdata)
 
 
-def download_tree(fileName: str, chain: str):
+def download_tree(file_name: str, chain: str):
     """
     Download a specific tree based on the merkle root of that tree
-    :param fileName: fileName of tree to download
+    :param file_name: fileName of tree to download
     """
     if chain == "eth":
         tree_bucket = "badger-json"
     else:
-        tree_bucket = "badger-json-{}".format(chain)
+        tree_bucket = f"badger-json-{chain}"
 
-    tree_file_key = "rewards/" + fileName
+    tree_file_key = "rewards/" + file_name
 
     console.print("Downloading file from s3: " + tree_file_key)
 
@@ -70,7 +70,7 @@ def download_past_trees(test: bool, number: int):
 
 
 def upload_tree(
-    fileName: str,
+    file_name: str,
     data: Dict,
     chain: str,
     bucket: str = "badger-json",
@@ -81,14 +81,14 @@ def upload_tree(
     :param fileName: the filename of the uploaded bucket
     :param data: the data to push
     """
-    chainId = env_config.get_web3(chain).eth.chain_id
+    chain_id = env_config.get_web3(chain).eth.chain_id
 
     if chain == "eth":
         key = "badger-tree.json"
         rewards_bucket = "badger-json"
     else:
-        key = "badger-tree-{}.json".format(chainId)
-        rewards_bucket = "badger-json-{}".format(chain)
+        key = f"badger-tree-{chain_id}.json"
+        rewards_bucket = f"badger-json-{chain}"
 
     upload_targets = [
         {
@@ -101,7 +101,7 @@ def upload_tree(
         upload_targets.append(
             {
                 "bucket": rewards_bucket,
-                "key": "rewards/" + fileName,
+                "key": "rewards/" + file_name,
             },  # badger-json rewards api
         )
 

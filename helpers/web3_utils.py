@@ -4,8 +4,8 @@ from config.env_config import env_config
 import json
 
 
-def make_contract(address: str, abiName: str, chain: str) -> ContractFunctions:
-    with open("abis/eth/{}.json".format(abiName)) as fp:
+def make_contract(address: str, abi_name: str, chain: str) -> ContractFunctions:
+    with open(f"abis/eth/{abi_name}.json") as fp:
         abi = json.load(fp)
 
     w3 = env_config.get_web3(chain)
@@ -14,5 +14,5 @@ def make_contract(address: str, abiName: str, chain: str) -> ContractFunctions:
 
 def get_badger_tree(chain: str) -> ContractFunctions:
     return make_contract(
-        EMISSIONS_CONTRACTS[chain]["BadgerTree"], abiName="BadgerTreeV2", chain=chain
+        EMISSIONS_CONTRACTS[chain]["BadgerTree"], abi_name="BadgerTreeV2", chain=chain
     )

@@ -20,18 +20,16 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, UserBalances]:
     :param block: block at which to query
 
     """
-    chainBalances = fetch_chain_balances(chain, block)
-    balancesBySett = {}
+    chain_balances = fetch_chain_balances(chain, block)
+    balances_by_sett = {}
 
-    for settAddr, balances in list(chainBalances.items()):
-        settBalances = parse_sett_balances(settAddr, balances)
-        token = make_contract(settAddr, abiName="ERC20", chain=chain)
-        console.log(
-            "Fetched {} balances for sett {}".format(len(balances), token.name().call())
-        )
-        balancesBySett[settAddr] = settBalances
+    for sett_addr, balances in list(chain_balances.items()):
+        sett_balances = parse_sett_balances(sett_addr, balances)
+        token = make_contract(sett_addr, abi_name="ERC20", chain=chain)
+        console.log(f"Fetched {len(balances)} balances for sett {token.name().call()}")
+        balances_by_sett[sett_addr] = sett_balances
 
-    return balancesBySett
+    return balances_by_sett
 
 
 @lru_cache(maxsize=128)
@@ -42,17 +40,15 @@ def sett_snapshot(chain: str, block: int, sett: str) -> UserBalances:
     :param block:
     :param sett:
     """
-    token = make_contract(sett, abiName="ERC20", chain=chain)
+    token = make_contract(sett, abi_name="ERC20", chain=chain)
     console.log(
-        "Taking snapshot on {} of {} ({}) at {}\n".format(
-            chain, token.name().call(), sett, block
-        )
+        f"Taking snapshot on {chain} of {token.name().call()} ({sett}) at {block}\n"
     )
     sett_balances = fetch_sett_balances(chain, block - 50, sett)
     return parse_sett_balances(sett, sett_balances)
 
 
-def parse_sett_balances(settAddress: str, balances: Dict[str, int]) -> UserBalances:
+def parse_sett_balances(sett_address: str, balances: Dict[str, int]) -> UserBalances:
     """
     Blacklist balances and add metadata for boost
     :param balances: balances of users:
@@ -60,24 +56,20 @@ def parse_sett_balances(settAddress: str, balances: Dict[str, int]) -> UserBalan
     """
     for addr, balance in list(balances.items()):
         if addr.lower() in REWARDS_BLACKLIST:
-            console.log(
-                "Removing {} from balances".format(REWARDS_BLACKLIST[addr.lower()])
-            )
+            console.log(f"Removing {REWARDS_BLACKLIST[addr.lower()]} from balances")
             del balances[addr]
 
-    settType, settRatio = get_sett_info(settAddress)
-    console.log(
-        "Sett {} has type {} and Ratio {} \n".format(settAddress, settType, settRatio)
-    )
-    userBalances = [
-        UserBalance(addr, bal, settAddress) for addr, bal in balances.items()
+    sett_type, sett_ratio = get_sett_info(sett_address)
+    console.log(f"Sett {sett_address} has type {sett_type} and Ratio {sett_ratio} \n")
+    user_balances = [
+        UserBalance(addr, bal, sett_address) for addr, bal in balances.items()
     ]
-    return UserBalances(userBalances, settType, settRatio)
+    return UserBalances(user_balances, sett_type, sett_ratio)
 
 
-def get_sett_info(settAddress) -> Tuple[str, float]:
+def get_sett_info(sett_address: str) -> Tuple[str, float]:
     info = SETT_INFO.get(
-        env_config.get_web3().toChecksumAddress(settAddress),
+        env_config.get_web3().toChecksumAddress(sett_address),
         {"type": "nonNative", "ratio": 1},
     )
     return info["type"], info["ratio"]

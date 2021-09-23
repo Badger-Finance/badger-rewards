@@ -12,11 +12,11 @@ class Schedule:
     duration: int
 
     def __repr__(self):
-        return "Schedule(sett={},token={},initalTokensLocked={},startTime={},duration={} days,endTime={}".format(
-            self.sett,
-            self.token,
-            self.initialTokensLocked,
-            to_utc_date(self.startTime),
-            to_days(self.duration),
-            to_utc_date(self.endTime),
+        return (
+            f"Schedule(sett={self.sett},"
+            f"token={self.token},"
+            f"initalTokensLocked={self.initialTokensLocked},"
+            f"startTime={to_utc_date(self.startTime)},"
+            f"duration={to_days(self.duration)} days,"
+            f"endTime={to_utc_date(self.endTime)}"
         )

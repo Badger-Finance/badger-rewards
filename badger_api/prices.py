@@ -7,7 +7,7 @@ def fetch_ppfs() -> Tuple[float, float]:
     """
     Fetch ppfs for bbadger and bdigg
     """
-    response = requests.get("{}/setts".format(urls["staging"])).json()
+    response = requests.get(f"{urls['staging']}/setts").json()
     badger = [s for s in response if s["asset"] == "BADGER"][0]
     digg = [s for s in response if s["asset"] == "DIGG"][0]
     return badger["ppfs"], digg["ppfs"]
@@ -20,9 +20,7 @@ def fetch_token_prices() -> Dict[str, float]:
     chains = ["eth", "bsc", "matic", "arbitrum"]
     prices = {}
     for chain in chains:
-        chain_prices = requests.get(
-            "{}/prices?chain={}".format(urls["staging"], chain)
-        ).json()
+        chain_prices = requests.get(f"{urls['staging']}/prices?chain={chain}").json()
         prices = {**prices, **chain_prices}
 
     return prices

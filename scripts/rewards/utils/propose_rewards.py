@@ -27,13 +27,11 @@ def propose_rewards(chain):
     past_rewards, start_block, end_block = calc_next_cycle_range(chain, tree_manager)
 
     console.log(
-        "Generating rewards between {} and {} on {} chain".format(
-            start_block, end_block, chain
-        )
+        f"Generating rewards between {start_block} and {end_block} on {chain} chain"
     )
     send_message_to_discord(
-        "**Proposing Rewards on {}**".format(chain),
-        "Calculating rewards between {} and {}".format(start_block, end_block),
+        f"**Proposing Rewards on {chain}**",
+        f"Calculating rewards between {start_block} and {end_block}",
         [],
         "Rewards Bot",
         url=discord_url,

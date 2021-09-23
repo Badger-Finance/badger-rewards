@@ -6,14 +6,14 @@ import json
 
 class DiggUtils:
     def __init__(self):
-        self.digg = make_contract(DIGG, abiName="Digg", chain="eth")
-        self.sharesPerFragment = self.digg._sharesPerFragment().call()
-        self.initialShares = self.digg._initialSharesPerFragment().call()
+        self.digg = make_contract(DIGG, abi_name="Digg", chain="eth")
+        self.shares_per_fragment = self.digg._sharesPerFragment().call()
+        self.initial_shares = self.digg._initialSharesPerFragment().call()
 
-    def sharesToFragments(self, shares: int) -> float:
+    def shares_to_fragments(self, shares: int) -> float:
         if shares == 0:
             return 0
-        return self.sharesPerFragment / shares
+        return self.shares_per_fragment / shares
 
 
 digg_utils = DiggUtils()

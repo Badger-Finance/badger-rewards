@@ -14,20 +14,18 @@ def approve_rewards(chain):
         MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", test=env_config.test
     )
 
-    currentRewards, startBlock, endBlock = get_last_proposed_cycle(chain)
-    if not currentRewards:
+    current_rewards, start_block, end_block = get_last_proposed_cycle(chain)
+    if not current_rewards:
         return
 
     console.log(
-        "Generating rewards between {} and {} on {} chain".format(
-            startBlock, endBlock, chain
-        )
+        f"Generating rewards between {start_block} and {end_block} on {chain} chain"
     )
     send_message_to_discord(
-        "**Approving Rewards on {}**".format(chain),
-        "Calculating rewards between {} and {}".format(startBlock, endBlock),
+        f"**Approving Rewards on {chain}**",
+        f"Calculating rewards between {start_block} and {end_block}",
         [],
         "Rewards Bot",
         url=discord_url,
     )
-    return approve_root(chain, startBlock, endBlock, currentRewards)
+    return approve_root(chain, start_block, end_block, current_rewards)
