@@ -109,7 +109,7 @@ def propose_root(
     chain: str,
     start: int,
     end: int,
-    pastRewards,
+    past_rewards,
     tree_manager: TreeManager,
     save=False,
 ):
@@ -178,7 +178,7 @@ def approve_root(
         )
 
         add_multipliers(rewards_data["multiplierData"], rewards_data["userMultipliers"])
-        cycle_logger.save(tree_manager.nextCycle, chain)
+        cycle_logger.save(tree_manager.next_cycle, chain)
         return rewards_data
 
 
