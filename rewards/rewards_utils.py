@@ -35,6 +35,7 @@ def get_claimed_for_token(data, token: str) -> int:
 def keccak(value: str):
     return Web3.toHex(Web3.keccak(text=value))
 
+
 def combine_rewards(rewards_list: List[RewardsList], cycle):
     combined_rewards = RewardsList(cycle)
     for rewards in rewards_list:

@@ -29,8 +29,7 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     for sett_addr, balances in list(chain_balances.items()):
         sett_balances = parse_sett_balances(sett_addr, balances)
         token = make_contract(sett_addr, abi_name="ERC20", chain=chain)
-        console.log(
-            f"Fetched {len(balances)} balances for sett {token.name().call()}")
+        console.log(f"Fetched {len(balances)} balances for sett {token.name().call()}")
         balances_by_sett[sett_addr] = sett_balances
 
     return balances_by_sett
@@ -60,15 +59,13 @@ def parse_sett_balances(sett_address: str, balances: Dict[str, int]) -> Snapshot
     """
     for addr, balance in list(balances.items()):
         if addr.lower() in REWARDS_BLACKLIST:
-            console.log(
-                f"Removing {REWARDS_BLACKLIST[addr.lower()]} from balances")
+            console.log(f"Removing {REWARDS_BLACKLIST[addr.lower()]} from balances")
             del balances[addr]
 
     sett_type, sett_ratio = get_sett_info(sett_address)
-    console.log(
-        f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
-    
-    return Snapshot(sett_address, balances,sett_type, sett_ratio)
+    console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
+
+    return Snapshot(sett_address, balances, sett_type, sett_ratio)
 
 
 def get_sett_info(sett_address: str) -> Tuple[str, float]:
@@ -79,7 +76,8 @@ def get_sett_info(sett_address: str) -> Tuple[str, float]:
     return info["type"], info["ratio"]
 
 
-def chain_snapshot_usd(chain: str, block: int):
+def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
+    """Take a snapshot of a chains native/non native balances in usd"""
     total_snapshot = chain_snapshot(chain, block)
     native = Counter()
     non_native = Counter()

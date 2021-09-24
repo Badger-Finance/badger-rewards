@@ -1,6 +1,4 @@
-from eth_utils.functional import combine
 from rewards.classes.Snapshot import Snapshot
-from rewards.snapshot.claims_snapshot import claims_snapshot
 from helpers.constants import EMISSIONS_CONTRACTS, XSUSHI
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
@@ -37,6 +35,12 @@ class RewardsManager:
         return sett_snapshot(self.chain, block, sett)
 
     def get_sett_from_strategy(self, strat: str) -> str:
+        """Go from strategy -> want -> controller -> want -> sett
+
+        :param strat: Strategy to find sett of
+        :type strat: str
+        :rtype: str
+        """
         strategy = make_contract(strat, "BaseStrategy", self.chain)
         controller = make_contract(
             strategy.controller().call(), "Controller", self.chain
@@ -45,7 +49,14 @@ class RewardsManager:
         sett = controller.vaults(want).call()
         return sett
 
-    def calculate_sett_rewards(self, sett, schedules_by_token, boosts) -> RewardsList:
+    def calculate_sett_rewards(
+        self, sett: str, schedules_by_token, boosts
+    ) -> RewardsList:
+        """
+        Calculate boosted rewards
+        using the unlock schedules for a particular sett
+
+        """
         start_time = self.web3.eth.getBlock(self.start)["timestamp"]
         end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
@@ -65,23 +76,26 @@ class RewardsManager:
             token_distribution = int(end_dist) - int(start_dist)
             if token == DIGG:
                 cycle_logger.add_sett_token_data(
-                    sett, token, digg_utils.shares_to_fragments(
-                        token_distribution)
+                    sett, token, digg_utils.shares_to_fragments(token_distribution)
                 )
             else:
-                cycle_logger.add_sett_token_data(
-                    sett, token, token_distribution)
+                cycle_logger.add_sett_token_data(sett, token, token_distribution)
 
             if token_distribution > 0:
-                all_rewards.append(self.distribute_rewards(
-                    token_distribution,
-                    boosted_sett_snapshot,
-                    token
-                ))
+                all_rewards.append(
+                    self.distribute_rewards(
+                        token_distribution, boosted_sett_snapshot, token
+                    )
+                )
 
         return combine_rewards(all_rewards)
 
-    def distribute_rewards_to_snapshot(self, amount: float, snapshot: Snapshot, token: str):
+    def distribute_rewards_to_snapshot(
+        self, amount: float, snapshot: Snapshot, token: str
+    ):
+        """
+        Distribute a certain amount of rewards to a snapshot of users
+        """
         rewards = RewardsList(self.cycle)
         total = snapshot.total_balance()
         if total == 0:
@@ -93,11 +107,7 @@ class RewardsManager:
             token = self.web3.toChecksumAddress(token)
             reward_amount = balance * unit
             assert reward_amount >= 0
-            rewards.increase_user_rewards(
-                addr,
-                token,
-                int(reward_amount)
-            )
+            rewards.increase_user_rewards(addr, token, int(reward_amount))
         return rewards
 
     def calculate_all_sett_rewards(
@@ -153,8 +163,7 @@ class RewardsManager:
                 )
                 if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     percentage_out_of_total = (
-                        int(to_distribute) /
-                        int(schedule.initialTokensLocked) * 100
+                        int(to_distribute) / int(schedule.initialTokensLocked) * 100
                     )
                     console.log(
                         (
@@ -173,7 +182,7 @@ class RewardsManager:
 
         return total_to_distribute
 
-    def boost_sett(self, boosts, sett, snapshot: Snapshot):
+    def boost_sett(self, boosts, sett: str, snapshot: Snapshot):
         if snapshot.type == "nonNative":
             pre_boost = {}
             for user, balance in snapshot:
@@ -189,9 +198,7 @@ class RewardsManager:
                 if sett not in self.apy_boosts:
                     self.apy_boosts[sett] = {}
 
-                self.apy_boosts[sett][user] = (
-                    post_boost / pre_boost[user]
-                )
+                self.apy_boosts[sett][user] = post_boost / pre_boost[user]
         return snapshot
 
     def calculate_tree_distributions(self) -> RewardsList:
@@ -217,11 +224,7 @@ class RewardsManager:
                 sett, self.web3.toChecksumAddress(token), amount
             )
             all_dist_rewards.append(
-                self.distribute_rewards_to_snapshot(
-                    amount,
-                    snapshot,
-                    token
-                )
+                self.distribute_rewards_to_snapshot(amount, snapshot, token)
             )
         return combine_rewards(all_dist_rewards)
 
@@ -231,16 +234,14 @@ class RewardsManager:
         all_sushi_rewards = []
         all_from_rewards = 0
         for strategy, events in sushi_events.items():
-            rewards, from_rewards = self.calc_sushi_distribution(
-                strategy, events)
-            all_from_events += sum(
-                map(lambda e: int(e["rewardAmount"]), events))
+            rewards, from_rewards = self.calc_sushi_distribution(strategy, events)
+            all_from_events += sum(map(lambda e: int(e["rewardAmount"]), events))
             all_from_rewards += from_rewards
             all_sushi_rewards.append(rewards)
         assert abs(all_from_events - all_from_rewards) < 1e9
         return combine_rewards(all_sushi_rewards, self.cycle)
 
-    def calc_sushi_distribution(self, strategy, events):
+    def calc_sushi_distribution(self, strategy: str, events):
         sett = self.get_sett_from_strategy(strategy)
         total_from_rewards = 0
         all_sushi_rewards = []
@@ -262,11 +263,7 @@ class RewardsManager:
             )
             snapshot = self.fetch_sett_snapshot(block, sett)
             all_sushi_rewards.append(
-                self.distribute_rewards_to_snapshot(
-                    reward_amount,
-                    snapshot,
-                    XSUSHI
-                )
+                self.distribute_rewards_to_snapshot(reward_amount, snapshot, XSUSHI)
             )
 
         return combine_rewards(all_sushi_rewards), total_from_rewards

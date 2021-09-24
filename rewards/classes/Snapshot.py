@@ -18,7 +18,7 @@ class Snapshot:
             new_bals[env_config.get_web3().toChecksumAddress(addr)] = balance
         return new_bals
 
-    def total_balance(self):
+    def total_balance(self) -> float:
         return sum([u.balance for u in self.balances.values()])
 
     def boost_balance(self, user, multiple):
@@ -32,10 +32,10 @@ class Snapshot:
         for user, balance in self.balances.items():
             yield user, balance
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.balances)
 
-    def __add__(self, other: Snapshot):
+    def __add__(self, other: Snapshot) -> Snapshot:
         new_bals = self.balances.copy()
         for addr, bal in other:
             new_bals[addr] = new_bals.get(addr, 0) + bal

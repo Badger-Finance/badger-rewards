@@ -20,7 +20,7 @@ from rich.console import Console
 from config.env_config import env_config
 from config.rewards_config import rewards_config
 from eth_utils.hexadecimal import encode_hex
-from typing import List, Dict
+from typing import List, Dict, Tuple
 import json
 
 console = Console()
@@ -79,13 +79,11 @@ def fetch_setts(chain: str) -> List[str]:
     return [env_config.get_web3().toChecksumAddress(s) for s in filtered_setts]
 
 
-def process_cumulative_rewards(current, new: RewardsList):
+def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
     """Combine past rewards with new rewards
 
     :param current: current rewards
     :param new: new rewards
-    :return: [description]
-    :rtype: [type]
     """
     result = RewardsList(new.cycle)
 

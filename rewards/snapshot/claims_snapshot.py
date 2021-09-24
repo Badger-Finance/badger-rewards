@@ -1,21 +1,14 @@
 from badger_api.account import fetch_all_claimable_balances
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import BADGER, DIGG, BCVX, BCVXCRV, ARB_BADGER, POLY_BADGER
-from typing import Dict
+from typing import Dict, Tuple
 from helpers.digg_utils import digg_utils
 from collections import Counter
 
 
 def claims_snapshot() -> Dict[str, Snapshot]:
     all_claims = fetch_all_claimable_balances()
-    claimable_tokens = [
-        BADGER,
-        DIGG,
-        BCVX,
-        BCVXCRV,
-        ARB_BADGER,
-        POLY_BADGER
-    ]
+    claimable_tokens = [BADGER, DIGG, BCVX, BCVXCRV, ARB_BADGER, POLY_BADGER]
     claims_data = {}
     snapshots = {}
     for addr, claims in all_claims.items():
@@ -28,18 +21,18 @@ def claims_snapshot() -> Dict[str, Snapshot]:
                 if token not in claims_data:
                     claims_data[token] = {}
                 claims_data[token][addr] = balance
-                
+
     for token, snapshot in claims_data.items():
         if token in [BADGER, DIGG, ARB_BADGER, POLY_BADGER]:
-            snapshots[token] = Snapshot(token,snapshot,ratio=1, type="native")
+            snapshots[token] = Snapshot(token, snapshot, ratio=1, type="native")
         if token in [BCVX, BCVXCRV]:
             snapshots[token] = Snapshot(token, snapshot, ratio=1, type="nonNative")
-
 
     return snapshots
 
 
-def claims_snapshot_usd():
+def claims_snapshot_usd() -> Tuple[Counter, Counter]:
+    """Take a snapshot of native and non native claims in usd"""
     snapshot = claims_snapshot()
     native = {}
     non_native = {}
@@ -50,5 +43,5 @@ def claims_snapshot_usd():
             native = native + balances
         elif usd_claims.type == "nonNative":
             non_native = non_native + balances
-        
+
     return native, non_native

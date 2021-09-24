@@ -10,7 +10,7 @@ from typing import Dict, Tuple
 def token_snapshot(chain: str, block: int) -> Tuple[Snapshot, Snapshot]:
     token_client = make_gql_client(f"tokens-{chain}")
     badger_bals, digg_bals = fetch_token_balances(token_client, block)
-    return Snapshot(BADGER,badger_bals), Snapshot(DIGG, digg_bals)
+    return Snapshot(BADGER, badger_bals), Snapshot(DIGG, digg_bals)
 
 
 def fuse_snapshot(chain: str, block: int):
@@ -19,9 +19,8 @@ def fuse_snapshot(chain: str, block: int):
     fuse_snapshots = {}
     for token, bals in fuse_bals:
         fuse_snapshots[token] = Snapshot(token, bals)
-        
+
     return fuse_snapshots
-    
 
 
 def token_snapshot_usd(chain: str, block: int):
@@ -30,10 +29,13 @@ def token_snapshot_usd(chain: str, block: int):
     badger_snapshot, digg_snapshot = token_snapshot(chain, block)
     # Account for tokens loaned in fuse
     if len(fuse_snapshots) > 0:
-        fuse_badger = fuse_snapshots.get(BADGER, Snapshot(BADGER,{}))
-        fuse_digg = fuse_snapshots.get(DIGG, Snapshot(DIGG,{}))
-        
+        fuse_badger = fuse_snapshots.get(BADGER, Snapshot(BADGER, {}))
+        fuse_digg = fuse_snapshots.get(DIGG, Snapshot(DIGG, {}))
+
         badger_snapshot = fuse_badger + badger_snapshot
         digg_snapshot = fuse_digg + digg_snapshot
 
-    return (badger_snapshot.convert_to_usd().balances, digg_snapshot.convert_to_usd().balances )
+    return (
+        badger_snapshot.convert_to_usd().balances,
+        digg_snapshot.convert_to_usd().balances,
+    )
