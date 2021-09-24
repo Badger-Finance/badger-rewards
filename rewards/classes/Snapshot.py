@@ -1,8 +1,8 @@
+from __future__ import annotations
 from typing import Tuple, Dict
 from config.env_config import env_config
 from badger_api.prices import fetch_token_prices
 from helpers.discord import send_message_to_discord
-from __future__ import annotations
 
 
 class Snapshot:
@@ -59,4 +59,4 @@ class Snapshot:
         for addr, bal in self.balances.items():
             new_bals[addr] = bal * price
 
-        return Snapshot(self.type, self.ratio, self.token, new_bals)
+        return Snapshot(self.token, new_bals, self.ratio, self.type)

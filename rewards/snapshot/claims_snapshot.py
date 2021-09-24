@@ -34,11 +34,11 @@ def claims_snapshot() -> Dict[str, Snapshot]:
 def claims_snapshot_usd() -> Tuple[Counter, Counter]:
     """Take a snapshot of native and non native claims in usd"""
     snapshot = claims_snapshot()
-    native = {}
-    non_native = {}
+    native = Counter()
+    non_native = Counter()
     for sett, claims in snapshot.items():
         usd_claims = claims.convert_to_usd()
-        balances = Counter(snapshot.balances)
+        balances = Counter(claims.balances)
         if usd_claims.type == "native":
             native = native + balances
         elif usd_claims.type == "nonNative":

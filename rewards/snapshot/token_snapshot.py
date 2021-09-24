@@ -17,7 +17,7 @@ def fuse_snapshot(chain: str, block: int):
     fuse_client = make_gql_client("fuse")
     fuse_bals = fetch_fuse_pool_balances(fuse_client, chain, block)
     fuse_snapshots = {}
-    for token, bals in fuse_bals:
+    for token, bals in fuse_bals.items():
         fuse_snapshots[token] = Snapshot(token, bals)
 
     return fuse_snapshots
