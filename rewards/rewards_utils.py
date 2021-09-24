@@ -1,6 +1,5 @@
-from rewards.classes.User import User
+from rewards.classes.Snapshot import Snapshot
 from rich.console import Console
-from rewards.classes.UserBalance import UserBalances
 from rewards.classes.RewardsList import RewardsList
 from web3 import Web3
 from typing import List
@@ -35,14 +34,6 @@ def get_claimed_for_token(data, token: str) -> int:
 
 def keccak(value: str):
     return Web3.toHex(Web3.keccak(text=value))
-
-
-def combine_balances(balances: List[UserBalances]) -> UserBalances:
-    all_balances = UserBalances()
-    for user_balances in balances:
-        all_balances = all_balances + user_balances
-    return all_balances
-
 
 def combine_rewards(rewards_list: List[RewardsList], cycle):
     combined_rewards = RewardsList(cycle)

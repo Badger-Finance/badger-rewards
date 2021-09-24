@@ -1,9 +1,8 @@
-from helpers.constants import BOOST_CHAINS, DISABLED_VAULTS
+from helpers.constants import BOOST_CHAINS
 from helpers.discord import send_message_to_discord
 from rewards.explorer import convert_from_eth
 from rich.console import Console
 from config.env_config import env_config
-from rewards.classes.UserBalance import UserBalances
 from typing import Dict, List, Tuple
 from collections import Counter
 from rewards.snapshot.chain_snapshot import chain_snapshot_usd
@@ -39,33 +38,6 @@ def filter_dust(balances: Dict[str, int], dust_amount: int) -> Dict[str, float]:
     return {addr: value for addr, value in balances.items() if value > dust_amount}
 
 
-def convert_balances_to_usd(
-    balances: UserBalances, sett: str
-) -> Tuple[Dict[str, float], str]:
-    """
-    Convert sett balance to usd and multiply by correct ratio
-    :param balances: balances to convert to usd
-    """
-    sett = env_config.get_web3().toChecksumAddress(sett)
-    if sett not in prices:
-        price = 0
-        send_message_to_discord(
-            "**BADGER BOOST ERROR**",
-            f"Cannot find pricing for f{sett}",
-            [],
-            "Boost Bot",
-        )
-    else:
-        price = prices[sett]
-
-    price_ratio = balances.sett_ratio
-    usd_balances = {}
-    for user in balances:
-        usd_balances[user.address] = price_ratio * price * user.balance
-
-    return usd_balances, balances.sett_type
-
-
 def calc_boost_balances(block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
     """
     Calculate boost data required for boost calculation
@@ -81,14 +53,14 @@ def calc_boost_balances(block: int) -> Tuple[Dict[str, float], Dict[str, float]]
         chain_block = blocks_by_chain[chain]
 
         console.log(f"Taking chain snapshot on {chain} \n")
-        native_setts, non_native_setts = chain_snapshot_usd(chain, chain_block)
-
+        if chain != "polygon":
+            native_setts, non_native_setts = chain_snapshot_usd(chain, chain_block)
+            non_native = non_native + Counter(non_native_setts)
+            native = native + Counter(native_setts)
+            
         console.log(f"Taking token snapshot on {chain}")
-
         tokens = token_snapshot_usd(chain, chain_block)
-
-        native = native + Counter(tokens) + Counter(native_setts)
-        non_native = non_native + Counter(non_native_setts)
+        native = native + Counter(tokens)
 
     native = native + Counter(native_claimable)
     non_native = non_native + Counter(non_native_claimable)
