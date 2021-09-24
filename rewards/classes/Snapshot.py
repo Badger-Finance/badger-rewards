@@ -19,7 +19,7 @@ class Snapshot:
         return new_bals
 
     def total_balance(self) -> float:
-        return sum([u.balance for u in self.balances.values()])
+        return sum(list(self.balances.values()))
 
     def boost_balance(self, user, multiple):
         self.balances[user] = self.balances[user] * multiple

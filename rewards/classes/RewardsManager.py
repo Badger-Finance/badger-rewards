@@ -83,12 +83,12 @@ class RewardsManager:
 
             if token_distribution > 0:
                 all_rewards.append(
-                    self.distribute_rewards(
+                    self.distribute_rewards_to_snapshot(
                         token_distribution, boosted_sett_snapshot, token
                     )
                 )
 
-        return combine_rewards(all_rewards)
+        return combine_rewards(all_rewards, self.cycle)
 
     def distribute_rewards_to_snapshot(
         self, amount: float, snapshot: Snapshot, token: str
@@ -226,7 +226,7 @@ class RewardsManager:
             all_dist_rewards.append(
                 self.distribute_rewards_to_snapshot(amount, snapshot, token)
             )
-        return combine_rewards(all_dist_rewards)
+        return combine_rewards(all_dist_rewards, self.cycle)
 
     def calc_sushi_distributions(self) -> Tuple[RewardsList, float]:
         sushi_events = fetch_sushi_harvest_events(self.start, self.end)
@@ -266,4 +266,4 @@ class RewardsManager:
                 self.distribute_rewards_to_snapshot(reward_amount, snapshot, XSUSHI)
             )
 
-        return combine_rewards(all_sushi_rewards), total_from_rewards
+        return combine_rewards(all_sushi_rewards, self.cycle), total_from_rewards
