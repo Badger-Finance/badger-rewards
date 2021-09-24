@@ -3,13 +3,15 @@ from typing import Tuple, Dict
 from config.env_config import env_config
 from badger_api.prices import fetch_token_prices
 from helpers.discord import send_message_to_discord
+from rich.console import Console
 
+console = Console()
 
 class Snapshot:
     def __init__(self, token, balances, ratio=1, type="none"):
         self.type = type
         self.ratio = ratio
-        self.token = token
+        self.token = env_config.get_web3().toChecksumAddress(token)
         self.balances = self.parse_balances(balances)
 
     def parse_balances(self, bals) -> Dict[str, float]:
@@ -46,6 +48,7 @@ class Snapshot:
         prices = fetch_token_prices()
         if self.token not in prices:
             price = 0
+            console.log(f"CANT FIND PRICING FOR {self.token}")
             send_message_to_discord(
                 "**ERROR**",
                 f"Cannot find pricing for {self.token}",

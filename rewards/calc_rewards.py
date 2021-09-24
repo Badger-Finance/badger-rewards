@@ -20,7 +20,7 @@ from rich.console import Console
 from config.env_config import env_config
 from config.rewards_config import rewards_config
 from eth_utils.hexadecimal import encode_hex
-from typing import List, Dict, Tuple
+from typing import List, Dict
 import json
 
 console = Console()
@@ -122,7 +122,7 @@ def propose_root(chain: str, start: int, end: int, past_rewards, save=False):
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-        # return
+        return
     rewards_data = generate_rewards_in_range(
         chain, start, end, save=save, past_tree=past_rewards
     )

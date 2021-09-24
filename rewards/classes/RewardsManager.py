@@ -1,3 +1,5 @@
+from toolz.itertoolz import cons
+from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import EMISSIONS_CONTRACTS, XSUSHI
 from rewards.explorer import get_block_by_timestamp
@@ -34,6 +36,16 @@ class RewardsManager:
     def fetch_sett_snapshot(self, block: int, sett: str) -> Snapshot:
         return sett_snapshot(self.chain, block, sett)
 
+    def bcvx_claims_snapshot(self):
+        bcvx = claims_snapshot()[BCVX]
+        console.log(bcvx)
+        return bcvx
+
+    def bcvxcrv_claims_snapshot(self):
+        bcvxcrv = claims_snapshot()[BCVXCRV]
+        console.log(bcvxcrv)
+        return bcvxcrv
+
     def get_sett_from_strategy(self, strat: str) -> str:
         """Go from strategy -> want -> controller -> want -> sett
 
@@ -61,7 +73,8 @@ class RewardsManager:
         end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
         boosted_sett_snapshot = self.boost_sett(boosts, sett, sett_snapshot)
-        all_rewards = []
+        rewards = RewardsList(self.cycle)
+        extra_rewards = []
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(
                 token, end_time, schedules, sett
@@ -82,13 +95,46 @@ class RewardsManager:
                 cycle_logger.add_sett_token_data(sett, token, token_distribution)
 
             if token_distribution > 0:
-                all_rewards.append(
-                    self.distribute_rewards_to_snapshot(
-                        token_distribution, boosted_sett_snapshot, token
-                    )
-                )
+                total = boosted_sett_snapshot.total_balance()
+                if total == 0:
+                    unit = 0
+                else:
+                    unit = token_distribution / total
+                    for user, balance in boosted_sett_snapshot:
+                        addr = self.web3.toChecksumAddress(user)
+                        token = self.web3.toChecksumAddress(token)
+                        reward_amount = balance * unit
+                        if addr == EMISSIONS_CONTRACTS["eth"]["BadgerTree"]:
+                            if sett == BCVX:
+                                extra_rewards.append(
+                                    self.distribute_rewards_to_snapshot(
+                                        reward_amount,
+                                        self.bcvx_claims_snapshot(),
+                                        token,
+                                    )
+                                )
+                                console.log(
+                                    f"{reward_amount} distributed to bcvxcrv holders"
+                                )
 
-        return combine_rewards(all_rewards, self.cycle)
+                            if sett == BCVXCRV:
+
+                                extra_rewards.append(
+                                    self.distribute_rewards_to_snapshot(
+                                        reward_amount,
+                                        self.bcvxcrv_claims_snapshot(),
+                                        token,
+                                    )
+                                )
+                                console.log(
+                                    f"{reward_amount} distributed to bcvxcrv holders"
+                                )
+                        else:
+                            rewards.increase_user_rewards(
+                                addr, token, int(reward_amount)
+                            )
+
+        return combine_rewards([rewards, *extra_rewards], self.cycle)
 
     def distribute_rewards_to_snapshot(
         self, amount: float, snapshot: Snapshot, token: str

@@ -3,9 +3,10 @@ from rewards.classes.Snapshot import Snapshot
 from helpers.constants import BADGER, DIGG, BCVX, BCVXCRV, ARB_BADGER, POLY_BADGER
 from typing import Dict, Tuple
 from helpers.digg_utils import digg_utils
+from functools import lru_cache
 from collections import Counter
 
-
+@lru_cache(maxsize=None)
 def claims_snapshot() -> Dict[str, Snapshot]:
     all_claims = fetch_all_claimable_balances()
     claimable_tokens = [BADGER, DIGG, BCVX, BCVXCRV, ARB_BADGER, POLY_BADGER]
