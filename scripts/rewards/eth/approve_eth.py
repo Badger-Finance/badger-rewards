@@ -7,21 +7,26 @@ from rewards.classes.TreeManager import TreeManager
 from rewards.calc_rewards import approve_root
 from rich.console import Console
 
+from decouple import config
 from eth_account import Account
+import json
 import os
 
 console = Console()
 
 
 def approve_rewards(chain):
-    discord_url = os.getenv("DISCORD_WEBHOOK_URL")
+    discord_url = config("DISCORD_WEBHOOK_URL")
     key_decrypt_password = get_secret(
-        os.getenv("DECRYPT_PASSWORD_ARN"),
-        os.getenv("DECRYPT_PASSWORD_KEY"),
-        region_name="us-west-2"
+        config("DECRYPT_PASSWORD_ARN"),
+        config("DECRYPT_PASSWORD_KEY"),
+        region_name="us-west-2",
     )
 
-    cycle_account = Account.decrypt(os.getenv("KEYFILE"), key_decrypt_password)
+    with open(config("KEYFILE")) as key_file:
+        key_file_json = json.load(key_file)
+
+    cycle_account = Account.decrypt(key_file_json, key_decrypt_password)
     # Account.from_key(cycle_key)
     tree_manager = TreeManager(chain, cycle_account)
     if tree_manager.has_pending_root():
