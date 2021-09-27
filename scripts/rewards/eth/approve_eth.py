@@ -18,7 +18,7 @@ def approve_rewards(chain):
     key_decrypt_password = get_secret(
         os.getenv("DECRYPT_PASSWORD_ARN"),
         os.getenv("DECRYPT_PASSWORD_KEY"),
-        test=env_config.test,
+        kube=env_config.kube,
     )
 
     cycle_account = Account.decrypt(os.getenv("KEYFILE"), key_decrypt_password)

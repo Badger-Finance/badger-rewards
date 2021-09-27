@@ -7,23 +7,24 @@ from web3.middleware import geth_poa_middleware
 class EnvConfig:
     def __init__(self):
         self.test = config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
+        self.kube = config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]
         self.graph_api_key = get_secret(
-            "boost-bot/graph-api-key-d", "GRAPH_API_KEY", test=self.test
+            "boost-bot/graph-api-key-d", "GRAPH_API_KEY", kube=self.kube
         )
         self.test_webhook_url = get_secret(
-            "boost-bot/test-discord-url", "TEST_WEBHOOK_URL", test=self.test
+            "boost-bot/test-discord-url", "TEST_WEBHOOK_URL", kube=self.kube
         )
         self.discord_webhook_url = get_secret(
-            "boost-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", test=self.test
+            "boost-bot/prod-discord-url", "DISCORD_WEBHOOK_URL", kube=self.kube
         )
 
         self.explorer_api_keys = {
-            "eth": get_secret("keepers/etherscan", "ETHERSCAN_TOKEN", test=self.test),
+            "eth": get_secret("keepers/etherscan", "ETHERSCAN_TOKEN", kube=self.kube),
             "polygon": get_secret(
-                "keepers/polygonscan", "POLYGONSCAN_TOKEN", test=self.test
+                "keepers/polygonscan", "POLYGONSCAN_TOKEN", kube=self.kube
             ),
             "arbitrum": get_secret(
-                "keepers/arbiscan", "ARBISCAN_TOKEN", test=self.test
+                "keepers/arbiscan", "ARBISCAN_TOKEN", kube=self.kube
             ),
         }
         polygon = self.make_provider("quiknode/poly-node-url", "POLYGON_NODE_URL")
@@ -45,7 +46,7 @@ class EnvConfig:
 
     def make_provider(self, secret_name: str, secret_key: str) -> Web3:
         return Web3(
-            Web3.HTTPProvider(get_secret(secret_name, secret_key, test=self.test))
+            Web3.HTTPProvider(get_secret(secret_name, secret_key, kube=self.kube))
         )
 
     def get_webhook_url(self) -> str:

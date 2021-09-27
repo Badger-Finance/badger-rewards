@@ -23,4 +23,6 @@ spec:
                 value: 'info'
               - name: TEST
                 value: 'False'
+              - name: KUBE
+                value: 'True'
           restartPolicy: OnFailure

@@ -26,7 +26,7 @@ def get_secret(
     secret_key: str,
     region_name: str = "us-west-1",
     assume_role_arn: str = None,
-    test: bool = False,
+    kube: bool = True,
 ) -> str:
     """Retrieves secret from AWS secretsmanager.
     Args:
@@ -42,7 +42,7 @@ def get_secret(
     Returns:
         str: secret value
     """
-    if test:
+    if not kube:
         return config(secret_key, "")
 
     # Create a Secrets Manager client

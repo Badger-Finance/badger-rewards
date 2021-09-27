@@ -13,13 +13,13 @@ console = Console()
 
 def propose_rewards(chain):
     discord_url = get_secret(
-        MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", test=env_config.test
+        MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", kube=env_config.kube
     )
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
         "private",
         assume_role_arn="arn:aws:iam::747584148381:role/cycle20210908001427790200000001",
-        test=env_config.test,
+        kube=env_config.kube,
     )
     cycle_account = Account.from_key(cycle_key)
 

@@ -28,7 +28,7 @@ console = Console()
 
 def console_and_discord(msg: str, chain: str):
     url = get_secret(
-        MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", test=env_config.test
+        MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", kube=env_config.kube
     )
     console.log(msg)
     send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
