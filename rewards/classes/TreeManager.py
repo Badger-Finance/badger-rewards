@@ -202,9 +202,8 @@ class TreeManager:
             options["maxPriorityFeePerGas"] = get_priority_fee(self.w3)
             options["maxFeePerGas"] = get_effective_gas_price(self.w3, self.chain)
             options["gas"] = 200000
-        if self.chain == "arbitrum":
+        elif self.chain == "arbitrum":
             options["gas"] = 3000000
-            # options["gasPrice"] = get_effective_gas_price(self.w3, self.chain)
         else:
             options["gasPrice"] = get_effective_gas_price(self.w3, self.chain)
         return options
