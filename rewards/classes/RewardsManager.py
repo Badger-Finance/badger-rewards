@@ -127,14 +127,17 @@ class RewardsManager:
                 console.log(f"\nSchedule {index} for {token} completed\n")
             else:
                 range_duration = end_time - schedule.startTime
-                to_distribute = min(
-                    schedule.initialTokensLocked,
-                    int(
-                        schedule.initialTokensLocked
-                        * range_duration
-                        // schedule.duration
-                    ),
-                )
+                if schedule.initialTokensLocked == 0:
+                    to_distribute = 0
+                else:
+                    to_distribute = min(
+                        schedule.initialTokensLocked,
+                        int(
+                            schedule.initialTokensLocked
+                            * range_duration
+                            // schedule.duration
+                        ),
+                    )
                 if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     percentage_out_of_total = (
                         int(to_distribute) / int(schedule.initialTokensLocked) * 100
