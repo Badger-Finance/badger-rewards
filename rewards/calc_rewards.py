@@ -105,7 +105,14 @@ def process_cumulative_rewards(current, new: RewardsList):
     return result
 
 
-def propose_root(chain: str, start: int, end: int, past_rewards, save=False):
+def propose_root(
+    chain: str,
+    start: int,
+    end: int,
+    past_rewards,
+    tree_manager: TreeManager,
+    save=False,
+):
     """
     Propose a root on a chain
 
@@ -115,7 +122,6 @@ def propose_root(chain: str, start: int, end: int, past_rewards, save=False):
     :param save: flag to save rewards file locally, defaults to False
     :type save: bool, optional
     """
-    tree_manager = TreeManager(chain)
     current_merkle_data = tree_manager.fetch_current_merkle_data()
     w3 = env_config.get_web3(chain)
 
@@ -126,7 +132,7 @@ def propose_root(chain: str, start: int, end: int, past_rewards, save=False):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
         # return
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=save, past_tree=past_rewards
+        chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager
     )
     console.log("Generated rewards")
 
@@ -136,17 +142,23 @@ def propose_root(chain: str, start: int, end: int, past_rewards, save=False):
     tx_hash, success = tree_manager.propose_root(rewards_data)
 
 
-def approve_root(chain: str, start: int, end: int, current_rewards):
+def approve_root(
+    chain: str, start: int, end: int, current_rewards, tree_manager: TreeManager
+):
     """Approve latest root on a chain
 
     :param chain: chain to approve root
     :param start: start block for rewards
     :param end: end block for rewards
     """
-    tree_manager = TreeManager(chain)
 
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=False, past_tree=current_rewards
+        chain,
+        start,
+        end,
+        save=False,
+        past_tree=current_rewards,
+        tree_manager=tree_manager,
     )
     console.log(
         f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
@@ -170,7 +182,9 @@ def approve_root(chain: str, start: int, end: int, current_rewards):
         return rewards_data
 
 
-def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past_tree):
+def generate_rewards_in_range(
+    chain: str, start: int, end: int, save: bool, past_tree, tree_manager: TreeManager
+):
     """Generate chain rewards for a chain within two blocks
 
     :param chain: chain to generate rewards
@@ -182,7 +196,6 @@ def generate_rewards_in_range(chain: str, start: int, end: int, save: bool, past
 
     console_and_discord(f"Generating rewards for {len(setts)} setts", chain)
 
-    tree_manager = TreeManager(chain)
     rewards_list = []
     rewards_manager = RewardsManager(chain, tree_manager.next_cycle, start, end)
 

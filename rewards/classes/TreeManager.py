@@ -26,20 +26,13 @@ console = Console()
 
 
 class TreeManager:
-    def __init__(self, chain: str):
+    def __init__(self, chain: str, cycle_account: Account):
         self.chain = chain
         self.w3 = env_config.get_web3(chain)
         self.badger_tree = get_badger_tree(chain)
         self.next_cycle = self.get_current_cycle() + 1
-        cycle_key = get_secret(
-            "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
-            "private",
-            assume_role_arn="arn:aws:iam::747584148381:role/cycle20210908001427790200000001",
-            test=env_config.test,
-        )
-        console.print("successfully got cycle_key")
-        self.propose_account = Account.from_key(cycle_key)
-        self.approve_account = Account.from_key(cycle_key)
+        self.propose_account = cycle_account
+        self.approve_account = cycle_account
         self.discord_url = get_secret(
             MONITORING_SECRET_NAMES.get(chain, ""),
             "DISCORD_WEBHOOK_URL",

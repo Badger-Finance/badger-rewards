@@ -7,8 +7,7 @@ from rich.console import Console
 console = Console()
 
 
-def get_last_proposed_cycle(chain: str):
-    tree_manager = TreeManager(chain)
+def get_last_proposed_cycle(chain: str, tree_manager: TreeManager):
     if not tree_manager.has_pending_root():
         console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
         return ({}, 0, 0)
@@ -31,8 +30,7 @@ def get_last_proposed_cycle(chain: str):
     return (current_rewards, last_claim_start, last_claim_end)
 
 
-def calc_next_cycle_range(chain: str):
-    tree_manager = TreeManager(chain)
+def calc_next_cycle_range(chain: str, tree_manager: TreeManager):
     # Fetch the appropriate file
     current_rewards = tree_manager.fetch_current_tree()
 
