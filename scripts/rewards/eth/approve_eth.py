@@ -14,9 +14,7 @@ console = Console()
 
 
 def approve_rewards(chain):
-    discord_url = get_secret(
-        MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", test=env_config.test
-    )
+    discord_url = os.getenv("DISCORD_WEBHOOK_URL")
     key_decrypt_password = get_secret(
         os.getenv("DECRYPT_PASSWORD_ARN"),
         os.getenv("DECRYPT_PASSWORD_KEY"),
