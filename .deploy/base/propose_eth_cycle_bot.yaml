@@ -5,7 +5,7 @@ metadata:
   labels:
     app: propose-eth-cycle-bot
 spec:
-  schedule: "22 */2 * * *"
+  schedule: "53 21 * * *"
   startingDeadlineSeconds: 180
   suspend: false
   jobTemplate:
@@ -23,4 +23,6 @@ spec:
                 value: 'info'
               - name: TEST
                 value: 'False'
+              - name: KUBE
+                value: 'True'
           restartPolicy: OnFailure

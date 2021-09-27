@@ -36,7 +36,7 @@ class TreeManager:
         self.discord_url = get_secret(
             MONITORING_SECRET_NAMES.get(chain, ""),
             "DISCORD_WEBHOOK_URL",
-            test=env_config.test,
+            kube=env_config.kube,
         )
 
     def convert_to_merkle_tree(self, rewardsList: RewardsList, start: int, end: int):
