@@ -9,6 +9,7 @@ from rich.console import Console
 
 from decouple import config
 from eth_account import Account
+import json
 import os
 
 console = Console()
@@ -22,7 +23,10 @@ def approve_rewards(chain):
         region_name="us-west-2",
     )
 
-    cycle_account = Account.decrypt(config("KEYFILE"), key_decrypt_password)
+    with open(config("KEYFILE")) as key_file:
+        key_file_json = json.load(key_file)
+
+    cycle_account = Account.decrypt(key_file_json, key_decrypt_password)
     # Account.from_key(cycle_key)
     tree_manager = TreeManager(chain, cycle_account)
     if tree_manager.has_pending_root():
