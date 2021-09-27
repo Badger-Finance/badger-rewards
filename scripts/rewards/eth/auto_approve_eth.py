@@ -1,4 +1,4 @@
-from scripts.rewards.utils.approve_rewards import approve_rewards
+from scripts.rewards.eth.approve_eth import approve_rewards
 import time
 from rich.console import Console
 
