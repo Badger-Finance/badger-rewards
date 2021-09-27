@@ -26,8 +26,8 @@ def approve_rewards(chain):
     with open(config("KEYFILE")) as key_file:
         key_file_json = json.load(key_file)
 
-    cycle_account = Account.decrypt(key_file_json, key_decrypt_password)
-    # Account.from_key(cycle_key)
+    cycle_key = Account.decrypt(key_file_json, key_decrypt_password)
+    cycle_account = Account.from_key(cycle_key)
     tree_manager = TreeManager(chain, cycle_account)
     if tree_manager.has_pending_root():
         console.log("pending root, start approve rewards")
