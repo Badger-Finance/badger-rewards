@@ -24,7 +24,9 @@ def approve_rewards(chain):
     cycle_account = Account.from_key(cycle_key)
 
     tree_manager = TreeManager(chain, cycle_account)
-    current_rewards, start_block, end_block = get_last_proposed_cycle(chain, tree_manager)
+    current_rewards, start_block, end_block = get_last_proposed_cycle(
+        chain, tree_manager
+    )
     if not current_rewards:
         return
 

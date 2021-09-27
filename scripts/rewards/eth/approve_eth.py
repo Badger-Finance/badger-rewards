@@ -24,24 +24,29 @@ def approve_rewards(chain):
     cycle_account = Account.decrypt(os.getenv("KEYFILE"), key_decrypt_password)
     # Account.from_key(cycle_key)
     tree_manager = TreeManager(chain, cycle_account)
-
-    currentRewards, startBlock, endBlock = get_last_proposed_cycle(chain, tree_manager)
-    if not currentRewards:
-        return
-
-    console.log(
-        "Generating rewards between {} and {} on {} chain".format(
-            startBlock, endBlock, chain
+    if tree_manager.has_pending_root():
+        console.log("pending root, start approve rewards")
+        currentRewards, startBlock, endBlock = get_last_proposed_cycle(
+            chain, tree_manager
         )
-    )
-    send_message_to_discord(
-        "**Approving Rewards on {}**".format(chain),
-        "Calculating rewards between {} and {}".format(startBlock, endBlock),
-        [],
-        "Rewards Bot",
-        url=discord_url,
-    )
-    return approve_root(chain, startBlock, endBlock, currentRewards, tree_manager)
+        if not currentRewards:
+            return
+
+        console.log(
+            "Generating rewards between {} and {} on {} chain".format(
+                startBlock, endBlock, chain
+            )
+        )
+        send_message_to_discord(
+            "**Approving Rewards on {}**".format(chain),
+            "Calculating rewards between {} and {}".format(startBlock, endBlock),
+            [],
+            "Rewards Bot",
+            url=discord_url,
+        )
+        return approve_root(chain, startBlock, endBlock, currentRewards, tree_manager)
+    else:
+        console.log("no pending root, exiting")
 
 
 if __name__ == "__main__":
