@@ -209,4 +209,4 @@ class TreeManager:
         return options
 
     def matches_pending_hash(self, new_hash: str) -> bool:
-        return self.badger_tree.pendingMerkleContentHash().call() == new_hash
+        return str(self.badger_tree.pendingMerkleContentHash().call()) == str(new_hash)
