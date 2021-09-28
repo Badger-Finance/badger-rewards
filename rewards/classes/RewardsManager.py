@@ -242,7 +242,7 @@ class RewardsManager:
                     "blockNumber": event["blockNumber"],
                     "timestamp": event["timestamp"],
                     "token": {"address": XSUSHI, "symbol": "xSushi"},
-                    "amount": event["rewardAmouht"],
+                    "amount": event["rewardAmount"],
                 },
             )
             block = int(event["blockNumber"])
