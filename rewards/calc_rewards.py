@@ -163,7 +163,7 @@ def approve_root(
         tree_manager=tree_manager,
     )
 
-    if tree_manager.matches_proposed_hash(rewards_data["rootHash"]):
+    if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
         console.log(
             f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
         )
