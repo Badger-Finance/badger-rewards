@@ -162,23 +162,34 @@ def approve_root(
         past_tree=current_rewards,
         tree_manager=tree_manager,
     )
-    console.log(
-        f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
-    )
 
-    tx_hash, success = tree_manager.approve_root(rewards_data)
-    cycle_logger.set_content_hash(rewards_data["rootHash"])
-    cycle_logger.set_merkle_root(rewards_data["merkleTree"]["merkleRoot"])
-    if success:
-        upload_tree(
-            rewards_data["fileName"],
-            rewards_data["merkleTree"],
-            chain,
-            staging=env_config.test,
+    if tree_manager.matches_proposed_hash(rewards_data["rootHash"]):
+        console.log(
+            f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
         )
 
-        add_multipliers(rewards_data["multiplierData"], rewards_data["userMultipliers"])
-        cycle_logger.save(tree_manager.next_cycle, chain)
+        tx_hash, success = tree_manager.approve_root(rewards_data)
+        cycle_logger.set_content_hash(rewards_data["rootHash"])
+        cycle_logger.set_merkle_root(rewards_data["merkleTree"]["merkleRoot"])
+        if success:
+            upload_tree(
+                rewards_data["fileName"],
+                rewards_data["merkleTree"],
+                chain,
+                staging=env_config.test,
+            )
+
+            add_multipliers(
+                rewards_data["multiplierData"], rewards_data["userMultipliers"]
+            )
+            cycle_logger.save(tree_manager.next_cycle, chain)
+            return rewards_data
+    else:
+        pending_hash = tree_manager.badger_tree.pendingMerkleContentHash().call()
+        console_and_discord(
+            f"Approve hash {rewards_data['rootHash']} doesn't match pending hash {pending_hash}",
+            chain,
+        )
         return rewards_data
 
 

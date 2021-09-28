@@ -207,3 +207,6 @@ class TreeManager:
         else:
             options["gasPrice"] = get_effective_gas_price(self.w3, self.chain)
         return options
+
+    def matches_pending_hash(self, new_hash: str) -> bool:
+        return self.badger_tree.pendingMerkleContentHash().call() == new_hash
