@@ -20,6 +20,7 @@ from rich.console import Console
 from config.env_config import env_config
 from config.rewards_config import rewards_config
 from eth_utils.hexadecimal import encode_hex
+from hexbytes import HexBytes
 from typing import List, Dict
 import json
 
@@ -185,9 +186,9 @@ def approve_root(
             cycle_logger.save(tree_manager.next_cycle, chain)
             return rewards_data
     else:
-        pending_hash = tree_manager.badger_tree.pendingMerkleContentHash().call()
+        pending_hash = HexBytes(tree_manager.badger_tree.pendingMerkleContentHash().call())
         console_and_discord(
-            f"Approve hash {rewards_data['rootHash']} doesn't match pending hash {pending_hash}",
+            f"Approve hash {rewards_data['rootHash']} doesn't match pending hash {pending_hash.hex()}",
             chain,
         )
         return rewards_data
