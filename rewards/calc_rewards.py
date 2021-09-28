@@ -139,7 +139,7 @@ def propose_root(
     console.log(
         f"\n==== Proposing root with rootHash {rewards_data['rootHash']} ====\n"
     )
-    tx_hash, success = tree_manager.propose_root(rewards_data)
+    #tx_hash, success = tree_manager.propose_root(rewards_data)
 
 
 def approve_root(
@@ -151,6 +151,8 @@ def approve_root(
     :param start: start block for rewards
     :param end: end block for rewards
     """
+    cycle_logger.set_start_block(start)
+    cycle_logger.set_end_block(end)
 
     rewards_data = generate_rewards_in_range(
         chain,
@@ -164,8 +166,6 @@ def approve_root(
         f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
     )
 
-    cycle_logger.set_start_block(start)
-    cycle_logger.set_end_block(end)
     tx_hash, success = tree_manager.approve_root(rewards_data)
     cycle_logger.set_content_hash(rewards_data["rootHash"])
     cycle_logger.set_merkle_root(rewards_data["merkleTree"]["merkleRoot"])
@@ -214,7 +214,6 @@ def generate_rewards_in_range(
         rewards_list.append(sushi_rewards)
 
     new_rewards = combine_rewards(rewards_list, rewards_manager.cycle)
-    new_rewards = combine_rewards([sett_rewards, tree_rewards], rewards_manager.cycle)
 
     console.log("Combining cumulative rewards... \n")
     cumulative_rewards = process_cumulative_rewards(past_tree, new_rewards)
