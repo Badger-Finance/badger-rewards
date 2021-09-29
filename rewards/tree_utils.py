@@ -39,6 +39,8 @@ def calc_next_cycle_range(chain: str, tree_manager: TreeManager):
 
     # Claim at last synced block
     end_block = last_synced_block(chain)
+    if chain == "arbitrum":
+        end_block = end_block - 100
 
     # Sanity check: Ensure start block is not too far in the past
     assert start_block < end_block
