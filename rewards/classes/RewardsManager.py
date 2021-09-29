@@ -25,12 +25,13 @@ console = Console()
 
 
 class RewardsManager:
-    def __init__(self, chain: str, cycle: int, start: int, end: int):
+    def __init__(self, chain: str, cycle: int, start: int, end: int, boosts):
         self.chain = chain
         self.web3 = env_config.get_web3(chain)
         self.cycle = cycle
         self.start = int(start)
         self.end = int(end)
+        self.boosts = boosts
         self.apy_boosts = {}
 
     def fetch_sett_snapshot(self, block: int, sett: str):
@@ -45,12 +46,12 @@ class RewardsManager:
         sett = controller.vaults(want).call()
         return sett
 
-    def calculate_sett_rewards(self, sett, schedules_by_token, boosts) -> RewardsList:
+    def calculate_sett_rewards(self, sett, schedules_by_token) -> RewardsList:
         start_time = self.web3.eth.getBlock(self.start)["timestamp"]
         end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         rewards = RewardsList(self.cycle)
         sett_balances = self.fetch_sett_snapshot(self.end, sett)
-        boosted_sett_balances = self.boost_sett(boosts, sett, sett_balances)
+        boosted_sett_balances = self.boost_sett(self.boosts, sett, sett_balances)
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(
                 token, end_time, schedules, sett
@@ -85,7 +86,7 @@ class RewardsManager:
         return rewards
 
     def calculate_all_sett_rewards(
-        self, setts: List[str], all_schedules, boosts
+        self, setts: List[str], all_schedules
     ) -> RewardsList:
         all_rewards = []
         for sett in setts:
@@ -93,7 +94,7 @@ class RewardsManager:
 
             console.log(f"Calculating rewards for {token.name().call()}")
             all_rewards.append(
-                self.calculate_sett_rewards(sett, all_schedules[sett], boosts)
+                self.calculate_sett_rewards(sett, all_schedules[sett])
             )
 
         return combine_rewards(all_rewards, self.cycle + 1)
@@ -109,12 +110,17 @@ class RewardsManager:
 
     def get_user_multipliers(self):
         user_multipliers = {}
-        for sett, user_apy_multipliers in self.apy_boosts.items():
-            for user, apy_multipliers in user_apy_multipliers.items():
-                user = self.web3.toChecksumAddress(user)
+        for sett, multipliers in self.get_sett_multipliers().items():
+            min_mult = multipliers["min"]
+            max_mult = multipliers["max"]
+            diff = max_mult - min_mult
+            for user, boost_info in self.boosts.items():
                 if user not in user_multipliers:
                     user_multipliers[user] = {}
-                user_multipliers[user][sett] = apy_multipliers
+                boost = boost_info.get("boost", 1)
+                
+                user_multipliers[user][sett] = multipliers["min"] + (boost/2000) * diff
+                
         return user_multipliers
 
     def get_distributed_for_token_at(
@@ -178,6 +184,7 @@ class RewardsManager:
                 self.apy_boosts[sett][user.address] = (
                     post_boost / pre_boost[user.address]
                 )
+                
         return snapshot
 
     def calculate_tree_distributions(self) -> RewardsList:
