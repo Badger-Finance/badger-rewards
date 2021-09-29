@@ -111,6 +111,8 @@ REWARDS_BLACKLIST = {
     "0xb65cef03b9b89f99517643226d76e286ee999e77": "Badger Dev Multisig",
     "0x8b950f43fcac4931d408f1fcda55c6cb6cbf3096": "Cream bBadger",
     "0x0a54d4b378c8dbfc7bc93be50c85debafdb87439": "Sushiswap bBadger/Weth",
+    "0x86cbD0ce0c087b482782c181dA8d191De18C8275": "Badger Tech Ops",
+    "0xD4868d98849a58F743787c77738D808376210292": "Badger Payments"
 }
 
 STAKE_RATIO_RANGES = list(
