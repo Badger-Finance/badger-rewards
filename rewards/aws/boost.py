@@ -5,16 +5,16 @@ from rich.console import Console
 import json
 
 console = Console()
-boost_file_name = "badger-boosts.json"
 
 
-def upload_boosts(boost_data):
+def upload_boosts(boost_data, chain: str):
     """Upload boosts file to aws bucket
 
     :param test:
     :param boost_data: calculated boost information
     """
 
+    boost_file_name = f"badger-boosts-{chain}.json"
     buckets = ["badger-staging-merkle-proofs"]
     if not env_config.test:
         buckets.append("badger-merkle-proofs")
@@ -42,12 +42,13 @@ def upload_boosts(boost_data):
         )
 
 
-def download_boosts():
+def download_boosts(chain: str):
     """Download latest boosts file
 
     :param test:
     """
     console.log("Downloading boosts ...")
+    boost_file_name = f"badger-boosts-{chain}"
     bucket = get_bucket(env_config.test)
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boost_file_name)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
@@ -55,13 +56,13 @@ def download_boosts():
     return data
 
 
-def add_user_data(user_data):
+def add_user_data(user_data, chain):
     """Upload users boost information
 
     :param test:
     :param user_data: user boost data
     """
-    old_boosts = download_boosts()
+    old_boosts = download_boosts(chain)
     boosts = {"userData": {}, "multiplierData": old_boosts["multiplierData"]}
     for user, data in user_data.items():
         if user in old_boosts["userData"]:
@@ -80,20 +81,20 @@ def add_user_data(user_data):
     with open("badger-boosts.json", "w") as fp:
         json.dump(boosts, fp, indent=4)
 
-    upload_boosts(boosts)
+    upload_boosts(boosts, chain)
 
 
-def add_multipliers(multiplier_data, user_multipliers):
+def add_multipliers(multiplier_data, user_multipliers, chain: str):
     """Upload sett and user multipliers
 
     :param test:
     :param multiplier_data: sett multipliers
     :param user_multipliers: user multipliers
     """
-    boosts = download_boosts()
+    boosts = download_boosts(chain)
     boosts["multiplierData"] = {**boosts["multiplierData"], **multiplier_data}
     for user in list(boosts["userData"].keys()):
         if user in user_multipliers:
             boosts["userData"][user]["multipliers"] = user_multipliers[user]
 
-    upload_boosts(boosts)
+    upload_boosts(boosts, chain)

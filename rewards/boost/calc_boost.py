@@ -31,13 +31,13 @@ def calc_stake_ratio(
     return stake_ratio
 
 
-def badger_boost(current_block: int):
+def badger_boost(current_block: int, chain: str):
     """
     Calculate badger boost multipliers based on stake ratios
     :param current_block: block to calculate boost at
     """
     console.log(f"Calculating boost at block {current_block} ...")
-    native_setts, non_native_setts = calc_boost_balances(current_block - 10)
+    native_setts, non_native_setts = calc_boost_balances(current_block - 10, chain)
 
     all_addresses = calc_union_addresses(native_setts, non_native_setts)
     console.log(f"{len(all_addresses)} addresses fetched")
