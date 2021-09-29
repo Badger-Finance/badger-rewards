@@ -113,6 +113,9 @@ REWARDS_BLACKLIST = {
     "0xb65cef03b9b89f99517643226d76e286ee999e77": "Badger Dev Multisig",
     "0x8b950f43fcac4931d408f1fcda55c6cb6cbf3096": "Cream bBadger",
     "0x0a54d4b378c8dbfc7bc93be50c85debafdb87439": "Sushiswap bBadger/Weth",
+    "0x660802Fc641b154aBA66a62137e71f331B6d787A": "Badger Tree",
+    "0x41671BA1abcbA387b9b2B752c205e22e916BE6e3": "IBBTC Peak",
+    "0x825218beD8BE0B30be39475755AceE0250C50627": "IBBTC ywBTC Peak"
 }
 
 STAKE_RATIO_RANGES = list(
