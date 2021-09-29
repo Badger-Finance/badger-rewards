@@ -73,18 +73,16 @@ def calc_boost_balances(
     :param block: block to collect the boost data from
     """
 
-    blocks_by_chain = convert_from_eth(block)
     native = Counter()
     non_native = Counter()
-    chain_block = blocks_by_chain[chain]
     console.log(f"Taking chain snapshot on {chain} \n")
     if chain == "polygon":
         snapshot = {}
     else:
-        snapshot = chain_snapshot(chain, chain_block)
+        snapshot = chain_snapshot(chain, block)
     console.log(f"Taking token snapshot on {chain}")
 
-    tokens = token_snapshot_usd(chain, chain_block)
+    tokens = token_snapshot_usd(chain, block)
     native = native + Counter(tokens)
     for sett, balances in snapshot.items():
         if sett in DISABLED_VAULTS:

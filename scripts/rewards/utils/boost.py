@@ -7,14 +7,15 @@ from rich.console import Console
 
 console = Console()
 
-if __name__ == "__main__":
-    current_block = env_config.get_web3().eth.block_number
-    chains = ",".join(BOOST_CHAINS)
+def generate_boosts(chain):
+    current_block = env_config.get_web3(chain).eth.block_number
     send_message_to_discord(
-        f"**CALCULATING NEW BOOST ({chains})**",
+        f"**CALCULATING NEW BOOST ({chain})**",
         "Pulling data from the graph",
         [],
         "Boost Bot",
     )
-    boost_data = badger_boost(current_block)
-    add_user_data(user_data=boost_data)
+    boost_data = badger_boost(current_block, chain)
+    add_user_data(user_data=boost_data, chain=chain)
+
+

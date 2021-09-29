@@ -48,7 +48,7 @@ def download_boosts(chain: str):
     :param test:
     """
     console.log("Downloading boosts ...")
-    boost_file_name = f"badger-boosts-{chain}"
+    boost_file_name = f"badger-boosts-{chain}.json"
     bucket = get_bucket(env_config.test)
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boost_file_name)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
@@ -77,9 +77,6 @@ def add_user_data(user_data, chain):
             "stakeRatio": data["stakeRatio"],
             "multipliers": multipliers,
         }
-
-    with open("badger-boosts.json", "w") as fp:
-        json.dump(boosts, fp, indent=4)
 
     upload_boosts(boosts, chain)
 

@@ -198,7 +198,7 @@ def generate_rewards_in_range(
     console_and_discord(f"Generating rewards for {len(setts)} setts", chain)
 
     rewards_list = []
-    boosts = download_boosts()
+    boosts = download_boosts(chain)
     rewards_manager = RewardsManager(chain, tree_manager.next_cycle, start, end, boosts["userData"])
 
     console.log("Calculating Tree Rewards...")
