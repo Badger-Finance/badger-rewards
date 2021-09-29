@@ -13,8 +13,8 @@ def upload_boosts(boost_data, chain: str):
     :param test:
     :param boost_data: calculated boost information
     """
-
-    boost_file_name = f"badger-boosts-{chain}.json"
+    chain_id = env_config.get_web3(chain).eth.chain_id
+    boost_file_name = f"badger-boosts-{chain_id}.json"
     buckets = ["badger-staging-merkle-proofs"]
     if not env_config.test:
         buckets.append("badger-merkle-proofs")
@@ -48,7 +48,9 @@ def download_boosts(chain: str):
     :param test:
     """
     console.log("Downloading boosts ...")
-    boost_file_name = f"badger-boosts-{chain}.json"
+    chain_id = env_config.get_web3(chain).eth.chain_id
+
+    boost_file_name = f"badger-boosts-{chain_id}.json"
     bucket = get_bucket(env_config.test)
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boost_file_name)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
