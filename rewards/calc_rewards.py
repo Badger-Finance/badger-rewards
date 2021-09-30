@@ -1,4 +1,3 @@
-from toolz.itertoolz import cons
 from rewards.aws.trees import upload_tree
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager
@@ -199,16 +198,16 @@ def generate_rewards_in_range(
 
     rewards_list = []
     boosts = download_boosts()
-    rewards_manager = RewardsManager(chain, tree_manager.next_cycle, start, end, boosts["userData"])
+    rewards_manager = RewardsManager(
+        chain, tree_manager.next_cycle, start, end, boosts["userData"]
+    )
 
     console.log("Calculating Tree Rewards...")
     tree_rewards = rewards_manager.calculate_tree_distributions()
     rewards_list.append(tree_rewards)
 
     console.log("Calculating Sett Rewards...")
-    sett_rewards = rewards_manager.calculate_all_sett_rewards(
-        setts, all_schedules
-    )
+    sett_rewards = rewards_manager.calculate_all_sett_rewards(setts, all_schedules)
     rewards_list.append(sett_rewards)
     if chain == "eth":
         sushi_rewards = rewards_manager.calc_sushi_distributions()

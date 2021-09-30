@@ -93,9 +93,7 @@ class RewardsManager:
             token = make_contract(sett, "ERC20", self.chain)
 
             console.log(f"Calculating rewards for {token.name().call()}")
-            all_rewards.append(
-                self.calculate_sett_rewards(sett, all_schedules[sett])
-            )
+            all_rewards.append(self.calculate_sett_rewards(sett, all_schedules[sett]))
 
         return combine_rewards(all_rewards, self.cycle + 1)
 
@@ -118,9 +116,11 @@ class RewardsManager:
                 if user not in user_multipliers:
                     user_multipliers[user] = {}
                 boost = boost_info.get("boost", 1)
-                
-                user_multipliers[user][sett] = multipliers["min"] + (boost/2000) * diff
-                
+
+                user_multipliers[user][sett] = (
+                    multipliers["min"] + (boost / 2000) * diff
+                )
+
         return user_multipliers
 
     def get_distributed_for_token_at(
@@ -184,7 +184,7 @@ class RewardsManager:
                 self.apy_boosts[sett][user.address] = (
                     post_boost / pre_boost[user.address]
                 )
-                
+
         return snapshot
 
     def calculate_tree_distributions(self) -> RewardsList:
