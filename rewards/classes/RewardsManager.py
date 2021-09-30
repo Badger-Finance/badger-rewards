@@ -17,7 +17,7 @@ from helpers.constants import DIGG
 from helpers.digg_utils import digg_utils
 from config.env_config import env_config
 from rich.console import Console
-from typing import List
+from typing import List, Dict
 
 console = Console()
 
@@ -44,7 +44,9 @@ class RewardsManager:
         sett = controller.vaults(want).call()
         return sett
 
-    def calculate_sett_rewards(self, sett, schedules_by_token) -> RewardsList:
+    def calculate_sett_rewards(
+        self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
+    ) -> RewardsList:
         start_time = self.web3.eth.getBlock(self.start)["timestamp"]
         end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         rewards = RewardsList(self.cycle)
@@ -84,7 +86,7 @@ class RewardsManager:
         return rewards
 
     def calculate_all_sett_rewards(
-        self, setts: List[str], all_schedules
+        self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
     ) -> RewardsList:
         all_rewards = []
         for sett in setts:
