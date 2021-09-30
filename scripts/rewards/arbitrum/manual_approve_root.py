@@ -1,4 +1,5 @@
 from scripts.rewards.utils.approve_rewards import approve_rewards
+from rewards.calc_rewards import generate_rewards_in_range
 from rewards.classes.TreeManager import TreeManager
 from rewards.tree_utils import get_last_proposed_cycle
 from rewards.aws.helpers import get_secret
@@ -33,10 +34,5 @@ if __name__ == "__main__":
     arb_tree = json.load(open("arb_tree.json"))
     start_block = arb_tree["startBlock"]
     end_block = arb_tree["endBlock"]
-
-    propose_root(chain, start_block, end_block,
-                 arb_tree, tree_manager, save=False)
-
-    time.sleep(10)
-
+    
     approve_root(chain, start_block, end_block, arb_tree, tree_manager)
