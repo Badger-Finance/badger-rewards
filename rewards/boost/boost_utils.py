@@ -86,7 +86,7 @@ def calc_boost_balances(block: int) -> Tuple[Dict[str, float], Dict[str, float]]
         tokens = token_snapshot_usd(chain, chain_block)
         native = native + Counter(tokens)
         for sett, balances in snapshot.items():
-            if sett in DISABLED_VAULTS:
+            if sett.lower() in DISABLED_VAULTS:
                 continue
             balances, sett_type = convert_balances_to_usd(balances, sett)
             if sett_type == "native":
