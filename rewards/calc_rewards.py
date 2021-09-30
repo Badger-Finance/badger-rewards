@@ -76,7 +76,7 @@ def fetch_setts(chain: str) -> List[str]:
     :param chain:
     """
     setts = list_setts(chain)
-    filtered_setts = list(filter(lambda x: x not in DISABLED_VAULTS, setts))
+    filtered_setts = list(filter(lambda x: x.lower() not in DISABLED_VAULTS, setts))
     return [env_config.get_web3().toChecksumAddress(s) for s in filtered_setts]
 
 
