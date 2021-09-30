@@ -32,7 +32,13 @@ if __name__ == "__main__":
     tree_manager = TreeManager(chain, cycle_account)
 
     arb_tree = json.load(open("arb_tree.json"))
+    arb_tree2 = dict(arb_tree)
     start_block = arb_tree["startBlock"]
     end_block = arb_tree["endBlock"]
+
+    propose_root(chain, start_block, end_block,
+                 arb_tree, tree_manager, save=True)
     
-    approve_root(chain, start_block, end_block, arb_tree, tree_manager)
+    time.sleep(60)
+    
+    approve_root(chain, start_block, end_block, arb_tree2, tree_manager)
