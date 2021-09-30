@@ -1,5 +1,3 @@
-from itertools import cycle
-from rewards.classes.UserBalance import UserBalance
 from helpers.constants import XSUSHI
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
@@ -51,7 +49,7 @@ class RewardsManager:
         end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         rewards = RewardsList(self.cycle)
         sett_balances = self.fetch_sett_snapshot(self.end, sett)
-        boosted_sett_balances = self.boost_sett(self.boosts, sett, sett_balances)
+        boosted_sett_balances = self.boost_sett(sett, sett_balances)
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(
                 token, end_time, schedules, sett
@@ -165,14 +163,14 @@ class RewardsManager:
 
         return total_to_distribute
 
-    def boost_sett(self, boosts, sett, snapshot: UserBalances):
+    def boost_sett(self, sett: str, snapshot: UserBalances):
         if snapshot.sett_type == "nonNative":
             pre_boost = {}
             for user in snapshot:
                 pre_boost[user.address] = snapshot.percentage_of_total(user.address)
 
             for user in snapshot:
-                boost_info = boosts.get(user.address, {})
+                boost_info = self.boosts.get(user.address, {})
                 boost = boost_info.get("boost", 1)
                 user.boost_balance(boost)
 
