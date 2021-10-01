@@ -7,6 +7,7 @@ from rich.console import Console
 
 console = Console()
 
+
 class Snapshot:
     def __init__(self, token, balances, ratio=1, type="none"):
         self.type = type

@@ -7,6 +7,7 @@ from rich.console import Console
 
 console = Console()
 
+
 def generate_boosts(chain):
     current_block = env_config.get_web3(chain).eth.block_number
     send_message_to_discord(
@@ -17,5 +18,3 @@ def generate_boosts(chain):
     )
     boost_data = badger_boost(current_block, chain)
     add_user_data(user_data=boost_data, chain=chain)
-
-

@@ -37,7 +37,9 @@ def filter_dust(balances: Dict[str, int], dust_amount: int) -> Dict[str, float]:
     return {addr: value for addr, value in balances.items() if value > dust_amount}
 
 
-def calc_boost_balances(block: int, chain: str) -> Tuple[Dict[str, float], Dict[str, float]]:
+def calc_boost_balances(
+    block: int, chain: str
+) -> Tuple[Dict[str, float], Dict[str, float]]:
     """
     Calculate boost data required for boost calculation
     :param block: block to collect the boost data from
@@ -45,11 +47,11 @@ def calc_boost_balances(block: int, chain: str) -> Tuple[Dict[str, float], Dict[
 
     native = Counter()
     non_native = Counter()
- 
+
     console.log(f"Taking token snapshot on {chain}")
     tokens = token_snapshot_usd(chain, block)
     native = native + Counter(tokens)
-    native_claimable, non_native_claimable = claims_snapshot_usd()
+    native_claimable, non_native_claimable = claims_snapshot_usd(chain)
 
     console.log(f"Taking chain snapshot on {chain} \n")
     if chain != "polygon":

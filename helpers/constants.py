@@ -181,7 +181,7 @@ DISABLED_VAULTS = [
     "0x85e1cacae9a63429394d68db59e14af74143c61c",
     "0xaf9ab64f568149361ab670372b16661f4380e80b",
     "0xfdb9e5a186fb7655ac9cd7caff3d6d4c6064cc50",
-    "0x0c2153e8ae4db8233c61717cdc4c75630e952561"
+    "0x0c2153e8ae4db8233c61717cdc4c75630e952561",
 ]
 
 MONITORING_SECRET_NAMES = {
@@ -191,3 +191,9 @@ MONITORING_SECRET_NAMES = {
 }
 
 BOOST_CHAINS = ["eth", "polygon", "arbitrum"]
+
+CLAIMABLE_TOKENS = {
+    "eth": {"native": [BADGER, DIGG], "non_native": [BCVX, BCVXCRV]},
+    "arbitrum": {"native": [ARB_BADGER], "non_native": []},
+    "polygon": {"native": [POLY_BADGER], "non_native": []},
+}

@@ -180,13 +180,16 @@ def approve_root(
             )
 
             add_multipliers(
-                rewards_data["multiplierData"], rewards_data["userMultipliers"],
-                chain=chain
+                rewards_data["multiplierData"],
+                rewards_data["userMultipliers"],
+                chain=chain,
             )
             cycle_logger.save(tree_manager.next_cycle, chain)
             return rewards_data
     else:
-        pending_hash = HexBytes(tree_manager.badger_tree.pendingMerkleContentHash().call())
+        pending_hash = HexBytes(
+            tree_manager.badger_tree.pendingMerkleContentHash().call()
+        )
         console_and_discord(
             f"Approve hash {rewards_data['rootHash']} doesn't match pending hash {pending_hash.hex()}",
             chain,
@@ -210,16 +213,16 @@ def generate_rewards_in_range(
 
     rewards_list = []
     boosts = download_boosts(chain)
-    rewards_manager = RewardsManager(chain, tree_manager.next_cycle, start, end, boosts["userData"])
+    rewards_manager = RewardsManager(
+        chain, tree_manager.next_cycle, start, end, boosts["userData"]
+    )
 
     console.log("Calculating Tree Rewards...")
     tree_rewards = rewards_manager.calculate_tree_distributions()
     rewards_list.append(tree_rewards)
 
     console.log("Calculating Sett Rewards...")
-    sett_rewards = rewards_manager.calculate_all_sett_rewards(
-        setts, all_schedules
-    )
+    sett_rewards = rewards_manager.calculate_all_sett_rewards(setts, all_schedules)
     rewards_list.append(sett_rewards)
     if chain == "eth":
         sushi_rewards = rewards_manager.calc_sushi_distributions()

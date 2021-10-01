@@ -3,20 +3,24 @@ from rewards.classes.Snapshot import Snapshot
 from helpers.constants import BADGER, DIGG, BCVX, BCVXCRV, ARB_BADGER, POLY_BADGER
 from typing import Dict, Tuple
 from helpers.digg_utils import digg_utils
+from helpers.constants import CLAIMABLE_TOKENS
 from functools import lru_cache
 from collections import Counter
 
+
 @lru_cache(maxsize=None)
-def claims_snapshot() -> Dict[str, Snapshot]:
-    all_claims = fetch_all_claimable_balances()
-    claimable_tokens = [BADGER, DIGG, BCVX, BCVXCRV, ARB_BADGER, POLY_BADGER]
+def claims_snapshot(chain: str) -> Dict[str, Snapshot]:
+    all_claims = fetch_all_claimable_balances(chain)
+    chain_claimable_tokens = CLAIMABLE_TOKENS[chain]
+    native_tokens = chain_claimable_tokens["native"]
+    non_native_tokens = chain_claimable_tokens["non_native"]
     claims_data = {}
     snapshots = {}
     for addr, claims in all_claims.items():
         for claim in claims:
             token = claim["address"]
             balance = int(claim["balance"])
-            if token in claimable_tokens:
+            if token in chain_claimable_tokens:
                 if token == DIGG:
                     balance = digg_utils.shares_to_fragments(balance)
                 if token not in claims_data:
@@ -24,17 +28,17 @@ def claims_snapshot() -> Dict[str, Snapshot]:
                 claims_data[token][addr] = balance
 
     for token, snapshot in claims_data.items():
-        if token in [BADGER, DIGG, ARB_BADGER, POLY_BADGER]:
+        if token in native_tokens:
             snapshots[token] = Snapshot(token, snapshot, ratio=1, type="native")
-        if token in [BCVX, BCVXCRV]:
+        if token in non_native_tokens:
             snapshots[token] = Snapshot(token, snapshot, ratio=1, type="nonNative")
 
     return snapshots
 
 
-def claims_snapshot_usd() -> Tuple[Counter, Counter]:
+def claims_snapshot_usd(chain: str) -> Tuple[Counter, Counter]:
     """Take a snapshot of native and non native claims in usd"""
-    snapshot = claims_snapshot()
+    snapshot = claims_snapshot(chain)
     native = Counter()
     non_native = Counter()
     for sett, claims in snapshot.items():
