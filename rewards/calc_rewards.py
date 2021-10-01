@@ -81,13 +81,11 @@ def fetch_setts(chain: str) -> List[str]:
     return [env_config.get_web3().toChecksumAddress(s) for s in filtered_setts]
 
 
-def process_cumulative_rewards(current, new: RewardsList):
+def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
     """Combine past rewards with new rewards
 
     :param current: current rewards
     :param new: new rewards
-    :return: [description]
-    :rtype: [type]
     """
     result = RewardsList(new.cycle)
 
@@ -132,7 +130,7 @@ def propose_root(
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-        # return
+        return
     rewards_data = generate_rewards_in_range(
         chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager
     )

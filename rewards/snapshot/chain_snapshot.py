@@ -1,16 +1,19 @@
+from rewards.classes.Snapshot import Snapshot
 from config.env_config import env_config
-from helpers.constants import REWARDS_BLACKLIST, SETT_INFO
+from helpers.constants import REWARDS_BLACKLIST, SETT_INFO, DISABLED_VAULTS
 from helpers.web3_utils import make_contract
-from rewards.classes.UserBalance import UserBalances, UserBalance
+from helpers.discord import send_message_to_discord
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
 from functools import lru_cache
 from rich.console import Console
 from typing import Dict, Tuple
+from collections import Counter
+from badger_api.prices import fetch_token_prices
 
 console = Console()
 
 
-def chain_snapshot(chain: str, block: int) -> Dict[str, UserBalances]:
+def chain_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     """
     Take a snapshot of a chains sett balances at a certain block
 
@@ -31,7 +34,7 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, UserBalances]:
     return balances_by_sett
 
 
-def sett_snapshot(chain: str, block: int, sett: str) -> UserBalances:
+def sett_snapshot(chain: str, block: int, sett: str) -> Snapshot:
     """
     Take a snapshot of a sett on a chain at a certain block
     :param chain:
@@ -46,7 +49,7 @@ def sett_snapshot(chain: str, block: int, sett: str) -> UserBalances:
     return parse_sett_balances(sett, sett_balances)
 
 
-def parse_sett_balances(sett_address: str, balances: Dict[str, int]) -> UserBalances:
+def parse_sett_balances(sett_address: str, balances: Dict[str, int]) -> Snapshot:
     """
     Blacklist balances and add metadata for boost
     :param balances: balances of users:
@@ -58,11 +61,9 @@ def parse_sett_balances(sett_address: str, balances: Dict[str, int]) -> UserBala
             del balances[addr]
 
     sett_type, sett_ratio = get_sett_info(sett_address)
-    console.log(f"Sett {sett_address} has type {sett_type} and Ratio {sett_ratio} \n")
-    user_balances = [
-        UserBalance(addr, bal, sett_address) for addr, bal in balances.items()
-    ]
-    return UserBalances(user_balances, sett_type, sett_ratio)
+    console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
+
+    return Snapshot(sett_address, balances, sett_type, sett_ratio)
 
 
 def get_sett_info(sett_address: str) -> Tuple[str, float]:
@@ -71,3 +72,21 @@ def get_sett_info(sett_address: str) -> Tuple[str, float]:
         {"type": "nonNative", "ratio": 1},
     )
     return info["type"], info["ratio"]
+
+
+def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
+    """Take a snapshot of a chains native/non native balances in usd"""
+    total_snapshot = chain_snapshot(chain, block)
+    native = Counter()
+    non_native = Counter()
+    for sett, snapshot in total_snapshot.items():
+        if sett in DISABLED_VAULTS:
+            continue
+        usd_snapshot = snapshot.convert_to_usd()
+        balances = Counter(snapshot.balances)
+        if usd_snapshot.type == "native":
+            native = native + balances
+        elif usd_snapshot.type == "nonNative":
+            non_native = non_native + balances
+
+    return native, non_native

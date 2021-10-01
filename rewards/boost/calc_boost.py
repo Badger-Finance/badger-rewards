@@ -54,8 +54,11 @@ def badger_boost(current_block: int, chain: str):
     stake_ratios = dict(zip(all_addresses, stake_ratios_list))
 
     for addr in all_addresses:
-        boost_info[addr] = {"nativeBalance": 0,
-                            "nonNativeBalance": 0, "stakeRatio": 0}
+        boost_info[addr.lower()] = {
+            "nativeBalance": 0,
+            "nonNativeBalance": 0,
+            "stakeRatio": 0,
+        }
 
     for user, native_usd in native_setts.items():
         boost_info[user.lower()]["nativeBalance"] = native_usd
