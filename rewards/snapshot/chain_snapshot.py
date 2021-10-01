@@ -63,7 +63,7 @@ def parse_sett_balances(sett_address: str, balances: Dict[str, int]) -> Snapshot
     sett_type, sett_ratio = get_sett_info(sett_address)
     console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
 
-    return Snapshot(sett_address, balances, sett_type, sett_ratio)
+    return Snapshot(sett_address, balances, sett_ratio, sett_type)
 
 
 def get_sett_info(sett_address: str) -> Tuple[str, float]:

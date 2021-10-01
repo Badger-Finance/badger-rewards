@@ -17,7 +17,7 @@ def fetch_total_claimable_pages():
     return fetch_claimable(1)["maxPage"]
 
 
-def fetch_all_claimable_balances():
+def fetch_all_claimable_balances(chain: str):
     """
     Fetch the claimable balances by fetching in parallel
 

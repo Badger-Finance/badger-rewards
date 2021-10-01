@@ -2,8 +2,6 @@ from rewards.classes.Snapshot import Snapshot
 from subgraph.queries.tokens import fetch_token_balances, fetch_fuse_pool_balances
 from subgraph.subgraph_utils import make_gql_client
 from helpers.constants import BADGER, DIGG
-from badger_api.prices import fetch_token_prices, fetch_ppfs
-from collections import Counter
 from typing import Dict, Tuple
 
 
@@ -13,7 +11,7 @@ def token_snapshot(chain: str, block: int) -> Tuple[Snapshot, Snapshot]:
     return Snapshot(BADGER, badger_bals), Snapshot(DIGG, digg_bals)
 
 
-def fuse_snapshot(chain: str, block: int):
+def fuse_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     fuse_client = make_gql_client("fuse")
     fuse_bals = fetch_fuse_pool_balances(fuse_client, chain, block)
     fuse_snapshots = {}
@@ -23,7 +21,7 @@ def fuse_snapshot(chain: str, block: int):
     return fuse_snapshots
 
 
-def token_snapshot_usd(chain: str, block: int):
+def token_snapshot_usd(chain: str, block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
 
     fuse_snapshots = fuse_snapshot(chain, block)
     badger_snapshot, digg_snapshot = token_snapshot(chain, block)
