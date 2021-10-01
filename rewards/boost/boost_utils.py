@@ -80,12 +80,13 @@ def calc_boost_balances(
         snapshot = {}
     else:
         snapshot = chain_snapshot(chain, block)
+        
     console.log(f"Taking token snapshot on {chain}")
 
     tokens = token_snapshot_usd(chain, block)
     native = native + Counter(tokens)
     for sett, balances in snapshot.items():
-        if sett in DISABLED_VAULTS:
+        if sett.lower() in DISABLED_VAULTS:
             continue
         balances, sett_type = convert_balances_to_usd(balances, sett)
         if sett_type == "native":
