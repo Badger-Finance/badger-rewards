@@ -182,7 +182,8 @@ def approve_root(
             )
 
             add_multipliers(
-                rewards_data["multiplierData"], rewards_data["userMultipliers"]
+                rewards_data["multiplierData"], rewards_data["userMultipliers"],
+                chain=chain
             )
             cycle_logger.save(tree_manager.next_cycle, chain)
             return rewards_data
