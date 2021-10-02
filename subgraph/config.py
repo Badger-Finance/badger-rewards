@@ -18,6 +18,6 @@ subgraph_urls = {
     "harvests-eth": "https://api.thegraph.com/subgraphs/name/darruma/badger-harvests",
     "harvests-polygon": "https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-polygon",
     "harvests-arbitrum": "https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-arbitrum",
-    "fuse": "https://api.thegraph.com/subgraphs/name/platocrat/fuse-subgraph",
+    "fuse": "https://api.thegraph.com/subgraphs/name/darruma/fuse-subgraph-badger",
     "thegraph": "https://api.thegraph.com/index-node/graphql",
 }
