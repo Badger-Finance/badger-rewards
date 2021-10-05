@@ -48,7 +48,14 @@ class RewardsManager:
         end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         rewards = RewardsList(self.cycle)
         sett_balances = self.fetch_sett_snapshot(self.end, sett)
-        boosted_sett_balances = self.boost_sett(boosts, sett, sett_balances)
+        """
+        When distributing rewards to the bcvx vault,
+        we want them to be calculated pro-rata
+        rather than boosted
+        """
+        if self.web3.toChecksumAddress(sett) != BLCVX:
+            sett_balances = self.boost_sett(boosts, sett, sett_balances)
+
         for token, schedules in schedules_by_token.items():
             token = self.web3.toChecksumAddress(token)
             end_dist = self.get_distributed_for_token_at(
@@ -70,19 +77,9 @@ class RewardsManager:
                 cycle_logger.add_sett_token_data(sett, token, token_distribution)
 
             if token_distribution > 0:
-                """
-                When distributing bcvxcrv to the bcvx vault,
-                we want the rewards to be calculated pro-rata
-                rather than boosted
-                """
-                if self.web3.toChecksumAddress(sett) == BLCVX and token in [BCVXCRV, BADGER]:
-                    bals = sett_balances
-                else:
-                    bals = boosted_sett_balances
-                    
-                total = bals.total_balance()
+                total = sett_balances.total_balance()
                 rewards_unit = token_distribution / total
-                for user in bals:
+                for user in sett_balances:
                     addr = self.web3.toChecksumAddress(user.address)
                     reward_amount = user.balance * rewards_unit
                     assert reward_amount >= 0
