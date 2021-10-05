@@ -1,6 +1,4 @@
-from itertools import cycle
-from rewards.classes.UserBalance import UserBalance
-from helpers.constants import BADGER, BCVX, BCVXCRV, BLCVX, XSUSHI
+from helpers.constants import BADGER, BCVX, BCVXCRV, BLCVX, DISABLED_VAULTS, XSUSHI
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
@@ -77,7 +75,7 @@ class RewardsManager:
                 we want the rewards to be calculated pro-rata
                 rather than boosted
                 """
-                if self.web3.toChecksumAddress(sett) == BLCVX and token == BCVXCRV:
+                if self.web3.toChecksumAddress(sett) == BLCVX and token in [BCVXCRV, BADGER]:
                     bals = sett_balances
                 else:
                     bals = boosted_sett_balances
