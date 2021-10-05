@@ -1,4 +1,4 @@
-from helpers.constants import BADGER, BCVX, BCVXCRV, BLCVX, DISABLED_VAULTS, XSUSHI
+from helpers.constants import BADGER, BCVX, BCVXCRV, BLCVX, DISABLED_VAULTS, PRO_RATA_VAULTS, XSUSHI
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
@@ -53,7 +53,7 @@ class RewardsManager:
         we want them to be calculated pro-rata
         rather than boosted
         """
-        if self.web3.toChecksumAddress(sett) != BLCVX:
+        if sett not in PRO_RATA_VAULTS:
             sett_balances = self.boost_sett(boosts, sett, sett_balances)
 
         for token, schedules in schedules_by_token.items():

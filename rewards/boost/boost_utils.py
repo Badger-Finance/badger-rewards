@@ -1,4 +1,4 @@
-from helpers.constants import BLCVX, BOOST_CHAINS, DISABLED_VAULTS
+from helpers.constants import BLCVX, BOOST_CHAINS, DISABLED_VAULTS, PRO_RATA_VAULTS
 from helpers.discord import send_message_to_discord
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rewards.explorer import convert_from_eth
@@ -87,7 +87,7 @@ def calc_boost_balances(block: int) -> Tuple[Dict[str, float], Dict[str, float]]
         native = native + Counter(tokens)
         for sett, balances in snapshot.items():
             sett = sett.lower()
-            if sett in DISABLED_VAULTS or sett == BLCVX.lower():
+            if sett in DISABLED_VAULTS or sett in PRO_RATA_VAULTS:
                 continue
             balances, sett_type = convert_balances_to_usd(balances, sett)
             if sett_type == "native":

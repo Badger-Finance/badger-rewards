@@ -183,6 +183,10 @@ DISABLED_VAULTS = [
     "0x0c2153e8ae4db8233c61717cdc4c75630e952561"
 ]
 
+PRO_RATA_VAULTS = [
+    BLCVX.lower()
+]
+
 MONITORING_SECRET_NAMES = {
     "eth": "cycle-bot/eth/prod-discord-url",
     "polygon": "cycle-bot/prod-discord-url",
