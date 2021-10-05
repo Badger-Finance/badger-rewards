@@ -1,4 +1,3 @@
-from toolz.itertoolz import cons
 from rewards.aws.trees import upload_tree
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager

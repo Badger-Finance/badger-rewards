@@ -1,7 +1,4 @@
-from helpers.constants import BOOST_CHAINS
-from rewards.explorer import convert_from_eth
 from rich.console import Console
-from config.env_config import env_config
 from typing import Dict, List, Tuple
 from collections import Counter
 from rewards.snapshot.chain_snapshot import chain_snapshot_usd

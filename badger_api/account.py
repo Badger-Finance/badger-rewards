@@ -1,7 +1,6 @@
 import requests
 from badger_api.config import urls
 import concurrent.futures
-from typing import List
 
 
 def fetch_claimable(page: int, chain: str):

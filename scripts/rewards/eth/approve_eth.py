@@ -10,7 +10,6 @@ from rich.console import Console
 from decouple import config
 from eth_account import Account
 import json
-import os
 
 console = Console()
 

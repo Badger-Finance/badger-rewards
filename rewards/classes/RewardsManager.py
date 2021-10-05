@@ -1,7 +1,6 @@
-from toolz.itertoolz import cons
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.classes.Snapshot import Snapshot
-from helpers.constants import EMISSIONS_CONTRACTS, XSUSHI
+from helpers.constants import BADGER, BCVX, BCVXCRV, BLCVX, DISABLED_VAULTS, PRO_RATA_VAULTS, XSUSHI, EMISSIONS_CONTRACTS
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
@@ -66,12 +65,19 @@ class RewardsManager:
         start_time = self.web3.eth.getBlock(self.start)["timestamp"]
         end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
-        boosted_sett_snapshot = self.boost_sett(sett, sett_snapshot)
         rewards = RewardsList(self.cycle)
         sett_balances = self.fetch_sett_snapshot(self.end, sett)
-        boosted_sett_balances = self.boost_sett(self.boosts, sett, sett_balances)
         extra_rewards = []
+        """
+        When distributing rewards to the bcvx vault,
+        we want them to be calculated pro-rata
+        rather than boosted
+        """
+        if sett not in PRO_RATA_VAULTS:
+            sett_snapshot = self.boost_sett(sett, sett_balances)
+
         for token, schedules in schedules_by_token.items():
+            token = self.web3.toChecksumAddress(token)
             end_dist = self.get_distributed_for_token_at(
                 token, end_time, schedules, sett
             )
@@ -81,7 +87,6 @@ class RewardsManager:
             for schedule in schedules:
                 if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     cycle_logger.add_schedule(sett, schedule)
-
             token_distribution = int(end_dist) - int(start_dist)
             if token == DIGG:
                 cycle_logger.add_sett_token_data(
@@ -91,12 +96,13 @@ class RewardsManager:
                 cycle_logger.add_sett_token_data(sett, token, token_distribution)
 
             if token_distribution > 0:
-                total = boosted_sett_balances.total_balance()
+                sett = self.web3.toChecksumAddress(sett)
+                total = sett_snapshot.total_balance()
                 if total == 0:
                     unit = 0
                 else:
                     unit = token_distribution / total
-                    for user, balance in boosted_sett_snapshot:
+                    for user, balance in sett_snapshot:
                         addr = self.web3.toChecksumAddress(user)
                         token = self.web3.toChecksumAddress(token)
                         reward_amount = balance * unit
