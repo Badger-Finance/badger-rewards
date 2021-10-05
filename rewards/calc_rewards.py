@@ -20,6 +20,7 @@ from rich.console import Console
 from config.env_config import env_config
 from config.rewards_config import rewards_config
 from eth_utils.hexadecimal import encode_hex
+from hexbytes import HexBytes
 from typing import List, Dict
 import json
 
@@ -75,7 +76,7 @@ def fetch_setts(chain: str) -> List[str]:
     :param chain:
     """
     setts = list_setts(chain)
-    filtered_setts = list(filter(lambda x: x not in DISABLED_VAULTS, setts))
+    filtered_setts = list(filter(lambda x: x.lower() not in DISABLED_VAULTS, setts))
     return [env_config.get_web3().toChecksumAddress(s) for s in filtered_setts]
 
 
@@ -162,23 +163,34 @@ def approve_root(
         past_tree=current_rewards,
         tree_manager=tree_manager,
     )
-    console.log(
-        f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
-    )
 
-    tx_hash, success = tree_manager.approve_root(rewards_data)
-    cycle_logger.set_content_hash(rewards_data["rootHash"])
-    cycle_logger.set_merkle_root(rewards_data["merkleTree"]["merkleRoot"])
-    if success:
-        upload_tree(
-            rewards_data["fileName"],
-            rewards_data["merkleTree"],
-            chain,
-            staging=env_config.test,
+    if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
+        console.log(
+            f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
         )
 
-        add_multipliers(rewards_data["multiplierData"], rewards_data["userMultipliers"])
-        cycle_logger.save(tree_manager.next_cycle, chain)
+        tx_hash, success = tree_manager.approve_root(rewards_data)
+        cycle_logger.set_content_hash(rewards_data["rootHash"])
+        cycle_logger.set_merkle_root(rewards_data["merkleTree"]["merkleRoot"])
+        if success:
+            upload_tree(
+                rewards_data["fileName"],
+                rewards_data["merkleTree"],
+                chain,
+                staging=env_config.test,
+            )
+
+            add_multipliers(
+                rewards_data["multiplierData"], rewards_data["userMultipliers"]
+            )
+            cycle_logger.save(tree_manager.next_cycle, chain)
+            return rewards_data
+    else:
+        pending_hash = HexBytes(tree_manager.badger_tree.pendingMerkleContentHash().call())
+        console_and_discord(
+            f"Approve hash {rewards_data['rootHash']} doesn't match pending hash {pending_hash.hex()}",
+            chain,
+        )
         return rewards_data
 
 

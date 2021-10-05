@@ -10,7 +10,6 @@ from typing import Dict, Tuple
 console = Console()
 
 
-@lru_cache(maxsize=128)
 def chain_snapshot(chain: str, block: int) -> Dict[str, UserBalances]:
     """
     Take a snapshot of a chains sett balances at a certain block
@@ -32,7 +31,6 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, UserBalances]:
     return balances_by_sett
 
 
-@lru_cache(maxsize=128)
 def sett_snapshot(chain: str, block: int, sett: str) -> UserBalances:
     """
     Take a snapshot of a sett on a chain at a certain block
