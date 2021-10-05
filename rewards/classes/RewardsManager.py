@@ -31,8 +31,8 @@ class RewardsManager:
         self.end = int(end)
         self.apy_boosts = {}
 
-    def fetch_sett_snapshot(self, block: int, sett: str):
-        return sett_snapshot(self.chain, block, sett)
+    def fetch_sett_snapshot(self, block: int, sett: str, blacklist: bool = True):
+        return sett_snapshot(self.chain, block, sett, blacklist)
 
     def get_sett_from_strategy(self, strat: str) -> str:
         strategy = make_contract(strat, "BaseStrategy", self.chain)
@@ -201,7 +201,7 @@ class RewardsManager:
             token = dist["token"]["address"]
             strategy = dist["id"].split("-")[0]
             sett = self.get_sett_from_strategy(strategy)
-            balances = self.fetch_sett_snapshot(block, sett)
+            balances = self.fetch_sett_snapshot(block, sett, blacklist=False)
             amount = int(dist["amount"])
             total_balance = balances.total_balance()
             if total_balance == 0:
@@ -256,7 +256,7 @@ class RewardsManager:
             cycle_logger.add_sett_token_data(
                 sett, self.web3.toChecksumAddress(XSUSHI), reward_amount
             )
-            balances = self.fetch_sett_snapshot(block, sett)
+            balances = self.fetch_sett_snapshot(block, sett, blacklist=False)
             rewards_unit = reward_amount / balances.total_balance()
             for user in balances:
                 user_rewards = rewards_unit * user.balance
