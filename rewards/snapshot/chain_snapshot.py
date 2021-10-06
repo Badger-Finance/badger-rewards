@@ -58,7 +58,7 @@ def parse_sett_balances(sett_address: str, balances: Dict[str, int], blacklist: 
 
     for addr, balance in list(balances.items()):
         if addr.lower() in addresses_to_blacklist:
-            console.log(f"Removing {REWARDS_BLACKLIST[addr.lower()]} from balances")
+            console.log(f"Removing {addresses_to_blacklist[addr.lower()]} from balances")
             del balances[addr]
 
     sett_type, sett_ratio = get_sett_info(sett_address)
