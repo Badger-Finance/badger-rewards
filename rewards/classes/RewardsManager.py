@@ -58,7 +58,7 @@ class RewardsManager:
         rather than boosted
         """
         if sett not in PRO_RATA_VAULTS:
-            sett_balances = self.boost_sett(boosts, sett, sett_balances)
+            sett_balances = self.boost_sett(sett, sett_balances)
 
         for token, schedules in schedules_by_token.items():
             token = self.web3.toChecksumAddress(token)
@@ -125,10 +125,11 @@ class RewardsManager:
                 if user not in user_multipliers:
                     user_multipliers[user] = {}
                 boost = boost_info.get("boost", 1)
-
-                user_multipliers[user][sett] = (
-                    multipliers["min"] + (boost / 2000) * diff
-                )
+                if boost == 1:
+                    user_sett_multiplier = multipliers["min"]
+                else:
+                    user_sett_multiplier = multipliers["min"] + (boost / 2000) * diff
+                user_multipliers[user][sett] = user_sett_multiplier
 
         return user_multipliers
 
@@ -198,7 +199,7 @@ class RewardsManager:
 
     def calculate_tree_distributions(self) -> RewardsList:
         tree_distributions = fetch_tree_distributions(
-            self.web3.eth.getBlock(self.start)["timestamp"],
+            self.web3.eth.getBlock(self.start - 20000)["timestamp"],
             self.web3.eth.getBlock(self.end)["timestamp"],
             self.chain,
         )
