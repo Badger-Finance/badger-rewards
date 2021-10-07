@@ -22,6 +22,7 @@ from config.rewards_config import rewards_config
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
 from typing import List, Dict
+from web3 import Web3
 import json
 
 console = Console()
@@ -76,7 +77,7 @@ def fetch_setts(chain: str) -> List[str]:
     :param chain:
     """
     setts = list_setts(chain)
-    filtered_setts = list(filter(lambda x: x.lower() not in DISABLED_VAULTS, setts))
+    filtered_setts = list(filter(lambda x: Web3.toChecksumAddress(x) not in DISABLED_VAULTS, setts))
     return [env_config.get_web3().toChecksumAddress(s) for s in filtered_setts]
 
 
@@ -140,7 +141,7 @@ def propose_root(
     console.log(
         f"\n==== Proposing root with rootHash {rewards_data['rootHash']} ====\n"
     )
-    tx_hash, success = tree_manager.propose_root(rewards_data)
+    #3tx_hash, success = tree_manager.propose_root(rewards_data)
 
 
 def approve_root(
@@ -210,16 +211,16 @@ def generate_rewards_in_range(
 
     rewards_list = []
     boosts = download_boosts()
-    rewards_manager = RewardsManager(
-        chain, tree_manager.next_cycle, start, end, boosts["userData"]
-    )
+    rewards_manager = RewardsManager(chain, tree_manager.next_cycle, start, end, boosts["userData"])
 
     console.log("Calculating Tree Rewards...")
     tree_rewards = rewards_manager.calculate_tree_distributions()
     rewards_list.append(tree_rewards)
 
     console.log("Calculating Sett Rewards...")
-    sett_rewards = rewards_manager.calculate_all_sett_rewards(setts, all_schedules)
+    sett_rewards = rewards_manager.calculate_all_sett_rewards(
+        setts, all_schedules
+    )
     rewards_list.append(sett_rewards)
     if chain == "eth":
         sushi_rewards = rewards_manager.calc_sushi_distributions()
@@ -242,6 +243,7 @@ def generate_rewards_in_range(
     if save:
         with open(file_name, "w") as fp:
             json.dump(merkle_tree, fp, indent=4)
+
     return {
         "merkleTree": merkle_tree,
         "rootHash": root_hash.hex(),

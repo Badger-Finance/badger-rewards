@@ -57,7 +57,7 @@ class RewardsManager:
         we want them to be calculated pro-rata
         rather than boosted
         """
-        if sett not in PRO_RATA_VAULTS:
+        if self.web3.toChecksumAddress(sett) not in PRO_RATA_VAULTS:
             sett_balances = self.boost_sett(sett, sett_balances)
 
         for token, schedules in schedules_by_token.items():
