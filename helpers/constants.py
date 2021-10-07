@@ -107,17 +107,21 @@ BADGER_SETTS = ["native.badger", "native.uniBadgerWbtc", "native.sushiBadgerWbtc
 NATIVE_DIGG_SETTS = ["native.uniDiggWbtc", "native.sushiDiggWbtc"]
 
 
-REWARDS_BLACKLIST = {
-    "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28": "Badger Vault",
+EMISSIONS_BLACKLIST = {
     "0xb65cef03b9b89f99517643226d76e286ee999e77": "Badger Dev Multisig",
+    "0x86cbD0ce0c087b482782c181dA8d191De18C8275": "Badger Tech Ops",
+}
+
+REWARDS_BLACKLIST = {
     "0x8b950f43fcac4931d408f1fcda55c6cb6cbf3096": "Cream bBadger",
     "0x0a54d4b378c8dbfc7bc93be50c85debafdb87439": "Sushiswap bBadger/Weth",
     "0x660802Fc641b154aBA66a62137e71f331B6d787A": "Badger Tree",
+    "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28": "Badger Vault",
     "0x41671BA1abcbA387b9b2B752c205e22e916BE6e3": "IBBTC Peak",
     "0x825218beD8BE0B30be39475755AceE0250C50627": "IBBTC ywBTC Peak",
-    "0x86cbD0ce0c087b482782c181dA8d191De18C8275": "Badger Tech Ops",
-    "0xD4868d98849a58F743787c77738D808376210292": "Badger Payments"
+    "0xD4868d98849a58F743787c77738D808376210292": "Badger Payments",
 }
+
 
 STAKE_RATIO_RANGES = list(
     [
@@ -185,11 +189,12 @@ DISABLED_VAULTS = [
     "0x85e1cacae9a63429394d68db59e14af74143c61c",
     "0xaf9ab64f568149361ab670372b16661f4380e80b",
     "0xfdb9e5a186fb7655ac9cd7caff3d6d4c6064cc50",
-    "0x0c2153e8ae4db8233c61717cdc4c75630e952561"
+    "0x0c2153e8ae4db8233c61717cdc4c75630e952561",
+    "0x53c8e199eb2cb7c01543c137078a038937a68e40"
 ]
 
 PRO_RATA_VAULTS = [
-    BLCVX.lower()
+    BLCVX
 ]
 
 MONITORING_SECRET_NAMES = {
