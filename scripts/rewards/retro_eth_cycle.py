@@ -28,7 +28,7 @@ if __name__ == "__main__":
     cycle_account = Account.from_key(cycle_key)
     end_block = last_synced_block(chain)
     tree_manager = TreeManager(chain, cycle_account)
-    
+    print(start_block, end_block)
     rewards = generate_rewards_in_range(
         chain,
         start=start_block,
@@ -37,14 +37,14 @@ if __name__ == "__main__":
         past_tree=tree,
         tree_manager=tree_manager
     )
-    tx_hash, success = tree_manager.propose_root(
+    tx_hash, propose_success = tree_manager.propose_root(
         rewards
     )
-    if success:
-        tx_hash, success = tree_manager.approve_root(
+    if propose_success:
+        tx_hash, approve_success = tree_manager.approve_root(
             rewards
         )
-        if success:
+        if approve_success:
             upload_tree(
                 rewards["fileName"],
                 rewards["merkleTree"],
