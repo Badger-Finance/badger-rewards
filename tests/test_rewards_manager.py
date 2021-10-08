@@ -13,13 +13,16 @@ os.environ["TEST"] = "True"
 def cycle() -> int:
     return test_cycle
 
+
 @pytest.fixture
 def start() -> int:
     return test_start
 
+
 @pytest.fixture
 def end() -> bool:
     return test_end
+
 
 @pytest.fixture
 def boosts():
@@ -28,6 +31,7 @@ def boosts():
 
 def mock_get_sett_multipliers():
     return mock_boosts["multiplierData"]
+
 
 @pytest.fixture
 def rewards_manager(cycle, start, end, boosts, request) -> RewardsManager:
@@ -46,5 +50,3 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
     for user, data in user_multipliers.items():
         user_info = boosts["userData"][user]
         TestCase().assertDictEqual(data, user_info)
-
-        

@@ -8,8 +8,8 @@ chains = ["eth", "arbitrum", "polygon"]
 
 with open("tests/mock_tree.json") as f:
     mock_tree = json.load(f)
+
 mock_boosts = json.load(open("tests/mock_boosts.json"))
-print(mock_boosts)
 test_start = int(mock_tree["startBlock"])
 test_end = int(mock_tree["endBlock"])
 test_cycle = int(mock_tree["cycle"])
