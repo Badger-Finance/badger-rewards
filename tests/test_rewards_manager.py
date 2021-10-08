@@ -25,14 +25,9 @@ def end() -> bool:
 def boosts():
     return mock_boosts
 
-@pytest.fixture
-def user_data():
-    return mock_boosts["userData"]
-
 
 def mock_get_sett_multipliers():
     return mock_boosts["multiplierData"]
-
 
 @pytest.fixture
 def rewards_manager(cycle, start, end, boosts, request) -> RewardsManager:
@@ -46,11 +41,10 @@ def rewards_manager(cycle, start, end, boosts, request) -> RewardsManager:
     ["eth"],
     indirect=True,
 )
-def test_get_user_multipliers(rewards_manager: RewardsManager, user_data):
+def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
     user_multipliers = rewards_manager.get_user_multipliers()
     for user, data in user_multipliers.items():
-        for sett, mult in data.items():
-            if sett in user_data[user]:
-                assert mult == user_data[user][sett]
+        user_info = boosts["userData"][user]
+        TestCase().assertDictEqual(data, user_info)
 
         
