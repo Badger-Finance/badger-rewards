@@ -46,7 +46,9 @@ def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> UserBal
     return parse_sett_balances(sett, sett_balances, blacklist)
 
 
-def parse_sett_balances(sett_address: str, balances: Dict[str, int], blacklist: bool = True) -> UserBalances:
+def parse_sett_balances(
+    sett_address: str, balances: Dict[str, int], blacklist: bool = True
+) -> UserBalances:
     """
     Blacklist balances and add metadata for boost
     :param balances: balances of users:

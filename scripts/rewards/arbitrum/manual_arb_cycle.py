@@ -36,9 +36,8 @@ if __name__ == "__main__":
     start_block = arb_tree["startBlock"]
     end_block = arb_tree["endBlock"]
 
-    propose_root(chain, start_block, end_block,
-                 arb_tree, tree_manager, save=True)
-    
+    propose_root(chain, start_block, end_block, arb_tree, tree_manager, save=True)
+
     time.sleep(60)
-    
+
     approve_root(chain, start_block, end_block, arb_tree2, tree_manager)

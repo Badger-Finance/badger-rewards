@@ -1,5 +1,4 @@
-import web3
-from helpers.constants import BLCVX, BOOST_CHAINS, DISABLED_VAULTS, PRO_RATA_VAULTS
+from helpers.constants import BOOST_CHAINS, DISABLED_VAULTS, PRO_RATA_VAULTS
 from web3 import Web3
 from helpers.discord import send_message_to_discord
 from rewards.snapshot.token_snapshot import token_snapshot_usd

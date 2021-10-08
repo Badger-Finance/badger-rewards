@@ -1,4 +1,4 @@
-from helpers.constants import BADGER, BCVX, BCVXCRV, BLCVX, DISABLED_VAULTS, PRO_RATA_VAULTS, XSUSHI
+from helpers.constants import PRO_RATA_VAULTS, XSUSHI
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
@@ -12,7 +12,6 @@ from rewards.classes.UserBalance import UserBalances
 from rewards.classes.Schedule import Schedule
 from rewards.classes.CycleLogger import cycle_logger
 from helpers.time_utils import to_utc_date, to_hours
-from helpers.web3_utils import make_contract
 from helpers.constants import DIGG
 from helpers.digg_utils import digg_utils
 from config.env_config import env_config
@@ -71,7 +70,7 @@ class RewardsManager:
             for schedule in schedules:
                 if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     cycle_logger.add_schedule(sett, schedule)
-                    
+
             token_distribution = int(end_dist) - int(start_dist)
             if token == DIGG:
                 cycle_logger.add_sett_token_data(
