@@ -15,10 +15,10 @@ if __name__ == "__main__":
     tree_file_name = "rewards-1-0x83b8544a0ea1cac9747c4aec3c9e6df79611bd6c1e54333d101ac162df82cd91.json"
     tree = json.load(open(tree_file_name))
     start_block = int(tree["endBlock"]) + 1
-    
+
     with open(config("KEYFILE")) as key_file:
         key_file_json = json.load(key_file)
-        
+
     key_decrypt_password = get_secret(
         config("DECRYPT_PASSWORD_ARN"),
         config("DECRYPT_PASSWORD_KEY"),
@@ -35,25 +35,9 @@ if __name__ == "__main__":
         end=end_block,
         save=False,
         past_tree=tree,
-        tree_manager=tree_manager
+        tree_manager=tree_manager,
     )
-    tx_hash, approve_success = tree_manager.approve_root(
-        rewards
-    )
+    tx_hash, approve_success = tree_manager.approve_root(rewards)
     if approve_success:
-        upload_tree(
-            rewards["fileName"],
-            rewards["merkleTree"],
-            chain,
-            False
-        )
-        add_multipliers(
-            rewards["multiplierData"], rewards["userMultipliers"]
-        )
-
-
-
-    
-    
-    
-    
+        upload_tree(rewards["fileName"], rewards["merkleTree"], chain, False)
+        add_multipliers(rewards["multiplierData"], rewards["userMultipliers"])

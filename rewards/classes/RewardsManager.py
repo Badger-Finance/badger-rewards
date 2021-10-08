@@ -1,4 +1,4 @@
-from helpers.constants import BADGER, BCVX, BCVXCRV, BLCVX, DISABLED_VAULTS, PRO_RATA_VAULTS, XSUSHI
+from helpers.constants import PRO_RATA_VAULTS, XSUSHI
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
@@ -12,23 +12,23 @@ from rewards.classes.UserBalance import UserBalances
 from rewards.classes.Schedule import Schedule
 from rewards.classes.CycleLogger import cycle_logger
 from helpers.time_utils import to_utc_date, to_hours
-from helpers.web3_utils import make_contract
 from helpers.constants import DIGG
 from helpers.digg_utils import digg_utils
 from config.env_config import env_config
 from rich.console import Console
-from typing import List
+from typing import List, Dict
 
 console = Console()
 
 
 class RewardsManager:
-    def __init__(self, chain: str, cycle: int, start: int, end: int):
+    def __init__(self, chain: str, cycle: int, start: int, end: int, boosts):
         self.chain = chain
         self.web3 = env_config.get_web3(chain)
         self.cycle = cycle
         self.start = int(start)
         self.end = int(end)
+        self.boosts = boosts
         self.apy_boosts = {}
 
     def fetch_sett_snapshot(self, block: int, sett: str, blacklist: bool = True):
@@ -43,18 +43,21 @@ class RewardsManager:
         sett = controller.vaults(want).call()
         return sett
 
-    def calculate_sett_rewards(self, sett, schedules_by_token, boosts) -> RewardsList:
+    def calculate_sett_rewards(
+        self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
+    ) -> RewardsList:
         start_time = self.web3.eth.getBlock(self.start)["timestamp"]
         end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         rewards = RewardsList(self.cycle)
         sett_balances = self.fetch_sett_snapshot(self.end, sett)
+
         """
         When distributing rewards to the bcvx vault,
         we want them to be calculated pro-rata
         rather than boosted
         """
-        if sett not in PRO_RATA_VAULTS:
-            sett_balances = self.boost_sett(boosts, sett, sett_balances)
+        if self.web3.toChecksumAddress(sett) not in PRO_RATA_VAULTS:
+            sett_balances = self.boost_sett(sett, sett_balances)
 
         for token, schedules in schedules_by_token.items():
             token = self.web3.toChecksumAddress(token)
@@ -67,7 +70,7 @@ class RewardsManager:
             for schedule in schedules:
                 if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     cycle_logger.add_schedule(sett, schedule)
-                    
+
             token_distribution = int(end_dist) - int(start_dist)
             if token == DIGG:
                 cycle_logger.add_sett_token_data(
@@ -91,16 +94,14 @@ class RewardsManager:
         return rewards
 
     def calculate_all_sett_rewards(
-        self, setts: List[str], all_schedules, boosts
+        self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
     ) -> RewardsList:
         all_rewards = []
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
 
             console.log(f"Calculating rewards for {token.name().call()}")
-            all_rewards.append(
-                self.calculate_sett_rewards(sett, all_schedules[sett], boosts)
-            )
+            all_rewards.append(self.calculate_sett_rewards(sett, all_schedules[sett]))
 
         return combine_rewards(all_rewards, self.cycle + 1)
 
@@ -113,14 +114,22 @@ class RewardsManager:
             }
         return sett_multipliers
 
-    def get_user_multipliers(self):
+    def get_user_multipliers(self) -> Dict[str, Dict[str, float]]:
         user_multipliers = {}
-        for sett, user_apy_multipliers in self.apy_boosts.items():
-            for user, apy_multipliers in user_apy_multipliers.items():
-                user = self.web3.toChecksumAddress(user)
+        for sett, multipliers in self.get_sett_multipliers().items():
+            min_mult = multipliers["min"]
+            max_mult = multipliers["max"]
+            diff = max_mult - min_mult
+            for user, boost_info in self.boosts.items():
                 if user not in user_multipliers:
                     user_multipliers[user] = {}
-                user_multipliers[user][sett] = apy_multipliers
+                boost = boost_info.get("boost", 1)
+                if boost == 1:
+                    user_sett_multiplier = multipliers["min"]
+                else:
+                    user_sett_multiplier = multipliers["min"] + (boost / 2000) * diff
+                user_multipliers[user][sett] = user_sett_multiplier
+
         return user_multipliers
 
     def get_distributed_for_token_at(
@@ -165,14 +174,14 @@ class RewardsManager:
 
         return total_to_distribute
 
-    def boost_sett(self, boosts, sett, snapshot: UserBalances):
+    def boost_sett(self, sett: str, snapshot: UserBalances):
         if snapshot.sett_type == "nonNative":
             pre_boost = {}
             for user in snapshot:
                 pre_boost[user.address] = snapshot.percentage_of_total(user.address)
 
             for user in snapshot:
-                boost_info = boosts.get(user.address, {})
+                boost_info = self.boosts.get(user.address, {})
                 boost = boost_info.get("boost", 1)
                 user.boost_balance(boost)
 
@@ -184,11 +193,12 @@ class RewardsManager:
                 self.apy_boosts[sett][user.address] = (
                     post_boost / pre_boost[user.address]
                 )
+
         return snapshot
 
     def calculate_tree_distributions(self) -> RewardsList:
         tree_distributions = fetch_tree_distributions(
-            self.web3.eth.getBlock(self.start)["timestamp"],
+            self.web3.eth.getBlock(self.start - 20000)["timestamp"],
             self.web3.eth.getBlock(self.end)["timestamp"],
             self.chain,
         )

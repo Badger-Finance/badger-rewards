@@ -5,6 +5,7 @@ from rewards.classes.UserBalance import UserBalances, UserBalance
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
 from rich.console import Console
 from typing import Dict, Tuple
+from web3 import Web3
 
 console = Console()
 
@@ -45,7 +46,9 @@ def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> UserBal
     return parse_sett_balances(sett, sett_balances, blacklist)
 
 
-def parse_sett_balances(sett_address: str, balances: Dict[str, int], blacklist: bool = True) -> UserBalances:
+def parse_sett_balances(
+    sett_address: str, balances: Dict[str, int], blacklist: bool = True
+) -> UserBalances:
     """
     Blacklist balances and add metadata for boost
     :param balances: balances of users:
@@ -57,9 +60,11 @@ def parse_sett_balances(sett_address: str, balances: Dict[str, int], blacklist: 
         addresses_to_blacklist = REWARDS_BLACKLIST
 
     for addr, balance in list(balances.items()):
-        if addr.lower() in addresses_to_blacklist:
-            console.log(f"Removing {addresses_to_blacklist[addr.lower()]} from balances")
-            del balances[addr]
+        addr = Web3.toChecksumAddress(addr)
+        print(addr)
+        if addr in addresses_to_blacklist:
+            console.log(f"Removing {addresses_to_blacklist[addr]} from balances")
+            del balances[addr.lower()]
 
     sett_type, sett_ratio = get_sett_info(sett_address)
     console.log(f"Sett {sett_address} has type {sett_type} and Ratio {sett_ratio} \n")
