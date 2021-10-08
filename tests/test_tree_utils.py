@@ -1,11 +1,6 @@
-import os
 import pytest
 import json
-from brownie import accounts, Contract, web3
 from eth_account import Account
-from decimal import Decimal
-from hexbytes import HexBytes
-from web3 import contract
 
 
 from rewards.tree_utils import get_last_proposed_cycle, calc_next_cycle_range

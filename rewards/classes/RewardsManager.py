@@ -114,7 +114,7 @@ class RewardsManager:
             }
         return sett_multipliers
 
-    def get_user_multipliers(self):
+    def get_user_multipliers(self) -> Dict[str, Dict[str, float]]:
         user_multipliers = {}
         for sett, multipliers in self.get_sett_multipliers().items():
             min_mult = multipliers["min"]

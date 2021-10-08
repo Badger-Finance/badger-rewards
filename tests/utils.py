@@ -1,4 +1,3 @@
-from brownie import Contract
 from decimal import Decimal
 from hexbytes import HexBytes
 import json
@@ -6,8 +5,14 @@ import json
 test_address = "0xD88a9aF149366d57aEbc32D2eABAdf93EdA41A84"
 test_key = "0f0bdc830bde4be43c3a54c369c6f6a94ac9071911dc3913e35ce5ed8fe955b9"
 chains = ["eth", "arbitrum", "polygon"]
-with open("./tests/mock_tree.json") as f:
+
+with open("tests/mock_tree.json") as f:
     mock_tree = json.load(f)
+mock_boosts = json.load(open("tests/mock_boosts.json"))
+print(mock_boosts)
+test_start = int(mock_tree["startBlock"])
+test_end = int(mock_tree["endBlock"])
+test_cycle = int(mock_tree["cycle"])
 
 
 def mock_send_discord(
