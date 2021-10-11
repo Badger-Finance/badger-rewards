@@ -1,5 +1,6 @@
 
 from helpers.constants import BCVX, BCVXCRV
+from rewards.aws.boost import download_boosts
 from rewards.calc_rewards import process_cumulative_rewards
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.classes.RewardsList import RewardsList
@@ -22,6 +23,7 @@ def check_negative_balances(merkle_tree, tree_manager):
         balances_to_fix[addr] = {}
         if any(token in tokens_to_check for token in claims["tokens"]):
             claimed = tree_manager.get_claimed_for(addr, [BCVX, BCVXCRV])
+            print(claimed)
             bcvx_claimed = claimed[1][claimed.index(BCVX)]
             bcvx_crv_claimed = claimed[1][claimed.index(BCVXCRV)]
             
@@ -39,6 +41,7 @@ def check_negative_balances(merkle_tree, tree_manager):
                     balances_to_fix[addr] = {}
                 balances_to_fix[addr][BCVXCRV] = abs(claimable_bcvxcrv)
                 
+    print(balances_to_fix)            
     return balances_to_fix
 
                 
@@ -48,6 +51,8 @@ def fix_eth_rewards():
     tree_file_name = "rewards-1-0xd00b9252eeb4b0a35a9e23b24f28a3154a09f1072f6b2f870796347eee844870.json"
     tree = json.load(open(tree_file_name))
     start_block = int(tree["endBlock"]) + 1
+    end_block = 13398599
+    
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
         "private",
@@ -57,8 +62,8 @@ def fix_eth_rewards():
     cycle_account = Account.from_key(cycle_key)
 
     tree_manager = TreeManager(chain, cycle_account)
-    rewards_manager = RewardsManager("eth", tree_manager.next_cycle, start_block, end_block)
-    end_block = 13398599
+    boosts = download_boosts()
+    rewards_manager = RewardsManager("eth", tree_manager.next_cycle, start_block, end_block, boosts)
     print(start_block, end_block)
     
     ## Generate rewards for cycle

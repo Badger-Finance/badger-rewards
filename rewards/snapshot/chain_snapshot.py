@@ -61,7 +61,6 @@ def parse_sett_balances(
 
     for addr, balance in list(balances.items()):
         addr = Web3.toChecksumAddress(addr)
-        print(addr)
         if addr in addresses_to_blacklist:
             console.log(f"Removing {addresses_to_blacklist[addr]} from balances")
             del balances[addr.lower()]

@@ -1,6 +1,5 @@
 from config.env_config import env_config
 from rewards.classes.TreeManager import TreeManager
-from couple import config
 from rewards.aws.helpers import get_secret
 from eth_account import Account
 from scripts.rewards.eth.retroactive.fix_eth_rewards.fix_eth_rewards import fix_eth_rewards
