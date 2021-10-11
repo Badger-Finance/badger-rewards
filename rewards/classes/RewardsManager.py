@@ -198,7 +198,7 @@ class RewardsManager:
 
     def calculate_tree_distributions(self) -> RewardsList:
         tree_distributions = fetch_tree_distributions(
-            self.web3.eth.getBlock(self.start - 20000)["timestamp"],
+            self.web3.eth.getBlock(self.start)["timestamp"],
             self.web3.eth.getBlock(self.end)["timestamp"],
             self.chain,
         )
