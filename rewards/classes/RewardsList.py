@@ -46,6 +46,21 @@ class RewardsList:
             self.totals[token] += toAdd
         else:
             self.totals[token] = toAdd
+            
+    def decrease_user_rewards(self, user, token, to_decrease):
+        if to_decrease < 0:
+            to_decrease = 0
+            
+        if user in self.claims and token in self.claims[user]:
+            self.claims[user][token] -= to_decrease
+        else:
+            self.claims[user][token] = 0
+
+        if token in self.totals:
+            self.totals[token] -= to_decrease
+        else:
+            self.totals[token] = 0
+        
 
     def hasToken(self, token):
         if self.tokens[token]:
