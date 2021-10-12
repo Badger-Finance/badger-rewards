@@ -24,7 +24,7 @@ if __name__ == "__main__":
     cycle_account = Account.from_key(cycle_key)
     tree_manager = TreeManager(chain, cycle_account)
 
-    rewards = fix_eth_rewards()
+    rewards = fix_eth_rewards(tree_manager)
     if tree_manager.matches_pending_hash(rewards["rootHash"]):
         tx_hash, approve_success = tree_manager.approve_root(rewards)
         if approve_success:

@@ -78,22 +78,13 @@ def check_negative_balances(merkle_tree, tree_manager):
     return balances_to_fix
 
 
-def fix_eth_rewards(): 
+def fix_eth_rewards(tree_manager): 
     chain = "eth"
     tree_file_name = "rewards-1-0xd00b9252eeb4b0a35a9e23b24f28a3154a09f1072f6b2f870796347eee844870.json"
     tree = json.load(open(tree_file_name))
     start_block = int(tree["endBlock"]) + 1
     end_block = 13403312
     
-    cycle_key = get_secret(
-        "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
-        "private",
-        assume_role_arn="arn:aws:iam::747584148381:role/cycle20210908001427790200000001",
-        kube=env_config.kube,
-    )
-    cycle_account = Account.from_key(cycle_key)
-
-    tree_manager = TreeManager(chain, cycle_account)
     boosts = download_boosts()
     rewards_manager = RewardsManager("eth", tree_manager.next_cycle, start_block, end_block, boosts)
     print(start_block, end_block)

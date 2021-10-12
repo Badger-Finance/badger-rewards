@@ -23,5 +23,5 @@ if __name__ == "__main__":
     cycle_account = Account.from_key(cycle_key)
     tree_manager = TreeManager(chain, cycle_account)
 
-    rewards = fix_eth_rewards()
+    rewards = fix_eth_rewards(tree_manager)
   
