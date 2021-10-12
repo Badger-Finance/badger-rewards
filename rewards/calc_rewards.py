@@ -143,7 +143,7 @@ def propose_root(
     console.log(
         f"\n==== Proposing root with rootHash {rewards_data['rootHash']} ====\n"
     )
-    #tx_hash, success = tree_manager.propose_root(rewards_data)
+    tx_hash, success = tree_manager.propose_root(rewards_data)
 
 
 def approve_root(
