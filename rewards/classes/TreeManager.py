@@ -134,7 +134,7 @@ class TreeManager:
 
     def get_claimable_for(self, user: str, tokens: List[str], cumAmounts: List[int]):
         return self.badger_tree.getClaimableFor(user, tokens, cumAmounts).call()
-    
+
     def get_claimed_for(self, user: str, tokens: List[str]):
         return self.badger_tree.getClaimedFor(user, tokens).call()
 

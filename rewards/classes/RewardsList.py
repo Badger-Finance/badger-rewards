@@ -46,7 +46,6 @@ class RewardsList:
             self.totals[token] += toAdd
         else:
             self.totals[token] = toAdd
-            
 
     def hasToken(self, token):
         if self.tokens[token]:
