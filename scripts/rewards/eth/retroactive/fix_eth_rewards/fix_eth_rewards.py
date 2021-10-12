@@ -1,4 +1,3 @@
-
 from helpers.constants import BCVX, BCVXCRV
 from rewards.aws.boost import download_boosts
 from rewards.calc_rewards import process_cumulative_rewards
@@ -13,22 +12,27 @@ import json
 from rewards.aws.helpers import get_secret
 from eth_account import Account
 from eth_utils.hexadecimal import encode_hex
+from rich.console import Console
 
+console = Console()
 
 def check_negative_balances(merkle_tree, tree_manager):
     # Check if there are negative claimable rewards
     tokens_to_check = [BCVX, BCVXCRV]
     balances_to_fix = {}
     for addr, claims in merkle_tree["claims"].items():
-        balances_to_fix[addr] = {}
         if any(token in tokens_to_check for token in claims["tokens"]):
             claimed = tree_manager.get_claimed_for(addr, [BCVX, BCVXCRV])
-            print(claimed)
-            bcvx_claimed = claimed[1][claimed.index(BCVX)]
-            bcvx_crv_claimed = claimed[1][claimed.index(BCVXCRV)]
-            
-            bcvx_total = claims["cumulativeAmount"][claims["tokens"].index(BCVX)]
-            bcvxcrv_total = claims["cumulativeAmount"][claims["tokens"].index(BCVXCRV)]
+            bcvx_claimed = int(claimed[1][claimed[0].index(BCVX)])
+            bcvx_crv_claimed = int(claimed[1][claimed[0].index(BCVXCRV)])
+            if BCVX not in claims["tokens"]:
+                bcvx_total = 0
+            else:
+                bcvx_total = int(claims["cumulativeAmounts"][claims["tokens"].index(BCVX)])
+            if BCVXCRV not in claims["tokens"]:
+                bcvxcrv_total = 0
+            else:
+                bcvxcrv_total = int(claims["cumulativeAmounts"][claims["tokens"].index(BCVXCRV)])
             
             claimable_bcvx = bcvx_total - bcvx_claimed
             claimable_bcvxcrv = bcvxcrv_total - bcvx_crv_claimed
@@ -41,7 +45,8 @@ def check_negative_balances(merkle_tree, tree_manager):
                     balances_to_fix[addr] = {}
                 balances_to_fix[addr][BCVXCRV] = abs(claimable_bcvxcrv)
                 
-    print(balances_to_fix)            
+    with open("balances_to_fix.json", "w") as fp:
+        json.dump(balances_to_fix, fp)
     return balances_to_fix
 
                 
@@ -75,15 +80,17 @@ def fix_eth_rewards():
         past_tree=tree,
         tree_manager=tree_manager,
     )
+    with open("intermediate_rewards.json", "w") as fp:
+        json.dump(rewards["merkleTree"],fp)
     # convert to rewards list
     rewards_list = process_cumulative_rewards(rewards["merkleTree"], RewardsList(tree_manager.next_cycle))
     balances = check_negative_balances(rewards["merkleTree"], tree_manager)
     for addr, token_data in balances.items():
         for token, amount in token_data.items():
-            rewards_list.decrease_user_rewards(
+            rewards_list.increase_user_rewards(
                addr,
                token,
-               to_decrease=amount
+               amount
             )
     rewards_tree = rewards_to_merkle_tree(rewards_list, start_block, end_block)
     root_hash = rewards_manager.web3.keccak(text=rewards_tree["merkleRoot"])
@@ -92,6 +99,7 @@ def fix_eth_rewards():
     
     bals = check_negative_balances(rewards_tree, tree_manager)
     assert len(bals) == 0
+    console.log("No negative balances")
     
     return {
         "merkleTree": rewards_tree,
