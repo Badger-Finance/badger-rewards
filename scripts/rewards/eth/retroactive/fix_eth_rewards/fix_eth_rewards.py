@@ -16,12 +16,11 @@ from rich.console import Console
 
 console = Console()
 
-
 def check_negative_balances(merkle_tree, tree_manager):
     """
     Check if a merkle tree produces negative claimable balances
     using the calculation
-
+    
     claimable balance = cumulative amount -  total_claimed
     """
     tokens_to_check = [BCVX, BCVXCRV]
@@ -34,16 +33,12 @@ def check_negative_balances(merkle_tree, tree_manager):
             if BCVX not in claims["tokens"]:
                 bcvx_total = 0
             else:
-                bcvx_total = int(
-                    claims["cumulativeAmounts"][claims["tokens"].index(BCVX)]
-                )
+                bcvx_total = int(claims["cumulativeAmounts"][claims["tokens"].index(BCVX)])
             if BCVXCRV not in claims["tokens"]:
                 bcvxcrv_total = 0
             else:
-                bcvxcrv_total = int(
-                    claims["cumulativeAmounts"][claims["tokens"].index(BCVXCRV)]
-                )
-
+                bcvxcrv_total = int(claims["cumulativeAmounts"][claims["tokens"].index(BCVXCRV)])
+            
             claimable_bcvx = bcvx_total - bcvx_claimed
             claimable_bcvxcrv = bcvxcrv_total - bcvx_crv_claimed
             if claimable_bcvx < 0:
@@ -54,17 +49,18 @@ def check_negative_balances(merkle_tree, tree_manager):
                 if addr not in balances_to_fix:
                     balances_to_fix[addr] = {}
                 balances_to_fix[addr][BCVXCRV] = abs(claimable_bcvxcrv)
-
+                
     return balances_to_fix
 
-
-def fix_eth_rewards():
+                
+        
+def fix_eth_rewards(): 
     chain = "eth"
     tree_file_name = "rewards-1-0xd00b9252eeb4b0a35a9e23b24f28a3154a09f1072f6b2f870796347eee844870.json"
     tree = json.load(open(tree_file_name))
     start_block = int(tree["endBlock"]) + 1
     end_block = 13403669
-
+    
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
         "private",
@@ -75,11 +71,9 @@ def fix_eth_rewards():
 
     tree_manager = TreeManager(chain, cycle_account)
     boosts = download_boosts()
-    rewards_manager = RewardsManager(
-        "eth", tree_manager.next_cycle, start_block, end_block, boosts
-    )
+    rewards_manager = RewardsManager("eth", tree_manager.next_cycle, start_block, end_block, boosts)
     print(start_block, end_block)
-
+    
     ## Generate rewards for cycle
     rewards = generate_rewards_in_range(
         chain,
@@ -90,33 +84,42 @@ def fix_eth_rewards():
         tree_manager=tree_manager,
     )
     with open("intermediate_rewards.json", "w") as fp:
-        json.dump(rewards["merkleTree"], fp)
+        json.dump(rewards["merkleTree"],fp)
     # convert to rewards list
-    rewards_list = process_cumulative_rewards(
-        rewards["merkleTree"], RewardsList(tree_manager.next_cycle)
-    )
+    rewards_list = process_cumulative_rewards(rewards["merkleTree"], RewardsList(tree_manager.next_cycle))
     balances = check_negative_balances(rewards["merkleTree"], tree_manager)
     with open("balances_to_fix.json", "w") as fp:
         json.dump(balances, fp)
-
+        
     for addr, token_data in balances.items():
         for token, amount in token_data.items():
             ## Increase users rewards who claimed too much so that their claimable balances are no longer zero
-            rewards_list.increase_user_rewards(addr, token, amount)
+            rewards_list.increase_user_rewards(
+               addr,
+               token,
+               amount
+            )
     rewards_tree = rewards_to_merkle_tree(rewards_list, start_block, end_block)
     root_hash = rewards_manager.web3.keccak(text=rewards_tree["merkleRoot"])
     chain_id = rewards_manager.web3.eth.chain_id
     file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
-
+   
+    
     ## Check that there are no more negative claimable balances with this tree
     bals = check_negative_balances(rewards_tree, tree_manager)
     assert len(bals) == 0
+    
     console.log("No negative balances")
-
+    
     return {
         "merkleTree": rewards_tree,
         "rootHash": root_hash.hex(),
         "fileName": file_name,
         "multiplierData": rewards_manager.get_sett_multipliers(),
         "userMultipliers": rewards_manager.get_user_multipliers(),
-    }
+    } 
+
+    
+            
+        
+    
