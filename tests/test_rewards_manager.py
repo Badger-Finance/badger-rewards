@@ -28,14 +28,17 @@ def end() -> bool:
 @pytest.fixture
 def boosts():
     return mock_boosts
-    
+
+
 def mock_get_sett_multipliers():
     return mock_boosts["multiplierData"]
 
 
 @pytest.fixture
 def rewards_manager(cycle, start, end, boosts, request) -> RewardsManager:
-    rewards_manager = RewardsManager(request.param, cycle, start, end, boosts["userData"])
+    rewards_manager = RewardsManager(
+        request.param, cycle, start, end, boosts["userData"]
+    )
     rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
     return rewards_manager
 
