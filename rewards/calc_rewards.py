@@ -143,7 +143,7 @@ def propose_root(
     console.log(
         f"\n==== Proposing root with rootHash {rewards_data['rootHash']} ====\n"
     )
-    tx_hash, success = tree_manager.propose_root(rewards_data)
+    #tx_hash, success = tree_manager.propose_root(rewards_data)
 
 
 def approve_root(
@@ -242,7 +242,7 @@ def generate_rewards_in_range(
 
     file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
 
-    verify_rewards(past_tree, merkle_tree)
+    verify_rewards(past_tree, merkle_tree, chain)
 
     if save:
         with open(file_name, "w") as fp:

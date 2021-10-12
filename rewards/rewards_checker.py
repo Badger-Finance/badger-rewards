@@ -2,6 +2,8 @@ from helpers.constants import TOKENS_TO_CHECK
 from tabulate import tabulate
 from rich.console import Console
 
+from helpers.discord import send_code_block_to_discord, send_message_to_discord
+
 console = Console()
 
 
@@ -30,25 +32,25 @@ def val(amount, decimals=18):
     return f"{amount / 10 ** decimals:,.18f}"
 
 
-def print_token_diff_table(name, before, after, sanity_diff, decimals=18):
+def token_diff_table(name, before, after, decimals=18):
     diff = after - before
     console.print(f"Diff for {name} \n")
     table = []
     table.append([f"{name} before", val(before, decimals=decimals)])
     table.append([f"{name} after", val(after, decimals=decimals)])
     table.append([f"{name} diff", val(diff, decimals=decimals)])
-    print(tabulate(table, headers=["key", "value"]))
-
-    #assert diff <= sanity_diff
+    return diff, tabulate(table, headers=["token", "amount"])
 
 
-def verify_rewards(past_tree, new_tree):
+def verify_rewards(past_tree, new_tree, chain):
     console.log("Verifying Rewards ... \n")
-    for name, token in TOKENS_TO_CHECK.items():
+    for name, token in TOKENS_TO_CHECK[chain].items():
         if name == "Digg":
             continue
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
-        print_token_diff_table(
-            name, total_before_token, total_after_token, 40000 * 1e18
+        diff, table = token_diff_table(name, total_before_token, total_after_token)
+        send_code_block_to_discord(
+            msg=table,
+            username="Rewards Bot",
         )

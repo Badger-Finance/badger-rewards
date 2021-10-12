@@ -1,3 +1,4 @@
+from re import I
 from web3 import Web3
 from dotmap import DotMap
 
@@ -94,6 +95,22 @@ TOKENS_TO_CHECK = {
     "bCvx": BCVX,
     "Pnt": PNT,
     "Bor": BOR,
+}
+
+TOKENS_TO_CHECK = {
+    "eth": {
+        "Badger": BADGER,
+        "Digg": DIGG,
+        "Farm": FARM,
+        "xSushi": XSUSHI,
+        "Dfd": DFD,
+        "bCvxCrv": BCVXCRV,
+        "bCvx": BCVX,
+        "Pnt": PNT,
+        "Bor": BOR,
+    },
+    "arbitrum": {},
+    "polygon": {},
 }
 
 

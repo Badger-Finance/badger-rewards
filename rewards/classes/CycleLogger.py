@@ -32,7 +32,7 @@ class CycleLogger:
         self.content_hash = content_hash
 
     def add_sett_from_rewards(self, sett: str, rewards_list: RewardsList):
-        for token, total in rewards_list.totals:
+        for token, total in rewards_list.totals.items():
             self.add_sett_token_data(sett, token, total)
     
     def add_sett_token_data(self, sett: str, token: str, amount: int):

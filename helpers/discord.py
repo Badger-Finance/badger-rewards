@@ -41,3 +41,16 @@ def send_message_to_discord(
         )
 
     webhook.send(embed=embed, username=username)
+
+def send_code_block_to_discord(
+    msg: str,
+    username: str,
+    url: str = env_config.get_webhook_url()
+):
+    webhook = Webhook.from_url(
+        url,
+        adapter=RequestsWebhookAdapter(),
+    )
+    msg = f"```\n{msg}\n```"
+    webhook.send(username=username, content=msg)
+ 
