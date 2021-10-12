@@ -5,9 +5,9 @@ metadata:
   labels:
     app: boost-bot
 spec:
-  schedule: "*/20 * * * *"
+  schedule: "45 17 * * *"
   startingDeadlineSeconds: 180
-  suspend: true
+  suspend: false
   jobTemplate:
     spec:
       template:
