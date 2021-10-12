@@ -25,8 +25,8 @@ if __name__ == "__main__":
     tree_manager = TreeManager(chain, cycle_account)
 
     rewards = fix_eth_rewards()
-
-    tx_hash, approve_success = tree_manager.approve_root(rewards)
-    if approve_success:
-        upload_tree(rewards["fileName"], rewards["merkleTree"], chain, False)
-        add_multipliers(rewards["multiplierData"], rewards["userMultipliers"])
+    if tree_manager.matches_pending_hash(rewards["rootHash"]):
+        tx_hash, approve_success = tree_manager.approve_root(rewards)
+        if approve_success:
+            upload_tree(rewards["fileName"], rewards["merkleTree"], chain, False)
+            add_multipliers(rewards["multiplierData"], rewards["userMultipliers"])

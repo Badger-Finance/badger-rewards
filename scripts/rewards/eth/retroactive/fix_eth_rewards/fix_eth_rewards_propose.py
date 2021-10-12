@@ -19,4 +19,4 @@ if __name__ == "__main__":
 
     tree_manager = TreeManager(chain, cycle_account)
     rewards = fix_eth_rewards()
-    # tx_hash, propose_success = tree_manager.propose_root(rewards)
+    tx_hash, propose_success = tree_manager.propose_root(rewards)
