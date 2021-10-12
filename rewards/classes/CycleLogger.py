@@ -1,3 +1,6 @@
+from helpers.constants import DIGG
+from helpers.digg_utils import digg_utils
+from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.aws.analytics import upload_analytics
 import dataclasses
@@ -28,11 +31,18 @@ class CycleLogger:
     def set_content_hash(self, content_hash):
         self.content_hash = content_hash
 
+    def add_sett_from_rewards(self, sett: str, rewards_list: RewardsList):
+        for token, total in rewards_list.totals:
+            self.add_sett_token_data(sett, token, total)
+    
     def add_sett_token_data(self, sett: str, token: str, amount: int):
         if sett not in self.sett_data:
             self.sett_data[sett] = {}
         if token not in self.sett_data[sett]:
             self.sett_data[sett][token] = 0
+        if token == DIGG:
+            amount = digg_utils.shares_to_fragments(amount)
+
         self.sett_data[sett][token] += amount
 
     def add_tree_distribution(self, sett: str, distribution):
@@ -44,7 +54,7 @@ class CycleLogger:
         if sett not in self.schedules:
             self.schedules[sett] = []
         self.schedules[sett].append(dataclasses.asdict(schedule))
-
+        
     def save(self, cycle: int, chain: str):
         upload_schedules(chain, self.schedules)
         analytics_data = (
@@ -60,6 +70,7 @@ class CycleLogger:
             },
         )
         upload_analytics(chain, cycle, analytics_data)
+        
 
 
 cycle_logger = CycleLogger()

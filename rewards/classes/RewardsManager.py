@@ -12,8 +12,6 @@ from rewards.classes.UserBalance import UserBalances
 from rewards.classes.Schedule import Schedule
 from rewards.classes.CycleLogger import cycle_logger
 from helpers.time_utils import to_utc_date, to_hours
-from helpers.constants import DIGG
-from helpers.digg_utils import digg_utils
 from config.env_config import env_config
 from rich.console import Console
 from typing import List, Dict
@@ -68,17 +66,10 @@ class RewardsManager:
                 token, start_time, schedules, sett
             )
             for schedule in schedules:
-                if schedule.startTime <= end_time and schedule.endTime >= end_time:
+                if schedule.startTime < end_time and schedule.endTime > end_time:
                     cycle_logger.add_schedule(sett, schedule)
 
             token_distribution = int(end_dist) - int(start_dist)
-            if token == DIGG:
-                cycle_logger.add_sett_token_data(
-                    sett, token, digg_utils.shares_to_fragments(token_distribution)
-                )
-            else:
-                cycle_logger.add_sett_token_data(sett, token, token_distribution)
-
             if token_distribution > 0:
                 total = sett_balances.total_balance()
                 rewards_unit = token_distribution / total
@@ -91,6 +82,7 @@ class RewardsManager:
                         self.web3.toChecksumAddress(token),
                         int(reward_amount),
                     )
+        cycle_logger.add_sett_from_rewards(sett, rewards)
         return rewards
 
     def calculate_all_sett_rewards(
@@ -213,16 +205,14 @@ class RewardsManager:
             sett = self.get_sett_from_strategy(strategy)
             balances = self.fetch_sett_snapshot(block, sett, blacklist=False)
             amount = int(dist["amount"])
+            cycle_logger.add_tree_distribution(sett, dist)
+            cycle_logger.add_sett_token_data(sett, token, amount)
             total_balance = balances.total_balance()
             if total_balance == 0:
                 rewards_unit = 0
             else:
                 rewards_unit = amount / balances.total_balance()
 
-            cycle_logger.add_tree_distribution(sett, dist)
-            cycle_logger.add_sett_token_data(
-                sett, self.web3.toChecksumAddress(token), amount
-            )
             for user in balances:
                 user_rewards = rewards_unit * user.balance
                 rewards.increase_user_rewards(
