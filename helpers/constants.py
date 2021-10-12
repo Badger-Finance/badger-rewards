@@ -101,16 +101,21 @@ TOKENS_TO_CHECK = {
     "eth": {
         "Badger": BADGER,
         "Digg": DIGG,
-        "Farm": FARM,
         "xSushi": XSUSHI,
         "Dfd": DFD,
         "bCvxCrv": BCVXCRV,
         "bCvx": BCVX,
-        "Pnt": PNT,
-        "Bor": BOR,
     },
-    "arbitrum": {},
-    "polygon": {},
+    "arbitrum": {
+        "Badger": "0xBfa641051Ba0a0Ad1b0AcF549a89536A0D76472E",
+        "Crv": "0x11cDb42B0EB46D95f990BeDD4695A6e3fA034978",
+        "Sushi/WETH LP": "0xe774D1FB3133b037AA17D39165b8F45f444f632d",
+        "Swapr/WETH LP": "0x0c2153e8aE4DB8233c61717cDC4c75630E952561",
+    },
+    "polygon": {
+        "Badger": "0x1FcbE5937B0cc2adf69772D228fA4205aCF4D9b2",
+        "Sushi": "0x0b3F868E0BE5597D5DB7fEB59E1CADBb0fdDa50a",
+    },
 }
 
 
