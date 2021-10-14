@@ -1,4 +1,3 @@
-from re import I
 from web3 import Web3
 from dotmap import DotMap
 

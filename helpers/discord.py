@@ -1,6 +1,5 @@
 from discord import Webhook, RequestsWebhookAdapter, Embed
 from config.env_config import env_config
-from rewards.aws.helpers import get_secret
 
 
 def send_error_to_discord(e, error_msg):
