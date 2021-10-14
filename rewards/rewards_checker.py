@@ -1,8 +1,8 @@
 from helpers.constants import TOKENS_TO_CHECK
 from tabulate import tabulate
 from rich.console import Console
-
 from helpers.discord import send_code_block_to_discord, send_message_to_discord
+from helpers.digg_utils import digg_utils
 
 console = Console()
 
@@ -44,14 +44,26 @@ def token_diff_table(name, before, after, decimals=18):
 
 def verify_rewards(past_tree, new_tree, chain):
     console.log("Verifying Rewards ... \n")
+    send_message_to_discord("Token Diff", f"Diff for rewards on {chain}", [], "Rewards Bot")
     for name, token in TOKENS_TO_CHECK[chain].items():
-        if name == "Digg":
-            continue
+       
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
-        diff, table = token_diff_table(name, total_before_token, total_after_token)
+        console.log(name, total_before_token, total_after_token)
+        if name == "Digg":
+            diff, table = token_diff_table(
+                name,
+                digg_utils.shares_to_fragments(total_before_token),
+                digg_utils.shares_to_fragments(total_after_token),
+                decimals=9
+            )
+            print(digg_utils.shares_to_fragments(total_before_token),digg_utils.shares_to_fragments(total))
+        else:
+            diff, table = token_diff_table(name, total_before_token, total_after_token)
         assert diff < 2000 * 1e18
+        
         send_code_block_to_discord(
             msg=table,
             username="Rewards Bot",
         )
+        print(table)
