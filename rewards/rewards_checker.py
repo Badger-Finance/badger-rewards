@@ -50,6 +50,7 @@ def verify_rewards(past_tree, new_tree, chain):
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
         diff, table = token_diff_table(name, total_before_token, total_after_token)
+        assert diff < 2000 * 1e18
         send_code_block_to_discord(
             msg=table,
             username="Rewards Bot",
