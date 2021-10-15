@@ -1,7 +1,5 @@
 from subgraph.queries.setts import last_synced_block
 from rewards.classes.TreeManager import TreeManager
-from config.rewards_config import rewards_config
-from config.env_config import env_config
 from rich.console import Console
 
 console = Console()

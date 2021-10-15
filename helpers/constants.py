@@ -84,6 +84,8 @@ BOR = "0x3c9d6c1C73b31c837832c72E04D3152f051fc1A9"
 BBADGER = "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28"
 BDIGG = "0x7e7e112a68d8d2e221e11047a72ffc1065c38e1a"
 
+ARB_BADGER = "0xBfa641051Ba0a0Ad1b0AcF549a89536A0D76472E"
+POLY_BADGER = "0x1FcbE5937B0cc2adf69772D228fA4205aCF4D9b2"
 TOKENS_TO_CHECK = {
     "Badger": BADGER,
     "Digg": DIGG,
@@ -202,3 +204,9 @@ MONITORING_SECRET_NAMES = {
 }
 
 BOOST_CHAINS = ["eth", "polygon", "arbitrum"]
+
+CLAIMABLE_TOKENS = {
+    "eth": {"native": [BADGER, DIGG], "non_native": [BCVX, BCVXCRV]},
+    "arbitrum": {"native": [ARB_BADGER], "non_native": []},
+    "polygon": {"native": [POLY_BADGER], "non_native": []},
+}

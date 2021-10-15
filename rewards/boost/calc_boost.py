@@ -1,4 +1,5 @@
 from rich.console import Console
+import json
 from helpers.constants import (
     STAKE_RATIO_RANGES,
 )
@@ -31,13 +32,13 @@ def calc_stake_ratio(
     return stake_ratio
 
 
-def badger_boost(current_block: int):
+def badger_boost(current_block: int, chain: str):
     """
     Calculate badger boost multipliers based on stake ratios
     :param current_block: block to calculate boost at
     """
     console.log(f"Calculating boost at block {current_block} ...")
-    native_setts, non_native_setts = calc_boost_balances(current_block - 10)
+    native_setts, non_native_setts = calc_boost_balances(current_block - 10, chain)
 
     all_addresses = calc_union_addresses(native_setts, non_native_setts)
     console.log(f"{len(all_addresses)} addresses fetched")
@@ -52,7 +53,11 @@ def badger_boost(current_block: int):
     stake_ratios = dict(zip(all_addresses, stake_ratios_list))
 
     for addr in all_addresses:
-        boost_info[addr] = {"nativeBalance": 0, "nonNativeBalance": 0, "stakeRatio": 0}
+        boost_info[addr.lower()] = {
+            "nativeBalance": 0,
+            "nonNativeBalance": 0,
+            "stakeRatio": 0,
+        }
 
     for user, native_usd in native_setts.items():
         boost_info[user.lower()]["nativeBalance"] = native_usd
