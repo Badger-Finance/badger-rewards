@@ -1,14 +1,12 @@
 from rewards.classes.Snapshot import Snapshot
 from config.env_config import env_config
-from helpers.constants import REWARDS_BLACKLIST, SETT_INFO, DISABLED_VAULTS
+from helpers.constants import REWARDS_BLACKLIST, SETT_INFO, DISABLED_VAULTS, EMISSIONS_BLACKLIST
 from helpers.web3_utils import make_contract
-from helpers.discord import send_message_to_discord
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
-from functools import lru_cache
 from rich.console import Console
 from typing import Dict, Tuple
 from collections import Counter
-from badger_api.prices import fetch_token_prices
+from web3 import Web3
 
 console = Console()
 
@@ -34,7 +32,7 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     return balances_by_sett
 
 
-def sett_snapshot(chain: str, block: int, sett: str) -> Snapshot:
+def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> Snapshot:
     """
     Take a snapshot of a sett on a chain at a certain block
     :param chain:
@@ -46,19 +44,25 @@ def sett_snapshot(chain: str, block: int, sett: str) -> Snapshot:
         f"Taking snapshot on {chain} of {token.name().call()} ({sett}) at {block}\n"
     )
     sett_balances = fetch_sett_balances(chain, block - 50, sett)
-    return parse_sett_balances(sett, sett_balances)
+    return parse_sett_balances(sett, sett_balances, blacklist)
 
 
-def parse_sett_balances(sett_address: str, balances: Dict[str, int]) -> Snapshot:
+def parse_sett_balances(sett_address: str, balances: Dict[str, int], blacklist: bool = True) -> Snapshot:
     """
     Blacklist balances and add metadata for boost
     :param balances: balances of users:
     :param chain: chain where balances come from
     """
+    if blacklist:
+        addresses_to_blacklist = {**REWARDS_BLACKLIST, **EMISSIONS_BLACKLIST}
+    else:
+        addresses_to_blacklist = REWARDS_BLACKLIST
+
     for addr, balance in list(balances.items()):
-        if addr.lower() in REWARDS_BLACKLIST:
-            console.log(f"Removing {REWARDS_BLACKLIST[addr.lower()]} from balances")
-            del balances[addr]
+        addr = Web3.toChecksumAddress(addr)
+        if addr in addresses_to_blacklist:
+            console.log(f"Removing {addresses_to_blacklist[addr]} from balances")
+            del balances[addr.lower()]
 
     sett_type, sett_ratio = get_sett_info(sett_address)
     console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")

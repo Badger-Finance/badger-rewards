@@ -22,6 +22,7 @@ from config.rewards_config import rewards_config
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
 from typing import List, Dict
+from web3 import Web3
 import json
 
 console = Console()
@@ -76,7 +77,9 @@ def fetch_setts(chain: str) -> List[str]:
     :param chain:
     """
     setts = list_setts(chain)
-    filtered_setts = list(filter(lambda x: x.lower() not in DISABLED_VAULTS, setts))
+    filtered_setts = list(
+        filter(lambda x: Web3.toChecksumAddress(x) not in DISABLED_VAULTS, setts)
+    )
     return [env_config.get_web3().toChecksumAddress(s) for s in filtered_setts]
 
 
@@ -244,6 +247,7 @@ def generate_rewards_in_range(
     if save:
         with open(file_name, "w") as fp:
             json.dump(merkle_tree, fp, indent=4)
+
     return {
         "merkleTree": merkle_tree,
         "rootHash": root_hash.hex(),

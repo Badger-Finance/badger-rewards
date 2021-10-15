@@ -16,7 +16,7 @@ from helpers.time_utils import to_utc_date, to_hours
 from helpers.digg_utils import digg_utils
 from config.env_config import env_config
 from rich.console import Console
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 console = Console()
 
@@ -31,8 +31,8 @@ class RewardsManager:
         self.boosts = boosts
         self.apy_boosts = {}
 
-    def fetch_sett_snapshot(self, block: int, sett: str) -> Snapshot:
-        return sett_snapshot(self.chain, block, sett)
+    def fetch_sett_snapshot(self, block: int, sett: str, blacklist: bool = True) -> Snapshot:
+        return sett_snapshot(self.chain, block, sett, blacklist)
 
     def bcvx_claims_snapshot(self):
         bcvx = claims_snapshot()[BCVX]
@@ -59,20 +59,21 @@ class RewardsManager:
         sett = controller.vaults(want).call()
         return sett
 
-    def calculate_sett_rewards(self, sett, schedules_by_token) -> RewardsList:
+    def calculate_sett_rewards(
+        self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
+    ) -> RewardsList:
         start_time = self.web3.eth.getBlock(self.start)["timestamp"]
         end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
         rewards = RewardsList(self.cycle)
-        sett_balances = self.fetch_sett_snapshot(self.end, sett)
         extra_rewards = []
         """
         When distributing rewards to the bcvx vault,
         we want them to be calculated pro-rata
         rather than boosted
         """
-        if sett not in PRO_RATA_VAULTS:
-            sett_snapshot = self.boost_sett(sett, sett_balances)
+        if self.web3.toChecksumAddress(sett) not in PRO_RATA_VAULTS:
+            sett_snapshot = self.boost_sett(sett, sett_snapshot)
 
         for token, schedules in schedules_by_token.items():
             token = self.web3.toChecksumAddress(token)
@@ -157,7 +158,7 @@ class RewardsManager:
         return rewards
 
     def calculate_all_sett_rewards(
-        self, setts: List[str], all_schedules
+        self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
     ) -> RewardsList:
         all_rewards = []
         for sett in setts:
@@ -177,7 +178,7 @@ class RewardsManager:
             }
         return sett_multipliers
 
-    def get_user_multipliers(self):
+    def get_user_multipliers(self) -> Dict[str, Dict[str, float]]:
         user_multipliers = {}
         for sett, multipliers in self.get_sett_multipliers().items():
             min_mult = multipliers["min"]
@@ -187,10 +188,11 @@ class RewardsManager:
                 if user not in user_multipliers:
                     user_multipliers[user] = {}
                 boost = boost_info.get("boost", 1)
-
-                user_multipliers[user][sett] = (
-                    multipliers["min"] + (boost / 2000) * diff
-                )
+                if boost == 1:
+                    user_sett_multiplier = multipliers["min"]
+                else:
+                    user_sett_multiplier = multipliers["min"] + (boost / 2000) * diff
+                user_multipliers[user][sett] = user_sett_multiplier
 
         return user_multipliers
 
@@ -236,14 +238,14 @@ class RewardsManager:
 
         return total_to_distribute
 
-    def boost_sett(self, boosts, sett: str, snapshot: Snapshot):
+    def boost_sett(self, sett: str, snapshot: Snapshot):
         if snapshot.type == "nonNative":
             pre_boost = {}
             for user, balance in snapshot:
                 pre_boost[user] = snapshot.percentage_of_total(user)
 
-            for user, balance in snapshot:
-                boost_info = boosts.get(user, {})
+            for user in snapshot:
+                boost_info = self.boosts.get(user.address, {})
                 boost = boost_info.get("boost", 1)
                 snapshot.boost_balance(user, boost)
 
@@ -273,7 +275,8 @@ class RewardsManager:
             token = dist["token"]["address"]
             strategy = dist["id"].split("-")[0]
             sett = self.get_sett_from_strategy(strategy)
-            snapshot = self.fetch_sett_snapshot(block, sett)
+            # Dont blacklist tree rewards for emissions contracts
+            snapshot = self.fetch_sett_snapshot(block, sett, blacklist=False)
             amount = int(dist["amount"])
 
             cycle_logger.add_tree_distribution(sett, dist)
