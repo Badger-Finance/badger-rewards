@@ -12,7 +12,7 @@ def fetch_claimable(page: int, chain: str):
     return data
 
 
-def fetch_total_claimable_pages(chain: str):
+def fetch_total_claimable_pages(chain: str) -> int:
     return fetch_claimable(1, chain)["maxPage"]
 
 
