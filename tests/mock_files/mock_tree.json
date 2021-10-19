@@ -4,9 +4,8 @@
     "startBlock": "1731434",
     "endBlock": "1732852",
     "tokenTotals": {
-        "0xBfa641051Ba0a0Ad1b0AcF549a89536A0D76472E": 7378021971496714709747,
-        "0x11cDb42B0EB46D95f990BeDD4695A6e3fA034978": 10163623784458283214297,
-        "0xe774D1FB3133b037AA17D39165b8F45f444f632d": 4716754710559076977
+        "0xBfa641051Ba0a0Ad1b0AcF549a89536A0D76472E": 50238524487523880,
+        "0x11cDb42B0EB46D95f990BeDD4695A6e3fA034978": 45627033524707570000
     },
     "claims": {
         "0x05995bc5736707208EBDb18BC5bE812668b525B2": {
@@ -62,11 +61,9 @@
             "user": "0x08FEa3E62Bd61c27d653F474Ce571B4262daCBAB",
             "cycle": "0x7f",
             "tokens": [
-                "0xBfa641051Ba0a0Ad1b0AcF549a89536A0D76472E",
                 "0x11cDb42B0EB46D95f990BeDD4695A6e3fA034978"
             ],
             "cumulativeAmounts": [
-                "43389621881020163",
                 "40302732481775992832"
             ],
             "proof": [
