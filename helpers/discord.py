@@ -2,21 +2,23 @@ from discord import Webhook, RequestsWebhookAdapter, Embed
 from config.env_config import env_config
 
 
-def send_error_to_discord(e, error_msg):
+def send_error_to_discord(e, error_msg, error_type):
     send_message_to_discord(
-        "**BADGER BOOST ERROR**",
+        f"**{error_type}**",
         f":x: {error_msg}",
         [
             {
                 "name": "Error Type",
                 "value": type(e),
                 "inline": True,
+            },
+            {
                 "name": "Error Description",
                 "value": e.args,
                 "inline": True,
-            }
+            },
         ],
-        "Boost Bot",
+        "Error Bot",
     )
 
 
@@ -41,10 +43,9 @@ def send_message_to_discord(
 
     webhook.send(embed=embed, username=username)
 
+
 def send_code_block_to_discord(
-    msg: str,
-    username: str,
-    url: str = env_config.get_webhook_url()
+    msg: str, username: str, url: str = env_config.get_webhook_url()
 ):
     webhook = Webhook.from_url(
         url,
@@ -52,4 +53,3 @@ def send_code_block_to_discord(
     )
     msg = f"```\n{msg}\n```"
     webhook.send(username=username, content=msg)
- 

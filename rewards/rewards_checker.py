@@ -1,7 +1,8 @@
-from helpers.constants import TOKENS_TO_CHECK
+from config.env_config import env_config
+from helpers.constants import SANITY_TOKEN_AMOUNT, TOKENS_TO_CHECK
 from tabulate import tabulate
 from rich.console import Console
-from helpers.discord import send_code_block_to_discord, send_message_to_discord
+from helpers.discord import send_code_block_to_discord, send_error_to_discord, send_message_to_discord
 from helpers.digg_utils import digg_utils
 
 console = Console()
@@ -57,10 +58,15 @@ def verify_rewards(past_tree, new_tree, chain):
                 digg_utils.shares_to_fragments(total_after_token),
                 decimals=9
             )
-            print(digg_utils.shares_to_fragments(total_before_token),digg_utils.shares_to_fragments(total))
+            print(digg_utils.shares_to_fragments(total_before_token), digg_utils.shares_to_fragments(total_after_token))
         else:
             diff, table = token_diff_table(name, total_before_token, total_after_token)
-        assert diff < 2000 * 1e18
+        if not env_config.retroactive:
+            try:
+                assert diff < SANITY_TOKEN_AMOUNT
+            except AssertionError as e:
+                send_error_to_discord(e, "Error verifying rewards", "Rewards Error")
+                raise e
         
         send_code_block_to_discord(
             msg=table,

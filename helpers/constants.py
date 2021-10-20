@@ -264,3 +264,5 @@ MONITORING_SECRET_NAMES = {
 }
 
 BOOST_CHAINS = ["eth", "polygon", "arbitrum"]
+
+SANITY_TOKEN_AMOUNT = 4000 * 1e18
