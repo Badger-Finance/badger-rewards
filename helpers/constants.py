@@ -270,3 +270,4 @@ CLAIMABLE_TOKENS = {
     "arbitrum": {"native": [ARB_BADGER], "non_native": []},
     "polygon": {"native": [POLY_BADGER], "non_native": []},
 }
+SANITY_TOKEN_AMOUNT = 4000 * 1e18

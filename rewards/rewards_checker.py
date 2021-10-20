@@ -1,8 +1,11 @@
 from rewards.classes.TreeManager import TreeManager
 from rewards.tree_utils import calc_claimable_balances
-from helpers.constants import TOKENS_TO_CHECK
 from tabulate import tabulate
 from rich.console import Console
+from config.env_config import env_config
+from helpers.constants import SANITY_TOKEN_AMOUNT, TOKENS_TO_CHECK
+from helpers.discord import send_code_block_to_discord, send_error_to_discord
+from helpers.digg_utils import digg_utils
 
 console = Console()
 
@@ -32,16 +35,15 @@ def val(amount, decimals=18):
     return f"{amount / 10 ** decimals:,.18f}"
 
 
-def print_token_diff_table(name, before, after, sanity_diff, decimals=18):
+def token_diff_table(name, before, after, sanity_diff, decimals=18):
     diff = after - before
     console.print(f"Diff for {name} \n")
     table = []
     table.append([f"{name} before", val(before, decimals=decimals)])
     table.append([f"{name} after", val(after, decimals=decimals)])
     table.append([f"{name} diff", val(diff, decimals=decimals)])
-    print(tabulate(table, headers=["key", "value"]))
+    return diff, tabulate(table, headers=["token", "amount"])
 
-    #assert diff <= sanity_diff
 
 
 def verify_rewards(past_tree, new_tree, tree_manager: TreeManager):
@@ -61,6 +63,25 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager):
             continue
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
-        print_token_diff_table(
-            name, total_before_token, total_after_token, 40000 * 1e18
+        console.log(name, total_before_token, total_after_token)
+        if name == "Digg":
+            diff, table = token_diff_table(
+                name,
+                digg_utils.shares_to_fragments(total_before_token),
+                digg_utils.shares_to_fragments(total_after_token),
+                decimals=9
+            )
+            print(digg_utils.shares_to_fragments(total_before_token), digg_utils.shares_to_fragments(total_after_token))
+        else:
+            diff, table = token_diff_table(name, total_before_token, total_after_token)
+        if not env_config.retroactive:
+            try:
+                assert diff < SANITY_TOKEN_AMOUNT
+            except AssertionError as e:
+                send_error_to_discord(e, "Error verifying rewards", "Rewards Error")
+                raise e
+        
+        send_code_block_to_discord(
+            msg=table,
+            username="Rewards Bot",
         )
