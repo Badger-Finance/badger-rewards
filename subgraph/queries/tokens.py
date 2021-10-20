@@ -1,10 +1,15 @@
+from logging import error
+from re import S
 from gql import gql
 from subgraph.subgraph_utils import make_gql_client
 from config.env_config import env_config
 import math
 from rich.console import Console
 from typing import Dict, Tuple
-from helpers.discord import send_error_to_discord, send_message_to_discord
+from helpers.discord import (
+    send_error_to_discord,
+    send_message_to_discord,
+)
 from helpers.digg_utils import digg_utils
 from helpers.web3_utils import make_contract
 from functools import lru_cache
@@ -64,7 +69,10 @@ def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str
                                 fragment_balance = shares_per_fragment / amount
                             digg_balances[address] = float(fragment_balance) / 1e9
     except Exception as e:
-        send_error_to_discord(e, "Error in Fetching Token Balance", "Subgraph Error")
+        send_error_to_discord(
+            "Error in Fetching Token Balance",
+            "Subgraph Error",
+        )
         raise e
 
     return badger_balances, digg_balances
@@ -176,19 +184,8 @@ def fetch_fuse_pool_balances(client, chain, block):
         return balances
 
     except Exception as e:
-        send_message_to_discord(
-            "**BADGER BOOST ERROR**",
-            f":x: Error in Fetching Fuse Token Balance",
-            [
-                {
-                    "name": "Error Type",
-                    "value": type(e),
-                    "inline": True,
-                    "name": "Error Description",
-                    "value": e.args,
-                    "inline": True,
-                }
-            ],
-            "Boost Bot",
+        send_error_to_discord(
+            "Error in Fetching Fuse Balance",
+            "Subgraph Error",
         )
         raise e

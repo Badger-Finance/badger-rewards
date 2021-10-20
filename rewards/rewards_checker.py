@@ -2,8 +2,13 @@ from config.env_config import env_config
 from helpers.constants import SANITY_TOKEN_AMOUNT, TOKENS_TO_CHECK
 from tabulate import tabulate
 from rich.console import Console
-from helpers.discord import send_code_block_to_discord, send_error_to_discord, send_message_to_discord
+from helpers.discord import (
+    send_code_block_to_discord,
+    send_error_to_discord,
+    send_message_to_discord,
+)
 from helpers.digg_utils import digg_utils
+import sys
 
 console = Console()
 
@@ -45,9 +50,11 @@ def token_diff_table(name, before, after, decimals=18):
 
 def verify_rewards(past_tree, new_tree, chain):
     console.log("Verifying Rewards ... \n")
-    send_message_to_discord("Token Diff", f"Diff for rewards on {chain}", [], "Rewards Bot")
+    send_message_to_discord(
+        "Token Diff", f"Diff for rewards on {chain}", [], "Rewards Bot"
+    )
     for name, token in TOKENS_TO_CHECK[chain].items():
-       
+
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
         console.log(name, total_before_token, total_after_token)
@@ -56,18 +63,24 @@ def verify_rewards(past_tree, new_tree, chain):
                 name,
                 digg_utils.shares_to_fragments(total_before_token),
                 digg_utils.shares_to_fragments(total_after_token),
-                decimals=9
+                decimals=9,
             )
-            print(digg_utils.shares_to_fragments(total_before_token), digg_utils.shares_to_fragments(total_after_token))
+            print(
+                digg_utils.shares_to_fragments(total_before_token),
+                digg_utils.shares_to_fragments(total_after_token),
+            )
         else:
             diff, table = token_diff_table(name, total_before_token, total_after_token)
         if not env_config.retroactive:
             try:
                 assert diff < SANITY_TOKEN_AMOUNT
             except AssertionError as e:
-                send_error_to_discord(e, "Error verifying rewards", "Rewards Error")
+                send_error_to_discord(
+                    "Error verifying rewards",
+                    "Rewards Error",
+                )
                 raise e
-        
+
         send_code_block_to_discord(
             msg=table,
             username="Rewards Bot",

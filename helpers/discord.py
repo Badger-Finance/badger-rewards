@@ -1,20 +1,21 @@
 from discord import Webhook, RequestsWebhookAdapter, Embed
 from config.env_config import env_config
+import sys
 
-
-def send_error_to_discord(e, error_msg, error_type):
+def get_latest_exception_type() -> str:
+    err_type, _, _ = sys.exc_info()
+    return err_type.__name__
+ 
+    
+def send_error_to_discord(msg, issue):
+    
     send_message_to_discord(
-        f"**{error_type}**",
-        f":x: {error_msg}",
+        f"**{issue}**",
+        f":x: {msg}",
         [
             {
                 "name": "Error Type",
-                "value": type(e),
-                "inline": True,
-            },
-            {
-                "name": "Error Description",
-                "value": e.args,
+                "value": get_latest_exception_type(),
                 "inline": True,
             },
         ],

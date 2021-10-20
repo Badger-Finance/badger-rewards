@@ -1,5 +1,6 @@
 from web3 import Web3
 from dotmap import DotMap
+
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
 EmptyBytes32 = "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -202,14 +203,8 @@ STAKE_RATIO_RANGES = list(
     ]
 )
 
-LP_SETT_INFO = {
-    "type": "native",
-    "ratio": 0.5
-}
-TOKEN_SETT_INFO = {
-    "type": "native",
-    "ratio": 1
-}
+LP_SETT_INFO = {"type": "native", "ratio": 0.5}
+TOKEN_SETT_INFO = {"type": "native", "ratio": 1}
 
 SETT_INFO = {
     BBADGER: TOKEN_SETT_INFO,
@@ -252,7 +247,7 @@ DISABLED_VAULTS = [
     ARB_SWAPR_WETH,
     BCVX,
     ETH_TRICRYPTO_1,
-    HARVEST_RENCRV
+    HARVEST_RENCRV,
 ]
 
 PRO_RATA_VAULTS = [BLCVX]
@@ -265,4 +260,4 @@ MONITORING_SECRET_NAMES = {
 
 BOOST_CHAINS = ["eth", "polygon", "arbitrum"]
 
-SANITY_TOKEN_AMOUNT = 4000 * 1e18
+SANITY_TOKEN_AMOUNT = 10 * 1e18

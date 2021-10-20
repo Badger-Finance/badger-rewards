@@ -8,7 +8,13 @@ class EnvConfig:
     def __init__(self):
         self.test = config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
         self.kube = config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]
-        self.retroactive = config("RETROACTIVE", "True") in ["true", "1", "t", "y", "yes"]
+        self.retroactive = config("RETROACTIVE", "False") in [
+            "true",
+            "1",
+            "t",
+            "y",
+            "yes",
+        ]
         self.graph_api_key = get_secret(
             "boost-bot/graph-api-key-d", "GRAPH_API_KEY", kube=self.kube
         )
