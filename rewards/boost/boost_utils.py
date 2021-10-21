@@ -1,11 +1,8 @@
-from helpers.constants import DISABLED_VAULTS, PRO_RATA_VAULTS
-from web3 import Web3
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rich.console import Console
 from typing import Dict, List, Tuple
 from collections import Counter
 from rewards.snapshot.chain_snapshot import chain_snapshot_usd
-from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rewards.snapshot.claims_snapshot import claims_snapshot_usd
 from badger_api.prices import (
     fetch_token_prices,
@@ -48,21 +45,19 @@ def calc_boost_balances(
     native = Counter()
     non_native = Counter()
 
-    console.log(f"Taking token snapshot on {chain}")
+    console.log(f"\n === Taking token snapshot on {chain} === \n")
     badger_tokens, digg_tokens = token_snapshot_usd(chain, block)
     native = native + Counter(badger_tokens) + Counter(digg_tokens)
-    native_claimable, non_native_claimable = claims_snapshot_usd(chain)
 
-    console.log(f"Taking chain snapshot on {chain} \n")
+    console.log(f"\n === Taking chain snapshot on {chain} === \n")
     if chain != "polygon":
         native_setts, non_native_setts = chain_snapshot_usd(chain, block)
         non_native = non_native + Counter(non_native_setts)
         native = native + Counter(native_setts)
 
-    console.log(f"Taking token snapshot on {chain}")
-    badger_tokens, digg_tokens = token_snapshot_usd(chain, block)
-    native = native + Counter(badger_tokens) + Counter(digg_tokens)
+    console.log(f"\n === Taking claims snapshot on {chain} === \n")
 
+    native_claimable, non_native_claimable = claims_snapshot_usd(chain)
     native = native + Counter(native_claimable)
     non_native = non_native + Counter(non_native_claimable)
 

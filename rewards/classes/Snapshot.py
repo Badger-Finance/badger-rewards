@@ -4,6 +4,7 @@ from config.env_config import env_config
 from badger_api.prices import fetch_token_prices
 from helpers.discord import send_message_to_discord
 from rich.console import Console
+import json
 
 console = Console()
 
@@ -14,6 +15,9 @@ class Snapshot:
         self.ratio = ratio
         self.token = env_config.get_web3().toChecksumAddress(token)
         self.balances = self.parse_balances(balances)
+        
+    def __repr__(self) -> str:
+        return json.dumps(self.balances, indent=4)
 
     def parse_balances(self, bals) -> Dict[str, float]:
         new_bals = {}
