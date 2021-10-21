@@ -5,7 +5,6 @@ from helpers.constants import (
 from typing import Dict
 from tabulate import tabulate
 from helpers.discord import send_code_block_to_discord
-
 from rewards.boost.boost_utils import (
     calc_union_addresses,
     calc_boost_balances,
@@ -38,7 +37,8 @@ def badger_boost(current_block: int, chain: str):
     :param current_block: block to calculate boost at
     """
     console.log(f"Calculating boost at block {current_block} ...")
-    native_setts, non_native_setts = calc_boost_balances(current_block, chain)
+    native_setts, non_native_setts = calc_boost_balances(current_block - 100, chain)
+
     all_addresses = calc_union_addresses(native_setts, non_native_setts)
     console.log(f"{len(all_addresses)} addresses fetched")
     badger_boost = {}
@@ -48,9 +48,8 @@ def badger_boost(current_block: int, chain: str):
     stake_ratios_list = [
         calc_stake_ratio(addr, native_setts, non_native_setts) for addr in all_addresses
     ]
-    
-    stake_ratios = dict(zip(all_addresses, stake_ratios_list))
 
+    stake_ratios = dict(zip(all_addresses, stake_ratios_list))
     for addr in all_addresses:
         boost_info[addr.lower()] = {
             "nativeBalance": 0,
@@ -92,10 +91,13 @@ def badger_boost(current_block: int, chain: str):
             "stakeRatio": boost_metadata.get("stakeRatio", 0),
             "multipliers": {},
         }
+
+    stake_data = {k: stake_data[k] for k in sorted(stake_data, reverse=True)}
+
     stake_data_table = tabulate(
-            [[rng, amount] for rng, amount in stake_data.items()],
-            headers=["range", "amount of users"],
-        )
+        [[rng, amount] for rng, amount in stake_data.items()],
+        headers=["range", "amount of users"],
+    )
     print(stake_data_table)
     send_code_block_to_discord(stake_data_table, username="Boost Bot")
 

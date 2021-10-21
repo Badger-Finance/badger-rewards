@@ -24,4 +24,3 @@ if __name__ == "__main__":
     tree_manager = TreeManager(chain, cycle_account)
 
     rewards = fix_eth_rewards(tree_manager)
-  

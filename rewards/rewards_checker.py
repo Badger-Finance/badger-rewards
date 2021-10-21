@@ -45,14 +45,11 @@ def token_diff_table(name, before, after, sanity_diff, decimals=18):
     return diff, tabulate(table, headers=["token", "amount"])
 
 
-
 def verify_rewards(past_tree, new_tree, tree_manager: TreeManager):
     console.log("Verifying Rewards ... \n")
 
     claimable_balances = calc_claimable_balances(
-        tree_manager,
-        new_tree["tokenTotals"].keys(),
-        new_tree
+        tree_manager, new_tree["tokenTotals"].keys(), new_tree
     )
     for addr, bals in claimable_balances.items():
         for token, amount in bals.items():
@@ -69,9 +66,12 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager):
                 name,
                 digg_utils.shares_to_fragments(total_before_token),
                 digg_utils.shares_to_fragments(total_after_token),
-                decimals=9
+                decimals=9,
             )
-            print(digg_utils.shares_to_fragments(total_before_token), digg_utils.shares_to_fragments(total_after_token))
+            print(
+                digg_utils.shares_to_fragments(total_before_token),
+                digg_utils.shares_to_fragments(total_after_token),
+            )
         else:
             diff, table = token_diff_table(name, total_before_token, total_after_token)
         if not env_config.retroactive:
@@ -80,7 +80,7 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager):
             except AssertionError as e:
                 send_error_to_discord(e, "Error verifying rewards", "Rewards Error")
                 raise e
-        
+
         send_code_block_to_discord(
             msg=table,
             username="Rewards Bot",
