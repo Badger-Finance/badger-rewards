@@ -95,7 +95,7 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
         if sett in DISABLED_VAULTS:
             continue
         usd_snapshot = snapshot.convert_to_usd()
-        balances = Counter(snapshot.balances)
+        balances = Counter(usd_snapshot.balances)
         if usd_snapshot.type == "native":
             native = native + balances
         elif usd_snapshot.type == "nonNative":

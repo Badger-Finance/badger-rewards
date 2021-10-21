@@ -146,7 +146,6 @@ def fetch_fuse_pool_balances(client, chain, block):
             results = client.execute(query, variable_values=variables)
 
             for result in results["accountCTokens"]:
-                console.log(result)
 
                 last_token_id = result["id"]
                 symbol = result["symbol"]

@@ -30,7 +30,6 @@ def calc_stake_ratio(
         stake_ratio = (native_balance) / non_native_balance
     return stake_ratio
 
-
 def badger_boost(current_block: int, chain: str):
     """
     Calculate badger boost multipliers based on stake ratios
@@ -48,8 +47,8 @@ def badger_boost(current_block: int, chain: str):
     stake_ratios_list = [
         calc_stake_ratio(addr, native_setts, non_native_setts) for addr in all_addresses
     ]
-
     stake_ratios = dict(zip(all_addresses, stake_ratios_list))
+
     for addr in all_addresses:
         boost_info[addr.lower()] = {
             "nativeBalance": 0,
