@@ -20,18 +20,19 @@ def claims_snapshot(chain: str) -> Dict[str, Snapshot]:
         for claim in claims:
             token = claim["address"]
             balance = int(claim["balance"])
-            if token in chain_claimable_tokens:
-                if token == DIGG:
-                    balance = digg_utils.shares_to_fragments(balance)
-                if token not in claims_data:
-                    claims_data[token] = {}
-                claims_data[token][addr] = balance
+            if token == DIGG:
+                balance = digg_utils.shares_to_fragments(balance)
+            if token not in claims_data:
+                claims_data[token] = {}
+            claims_data[token][addr] = balance
 
     for token, snapshot in claims_data.items():
         if token in native_tokens:
             snapshots[token] = Snapshot(token, snapshot, ratio=1, type="native")
-        if token in non_native_tokens:
+        elif token in non_native_tokens:
             snapshots[token] = Snapshot(token, snapshot, ratio=1, type="nonNative")
+        else:
+            snapshots[token] = Snapshot(token, snapshot, ratio=1, type="other")
 
     return snapshots
 

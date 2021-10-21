@@ -1,3 +1,5 @@
+from rewards.classes.TreeManager import TreeManager
+from rewards.tree_utils import calc_claimable_balances
 from helpers.constants import TOKENS_TO_CHECK
 from tabulate import tabulate
 from rich.console import Console
@@ -42,8 +44,18 @@ def print_token_diff_table(name, before, after, sanity_diff, decimals=18):
     #assert diff <= sanity_diff
 
 
-def verify_rewards(past_tree, new_tree):
+def verify_rewards(past_tree, new_tree, tree_manager: TreeManager):
     console.log("Verifying Rewards ... \n")
+
+    claimable_balances = calc_claimable_balances(
+        tree_manager,
+        new_tree["tokenTotals"].keys(),
+        new_tree
+    )
+    for addr, bals in claimable_balances.items():
+        for token, amount in bals.items():
+            assert amount >= 0
+
     for name, token in TOKENS_TO_CHECK.items():
         if name == "Digg":
             continue

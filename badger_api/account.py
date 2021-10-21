@@ -12,7 +12,7 @@ def fetch_claimable(page: int, chain: str):
     return data
 
 
-def fetch_total_claimable_pages(chain: str):
+def fetch_total_claimable_pages(chain: str) -> int:
     return fetch_claimable(1, chain)["maxPage"]
 
 
@@ -22,10 +22,10 @@ def fetch_all_claimable_balances(chain: str):
 
     """
     results = {}
-    total_pages = fetch_total_claimable_pages()
+    total_pages = fetch_total_claimable_pages(chain)
     with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
         futures = [
-            executor.submit(fetch_claimable, page=p, chain=chain) for p in range(1, total_pages)
+            executor.submit(fetch_claimable, page=p, chain=chain) for p in range(0, total_pages + 1)
         ]
         for future in concurrent.futures.as_completed(futures):
             data = future.result()["rewards"]
