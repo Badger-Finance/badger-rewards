@@ -82,3 +82,45 @@ spec:
     - name: http
       port: 9000
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eth-boost-bot
+  labels:
+    app: eth-boost-bot
+    service: eth-boost-bot
+spec:
+  selector:
+    app: eth-boost-bot
+  ports:
+    - name: http
+      port: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arb-boost-bot
+  labels:
+    app: arb-boost-bot
+    service: arb-boost-bot
+spec:
+  selector:
+    app: arb-boost-bot
+  ports:
+    - name: http
+      port: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: poly-boost-bot
+  labels:
+    app: poly-boost-bot
+    service: poly-boost-bot
+spec:
+  selector:
+    app: poly-boost-bot
+  ports:
+    - name: http
+      port: 9000
+---
