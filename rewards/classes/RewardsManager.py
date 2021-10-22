@@ -1,6 +1,13 @@
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.classes.Snapshot import Snapshot
-from helpers.constants import BCVX, BCVXCRV, PRO_RATA_VAULTS, XSUSHI, EMISSIONS_CONTRACTS, DIGG
+from helpers.constants import (
+    BCVX,
+    BCVXCRV,
+    PRO_RATA_VAULTS,
+    XSUSHI,
+    EMISSIONS_CONTRACTS,
+    DIGG,
+)
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
 from rewards.rewards_utils import combine_rewards
@@ -31,7 +38,9 @@ class RewardsManager:
         self.boosts = boosts
         self.apy_boosts = {}
 
-    def fetch_sett_snapshot(self, block: int, sett: str, blacklist: bool = True) -> Snapshot:
+    def fetch_sett_snapshot(
+        self, block: int, sett: str, blacklist: bool = True
+    ) -> Snapshot:
         return sett_snapshot(self.chain, block, sett, blacklist)
 
     def bcvx_claims_snapshot(self):

@@ -21,7 +21,9 @@ def fuse_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     return fuse_snapshots
 
 
-def token_snapshot_usd(chain: str, block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
+def token_snapshot_usd(
+    chain: str, block: int
+) -> Tuple[Dict[str, float], Dict[str, float]]:
 
     fuse_snapshots = fuse_snapshot(chain, block)
     badger_snapshot, digg_snapshot = token_snapshot(chain, block)

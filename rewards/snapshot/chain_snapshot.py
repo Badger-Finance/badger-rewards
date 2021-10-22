@@ -1,6 +1,11 @@
 from rewards.classes.Snapshot import Snapshot
 from config.env_config import env_config
-from helpers.constants import REWARDS_BLACKLIST, SETT_INFO, DISABLED_VAULTS, EMISSIONS_BLACKLIST
+from helpers.constants import (
+    REWARDS_BLACKLIST,
+    SETT_INFO,
+    DISABLED_VAULTS,
+    EMISSIONS_BLACKLIST,
+)
 from helpers.web3_utils import make_contract
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
 from rich.console import Console
@@ -47,7 +52,9 @@ def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> Snapsho
     return parse_sett_balances(sett, sett_balances, blacklist)
 
 
-def parse_sett_balances(sett_address: str, balances: Dict[str, int], blacklist: bool = True) -> Snapshot:
+def parse_sett_balances(
+    sett_address: str, balances: Dict[str, int], blacklist: bool = True
+) -> Snapshot:
     """
     Blacklist balances and add metadata for boost
     :param balances: balances of users:
@@ -75,6 +82,7 @@ def get_sett_info(sett_address: str) -> Tuple[str, float]:
         env_config.get_web3().toChecksumAddress(sett_address),
         {"type": "nonNative", "ratio": 1},
     )
+    console.log(sett_address, info)
     return info["type"], info["ratio"]
 
 
@@ -87,7 +95,7 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
         if sett in DISABLED_VAULTS:
             continue
         usd_snapshot = snapshot.convert_to_usd()
-        balances = Counter(snapshot.balances)
+        balances = Counter(usd_snapshot.balances)
         if usd_snapshot.type == "native":
             native = native + balances
         elif usd_snapshot.type == "nonNative":
