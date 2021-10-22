@@ -1,5 +1,5 @@
 import requests
-from badger_api.config import urls
+from badger_api.config import get_api_url
 import concurrent.futures
 
 
@@ -8,11 +8,8 @@ def fetch_claimable(page: int, chain: str):
     Fetch claimable data from account data
     :param page: page to fetch data from
     """
-    if chain == "eth":
-        chain = "ethereum"
-
     data = requests.get(
-        f"{urls['staging']}/accounts/allClaimable?page={page}&chain={chain}"
+        f"{get_api_url()}/accounts/allClaimable?page={page}&chain={chain}"
     ).json()
     return data
 
