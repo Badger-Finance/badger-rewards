@@ -253,8 +253,8 @@ class RewardsManager:
             for user, balance in snapshot:
                 pre_boost[user] = snapshot.percentage_of_total(user)
 
-            for user in snapshot:
-                boost_info = self.boosts.get(user.address, {})
+            for user, balance in snapshot:
+                boost_info = self.boosts.get(user, {})
                 boost = boost_info.get("boost", 1)
                 snapshot.boost_balance(user, boost)
 
@@ -263,9 +263,7 @@ class RewardsManager:
                 if sett not in self.apy_boosts:
                     self.apy_boosts[sett] = {}
 
-                self.apy_boosts[sett][user.address] = (
-                    post_boost / pre_boost[user.address]
-                )
+                self.apy_boosts[sett][user] = post_boost / pre_boost[user]
 
         return snapshot
 

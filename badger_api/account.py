@@ -8,6 +8,9 @@ def fetch_claimable(page: int, chain: str):
     Fetch claimable data from account data
     :param page: page to fetch data from
     """
+    if chain == "eth":
+        chain = "ethereum"
+
     data = requests.get(
         f"{urls['staging']}/accounts/allClaimable?page={page}&chain={chain}"
     ).json()
@@ -23,6 +26,7 @@ def fetch_all_claimable_balances(chain: str):
     Fetch the claimable balances by fetching in parallel
 
     """
+
     results = {}
     total_pages = fetch_total_claimable_pages(chain)
     with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:

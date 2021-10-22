@@ -131,18 +131,6 @@ UNI_DIGG_WBTC = "0xC17078FDd324CC473F8175Dc5290fae5f2E84714"
 SUSHI_DIGG_WBTC = "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6"
 
 TOKENS_TO_CHECK = {
-    "Badger": BADGER,
-    "Digg": DIGG,
-    "Farm": FARM,
-    "xSushi": XSUSHI,
-    "Dfd": DFD,
-    "bCvxCrv": BCVXCRV,
-    "bCvx": BCVX,
-    "Pnt": PNT,
-    "Bor": BOR,
-}
-
-TOKENS_TO_CHECK = {
     "eth": {
         "Badger": BADGER,
         "Digg": DIGG,

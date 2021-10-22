@@ -79,7 +79,6 @@ def add_user_data(user_data, chain):
             "stakeRatio": data["stakeRatio"],
             "multipliers": multipliers,
         }
-
     upload_boosts(boosts, chain)
 
 
@@ -91,7 +90,7 @@ def add_multipliers(multiplier_data, user_multipliers, chain: str):
     :param user_multipliers: user multipliers
     """
     boosts = download_boosts(chain)
-    boosts["multiplierData"] = {**boosts["multiplierData"], **multiplier_data}
+    boosts["multiplierData"] = multiplier_data
     for user in list(boosts["userData"].keys()):
         if user in user_multipliers:
             boosts["userData"][user]["multipliers"] = user_multipliers[user]
