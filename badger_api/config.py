@@ -2,7 +2,7 @@ from config.env_config import env_config
 
 urls = {
     "staging": "https://staging-api.badger.com/v2",
-    "prod": "https://api.badger.finance/v2",
+    "prod": "https://api.badger.com/v2",
 }
 
 
