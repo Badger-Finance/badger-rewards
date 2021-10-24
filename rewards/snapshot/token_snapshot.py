@@ -1,7 +1,7 @@
 from subgraph.queries.tokens import fetch_token_balances, fetch_fuse_pool_balances
 from subgraph.subgraph_utils import make_gql_client
 from helpers.constants import BADGER, DIGG
-from badger_api.prices import fetch_token_prices, fetch_ppfs
+from badger_api.requests import fetch_token_prices
 from collections import Counter
 from typing import Dict, Tuple
 

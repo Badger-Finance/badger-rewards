@@ -9,12 +9,11 @@ from rewards.classes.UserBalance import UserBalances
 from typing import Dict, List, Tuple
 from collections import Counter
 from rewards.snapshot.chain_snapshot import chain_snapshot
-from badger_api.prices import (
+from badger_api.requests import (
     fetch_token_prices,
 )
 
 console = Console()
-prices = fetch_token_prices()
 
 
 def calc_union_addresses(
@@ -46,6 +45,8 @@ def convert_balances_to_usd(
     Convert sett balance to usd and multiply by correct ratio
     :param balances: balances to convert to usd
     """
+
+    prices = fetch_token_prices()
     sett = env_config.get_web3().toChecksumAddress(sett)
     if sett not in prices:
         price = 0
