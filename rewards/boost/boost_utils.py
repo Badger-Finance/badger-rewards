@@ -4,12 +4,9 @@ from typing import Dict, List, Tuple
 from collections import Counter
 from rewards.snapshot.chain_snapshot import chain_snapshot_usd
 from rewards.snapshot.claims_snapshot import claims_snapshot_usd
-from badger_api.prices import (
-    fetch_token_prices,
-)
+
 
 console = Console()
-prices = fetch_token_prices()
 
 
 def calc_union_addresses(

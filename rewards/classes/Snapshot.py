@@ -1,12 +1,11 @@
 from __future__ import annotations
 from typing import Tuple, Dict
 from config.env_config import env_config
-from badger_api.prices import fetch_token_prices
+from badger_api.requests import fetch_token_prices
 from helpers.discord import send_message_to_discord
 from rich.console import Console
 from helpers.web3_utils import make_token
 import json
-import math
 
 console = Console()
 
