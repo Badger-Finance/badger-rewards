@@ -6,6 +6,7 @@ from config.env_config import env_config
 from helpers.constants import SANITY_TOKEN_AMOUNT, TOKENS_TO_CHECK
 from helpers.discord import send_code_block_to_discord, send_error_to_discord
 from helpers.digg_utils import digg_utils
+import json
 
 console = Console()
 
@@ -45,17 +46,26 @@ def token_diff_table(name, before, after, sanity_diff, decimals=18):
     return diff, tabulate(table, headers=["token", "amount"])
 
 
-def verify_rewards(past_tree, new_tree, tree_manager: TreeManager):
+def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain):
     console.log("Verifying Rewards ... \n")
 
     claimable_balances = calc_claimable_balances(
         tree_manager, new_tree["tokenTotals"].keys(), new_tree
     )
+    negative_claimable = []
     for addr, bals in claimable_balances.items():
         for token, amount in bals.items():
-            assert amount >= 0
-
-    for name, token in TOKENS_TO_CHECK.items():
+            if amount < 0:
+                negative_claimable.append({
+                    addr: {k: v for k, v in bals.items() if v < 0}
+                })
+    try:
+        assert len(negative_claimable) == 0 
+    except AssertionError as e:
+        send_error_to_discord(e, f"Negative Claimable \n ```{json.dumps(negative_claimable,indent=4)}```", "Negative Rewards Error")
+        raise e
+        
+    for name, token in TOKENS_TO_CHECK[chain].items():
         if name == "Digg":
             continue
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))

@@ -164,7 +164,6 @@ def approve_root(
         past_tree=current_rewards,
         tree_manager=tree_manager,
     )
-
     if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
         console.log(
             f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
@@ -242,7 +241,7 @@ def generate_rewards_in_range(
 
     file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
 
-    verify_rewards(past_tree, merkle_tree, tree_manager)
+    verify_rewards(past_tree, merkle_tree, tree_manager, chain)
 
     if save:
         with open(file_name, "w") as fp:
