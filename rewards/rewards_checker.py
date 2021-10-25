@@ -36,7 +36,7 @@ def val(amount, decimals=18):
     return f"{amount / 10 ** decimals:,.18f}"
 
 
-def token_diff_table(name, before, after, sanity_diff, decimals=18):
+def token_diff_table(name, before, after, decimals=18):
     diff = after - before
     console.print(f"Diff for {name} \n")
     table = []
