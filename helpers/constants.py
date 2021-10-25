@@ -256,3 +256,4 @@ CLAIMABLE_TOKENS = {
     "polygon": {"native": [POLY_BADGER], "non_native": []},
 }
 SANITY_TOKEN_AMOUNT = 4000 * 1e18
+CLAIMS_TO_CHECK = 1000

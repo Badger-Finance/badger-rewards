@@ -1,11 +1,6 @@
-from rewards.snapshot.claims_snapshot import claims_snapshot
-
-
-def print_claimable(chain):
-    snapshots = claims_snapshot(chain)
-    for token, snapshot in snapshots.items():
-        print(token, snapshot.total_balance())
-
-
+from scripts.rewards.utils.managers import get_tree_manager
+from rewards.tree_utils import calc_claimable_balances
 if __name__ == "__main__":
-    print_claimable("arbitrum")
+    tree_manager = get_tree_manager("eth")
+    tree = tree_manager.fetch_current_tree()
+    print(calc_claimable_balances(tree_manager, list(tree["tokenTotals"].keys()), tree))

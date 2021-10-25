@@ -2,6 +2,8 @@ from subgraph.queries.setts import last_synced_block
 from rewards.classes.TreeManager import TreeManager
 from rich.console import Console
 from typing import List
+from helpers.constants import CLAIMS_TO_CHECK
+import random
 
 console = Console()
 
@@ -52,7 +54,10 @@ def calc_claimable_balances(
     tree_manager: TreeManager, tokens_to_check: List[str], merkle_tree
 ):
     balances = {}
-    for addr, claim in merkle_tree["claims"].items():
+    merkle_claims = merkle_tree["claims"]
+    addrs_to_check = random.sample(list(merkle_tree["claims"].keys()), min(CLAIMS_TO_CHECK, len(merkle_claims)))
+    for addr in addrs_to_check:
+        claim = merkle_claims[addr]
         claimable_bals = user_claimable_balances(
             addr, claim, tree_manager, tokens_to_check
         )
@@ -65,7 +70,7 @@ def user_claimable_balances(
 ):
     claimable_balances = {}
     if any(token in tokens_to_check for token in claim["tokens"]):
-        claimed = tree_manager.get_claimed_for(user, tokens_to_check)
+        claimed = tree_manager.get_claimed_for(tree_manager.w3.toChecksumAddress(user), tokens_to_check)
         for token in tokens_to_check:
             claimed_token = int(claimed[1][claimed[0].index(token)])
             if token not in claim["tokens"]:
