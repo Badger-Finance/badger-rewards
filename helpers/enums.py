@@ -1,11 +1,13 @@
-from strenum import StrEnum
+from enum import Enum
 
-
-class Network(StrEnum):
-    Ethereum = ("ethereum",)
-    Polygon = ("polygon",)
-    Arbitrum = ("arbitrum",)
-    BinanceSmartChain = ("binancesmartchain",)
-    Avalanche = ("avalanche",)
-    Fantom = ("fantom",)
-    xDai = ("xdai",)
+class Network(str, Enum):
+    Ethereum = "ethereum"
+    Polygon = "polygon"
+    Arbitrum = "arbitrum"
+    BinanceSmartChain = "binancesmartchain"
+    Avalanche = "avalanche"
+    Fantom = "fantom"
+    xDai = "xdai"
+    
+    def __str__(self):
+        return self.value
