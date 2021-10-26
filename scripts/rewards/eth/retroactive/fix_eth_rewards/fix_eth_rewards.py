@@ -23,7 +23,10 @@ tokens_to_check = [BADGER,DIGG]
 
 def check_zero_balances(tree, balances, tree_manager):
     all_bals = {}
+    i = 0
     for addr, token_info in balances.items():
+        i = i + 1
+        print(i)
         for token, amount in calculate_claimable_balances(addr, tree["claims"][addr], tree_manager).items():
             all_bals[token] = amount
             if token in token_info:
@@ -93,7 +96,7 @@ def fix_eth_rewards(tree_manager: TreeManager):
     print(start_block, end_block)
     
     rewards_list = process_cumulative_rewards(tree, RewardsList(tree_manager.next_cycle))
-    balances = check_negative_balances(tree["merkleTree"], tree_manager)
+    balances = check_negative_balances(tree, tree_manager)
     console.log(len(balances))
     with open("balances_to_fix.json", "w") as fp:
         json.dump(balances, fp)
