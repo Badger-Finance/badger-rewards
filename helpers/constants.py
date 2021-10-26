@@ -1,5 +1,6 @@
 from web3 import Web3
 from dotmap import DotMap
+from helpers.enums import Network
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -161,21 +162,21 @@ SETT_INFO = {
 }
 
 EMISSIONS_CONTRACTS = {
-    "eth": DotMap(
+    Network.Ethereum: DotMap(
         {
             "BadgerTree": "0x660802Fc641b154aBA66a62137e71f331B6d787A",
             "RewardsLogger": "0x0A4F4e92C3334821EbB523324D09E321a6B0d8ec",
             "GasOracle": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
         }
     ),
-    "polygon": DotMap(
+    Network.Polygon: DotMap(
         {
             "BadgerTree": "0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b",
             "RewardsLogger": "0xd0EE2A5108b8800D688AbC834445fd03b3b2738e",
             "GasOracle": "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
         }
     ),
-    "arbitrum": DotMap(
+    Network.Arbitrum: DotMap(
         {
             "BadgerTree": "0x635EB2C39C75954bb53Ebc011BDC6AfAAcE115A6",
             "RewardsLogger": "0x85E1cACAe9a63429394d68Db59E14af74143c61c",
@@ -196,9 +197,9 @@ DISABLED_VAULTS = [
 PRO_RATA_VAULTS = [BLCVX]
 
 MONITORING_SECRET_NAMES = {
-    "eth": "cycle-bot/eth/prod-discord-url",
-    "polygon": "cycle-bot/prod-discord-url",
-    "arbitrum": "cycle-bot/arbitrum/prod-discord-url",
+    Network.Ethereum: "cycle-bot/eth/prod-discord-url",
+    Network.Polygon: "cycle-bot/prod-discord-url",
+    Network.Arbitrum: "cycle-bot/arbitrum/prod-discord-url",
 }
 
-BOOST_CHAINS = ["eth", "polygon", "arbitrum"]
+BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]

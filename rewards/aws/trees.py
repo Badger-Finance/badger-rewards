@@ -4,6 +4,7 @@ from rewards.aws.helpers import get_bucket, s3
 import json
 from typing import Dict
 from rewards.aws.helpers import s3
+from helpers.enums import Network
 
 console = Console()
 
@@ -13,7 +14,7 @@ def download_latest_tree(chain: str):
     Download the latest merkle tree that was uploaded for a chain
     :param chain: the chain from which to fetch the latest tree from
     """
-    if chain == "eth":
+    if chain == Network.Ethereum:
         key = "badger-tree.json"
     else:
         key = f"badger-tree-{chain}.json"
@@ -34,7 +35,7 @@ def download_tree(file_name: str, chain: str):
     Download a specific tree based on the merkle root of that tree
     :param file_name: fileName of tree to download
     """
-    if chain == "eth":
+    if chain == Network.Ethereum:
         tree_bucket = "badger-json"
     else:
         tree_bucket = f"badger-json-{chain}"
@@ -83,7 +84,7 @@ def upload_tree(
     """
     chain_id = env_config.get_web3(chain).eth.chain_id
 
-    if chain == "eth":
+    if chain == Network.Ethereum:
         key = "badger-tree.json"
         rewards_bucket = "badger-json"
     else:

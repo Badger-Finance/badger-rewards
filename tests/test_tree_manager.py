@@ -6,6 +6,7 @@ from eth_account import Account
 from decimal import Decimal
 from hexbytes import HexBytes
 from web3 import contract
+from helpers.enums import Network
 
 os.environ["KUBE"] = "False"
 os.environ["TEST"] = "True"
@@ -41,7 +42,7 @@ def tree_manager(cycle_key, request) -> TreeManager:
 
 @pytest.mark.parametrize(
     "tree_manager",
-    ["eth"],
+    [Network.Ethereum],
     indirect=True,
 )
 def test_matches_pending_hash(tree_manager):

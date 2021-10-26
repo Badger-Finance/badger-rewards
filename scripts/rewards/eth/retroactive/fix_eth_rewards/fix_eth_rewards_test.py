@@ -8,9 +8,10 @@ from eth_account import Account
 from scripts.rewards.eth.retroactive.fix_eth_rewards.fix_eth_rewards import (
     fix_eth_rewards,
 )
+from helpers.enums import Network
 
 if __name__ == "__main__":
-    chain = "eth"
+    chain = Network.Ethereum
     with open(config("KEYFILE")) as key_file:
         key_file_json = json.load(key_file)
 
@@ -24,4 +25,3 @@ if __name__ == "__main__":
     tree_manager = TreeManager(chain, cycle_account)
 
     rewards = fix_eth_rewards(tree_manager)
-  

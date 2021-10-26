@@ -6,6 +6,7 @@ from helpers.constants import MONITORING_SECRET_NAMES
 from rewards.classes.TreeManager import TreeManager
 from rewards.calc_rewards import approve_root
 from rich.console import Console
+from helpers.enums import Network
 
 from decouple import config
 from eth_account import Account
@@ -55,4 +56,4 @@ def approve_rewards(chain):
 
 
 if __name__ == "__main__":
-    approve_rewards("eth")
+    approve_rewards(Network.Ethereum)

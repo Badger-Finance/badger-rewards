@@ -13,6 +13,8 @@ from badger_api.requests import (
     fetch_token_prices,
 )
 
+from helpers.enums import Network
+
 console = Console()
 
 
@@ -79,7 +81,7 @@ def calc_boost_balances(block: int) -> Tuple[Dict[str, float], Dict[str, float]]
     for chain in BOOST_CHAINS:
         chain_block = blocks_by_chain[chain]
         console.log(f"Taking chain snapshot on {chain} \n")
-        if chain == "polygon":
+        if chain == Network.Polygon:
             snapshot = {}
         else:
             snapshot = chain_snapshot(chain, chain_block)

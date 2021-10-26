@@ -34,6 +34,7 @@ def token_snapshot_usd(chain: str, block: int):
 def convert_tokens_to_usd(badger, digg):
 
     prices = fetch_token_prices()
+    print(prices)
     total = {}
 
     for addr, bal in badger.items():
