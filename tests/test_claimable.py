@@ -86,7 +86,7 @@ def test_calc_claimable_balances(
 
 @pytest.mark.parametrize(
     "chain",
-    ["eth", "matic", "arbitrum"],
+    BOOST_CHAINS,
 )
 def test_fetch_all_claimable_balances(chain):
     result = fetch_all_claimable_balances(chain)

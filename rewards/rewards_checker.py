@@ -44,7 +44,6 @@ def token_diff_table(name, before, after, sanity_diff, decimals=18):
     table.append([f"{name} diff", val(diff, decimals=decimals)])
     return diff, tabulate(table, headers=["token", "amount"])
 
-    # assert diff <= sanity_diff
 
 def verify_rewards(past_tree, new_tree, tree_manager: TreeManager):
     console.log("Verifying Rewards ... \n")
