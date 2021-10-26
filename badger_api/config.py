@@ -7,5 +7,4 @@ urls = {
 
 
 def get_api_base_path() -> str:
-    return urls["prod"]
     return urls["staging"] if env_config.test else urls["prod"]
