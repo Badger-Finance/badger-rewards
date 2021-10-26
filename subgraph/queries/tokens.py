@@ -65,7 +65,7 @@ def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str
                                 fragment_balance = shares_per_fragment / amount
                             digg_balances[address] = float(fragment_balance) / 1e9
     except Exception as e:
-        send_error_to_discord(e, "Error in Fetching Token Balance")
+        send_error_to_discord(e, "Error in Fetching Token Balance", "Subgraph Error")
         raise e
 
     return badger_balances, digg_balances
@@ -147,7 +147,6 @@ def fetch_fuse_pool_balances(client, chain, block):
             results = client.execute(query, variable_values=variables)
 
             for result in results["accountCTokens"]:
-                console.log(result)
 
                 last_token_id = result["id"]
                 symbol = result["symbol"]

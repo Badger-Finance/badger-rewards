@@ -1,8 +1,6 @@
 from rewards.tree_utils import get_last_proposed_cycle
 from rewards.aws.helpers import get_secret
-from config.env_config import env_config
 from helpers.discord import send_message_to_discord
-from helpers.constants import MONITORING_SECRET_NAMES
 from rewards.classes.TreeManager import TreeManager
 from rewards.calc_rewards import approve_root
 from rich.console import Console
@@ -11,7 +9,6 @@ from helpers.enums import Network
 from decouple import config
 from eth_account import Account
 import json
-import os
 
 console = Console()
 

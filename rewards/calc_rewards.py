@@ -84,13 +84,11 @@ def fetch_setts(chain: str) -> List[str]:
     return [env_config.get_web3().toChecksumAddress(s) for s in filtered_setts]
 
 
-def process_cumulative_rewards(current, new: RewardsList):
+def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
     """Combine past rewards with new rewards
 
     :param current: current rewards
     :param new: new rewards
-    :return: [description]
-    :rtype: [type]
     """
     result = RewardsList(new.cycle)
 
@@ -135,7 +133,7 @@ def propose_root(
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-        # return
+        return
     rewards_data = generate_rewards_in_range(
         chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager
     )
@@ -185,7 +183,9 @@ def approve_root(
             )
 
             add_multipliers(
-                rewards_data["multiplierData"], rewards_data["userMultipliers"]
+                rewards_data["multiplierData"],
+                rewards_data["userMultipliers"],
+                chain=chain,
             )
             cycle_logger.save(tree_manager.next_cycle, chain)
             return rewards_data
@@ -215,7 +215,7 @@ def generate_rewards_in_range(
     console_and_discord(f"Generating rewards for {len(setts)} setts", chain)
 
     rewards_list = []
-    boosts = download_boosts()
+    boosts = download_boosts(chain)
     rewards_manager = RewardsManager(
         chain, tree_manager.next_cycle, start, end, boosts["userData"]
     )
@@ -243,7 +243,7 @@ def generate_rewards_in_range(
 
     file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
 
-    verify_rewards(past_tree, merkle_tree)
+    verify_rewards(past_tree, merkle_tree, tree_manager)
 
     if save:
         with open(file_name, "w") as fp:

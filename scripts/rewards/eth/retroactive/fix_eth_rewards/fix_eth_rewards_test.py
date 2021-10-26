@@ -1,5 +1,3 @@
-from rewards.aws.trees import upload_tree
-from rewards.aws.boost import add_multipliers
 from rewards.classes.TreeManager import TreeManager
 from decouple import config
 import json

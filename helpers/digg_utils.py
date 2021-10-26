@@ -1,7 +1,5 @@
-from config.env_config import env_config
 from helpers.constants import DIGG
 from helpers.web3_utils import make_contract
-import json
 from helpers.enums import Network
 
 

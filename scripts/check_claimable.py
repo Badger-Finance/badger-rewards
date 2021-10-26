@@ -1,4 +1,5 @@
 from helpers.enums import Network
+from rewards.snapshot.claims_snapshot import claims_snapshot
 
 
 def print_claimable(chain):

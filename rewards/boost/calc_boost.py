@@ -4,7 +4,7 @@ from helpers.constants import (
 )
 from typing import Dict
 from tabulate import tabulate
-
+from helpers.discord import send_code_block_to_discord
 from rewards.boost.boost_utils import (
     calc_union_addresses,
     calc_boost_balances,
@@ -22,22 +22,21 @@ def calc_stake_ratio(
     :param native_setts: native balances
     :param non_native_setts: non native balances
     """
-    native_balance = native_setts.get(address.lower(), 0)
-    non_native_balance = non_native_setts.get(address.lower(), 0)
+    native_balance = native_setts.get(address, 0)
+    non_native_balance = non_native_setts.get(address, 0)
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
         stake_ratio = (native_balance) / non_native_balance
     return stake_ratio
 
-
-def badger_boost(current_block: int):
+def badger_boost(current_block: int, chain: str):
     """
     Calculate badger boost multipliers based on stake ratios
     :param current_block: block to calculate boost at
     """
     console.log(f"Calculating boost at block {current_block} ...")
-    native_setts, non_native_setts = calc_boost_balances(current_block - 10)
+    native_setts, non_native_setts = calc_boost_balances(current_block - 100, chain)
 
     all_addresses = calc_union_addresses(native_setts, non_native_setts)
     console.log(f"{len(all_addresses)} addresses fetched")
@@ -48,21 +47,24 @@ def badger_boost(current_block: int):
     stake_ratios_list = [
         calc_stake_ratio(addr, native_setts, non_native_setts) for addr in all_addresses
     ]
-
     stake_ratios = dict(zip(all_addresses, stake_ratios_list))
 
     for addr in all_addresses:
-        boost_info[addr] = {"nativeBalance": 0, "nonNativeBalance": 0, "stakeRatio": 0}
+        boost_info[addr] = {
+            "nativeBalance": 0,
+            "nonNativeBalance": 0,
+            "stakeRatio": 0,
+        }
 
     for user, native_usd in native_setts.items():
-        boost_info[user.lower()]["nativeBalance"] = native_usd
+        boost_info[user]["nativeBalance"] = native_usd
 
     for user, non_native_usd in non_native_setts.items():
-        boost_info[user.lower()]["nonNativeBalance"] = non_native_usd
+        boost_info[user]["nonNativeBalance"] = non_native_usd
 
-    for addr, ratio in stake_ratios.items():
-        boost_info[addr.lower()]["stakeRatio"] = ratio
-
+    for user, ratio in stake_ratios.items():
+        boost_info[user]["stakeRatio"] = ratio
+    
     stake_data = {}
     console.log(STAKE_RATIO_RANGES)
     for addr, stake_ratio in stake_ratios.items():
@@ -89,11 +91,13 @@ def badger_boost(current_block: int):
             "multipliers": {},
         }
 
-    print(
-        tabulate(
-            [[rng, amount] for rng, amount in stake_data.items()],
-            headers=["range", "amount of users"],
-        )
+    stake_data = {k: stake_data[k] for k in sorted(stake_data, reverse=True)}
+
+    stake_data_table = tabulate(
+        [[rng, amount] for rng, amount in stake_data.items()],
+        headers=["range", "amount of users"],
     )
+    print(stake_data_table)
+    send_code_block_to_discord(stake_data_table, username="Boost Bot")
 
     return boost_data
