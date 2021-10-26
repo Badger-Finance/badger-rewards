@@ -2,7 +2,7 @@ import pytest
 import json
 from eth_account import Account
 
-from badger_api.account import fetch_all_claimable_balances
+from badger_api.requests import fetch_all_claimable_balances
 from rewards.tree_utils import calc_claimable_balances, user_claimable_balances
 from rewards.classes.TreeManager import TreeManager
 from tests.utils import (

@@ -132,7 +132,7 @@ UNI_DIGG_WBTC = "0xC17078FDd324CC473F8175Dc5290fae5f2E84714"
 SUSHI_DIGG_WBTC = "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6"
 
 TOKENS_TO_CHECK = {
-    "eth": {
+    Network.Ethereum: {
         "Badger": BADGER,
         "Digg": DIGG,
         "xSushi": XSUSHI,
@@ -140,13 +140,13 @@ TOKENS_TO_CHECK = {
         "bCvxCrv": BCVXCRV,
         "bCvx": BCVX,
     },
-    "arbitrum": {
+    Network.Arbitrum: {
         "Badger": ARB_BADGER,
         "Crv": ARB_CRV,
         "Sushi/WETH LP": ARB_SUSHI_WETH,
         "Swapr/WETH LP": ARB_SWAPR_WETH,
     },
-    "polygon": {
+    Network.Polygon: {
         "Badger": POLY_BADGER,
         "Sushi": POLY_SUSHI,
     },
@@ -250,11 +250,10 @@ MONITORING_SECRET_NAMES = {
 }
 
 BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]
-BOOST_CHAINS = ["eth", "polygon", "arbitrum"]
 
 CLAIMABLE_TOKENS = {
-    "eth": {"native": [BADGER, DIGG], "non_native": [BCVX, BCVXCRV]},
-    "arbitrum": {"native": [ARB_BADGER], "non_native": []},
-    "polygon": {"native": [POLY_BADGER], "non_native": []},
+    Network.Ethereum: {"native": [BADGER, DIGG], "non_native": [BCVX, BCVXCRV]},
+    Network.Arbitrum: {"native": [ARB_BADGER], "non_native": []},
+    Network.Polygon: {"native": [POLY_BADGER], "non_native": []},
 }
 SANITY_TOKEN_AMOUNT = 4000 * 1e18

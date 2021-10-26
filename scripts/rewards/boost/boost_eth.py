@@ -1,4 +1,4 @@
 from scripts.rewards.utils.boost import generate_boosts
-
+from helpers.enums import Network
 if __name__ == "__main__":
-    generate_boosts("eth")
+    generate_boosts(Network.Ethereum)

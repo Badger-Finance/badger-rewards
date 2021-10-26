@@ -21,6 +21,7 @@ from rewards.classes.Schedule import Schedule
 from rewards.classes.CycleLogger import cycle_logger
 from helpers.time_utils import to_utc_date, to_hours
 from helpers.digg_utils import digg_utils
+from helpers.enums import Network
 from config.env_config import env_config
 from rich.console import Console
 from typing import List, Tuple, Dict
@@ -114,7 +115,7 @@ class RewardsManager:
                         addr = self.web3.toChecksumAddress(user)
                         token = self.web3.toChecksumAddress(token)
                         reward_amount = balance * unit
-                        if addr == EMISSIONS_CONTRACTS["eth"]["BadgerTree"]:
+                        if addr == EMISSIONS_CONTRACTS[Network.Ethereum]["BadgerTree"]:
                             if sett == BCVX:
                                 extra_rewards.append(
                                     self.distribute_rewards_to_snapshot(

@@ -49,7 +49,7 @@ def calc_boost_balances(
     native = native + Counter(badger_tokens) + Counter(digg_tokens)
 
     console.log(f"\n === Taking chain snapshot on {chain} === \n")
-    if chain != "polygon":
+    if chain != Network.Polygon:
         native_setts, non_native_setts = chain_snapshot_usd(chain, block)
         non_native = non_native + Counter(non_native_setts)
         native = native + Counter(native_setts)
