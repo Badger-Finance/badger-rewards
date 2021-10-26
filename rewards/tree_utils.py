@@ -1,11 +1,8 @@
 from subgraph.queries.setts import last_synced_block
 from rewards.classes.TreeManager import TreeManager
 from rich.console import Console
-<<<<<<< HEAD
 from helpers.enums import Network
-=======
 from typing import List
->>>>>>> development
 
 console = Console()
 
