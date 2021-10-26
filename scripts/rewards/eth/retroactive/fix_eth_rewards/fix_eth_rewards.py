@@ -1,6 +1,4 @@
-from graphql.language.ast import BooleanValueNode
-from toolz.itertoolz import cons
-from helpers.constants import BCVX, BCVXCRV
+from helpers.constants import BADGER, DIGG
 from rewards.aws.boost import download_boosts
 from rewards.calc_rewards import process_cumulative_rewards
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
@@ -21,39 +19,45 @@ from rewards.rewards_checker import verify_rewards
 console = Console()
 
 
-tokens_to_check = [BCVX, BCVXCRV]
+tokens_to_check = [BADGER,DIGG]
 
 def check_zero_balances(tree, balances, tree_manager):
+    all_bals = {}
     for addr, token_info in balances.items():
         for token, amount in calculate_claimable_balances(addr, tree["claims"][addr], tree_manager).items():
+            all_bals[token] = amount
             if token in token_info:
                 console.log(addr ,token, amount)
                 assert int(amount) == 0
+    with open("all_claimable.json", "w") as fp:
+        json.dump(all_bals, fp)
     console.log("ZERO BALANCES ")
     
-def calculate_claimable_balances(user, claim, tree_manager):
+def calculate_claimable_balances(user, claim, tree_manager: TreeManager):
     claimable_balances = {}
     if any(token in tokens_to_check for token in claim["tokens"]):
-        claimed = tree_manager.get_claimed_for(user, tokens_to_check)
-        bcvx_claimed = int(claimed[1][claimed[0].index(BCVX)])
-        bcvx_crv_claimed = int(claimed[1][claimed[0].index(BCVXCRV)])
-        if BCVX not in claim["tokens"]:
-            bcvx_total = 0
-            claimable_balances[BCVX] = 0
+        claimed = tree_manager.get_claimed_for(tree_manager.w3.toChecksumAddress( user ), tokens_to_check)
+        badger_claimed = int(claimed[1][claimed[0].index(BADGER)])
+        digg_claimed = int(claimed[1][claimed[0].index(DIGG)])
+        if BADGER not in claim["tokens"]:
+            badger_total = 0
+            claimable_balances[BADGER] = 0
         else:
-            bcvx_total = int(claim["cumulativeAmounts"][claim["tokens"].index(BCVX)])
-            claimable_bcvx = bcvx_total - bcvx_claimed
-            claimable_balances[BCVX] = int(claimable_bcvx)
-            
-        if BCVXCRV not in claim["tokens"]:
-            bcvxcrv_total = 0
-            claimable_balances[BCVXCRV] = 0
+            badger_total = int(claim["cumulativeAmounts"][claim["tokens"].index(BADGER)])
+            claimable_badger = badger_total - badger_claimed
+            claimable_balances[BADGER] = int(claimable_badger)
+
+        if DIGG not in claim["tokens"]:
+            digg_total = 0
+            claimable_balances[DIGG] = 0
 
         else:
-            bcvxcrv_total = int(claim["cumulativeAmounts"][claim["tokens"].index(BCVXCRV)])
-            claimable_bcvxcrv = bcvxcrv_total - bcvx_crv_claimed
-            claimable_balances[BCVXCRV] = int(claimable_bcvxcrv)
-        
+            digg_total = int(
+                claim["cumulativeAmounts"][claim["tokens"].index(DIGG)]
+            )
+            claimable_digg = digg_total - digg_claimed
+            claimable_balances[DIGG] = int(claimable_digg)
+
     return claimable_balances
         
 
@@ -78,32 +82,18 @@ def check_negative_balances(merkle_tree, tree_manager):
     return balances_to_fix
 
 
-def fix_eth_rewards(tree_manager): 
+def fix_eth_rewards(tree_manager: TreeManager):
     chain = "eth"
-    tree_file_name = "rewards-1-0xd00b9252eeb4b0a35a9e23b24f28a3154a09f1072f6b2f870796347eee844870.json"
-    tree = json.load(open(tree_file_name))
+    tree = tree_manager.fetch_current_tree()
     start_block = int(tree["endBlock"]) + 1
-    end_block = 13403312
+    end_block = start_block
     
     boosts = download_boosts()
     rewards_manager = RewardsManager("eth", tree_manager.next_cycle, start_block, end_block, boosts)
     print(start_block, end_block)
     
-    # Generate rewards for cycle
-    rewards = generate_rewards_in_range(
-        chain,
-        start=start_block,
-        end=end_block,
-        save=False,
-        past_tree=tree,
-        tree_manager=tree_manager,
-    )
-    #rewards = {
-    #    "merkleTree": json.load(open("intermediate_rewards.json"))
-    #}
-    # convert to rewards list
-    rewards_list = process_cumulative_rewards(rewards["merkleTree"], RewardsList(tree_manager.next_cycle))
-    balances = check_negative_balances(rewards["merkleTree"], tree_manager)
+    rewards_list = process_cumulative_rewards(tree, RewardsList(tree_manager.next_cycle))
+    balances = check_negative_balances(tree["merkleTree"], tree_manager)
     console.log(len(balances))
     with open("balances_to_fix.json", "w") as fp:
         json.dump(balances, fp)
