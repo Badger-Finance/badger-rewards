@@ -133,7 +133,6 @@ def propose_root(
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-        return
     rewards_data = generate_rewards_in_range(
         chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager
     )
@@ -243,7 +242,7 @@ def generate_rewards_in_range(
 
     file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
 
-    verify_rewards(past_tree, merkle_tree, tree_manager)
+    verify_rewards(past_tree, merkle_tree, tree_manager, chain)
 
     if save:
         with open(file_name, "w") as fp:
