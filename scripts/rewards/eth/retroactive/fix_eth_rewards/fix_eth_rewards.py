@@ -18,8 +18,8 @@ from rewards.rewards_checker import verify_rewards
 
 console = Console()
 
-
 tokens_to_check = [BADGER,DIGG]
+affected_addresses = list(json.load(open("affected_addresses.json")).keys())
 
 def check_zero_balances(tree, balances, tree_manager):
     all_bals = {}
@@ -74,14 +74,17 @@ def check_negative_balances(merkle_tree, tree_manager):
     """
     console.log("Checking negative balances")
     balances_to_fix = {}
+    i = 0
     for addr, claim in merkle_tree["claims"].items():
-        claimable_bals = calculate_claimable_balances(addr, claim, tree_manager)
-        for token, amount in claimable_bals.items():
-            if int(amount) < 0:
-                if addr not in balances_to_fix:
-                    balances_to_fix[addr] = {}
-                balances_to_fix[addr][token] = abs(amount)
-                
+        i = i + 1
+        print(i)
+        if addr in affected_addresses:
+            claimable_bals = calculate_claimable_balances(addr, claim, tree_manager)
+            for token, amount in claimable_bals.items():
+                if int(amount) < 0:
+                    if addr not in balances_to_fix:
+                        balances_to_fix[addr] = {}
+                    balances_to_fix[addr][token] = abs(amount)
     return balances_to_fix
 
 
@@ -104,7 +107,6 @@ def fix_eth_rewards(tree_manager: TreeManager):
     for addr, token_data in balances.items():
         for token, amount in token_data.items():
             ## Increase users rewards who claimed too much so that their claimable balances are no longer zero
-            console.log(addr, token, amount)
             rewards_list.increase_user_rewards(
                addr,
                token,
