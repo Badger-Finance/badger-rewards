@@ -17,7 +17,7 @@ spec:
           - name: propose-eth-cycle-bot
             image: IMAGE_NAME
             imagePullPolicy: IfNotPresent
-            command: ["python", "-m", "scripts.rewards.eth.retroactive.fix_eth_rewards.fix_eth_rewards.propose"]
+            command: ["python", "-m", "scripts.rewards.eth.retroactive.fix_eth_rewards.fix_eth_rewards_propose"]
             env:
               - name: LOG_LEVEL
                 value: 'info'
