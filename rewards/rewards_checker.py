@@ -45,8 +45,8 @@ def print_token_diff_table(name, before, after, sanity_diff, decimals=18):
 def verify_rewards(past_tree, new_tree):
     console.log("Verifying Rewards ... \n")
     for name, token in TOKENS_TO_CHECK.items():
-        if name == "Digg":
-            continue
+        #if name == "Digg":
+        #    continue
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
         print_token_diff_table(
