@@ -5,7 +5,7 @@ subgraph_ids = {
 }
 subgraph_urls = {
     # Chain graphs
-    "bsc": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-bsc",
+    Network.BinanceSmartChain: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-bsc",
     Network.Ethereum: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao",
     Network.Polygon: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-polygon",
     Network.Arbitrum: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-arbitrum",
