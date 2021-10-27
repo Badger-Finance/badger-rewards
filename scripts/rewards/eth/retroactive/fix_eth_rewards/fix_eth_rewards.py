@@ -19,6 +19,7 @@ from rewards.rewards_checker import verify_rewards
 console = Console()
 
 tokens_to_check = [BADGER,DIGG]
+
 affected_addresses = list(json.load(open("affected_addresses.json")).keys())
 
 def check_zero_balances(tree, balances, tree_manager):
