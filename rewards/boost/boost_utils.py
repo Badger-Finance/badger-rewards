@@ -52,7 +52,7 @@ def convert_balances_to_usd(
         price = 0
         send_message_to_discord(
             "**BADGER BOOST ERROR**",
-            f"Cannot find pricing for f{sett}",
+            f"Cannot find pricing for {sett}",
             [],
             "Boost Bot",
         )
