@@ -84,6 +84,8 @@ BOR = "0x3c9d6c1C73b31c837832c72E04D3152f051fc1A9"
 BBADGER = "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28"
 BDIGG = "0x7e7e112a68d8d2e221e11047a72ffc1065c38e1a"
 
+BARB_SWP_BADGER_WETH = "0xE9C12F06F8AFFD8719263FE4a81671453220389c"
+
 TOKENS_TO_CHECK = {
     "Badger": BADGER,
     "Digg": DIGG,
@@ -158,6 +160,7 @@ SETT_INFO = {
     "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a": {"type": "native", "ratio": 1},
     "0xC17078FDd324CC473F8175Dc5290fae5f2E84714": {"type": "native", "ratio": 0.5},
     "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6": {"type": "native", "ratio": 0.5},
+    BARB_SWP_BADGER_WETH: {"type": "native", "ratio": 0.5},
 }
 
 EMISSIONS_CONTRACTS = {
