@@ -1,5 +1,5 @@
 from rewards.classes.TreeManager import TreeManager
-from rewards.tree_utils import calc_claimable_balances
+from rewards.snapshot.claims_snapshot import claims_snapshot
 from tabulate import tabulate
 from rich.console import Console
 from config.env_config import env_config
@@ -49,22 +49,25 @@ def token_diff_table(name, before, after, decimals=18):
 def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain):
     console.log("Verifying Rewards ... \n")
 
-    claimable_balances = calc_claimable_balances(
-        tree_manager, new_tree["tokenTotals"].keys(), new_tree
-    )
+    claim_snapshot = claims_snapshot(chain)
+
     negative_claimable = []
-    for addr, bals in claimable_balances.items():
-        for token, amount in bals.items():
+    for token, snapshot in claim_snapshot.items():
+        for addr, amount in snapshot:
             if amount < 0:
-                negative_claimable.append({
-                    addr: {k: v for k, v in bals.items() if v < 0}
-                })
+                if addr not in negative_claimable:
+                    negative_claimable[addr] = {}
+                negative_claimable[addr][token] = amount
     try:
-        assert len(negative_claimable) == 0 
+        assert len(negative_claimable) == 0
     except AssertionError as e:
-        send_error_to_discord(e, f"Negative Claimable \n ```{json.dumps(negative_claimable,indent=4)}```", "Negative Rewards Error")
+        send_error_to_discord(
+            e,
+            f"Negative Claimable \n ```{json.dumps(negative_claimable,indent=4)}```",
+            "Negative Rewards Error",
+        )
         raise e
-        
+
     for name, token in TOKENS_TO_CHECK[chain].items():
         if name == "Digg":
             continue

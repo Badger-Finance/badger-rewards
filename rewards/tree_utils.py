@@ -48,37 +48,3 @@ def calc_next_cycle_range(chain: str, tree_manager: TreeManager):
 
     # Sanity check: Ensure start block is not too close to end block
     return (current_rewards, start_block, end_block)
-
-
-def calc_claimable_balances(
-    tree_manager: TreeManager, tokens_to_check: List[str], merkle_tree
-):
-    balances = {}
-    merkle_claims = merkle_tree["claims"]
-    addrs_to_check = random.sample(list(merkle_tree["claims"].keys()), min(CLAIMS_TO_CHECK, len(merkle_claims)))
-    for addr in addrs_to_check:
-        claim = merkle_claims[addr]
-        claimable_bals = user_claimable_balances(
-            addr, claim, tree_manager, tokens_to_check
-        )
-        balances[addr] = claimable_bals
-    return balances
-
-
-def user_claimable_balances(
-    user: str, claim, tree_manager: TreeManager, tokens_to_check
-):
-    claimable_balances = {}
-    if any(token in tokens_to_check for token in claim["tokens"]):
-        claimed = tree_manager.get_claimed_for(tree_manager.w3.toChecksumAddress(user), tokens_to_check)
-        for token in tokens_to_check:
-            claimed_token = int(claimed[1][claimed[0].index(token)])
-            if token not in claim["tokens"]:
-                claimable_balances[token] = 0
-            else:
-                total_token = int(
-                    claim["cumulativeAmounts"][claim["tokens"].index(token)]
-                )
-                claimable_balances[token] = int(total_token) - int(claimed_token)
-
-    return claimable_balances
