@@ -2,12 +2,12 @@ import requests
 from config.env_config import env_config
 from typing import Dict
 import time
+from helpers.enums import Network
 
 urls = {
-    "eth": "etherscan.io",
-    "polygon": "polygonscan.com",
-    "bsc": "bscscan.com",
-    "arbitrum": "arbiscan.io",
+    Network.Ethereum: "etherscan.io",
+    Network.Polygon: "polygonscan.com",
+    Network.Arbitrum: "arbiscan.io",
 }
 
 
@@ -36,10 +36,9 @@ def convert_from_eth(block) -> Dict[str, int]:
     """
     timestamp = env_config.get_web3().eth.getBlock(block)["timestamp"]
     return {
-        "eth": block,
-        # "bsc": get_block_by_timestamp("bsc", timestamp) - 1000,
-        "polygon": get_block_by_timestamp("polygon", timestamp) - 1000,
-        "arbitrum": get_block_by_timestamp("arbitrum", timestamp) - 1500,
+        Network.Ethereum: block,
+        Network.Polygon: get_block_by_timestamp(Network.Polygon, timestamp) - 1000,
+        Network.Arbitrum: get_block_by_timestamp(Network.Arbitrum, timestamp) - 1500,
     }
 
 

@@ -35,7 +35,7 @@ def val(amount, decimals=18):
     return f"{amount / 10 ** decimals:,.18f}"
 
 
-def token_diff_table(name, before, after, sanity_diff, decimals=18):
+def token_diff_table(name, before, after, decimals=18):
     diff = after - before
     console.print(f"Diff for {name} \n")
     table = []
@@ -45,7 +45,7 @@ def token_diff_table(name, before, after, sanity_diff, decimals=18):
     return diff, tabulate(table, headers=["token", "amount"])
 
 
-def verify_rewards(past_tree, new_tree, tree_manager: TreeManager):
+def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
     console.log("Verifying Rewards ... \n")
 
     claimable_balances = calc_claimable_balances(
@@ -55,9 +55,8 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager):
         for token, amount in bals.items():
             assert amount >= 0
 
-    for name, token in TOKENS_TO_CHECK.items():
-        if name == "Digg":
-            continue
+    for name, token in TOKENS_TO_CHECK[chain].items():
+        
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
         console.log(name, total_before_token, total_after_token)

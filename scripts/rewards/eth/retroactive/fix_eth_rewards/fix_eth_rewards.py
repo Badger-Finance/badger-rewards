@@ -1,12 +1,10 @@
-from graphql.language.ast import BooleanValueNode
-from toolz.itertoolz import cons
 from helpers.constants import BCVX, BCVXCRV
 from rewards.aws.boost import download_boosts
 from rewards.calc_rewards import process_cumulative_rewards
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.RewardsManager import RewardsManager
-
+from helpers.enums import Network
 from rewards.calc_rewards import generate_rewards_in_range
 from config.env_config import env_config
 from rewards.classes.TreeManager import TreeManager
@@ -85,7 +83,7 @@ def check_negative_balances(merkle_tree, tree_manager):
 
 
 def fix_eth_rewards(tree_manager):
-    chain = "eth"
+    chain = Network.Ethereum
     tree_file_name = "rewards-1-0xd00b9252eeb4b0a35a9e23b24f28a3154a09f1072f6b2f870796347eee844870.json"
     tree = json.load(open(tree_file_name))
     start_block = int(tree["endBlock"]) + 1
@@ -93,7 +91,7 @@ def fix_eth_rewards(tree_manager):
 
     boosts = download_boosts()
     rewards_manager = RewardsManager(
-        "eth", tree_manager.next_cycle, start_block, end_block, boosts
+        Network.Ethereum, tree_manager.next_cycle, start_block, end_block, boosts
     )
     print(start_block, end_block)
 

@@ -8,6 +8,7 @@ import requests
 from web3 import Web3, exceptions
 from config.env_config import env_config
 from typing import Tuple
+from helpers.enums import Network
 
 logger = logging.getLogger("tx-utils")
 
@@ -41,9 +42,9 @@ def get_gas_price_of_tx(
         EMISSIONS_CONTRACTS[chain]["GasOracle"], abi_name="ChainlinkOracle", chain=chain
     )
 
-    if chain == "eth":
+    if chain == Network.Ethereum:
         gas_price_base = Decimal(tx_receipt.get("effectiveGasPrice", 0) / 10 ** 18)
-    elif chain in ["polygon", "arbitrum"]:
+    elif chain in [Network.Polygon, Network.Arbitrum]:
         tx = web3.eth.get_transaction(tx_hash)
         gas_price_base = Decimal(tx.get("gasPrice", 0) / 10 ** 18)
 
@@ -71,9 +72,9 @@ def get_latest_arbitrum_fee(web3: Web3, default=int(5e9)):  # default to 5 gwei
     latest = web3.eth.getBlock("latest")
 
 
-def get_effective_gas_price(web3: Web3, chain: str = "eth") -> int:
+def get_effective_gas_price(web3: Web3, chain: str = Network.Ethereum) -> int:
     # TODO: Currently using max fee (per gas) that can be used for this tx. Maybe use base + priority (for average).
-    if chain == "eth":
+    if chain == Network.Ethereum:
         base_fee = get_latest_base_fee(web3)
         logger.info(f"latest base fee: {base_fee}")
 
@@ -81,10 +82,10 @@ def get_effective_gas_price(web3: Web3, chain: str = "eth") -> int:
         logger.info(f"avg priority fee: {priority_fee}")
         # max fee aka gas price enough to get included in next 6 blocks
         gas_price = 2 * base_fee + priority_fee
-    elif chain == "polygon":
+    elif chain == Network.Polygon:
         response = requests.get("https://gasstation-mainnet.matic.network").json()
         gas_price = web3.toWei(int(response.get("fast") * 1.1), "gwei")
-    elif chain == "arbitrum":
+    elif chain == Network.Arbitrum:
         gas_price = web3.eth.gas_price * 1.1
     return gas_price
 

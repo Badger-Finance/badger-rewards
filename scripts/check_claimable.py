@@ -1,3 +1,4 @@
+from helpers.enums import Network
 from rewards.snapshot.claims_snapshot import claims_snapshot
 
 
@@ -8,4 +9,4 @@ def print_claimable(chain):
 
 
 if __name__ == "__main__":
-    print_claimable("arbitrum")
+    print_claimable(Network.Arbitrum)

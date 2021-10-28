@@ -1,5 +1,5 @@
 import math
-from badger_api.account import fetch_all_claimable_balances
+from badger_api.requests import fetch_all_claimable_balances
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import BADGER, DIGG, BCVX, BCVXCRV, ARB_BADGER, POLY_BADGER
 from typing import Dict, Tuple

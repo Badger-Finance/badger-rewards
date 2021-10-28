@@ -1,5 +1,6 @@
 from web3 import Web3
 from dotmap import DotMap
+from helpers.enums import Network
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -131,7 +132,7 @@ UNI_DIGG_WBTC = "0xC17078FDd324CC473F8175Dc5290fae5f2E84714"
 SUSHI_DIGG_WBTC = "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6"
 
 TOKENS_TO_CHECK = {
-    "eth": {
+    Network.Ethereum: {
         "Badger": BADGER,
         "Digg": DIGG,
         "xSushi": XSUSHI,
@@ -139,13 +140,13 @@ TOKENS_TO_CHECK = {
         "bCvxCrv": BCVXCRV,
         "bCvx": BCVX,
     },
-    "arbitrum": {
+    Network.Arbitrum: {
         "Badger": ARB_BADGER,
         "Crv": ARB_CRV,
         "Sushi/WETH LP": ARB_SUSHI_WETH,
         "Swapr/WETH LP": ARB_SWAPR_WETH,
     },
-    "polygon": {
+    Network.Polygon: {
         "Badger": POLY_BADGER,
         "Sushi": POLY_SUSHI,
     },
@@ -206,21 +207,21 @@ SETT_INFO = {
 }
 
 EMISSIONS_CONTRACTS = {
-    "eth": DotMap(
+    Network.Ethereum: DotMap(
         {
             "BadgerTree": ETH_BADGER_TREE,
             "RewardsLogger": ETH_REWARDS_LOGGER,
             "GasOracle": ETH_GAS_ORACLE,
         }
     ),
-    "polygon": DotMap(
+    Network.Polygon: DotMap(
         {
             "BadgerTree": POLY_BADGER_TREE,
             "RewardsLogger": POLY_REWARDS_LOGGER,
             "GasOracle": POLY_GAS_ORACLE,
         }
     ),
-    "arbitrum": DotMap(
+    Network.Arbitrum: DotMap(
         {
             "BadgerTree": ARB_BADGER_TREE,
             "RewardsLogger": ARB_REWARDS_LOGGER,
@@ -243,16 +244,16 @@ DISABLED_VAULTS = [
 PRO_RATA_VAULTS = [BLCVX]
 
 MONITORING_SECRET_NAMES = {
-    "eth": "cycle-bot/eth/prod-discord-url",
-    "polygon": "cycle-bot/prod-discord-url",
-    "arbitrum": "cycle-bot/arbitrum/prod-discord-url",
+    Network.Ethereum: "cycle-bot/eth/prod-discord-url",
+    Network.Polygon: "cycle-bot/prod-discord-url",
+    Network.Arbitrum: "cycle-bot/arbitrum/prod-discord-url",
 }
 
-BOOST_CHAINS = ["eth", "polygon", "arbitrum"]
+BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]
 
 CLAIMABLE_TOKENS = {
-    "eth": {"native": [BADGER, DIGG], "non_native": [BCVX, BCVXCRV]},
-    "arbitrum": {"native": [ARB_BADGER], "non_native": []},
-    "polygon": {"native": [POLY_BADGER], "non_native": []},
+    Network.Ethereum: {"native": [BADGER, DIGG], "non_native": [BCVX, BCVXCRV]},
+    Network.Arbitrum: {"native": [ARB_BADGER], "non_native": []},
+    Network.Polygon: {"native": [POLY_BADGER], "non_native": []},
 }
 SANITY_TOKEN_AMOUNT = 4000 * 1e18

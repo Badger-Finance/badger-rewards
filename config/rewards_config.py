@@ -1,13 +1,15 @@
 from helpers.time_utils import hours
 
+from helpers.enums import Network
+
 
 class RewardsConfig:
     def __init__(self):
         self.globalStakingStartBlock = 11252068
         self.root_update_intervals = {
-            "eth": hours(1.5),
-            "polygon": hours(0.05),
-            "arbitrum": hours(1.5),
+            Network.Ethereum: hours(1.5),
+            Network.Polygon: hours(0.05),
+            Network.Arbitrum: hours(1.5),
         }
         self.maxStartBlockAge = 3200
         self.debug = False

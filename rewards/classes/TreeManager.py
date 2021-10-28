@@ -11,6 +11,7 @@ from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_tree
 from helpers.web3_utils import get_badger_tree
 from helpers.constants import MONITORING_SECRET_NAMES
+from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
 from rewards.tx_utils import (
     get_effective_gas_price,
@@ -136,7 +137,7 @@ class TreeManager:
         return self.badger_tree.getClaimableFor(user, tokens, cumAmounts).call()
 
     def get_claimed_for(self, user: str, tokens: List[str]):
-        return self.badger_tree.getClaimedFor(user, tokens).call()
+        return self.badger_tree.getClaimedFor(self.w3.toChecksumAddress(user), list(tokens)).call()
 
     def has_pending_root(self) -> bool:
         return self.badger_tree.hasPendingRoot().call()
@@ -201,11 +202,11 @@ class TreeManager:
             "nonce": self.w3.eth.get_transaction_count(account.address),
             "from": account.address,
         }
-        if self.chain == "eth":
+        if self.chain == Network.Ethereum:
             options["maxPriorityFeePerGas"] = get_priority_fee(self.w3)
             options["maxFeePerGas"] = get_effective_gas_price(self.w3, self.chain)
             options["gas"] = 200000
-        elif self.chain == "arbitrum":
+        elif self.chain == Network.Arbitrum:
             options["gas"] = 3000000
         else:
             options["gasPrice"] = get_effective_gas_price(self.w3, self.chain)
