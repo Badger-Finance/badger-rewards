@@ -137,7 +137,6 @@ class TreeManager:
         return self.badger_tree.getClaimableFor(user, tokens, cumAmounts).call()
 
     def get_claimed_for(self, user: str, tokens: List[str]):
-        return self.badger_tree.getClaimedFor(user, list(tokens)).call()
         return self.badger_tree.getClaimedFor(
             self.w3.toChecksumAddress(user), list(tokens)
         ).call()
