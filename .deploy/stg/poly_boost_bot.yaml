@@ -17,7 +17,7 @@ spec:
           - name: poly-boost-bot-stg
             image: IMAGE_NAME
             imagePullPolicy: IfNotPresent
-            command: ["python", "-m", "scripts.rewards.boost_polygon"]
+            command: ["python", "-m", "scripts.rewards.boost.boost_polygon"]
             env:
               - name: LOG_LEVEL
                 value: 'info'
