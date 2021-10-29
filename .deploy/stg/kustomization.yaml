@@ -1,14 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - approve_arb_cycle_bot.yaml
-  - approve_poly_cycle_bot.yaml
   - arb_boost_bot.yaml
-  - boost_bot.yaml
   - eth_boost_bot.yaml
   - poly_boost_bot.yaml
-  - propose_arb_cycle_bot.yaml
-  - propose_eth_cycle_bot.yaml
-  - propose_poly_cycle_bot.yaml
-  - service.yaml
   - service_account.yaml
