@@ -3,6 +3,7 @@ from rewards.aws.helpers import get_secret
 from rewards.classes.TreeManager import TreeManager
 from config.env_config import env_config
 
+
 def get_tree_manager(chain: str):
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",

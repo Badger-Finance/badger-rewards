@@ -2,9 +2,6 @@ from subgraph.queries.setts import last_synced_block
 from rewards.classes.TreeManager import TreeManager
 from rich.console import Console
 from helpers.enums import Network
-from typing import List
-from helpers.constants import CLAIMS_TO_CHECK
-import random
 
 console = Console()
 
