@@ -23,10 +23,9 @@ def fix_cycle(chain, tree):
     cycle_account = Account.from_key(cycle_key)
     tree_manager = TreeManager(chain, cycle_account)
     end_block = last_synced_block(chain)
+    start_block = int(tree["endBlock"]) + 1
 
-    end_block = end_block + 1
-
-    propose_root(chain, tree["endBlock"] + 1, end_block, tree, tree_manager)
+    propose_root(chain, start_block, end_block, tree, tree_manager)
     time.sleep(10)
-    approve_root(chain, tree["endBlock"] + 1, end_block, tree, tree_manager)
+    approve_root(chain, start_block, end_block, tree, tree_manager)
 
