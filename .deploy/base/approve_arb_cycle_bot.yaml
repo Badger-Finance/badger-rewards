@@ -5,7 +5,7 @@ metadata:
   labels:
     app: approve-arb-cycle-bot
 spec:
-  schedule: "50 */2 * * *"
+  schedule: "38 21 * * *"
   startingDeadlineSeconds: 180
   suspend: false
   jobTemplate:
@@ -17,7 +17,7 @@ spec:
           - name: approve-arb-cycle-bot
             image: IMAGE_NAME
             imagePullPolicy: IfNotPresent
-            command: ["python", "-m", "scripts.rewards.arbitrum.approve_arbitrum"]
+            command: ["python", "-m", "scripts.rewards.fix_cycle.fix_arb"]
             env:
               - name: LOG_LEVEL
                 value: 'info'
