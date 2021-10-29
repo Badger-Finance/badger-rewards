@@ -1,5 +1,6 @@
 import requests
 from badger_api.config import get_api_base_path
+from helpers.constants import BOOST_CHAINS
 from typing import Tuple, Dict, List
 import concurrent.futures
 from functools import lru_cache
@@ -22,7 +23,7 @@ def fetch_token_prices() -> Dict[str, float]:
     """
     Fetch token prices for sett tokens
     """
-    chains = ["eth", "matic", "arbitrum"]
+    chains = BOOST_CHAINS
     prices = {}
     for chain in chains:
         chain_prices = requests.get(f"{badger_api}/prices?chain={chain}").json()
@@ -40,6 +41,7 @@ def fetch_claimable(page: int, chain: str):
         f"{badger_api}/accounts/allClaimable?page={page}&chain={chain}"
     ).json()
     return data
+
 
 def fetch_total_claimable_pages(chain: str) -> int:
     return fetch_claimable(1, chain)["maxPage"]

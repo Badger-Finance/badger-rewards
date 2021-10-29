@@ -30,6 +30,7 @@ def calc_stake_ratio(
         stake_ratio = (native_balance) / non_native_balance
     return stake_ratio
 
+
 def badger_boost(current_block: int, chain: str):
     """
     Calculate badger boost multipliers based on stake ratios
@@ -64,7 +65,7 @@ def badger_boost(current_block: int, chain: str):
 
     for user, ratio in stake_ratios.items():
         boost_info[user]["stakeRatio"] = ratio
-    
+
     stake_data = {}
     console.log(STAKE_RATIO_RANGES)
     for addr, stake_ratio in stake_ratios.items():

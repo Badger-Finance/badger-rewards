@@ -14,6 +14,7 @@ from helpers.constants import (
     EMISSIONS_CONTRACTS,
     MONITORING_SECRET_NAMES,
 )
+from helpers.enums import Network
 from helpers.discord import send_message_to_discord
 from subgraph.queries.setts import list_setts
 from rich.console import Console
@@ -132,7 +133,6 @@ def propose_root(
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-        return
     rewards_data = generate_rewards_in_range(
         chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager
     )
@@ -225,7 +225,7 @@ def generate_rewards_in_range(
     console.log("Calculating Sett Rewards...")
     sett_rewards = rewards_manager.calculate_all_sett_rewards(setts, all_schedules)
     rewards_list.append(sett_rewards)
-    if chain == "eth":
+    if chain == Network.Ethereum:
         sushi_rewards = rewards_manager.calc_sushi_distributions()
         rewards_list.append(sushi_rewards)
 

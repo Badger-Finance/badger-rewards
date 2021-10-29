@@ -5,10 +5,11 @@ from eth_account import Account
 from scripts.rewards.eth.retroactive.fix_eth_rewards.fix_eth_rewards import (
     fix_eth_rewards,
 )
+from helpers.enums import Network
 
 
 if __name__ == "__main__":
-    chain = "eth"
+    chain = Network.Ethereum
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
         "private",

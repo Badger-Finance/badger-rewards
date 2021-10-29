@@ -8,6 +8,7 @@ from helpers.discord import send_error_to_discord, send_message_to_discord
 from helpers.digg_utils import digg_utils
 from helpers.web3_utils import make_contract
 from functools import lru_cache
+from helpers.enums import Network
 
 console = Console()
 
@@ -71,7 +72,7 @@ def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str
 
 
 def fetch_fuse_pool_balances(client, chain, block):
-    if chain != "eth":
+    if chain != Network.Ethereum:
         console.log("Fuse pools are only active on ETH")
         return {}
 

@@ -46,11 +46,9 @@ def token_diff_table(name, before, after, decimals=18):
     return diff, tabulate(table, headers=["token", "amount"])
 
 
-def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain):
+def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
     console.log("Verifying Rewards ... \n")
-
     claim_snapshot = claims_snapshot(chain)
-
     negative_claimable = []
     for token, snapshot in claim_snapshot.items():
         for addr, amount in snapshot:
@@ -69,8 +67,6 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain):
         raise e
 
     for name, token in TOKENS_TO_CHECK[chain].items():
-        if name == "Digg":
-            continue
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
         console.log(name, total_before_token, total_after_token)

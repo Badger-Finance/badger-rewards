@@ -9,9 +9,10 @@ from rewards.aws.helpers import get_secret
 from eth_account import Account
 from subgraph.queries.setts import last_synced_block
 
+from helpers.enums import Network
 
 if __name__ == "__main__":
-    chain = "eth"
+    chain = Network.Ethereum
     tree_file_name = "rewards-1-0x83b8544a0ea1cac9747c4aec3c9e6df79611bd6c1e54333d101ac162df82cd91.json"
     tree = json.load(open(tree_file_name))
     start_block = int(tree["endBlock"]) + 1
