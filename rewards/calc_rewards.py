@@ -141,7 +141,8 @@ def propose_root(
     console.log(
         f"\n==== Proposing root with rootHash {rewards_data['rootHash']} ====\n"
     )
-    tx_hash, success = tree_manager.propose_root(rewards_data)
+    if not env_config.test:
+        tx_hash, success = tree_manager.propose_root(rewards_data)
 
 
 def approve_root(
@@ -164,6 +165,13 @@ def approve_root(
         past_tree=current_rewards,
         tree_manager=tree_manager,
     )
+    if env_config.test:
+        add_multipliers(
+            rewards_data["multiplierData"],
+            rewards_data["userMultipliers"],
+            chain=chain,
+        )
+        return rewards_data
     if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
         console.log(
             f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"

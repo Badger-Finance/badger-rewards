@@ -13,7 +13,7 @@ subgraph_urls = {
     # Token graphs
     f"tokens-{Network.Ethereum}": "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens",
     f"tokens-{Network.BinanceSmartChain}": "https://bgraph-bsc.badger.guru/subgraphs/name/swole/badger-subgraph",
-    f"tokens-{Network.Polygon}": "https://bgraph-matic.badger.guru/subgraphs/name/swole/tokens-polygon",
+    f"tokens-{Network.Polygon}": "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-polygon",
     f"tokens-{Network.Arbitrum}": "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-arbitrum",
     # Harvest graphs
     f"harvests-{Network.Ethereum}": "https://api.thegraph.com/subgraphs/name/darruma/badger-harvests",
