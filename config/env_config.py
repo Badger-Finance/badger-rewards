@@ -42,10 +42,8 @@ class EnvConfig:
 
         self.web3 = {
             Network.Ethereum: self.make_provider("quiknode/eth-node-url", "NODE_URL"),
-            Network.Arbitrum: self.make_provider(
-                "alchemy/arbitrum-node-url", "ARBITRUM_NODE_URL"
-            ),
-            Network.Polygon: polygon,
+            Network.Arbitrum: Web3(Web3.HTTPProvider("https://arb1.arbitrum.io/rpc")),
+            Network.Polygon: polygon,     
         }
 
     def get_web3(self, chain: str = Network.Ethereum) -> Web3:
