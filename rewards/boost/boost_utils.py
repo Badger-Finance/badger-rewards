@@ -33,7 +33,7 @@ def filter_dust(balances: Dict[str, int], dust_amount: int) -> Dict[str, float]:
     return {addr: value for addr, value in balances.items() if value > dust_amount}
 
 
-def calc_boost_balances(block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
+def calc_boost_balances(block: int, chain: str) -> Tuple[Dict[str, float], Dict[str, float]]:
     """
     Calculate boost data required for boost calculation
     :param block: block to collect the boost data from
