@@ -56,7 +56,7 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
             assert amount >= 0
 
     for name, token in TOKENS_TO_CHECK[chain].items():
-        
+
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
         console.log(name, total_before_token, total_after_token)

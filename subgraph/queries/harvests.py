@@ -4,7 +4,7 @@ from rich.console import Console
 
 console = Console()
 
-harvests_client = make_gql_client("harvests-eth")
+harvests_client = make_gql_client("harvests-ethereum")
 
 
 def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
