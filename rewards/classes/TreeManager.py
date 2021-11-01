@@ -73,6 +73,7 @@ class TreeManager:
         tx_hash = HexBytes(0)
         try:
             tx_hash = self.build_function_and_send(self.approve_account, func=root_func)
+            # Wait 5 seconds before confirming a transaction to make sure the node can see the tx receipt
             time.sleep(5)
             succeeded, msg = confirm_transaction(
                 self.w3,
