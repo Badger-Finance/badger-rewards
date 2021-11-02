@@ -168,8 +168,8 @@ REWARDS_BLACKLIST = {
     IBBTC_PEAK: "IBBTC Peak",
     IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
     BADGER_PAYMENTS: "Badger Payments",
+    BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
-
 
 STAKE_RATIO_RANGES = list(
     [
