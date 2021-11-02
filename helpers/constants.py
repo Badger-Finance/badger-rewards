@@ -1,5 +1,6 @@
 from web3 import Web3
 from dotmap import DotMap
+from helpers.enums import Network
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -71,6 +72,30 @@ role_registry.add_role("DISTRIBUTOR_ROLE")
 role_registry.add_role("APPROVED_ACCOUNT_ROLE")
 
 
+DEV_MULTISIG = "0xB65cef03b9B89f99517643226d76e286ee999e77"
+TECH_OPS = "0x86cbD0ce0c087b482782c181dA8d191De18C8275"
+
+CREAM_BBADGER = "0x8B950f43fCAc4931D408F1fcdA55C6CB6cbF3096"
+SUSHI_BBADGER_WETH = "0x0a54d4b378C8dBfC7bC93BE50C85DebAFdb87439"
+
+ETH_BADGER_TREE = "0x660802Fc641b154aBA66a62137e71f331B6d787A"
+BADGER_VAULT = "0x19D97D8fA813EE2f51aD4B4e04EA08bAf4DFfC28"
+IBBTC_PEAK = "0x41671BA1abcbA387b9b2B752c205e22e916BE6e3"
+IBBTC_Y_PEAK = "0x825218beD8BE0B30be39475755AceE0250C50627"
+BADGER_PAYMENTS = "0xD4868d98849a58F743787c77738D808376210292"
+
+
+ETH_REWARDS_LOGGER = "0x0A4F4e92C3334821EbB523324D09E321a6B0d8ec"
+ETH_GAS_ORACLE = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
+
+POLY_BADGER_TREE = "0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b"
+POLY_REWARDS_LOGGER = "0xd0EE2A5108b8800D688AbC834445fd03b3b2738e"
+POLY_GAS_ORACLE = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0"
+
+ARB_BADGER_TREE = "0x635EB2C39C75954bb53Ebc011BDC6AfAAcE115A6"
+ARB_REWARDS_LOGGER = "0x85E1cACAe9a63429394d68Db59E14af74143c61c"
+ARB_GAS_ORACLE = "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"
+
 DIGG = "0x798D1bE841a82a273720CE31c822C61a67a601C3"
 BADGER = "0x3472A5A71965499acd81997a54BBA8D852C6E53d"
 FARM = "0xa0246c9032bC3A600820415aE600c6388619A14D"
@@ -83,51 +108,68 @@ BBVECVX_CVX = "0x937B8E917d0F36eDEBBA8E459C5FB16F3b315551"
 BVECVX_CVX_LP = "0x04c90C198b2eFF55716079bc06d7CCc4aa4d7512"
 PNT = "0x89Ab32156e46F46D02ade3FEcbe5Fc4243B9AAeD"
 BOR = "0x3c9d6c1C73b31c837832c72E04D3152f051fc1A9"
-BBADGER = "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28"
-BDIGG = "0x7e7e112a68d8d2e221e11047a72ffc1065c38e1a"
+BBADGER = "0x19D97D8fA813EE2f51aD4B4e04EA08bAf4DFfC28"
+BDIGG = "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a"
 
+ARB_BADGER = "0xBfa641051Ba0a0Ad1b0AcF549a89536A0D76472E"
+ARB_CRV = "0x11cDb42B0EB46D95f990BeDD4695A6e3fA034978"
+ARB_SUSHI_WETH = "0xe774D1FB3133b037AA17D39165b8F45f444f632d"
+ARB_SWAPR_WETH = "0x0c2153e8aE4DB8233c61717cDC4c75630E952561"
 BARB_SWP_BADGER_WETH = "0xE9C12F06F8AFFD8719263FE4a81671453220389c"
 
+
+POLY_BADGER = "0x1FcbE5937B0cc2adf69772D228fA4205aCF4D9b2"
+POLY_SUSHI = "0x0b3F868E0BE5597D5DB7fEB59E1CADBb0fdDa50a"
+
+BSC_TEST_VAULT = "0xB6bd5ae3d5F78A6Bb04bBb031E24fA9C2BbD090d"
+ARB_TRICRYPTO_1 = "0x85E1cACAe9a63429394d68Db59E14af74143c61c"
+ETH_TRICRYPTO_1 = "0xBE08Ef12e4a553666291E9fFC24fCCFd354F2Dd2"
+ARB_TRICRYPTO_3 = "0xfdb9e5a186FB7655aC9cD7CAFF3d6D4c6064cc50"
+ARB_SWAPR_WBTC_WETH = "0xaf9aB64F568149361ab670372b16661f4380e80B"
+HARVEST_RENCRV = "0xAf5A1DECfa95BAF63E0084a35c62592B774A2A87"
+
+UNI_BADGER_WBTC = "0x235c9e24D3FB2FAFd58a2E49D454Fdcd2DBf7FF1"
+SUSHI_BADGER_WBTC = "0x1862A18181346EBd9EdAf800804f89190DeF24a5"
+
+UNI_DIGG_WBTC = "0xC17078FDd324CC473F8175Dc5290fae5f2E84714"
+SUSHI_DIGG_WBTC = "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6"
+
 TOKENS_TO_CHECK = {
-    "Badger": BADGER,
-    "Digg": DIGG,
-    "Farm": FARM,
-    "xSushi": XSUSHI,
-    "Dfd": DFD,
-    "bCvxCrv": BCVXCRV,
-    "bCvx": BCVX,
-    "Pnt": PNT,
-    "Bor": BOR,
+    Network.Ethereum: {
+        "Badger": BADGER,
+        "Digg": DIGG,
+        "xSushi": XSUSHI,
+        "Dfd": DFD,
+        "bCvxCrv": BCVXCRV,
+        "bCvx": BCVX,
+    },
+    Network.Arbitrum: {
+        "Badger": ARB_BADGER,
+        "Crv": ARB_CRV,
+        "Sushi/WETH LP": ARB_SUSHI_WETH,
+        "Swapr/WETH LP": ARB_SWAPR_WETH,
+    },
+    Network.Polygon: {
+        "Badger": POLY_BADGER,
+        "Sushi": POLY_SUSHI,
+    },
 }
 
-
-PEAK_ADDRESSES = [
-    "0x825218beD8BE0B30be39475755AceE0250C50627",
-    "0x41671BA1abcbA387b9b2B752c205e22e916BE6e3",
-]
-
-DIGG_SETTS = ["native.uniDiggWbtc", "native.sushiDiggWbtc", "native.digg"]
-BADGER_SETTS = ["native.badger", "native.uniBadgerWbtc", "native.sushiBadgerWbtc"]
-NATIVE_DIGG_SETTS = ["native.uniDiggWbtc", "native.sushiDiggWbtc"]
-
-
 EMISSIONS_BLACKLIST = {
-    "0xB65cef03b9B89f99517643226d76e286ee999e77": "Badger Dev Multisig",
-    "0x86cbD0ce0c087b482782c181dA8d191De18C8275": "Badger Tech Ops",
-    BVECVX_CVX_LP: "bveCVX/CVX Curve LP"
+    DEV_MULTISIG: "Badger Dev Multisig",
+    TECH_OPS: "Badger Tech Ops",
 }
 
 REWARDS_BLACKLIST = {
-    "0x8B950f43fCAc4931D408F1fcdA55C6CB6cbF3096": "Cream bBadger",
-    "0x0a54d4b378C8dBfC7bC93BE50C85DebAFdb87439": "Sushiswap bBadger/Weth",
-    "0x660802Fc641b154aBA66a62137e71f331B6d787A": "Badger Tree",
-    "0x19D97D8fA813EE2f51aD4B4e04EA08bAf4DFfC28": "Badger Vault",
-    "0x41671BA1abcbA387b9b2B752c205e22e916BE6e3": "IBBTC Peak",
-    "0x825218beD8BE0B30be39475755AceE0250C50627": "IBBTC ywBTC Peak",
-    "0xD4868d98849a58F743787c77738D808376210292": "Badger Payments",
-    BVECVX_CVX_LP: "bveCVX/CVX Curve LP"
+    CREAM_BBADGER: "Cream bBadger",
+    SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
+    ETH_BADGER_TREE: "Badger Tree",
+    BADGER_VAULT: "Badger Vault",
+    IBBTC_PEAK: "IBBTC Peak",
+    IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
+    BADGER_PAYMENTS: "Badger Payments",
+    BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
-
 
 STAKE_RATIO_RANGES = list(
     [
@@ -154,58 +196,68 @@ STAKE_RATIO_RANGES = list(
     ]
 )
 
+LP_SETT_INFO = {"type": "native", "ratio": 0.5}
+TOKEN_SETT_INFO = {"type": "native", "ratio": 1}
+
 SETT_INFO = {
-    "0x19D97D8fA813EE2f51aD4B4e04EA08bAf4DFfC28": {
-        "type": "native",
-        "ratio": 1,
-    },
-    "0x235c9e24D3FB2FAFd58a2E49D454Fdcd2DBf7FF1": {"type": "native", "ratio": 0.5},
-    "0x1862A18181346EBd9EdAf800804f89190DeF24a5": {"type": "native", "ratio": 0.5},
-    "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a": {"type": "native", "ratio": 1},
-    "0xC17078FDd324CC473F8175Dc5290fae5f2E84714": {"type": "native", "ratio": 0.5},
-    "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6": {"type": "native", "ratio": 0.5},
-    BARB_SWP_BADGER_WETH: {"type": "native", "ratio": 0.5},
+    BBADGER: TOKEN_SETT_INFO,
+    UNI_BADGER_WBTC: LP_SETT_INFO,
+    SUSHI_BADGER_WBTC: LP_SETT_INFO,
+    BDIGG: TOKEN_SETT_INFO,
+    UNI_DIGG_WBTC: LP_SETT_INFO,
+    SUSHI_DIGG_WBTC: LP_SETT_INFO,
+    BARB_SWP_BADGER_WETH: LP_SETT_INFO,
 }
 
 EMISSIONS_CONTRACTS = {
-    "eth": DotMap(
+    Network.Ethereum: DotMap(
         {
-            "BadgerTree": "0x660802Fc641b154aBA66a62137e71f331B6d787A",
-            "RewardsLogger": "0x0A4F4e92C3334821EbB523324D09E321a6B0d8ec",
-            "GasOracle": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
+            "BadgerTree": ETH_BADGER_TREE,
+            "RewardsLogger": ETH_REWARDS_LOGGER,
+            "GasOracle": ETH_GAS_ORACLE,
         }
     ),
-    "polygon": DotMap(
+    Network.Polygon: DotMap(
         {
-            "BadgerTree": "0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b",
-            "RewardsLogger": "0xd0EE2A5108b8800D688AbC834445fd03b3b2738e",
-            "GasOracle": "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
+            "BadgerTree": POLY_BADGER_TREE,
+            "RewardsLogger": POLY_REWARDS_LOGGER,
+            "GasOracle": POLY_GAS_ORACLE,
         }
     ),
-    "arbitrum": DotMap(
+    Network.Arbitrum: DotMap(
         {
-            "BadgerTree": "0x635EB2C39C75954bb53Ebc011BDC6AfAAcE115A6",
-            "RewardsLogger": "0x85E1cACAe9a63429394d68Db59E14af74143c61c",
-            "GasOracle": "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
+            "BadgerTree": ARB_BADGER_TREE,
+            "RewardsLogger": ARB_REWARDS_LOGGER,
+            "GasOracle": ARB_GAS_ORACLE,
         }
     ),
 }
 
 DISABLED_VAULTS = [
-    "0xB6bd5ae3d5F78A6Bb04bBb031E24fA9C2BbD090d",
-    "0x85E1cACAe9a63429394d68Db59E14af74143c61c",
-    "0xaf9aB64F568149361ab670372b16661f4380e80B",
-    "0xfdb9e5a186FB7655aC9cD7CAFF3d6D4c6064cc50",
-    "0x0c2153e8aE4DB8233c61717cDC4c75630E952561",
-    "0x53C8E199eb2Cb7c01543C137078a038937a68E40",
+    BSC_TEST_VAULT,
+    ARB_TRICRYPTO_1,
+    ARB_TRICRYPTO_3,
+    ARB_SWAPR_WBTC_WETH,
+    ARB_SWAPR_WETH,
+    BCVX,
+    ETH_TRICRYPTO_1,
+    HARVEST_RENCRV,
 ]
 
 PRO_RATA_VAULTS = [BVECVX, BBVECVX_CVX]
 
 MONITORING_SECRET_NAMES = {
-    "eth": "cycle-bot/eth/prod-discord-url",
-    "polygon": "cycle-bot/prod-discord-url",
-    "arbitrum": "cycle-bot/arbitrum/prod-discord-url",
+    Network.Ethereum: "cycle-bot/eth/prod-discord-url",
+    Network.Polygon: "cycle-bot/prod-discord-url",
+    Network.Arbitrum: "cycle-bot/arbitrum/prod-discord-url",
 }
 
-BOOST_CHAINS = ["eth", "polygon", "arbitrum"]
+BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]
+
+CLAIMABLE_TOKENS = {
+    Network.Ethereum: {"native": [BADGER, DIGG], "non_native": [BCVXCRV]},
+    Network.Arbitrum: {"native": [ARB_BADGER], "non_native": []},
+    Network.Polygon: {"native": [POLY_BADGER], "non_native": []},
+}
+SANITY_TOKEN_AMOUNT = 4000 * 1e18
+BOOST_BLOCK_DELAY = 10

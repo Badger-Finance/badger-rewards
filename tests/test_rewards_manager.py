@@ -3,6 +3,7 @@ import pytest
 import json
 from tests.utils import mock_boosts, test_cycle, test_start, test_end
 from unittest import TestCase
+from helpers.enums import Network
 
 os.environ["KUBE"] = "False"
 os.environ["TEST"] = "True"
@@ -45,7 +46,7 @@ def rewards_manager(cycle, start, end, boosts, request) -> RewardsManager:
 
 @pytest.mark.parametrize(
     "rewards_manager",
-    ["eth"],
+    [Network.Ethereum],
     indirect=True,
 )
 def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):

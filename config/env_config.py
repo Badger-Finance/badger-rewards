@@ -2,6 +2,7 @@ from rewards.aws.helpers import get_secret
 from decouple import config
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
+from helpers.enums import Network
 
 
 class EnvConfig:
@@ -19,11 +20,13 @@ class EnvConfig:
         )
 
         self.explorer_api_keys = {
-            "eth": get_secret("keepers/etherscan", "ETHERSCAN_TOKEN", kube=self.kube),
-            "polygon": get_secret(
+            Network.Ethereum: get_secret(
+                "keepers/etherscan", "ETHERSCAN_TOKEN", kube=self.kube
+            ),
+            Network.Polygon: get_secret(
                 "keepers/polygonscan", "POLYGONSCAN_TOKEN", kube=self.kube
             ),
-            "arbitrum": get_secret(
+            Network.Arbitrum: get_secret(
                 "keepers/arbiscan", "ARBISCAN_TOKEN", kube=self.kube
             ),
         }
@@ -31,12 +34,12 @@ class EnvConfig:
         polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
 
         self.web3 = {
-            "eth": self.make_provider("quiknode/eth-node-url", "NODE_URL"),
-            "arbitrum": Web3(Web3.HTTPProvider("https://arb1.arbitrum.io/rpc")),
-            "polygon": polygon,
+            Network.Ethereum: self.make_provider("quiknode/eth-node-url", "NODE_URL"),
+            Network.Arbitrum: Web3(Web3.HTTPProvider("https://arb1.arbitrum.io/rpc")),
+            Network.Polygon: polygon,     
         }
 
-    def get_web3(self, chain: str = "eth") -> Web3:
+    def get_web3(self, chain: str = Network.Ethereum) -> Web3:
         return self.web3[chain]
 
     def get_explorer_api_key(self, chain: str) -> str:

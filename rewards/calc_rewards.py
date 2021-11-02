@@ -14,6 +14,7 @@ from helpers.constants import (
     EMISSIONS_CONTRACTS,
     MONITORING_SECRET_NAMES,
 )
+from helpers.enums import Network
 from helpers.discord import send_message_to_discord
 from subgraph.queries.setts import list_setts
 from rich.console import Console
@@ -83,13 +84,11 @@ def fetch_setts(chain: str) -> List[str]:
     return [env_config.get_web3().toChecksumAddress(s) for s in filtered_setts]
 
 
-def process_cumulative_rewards(current, new: RewardsList):
+def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
     """Combine past rewards with new rewards
 
     :param current: current rewards
     :param new: new rewards
-    :return: [description]
-    :rtype: [type]
     """
     result = RewardsList(new.cycle)
 
@@ -134,7 +133,6 @@ def propose_root(
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-        # return
     rewards_data = generate_rewards_in_range(
         chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager
     )
@@ -143,7 +141,8 @@ def propose_root(
     console.log(
         f"\n==== Proposing root with rootHash {rewards_data['rootHash']} ====\n"
     )
-    tx_hash, success = tree_manager.propose_root(rewards_data)
+    if not env_config.test:
+        tx_hash, success = tree_manager.propose_root(rewards_data)
 
 
 def approve_root(
@@ -166,7 +165,13 @@ def approve_root(
         past_tree=current_rewards,
         tree_manager=tree_manager,
     )
-
+    if env_config.test:
+        add_multipliers(
+            rewards_data["multiplierData"],
+            rewards_data["userMultipliers"],
+            chain=chain,
+        )
+        return rewards_data
     if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
         console.log(
             f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
@@ -184,7 +189,9 @@ def approve_root(
             )
 
             add_multipliers(
-                rewards_data["multiplierData"], rewards_data["userMultipliers"]
+                rewards_data["multiplierData"],
+                rewards_data["userMultipliers"],
+                chain=chain,
             )
             cycle_logger.save(tree_manager.next_cycle, chain)
             return rewards_data
@@ -214,7 +221,7 @@ def generate_rewards_in_range(
     console_and_discord(f"Generating rewards for {len(setts)} setts", chain)
 
     rewards_list = []
-    boosts = download_boosts()
+    boosts = download_boosts(chain)
     rewards_manager = RewardsManager(
         chain, tree_manager.next_cycle, start, end, boosts["userData"]
     )
@@ -226,7 +233,7 @@ def generate_rewards_in_range(
     console.log("Calculating Sett Rewards...")
     sett_rewards = rewards_manager.calculate_all_sett_rewards(setts, all_schedules)
     rewards_list.append(sett_rewards)
-    if chain == "eth":
+    if chain == Network.Ethereum:
         sushi_rewards = rewards_manager.calc_sushi_distributions()
         rewards_list.append(sushi_rewards)
 
@@ -242,7 +249,7 @@ def generate_rewards_in_range(
 
     file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
 
-    verify_rewards(past_tree, merkle_tree)
+    verify_rewards(past_tree, merkle_tree, tree_manager, chain)
 
     if save:
         with open(file_name, "w") as fp:

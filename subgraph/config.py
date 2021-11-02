@@ -1,23 +1,24 @@
+from helpers.enums import Network
+
 subgraph_ids = {
     "nfts": "0xba5edb751ccf93770796e273d8bce83e1e81e2d4-3",
 }
-
 subgraph_urls = {
     # Chain graphs
-    "bsc": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-bsc",
-    "eth": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao",
-    "polygon": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-polygon",
-    "arbitrum": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-arbitrum",
-    "xdai": "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-xdai",
+    Network.BinanceSmartChain: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-bsc",
+    Network.Ethereum: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao",
+    Network.Polygon: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-polygon",
+    Network.Arbitrum: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-arbitrum",
+    Network.xDai: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-xdai",
     # Token graphs
-    "tokens-eth": "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens",
-    "tokens-bsc": "https://bgraph-bsc.badger.guru/subgraphs/name/swole/badger-subgraph",
-    "tokens-polygon": "https://bgraph-matic.badger.guru/subgraphs/name/swole/tokens-polygon",
-    "tokens-arbitrum": "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-arbitrum",
+    f"tokens-{Network.Ethereum}": "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens",
+    f"tokens-{Network.BinanceSmartChain}": "https://bgraph-bsc.badger.guru/subgraphs/name/swole/badger-subgraph",
+    f"tokens-{Network.Polygon}": "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-polygon",
+    f"tokens-{Network.Arbitrum}": "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-arbitrum",
     # Harvest graphs
-    "harvests-eth": "https://api.thegraph.com/subgraphs/name/darruma/badger-harvests",
-    "harvests-polygon": "https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-polygon",
-    "harvests-arbitrum": "https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-arbitrum",
+    f"harvests-{Network.Ethereum}": "https://api.thegraph.com/subgraphs/name/darruma/badger-harvests",
+    f"harvests-{Network.Polygon}": "https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-polygon",
+    f"harvests-{Network.Arbitrum}": "https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-arbitrum",
     "fuse": "https://api.thegraph.com/subgraphs/name/darruma/fuse-subgraph-badger",
     "thegraph": "https://api.thegraph.com/index-node/graphql",
 }

@@ -1,8 +1,7 @@
 from subgraph.queries.setts import last_synced_block
 from rewards.classes.TreeManager import TreeManager
-from config.rewards_config import rewards_config
-from config.env_config import env_config
 from rich.console import Console
+from helpers.enums import Network
 
 console = Console()
 
@@ -39,7 +38,7 @@ def calc_next_cycle_range(chain: str, tree_manager: TreeManager):
 
     # Claim at last synced block
     end_block = last_synced_block(chain)
-    if chain == "arbitrum":
+    if chain == Network.Arbitrum:
         end_block = end_block - 100
 
     # Sanity check: Ensure start block is not too far in the past

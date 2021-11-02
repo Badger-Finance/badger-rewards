@@ -16,3 +16,7 @@ def get_badger_tree(chain: str) -> ContractFunctions:
     return make_contract(
         EMISSIONS_CONTRACTS[chain]["BadgerTree"], abi_name="BadgerTreeV2", chain=chain
     )
+
+
+def make_token(token_addr: str, chain: str):
+    return make_contract(token_addr, abi_name="ERC20", chain=chain)

@@ -11,13 +11,13 @@ from rewards.calc_rewards import approve_root, propose_root
 from rich.console import Console
 import json
 import time
-
+from helpers.enums import Network
 from scripts.rewards.utils.propose_rewards import propose_rewards
 
 console = Console()
 
 if __name__ == "__main__":
-    chain = "arbitrum"
+    chain = Network.Arbitrum
     discord_url = get_secret(
         MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", kube=env_config.kube
     )

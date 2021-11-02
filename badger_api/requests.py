@@ -1,5 +1,6 @@
 import requests
 from badger_api.config import get_api_base_path
+from helpers.constants import BOOST_CHAINS
 from typing import Tuple, Dict, List
 import concurrent.futures
 from functools import lru_cache
@@ -22,7 +23,7 @@ def fetch_token_prices() -> Dict[str, float]:
     """
     Fetch token prices for sett tokens
     """
-    chains = ["eth", "matic", "arbitrum"]
+    chains = BOOST_CHAINS
     prices = {}
     for chain in chains:
         chain_prices = requests.get(f"{badger_api}/prices?chain={chain}").json()
@@ -31,34 +32,35 @@ def fetch_token_prices() -> Dict[str, float]:
     return prices
 
 
-def fetch_account_data(address: str):
+def fetch_claimable(page: int, chain: str):
     """
-    Fetch data from account data
-    :param address: address whose information is required
+    Fetch claimable data from account data
+    :param page: page to fetch data from
     """
-    data = (
-        requests.get(f"{badger_api}/accounts/{address}")
-        .json()
-        .get("claimableBalances", [])
-    )
+    data = requests.get(
+        f"{badger_api}/accounts/allClaimable?page={page}&chain={chain}"
+    ).json()
     return data
 
 
-def fetch_claimable_balances(addresses: List[str]):
-    """
-    Fetch the claimable balances for a list of address
-    by fetching in parallel
+def fetch_total_claimable_pages(chain: str) -> int:
+    return fetch_claimable(1, chain)["maxPage"]
 
-    :param addresses: list of addresses whose balances we want
+
+def fetch_all_claimable_balances(chain: str):
     """
+    Fetch the claimable balances by fetching in parallel
+
+    """
+
     results = {}
+    total_pages = fetch_total_claimable_pages(chain)
     with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
-        futures_to_addr = {
-            executor.submit(fetch_account_data, address=addr): addr
-            for addr in addresses
-        }
-        for future in concurrent.futures.as_completed(futures_to_addr):
-            addr = futures_to_addr[future]
-            data = future.result()
-            results[addr] = data
+        futures = [
+            executor.submit(fetch_claimable, page=p, chain=chain)
+            for p in range(0, total_pages + 1)
+        ]
+        for future in concurrent.futures.as_completed(futures):
+            data = future.result()["rewards"]
+            results = {**results, **data}
     return results
