@@ -37,7 +37,7 @@ def badger_boost(current_block: int, chain: str):
     :param current_block: block to calculate boost at
     """
     console.log(f"Calculating boost at block {current_block} ...")
-    native_setts, non_native_setts = calc_boost_balances(current_block - 100, chain)
+    native_setts, non_native_setts = calc_boost_balances(current_block - 10, chain)
 
     all_addresses = calc_union_addresses(native_setts, non_native_setts)
     console.log(f"{len(all_addresses)} addresses fetched")

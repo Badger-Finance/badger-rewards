@@ -260,3 +260,4 @@ CLAIMABLE_TOKENS = {
     Network.Polygon: {"native": [POLY_BADGER], "non_native": []},
 }
 SANITY_TOKEN_AMOUNT = 4000 * 1e18
+BOOST_BLOCK_DELAY = 10
