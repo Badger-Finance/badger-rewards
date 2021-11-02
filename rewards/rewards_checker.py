@@ -83,13 +83,6 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
             )
         else:
             diff, table = token_diff_table(name, total_before_token, total_after_token)
-        if not env_config.retroactive:
-            try:
-                assert diff < SANITY_TOKEN_AMOUNT
-            except AssertionError as e:
-                send_error_to_discord(e, "Error verifying rewards", "Rewards Error")
-                raise e
-
         send_code_block_to_discord(
             msg=table,
             username="Rewards Bot",
