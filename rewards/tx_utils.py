@@ -116,7 +116,7 @@ def get_priority_fee(
     return priority_fee
 
 
-def get_transaction(
+def is_transaction_found(
     web3: Web3, tx_hash: HexBytes, timeout: int, tries: int = 5
 ) -> bool:
     attempt = 0
@@ -159,7 +159,7 @@ def confirm_transaction(
     logger.info(f"tx_hash before confirm: {tx_hash}")
 
     try:
-        get_transaction(web3, tx_hash, timeout)
+        is_transaction_found(web3, tx_hash, timeout)
         msg = f"Transaction {tx_hash} succeeded!"
         logger.info(msg)
         return True, msg
