@@ -6,6 +6,8 @@ from brownie import web3
 
 os.environ["TEST"] = "True"
 os.environ["KUBE"] = "False"
+os.environ["AWS_SECRET_ACCESS_KEY"] = ""
+os.environ["AWS_ACCESS_KEY_ID"] = ""
 
 from rewards.tx_utils import is_transaction_found
 
