@@ -1,13 +1,12 @@
 from decimal import Decimal
 from helpers.discord import send_message_to_discord
 from helpers.web3_utils import make_contract
-from helpers.constants import EMISSIONS_CONTRACTS, MAX_TX_TRIES
+from helpers.constants import EMISSIONS_CONTRACTS
 from hexbytes import HexBytes
 import logging
 import time
 import requests
 from web3 import Web3, exceptions
-from config.env_config import env_config
 from typing import Tuple
 from helpers.enums import Network
 
