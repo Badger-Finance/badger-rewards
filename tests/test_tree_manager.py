@@ -7,12 +7,11 @@ from decimal import Decimal
 from hexbytes import HexBytes
 from web3 import contract
 from helpers.enums import Network
+from tests.utils import test_address, test_key, chains, mock_tree, set_env_vars
 
-os.environ["KUBE"] = "False"
-os.environ["TEST"] = "True"
+set_env_vars()
 
 from rewards.classes.TreeManager import TreeManager
-from tests.utils import test_address, test_key, chains, mock_tree
 
 
 def mock_download_tree(file_name: str, chain: str):
