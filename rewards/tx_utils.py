@@ -125,6 +125,7 @@ def check_tx_receipt(web3: Web3, tx_hash: HexBytes, timeout: int, tries: int = 5
             web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)
             msg = f"Transaction {tx_hash} succeeded!"
             send_message_to_discord("Transaction Success", msg, [], "Rewards Bot")
+            tx_found = True
         except Exception as e:
             msg = f"Error waiting for {tx_hash}. Error: {e}. \n Retrying..."
             attempt += 1
