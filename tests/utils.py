@@ -1,7 +1,15 @@
 from decimal import Decimal
 from hexbytes import HexBytes
 import json
+import os
 from helpers.enums import Network
+
+
+def set_env_vars():
+    os.environ["TEST"] = "True"
+    os.environ["KUBE"] = "False"
+    os.environ["AWS_SECRET_ACCESS_KEY"] = ""
+    os.environ["AWS_ACCESS_KEY_ID"] = ""
 
 
 def get_mock_json(name):

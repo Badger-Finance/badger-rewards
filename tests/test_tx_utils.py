@@ -3,11 +3,9 @@ import json
 import os
 from eth_account import Account
 from brownie import web3
+from tests.utils import set_env_vars
 
-os.environ["TEST"] = "True"
-os.environ["KUBE"] = "False"
-os.environ["AWS_SECRET_ACCESS_KEY"] = ""
-os.environ["AWS_ACCESS_KEY_ID"] = ""
+set_env_vars()
 
 from rewards.tx_utils import is_transaction_found
 
