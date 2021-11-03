@@ -119,6 +119,7 @@ def get_priority_fee(
 def check_tx_receipt(web3: Web3, tx_hash: HexBytes, timeout: int, tries: int = 5):
     tx_found = False
     attempt = 0
+    error = None
     while not tx_found and attempt < tries:
         try:
             web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)
@@ -127,6 +128,7 @@ def check_tx_receipt(web3: Web3, tx_hash: HexBytes, timeout: int, tries: int = 5
         except Exception as e:
             msg = f"Error waiting for {tx_hash}. Error: {e}. \n Retrying..."
             attempt += 1
+            error = e
             logger.error(msg)
             send_message_to_discord("Transaction Error", msg, [], "Rewards Bot")
             time.sleep(5)
@@ -134,7 +136,7 @@ def check_tx_receipt(web3: Web3, tx_hash: HexBytes, timeout: int, tries: int = 5
     if not tx_found:
         msg = f"Error waiting for {tx_hash} after {tries} tries"
         send_message_to_discord("Transaction Error", msg, [], "Rewards Bot")
-        raise exceptions.TransactionNotFound(msg)
+        raise error
         
 
 def confirm_transaction(
