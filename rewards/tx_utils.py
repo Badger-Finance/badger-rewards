@@ -1,12 +1,12 @@
 from decimal import Decimal
+from helpers.discord import send_message_to_discord
 from helpers.web3_utils import make_contract
 from helpers.constants import EMISSIONS_CONTRACTS
 from hexbytes import HexBytes
-import json
 import logging
+import time
 import requests
 from web3 import Web3, exceptions
-from config.env_config import env_config
 from typing import Tuple
 from helpers.enums import Network
 
@@ -116,6 +116,31 @@ def get_priority_fee(
     return priority_fee
 
 
+def is_transaction_found(
+    web3: Web3, tx_hash: HexBytes, timeout: int, tries: int = 5
+) -> bool:
+    attempt = 0
+    error = None
+    while attempt < tries:
+        try:
+            web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)
+            web3.eth.get_transaction(tx_hash)
+            msg = f"Transaction {tx_hash} succeeded!"
+            send_message_to_discord("Transaction Success", msg, [], "Rewards Bot")
+            return True
+        except Exception as e:
+            msg = f"Error waiting for {tx_hash}. Error: {e}. \n Retrying..."
+            attempt += 1
+            error = e
+            logger.error(msg)
+            send_message_to_discord("Transaction Error", msg, [], "Rewards Bot")
+            time.sleep(5)
+
+    msg = f"Error waiting for {tx_hash} after {tries} tries"
+    send_message_to_discord("Transaction Error", msg, [], "Rewards Bot")
+    raise error
+
+
 def confirm_transaction(
     web3: Web3, tx_hash: HexBytes, timeout: int = 60, max_block: int = None
 ) -> Tuple[bool, str]:
@@ -134,7 +159,7 @@ def confirm_transaction(
     logger.info(f"tx_hash before confirm: {tx_hash}")
 
     try:
-        web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)
+        is_transaction_found(web3, tx_hash, timeout)
         msg = f"Transaction {tx_hash} succeeded!"
         logger.info(msg)
         return True, msg

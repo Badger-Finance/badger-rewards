@@ -1,12 +1,11 @@
 import os
 import pytest
 import json
-from tests.utils import mock_boosts, test_cycle, test_start, test_end
+from tests.utils import mock_boosts, test_cycle, test_start, test_end, set_env_vars
 from unittest import TestCase
 from helpers.enums import Network
 
-os.environ["KUBE"] = "False"
-os.environ["TEST"] = "True"
+set_env_vars()
 
 from rewards.classes.RewardsManager import RewardsManager
 
