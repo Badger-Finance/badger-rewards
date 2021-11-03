@@ -116,17 +116,18 @@ def get_priority_fee(
     return priority_fee
 
 
-def check_tx_receipt(web3: Web3, tx_hash: HexBytes, timeout: int, tries: int = 5):
-    tx_found = False
+def is_transaction_found(
+    web3: Web3, tx_hash: HexBytes, timeout: int, tries: int = 5
+) -> bool:
     attempt = 0
     error = None
-    while not tx_found and attempt < tries:
+    while attempt < tries:
         try:
             web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)
             web3.eth.get_transaction(tx_hash)
             msg = f"Transaction {tx_hash} succeeded!"
             send_message_to_discord("Transaction Success", msg, [], "Rewards Bot")
-            tx_found = True
+            return True
         except Exception as e:
             msg = f"Error waiting for {tx_hash}. Error: {e}. \n Retrying..."
             attempt += 1
@@ -134,11 +135,11 @@ def check_tx_receipt(web3: Web3, tx_hash: HexBytes, timeout: int, tries: int = 5
             logger.error(msg)
             send_message_to_discord("Transaction Error", msg, [], "Rewards Bot")
             time.sleep(5)
-    if not tx_found:
-        msg = f"Error waiting for {tx_hash} after {tries} tries"
-        send_message_to_discord("Transaction Error", msg, [], "Rewards Bot")
-        raise error
-        
+
+    msg = f"Error waiting for {tx_hash} after {tries} tries"
+    send_message_to_discord("Transaction Error", msg, [], "Rewards Bot")
+    raise error
+
 
 def confirm_transaction(
     web3: Web3, tx_hash: HexBytes, timeout: int = 60, max_block: int = None
@@ -158,7 +159,7 @@ def confirm_transaction(
     logger.info(f"tx_hash before confirm: {tx_hash}")
 
     try:
-        check_tx_receipt(web3, tx_hash, timeout)
+        is_transaction_found(web3, tx_hash, timeout)
         msg = f"Transaction {tx_hash} succeeded!"
         logger.info(msg)
         return True, msg

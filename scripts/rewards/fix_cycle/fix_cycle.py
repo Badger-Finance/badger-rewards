@@ -12,7 +12,6 @@ from scripts.rewards.utils.propose_rewards import propose_rewards
 from subgraph.queries.setts import last_synced_block
 
 
-
 def fix_cycle(chain, tree):
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
@@ -28,4 +27,3 @@ def fix_cycle(chain, tree):
     propose_root(chain, start_block, end_block, tree, tree_manager)
     time.sleep(10)
     approve_root(chain, start_block, end_block, tree, tree_manager)
-

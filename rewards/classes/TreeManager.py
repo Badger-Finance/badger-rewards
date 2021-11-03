@@ -23,6 +23,7 @@ from rich.console import Console
 from typing import List, Tuple
 import json
 import time
+
 console = Console()
 
 
