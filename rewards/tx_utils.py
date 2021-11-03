@@ -132,7 +132,6 @@ def check_tx_receipt(web3: Web3, tx_hash: HexBytes, timeout: int, tries: int = 5
             logger.error(msg)
             send_message_to_discord("Transaction Error", msg, [], "Rewards Bot")
             time.sleep(5)
-            pass
     if not tx_found:
         msg = f"Error waiting for {tx_hash} after {tries} tries"
         send_message_to_discord("Transaction Error", msg, [], "Rewards Bot")
