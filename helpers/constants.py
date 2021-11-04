@@ -1,6 +1,6 @@
 from web3 import Web3
 from dotmap import DotMap
-from helpers.enums import Network
+from helpers.enums import BalanceType, Network
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -255,9 +255,9 @@ MONITORING_SECRET_NAMES = {
 BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]
 
 CLAIMABLE_TOKENS = {
-    Network.Ethereum: {"native": [BADGER, DIGG], "non_native": [BCVXCRV]},
-    Network.Arbitrum: {"native": [ARB_BADGER], "non_native": []},
-    Network.Polygon: {"native": [POLY_BADGER], "non_native": []},
+    Network.Ethereum: {BalanceType.Native: [BADGER, DIGG], BalanceType.NonNative: [BCVXCRV]},
+    Network.Arbitrum: {BalanceType.Native: [ARB_BADGER], BalanceType.NonNative: []},
+    Network.Polygon: {BalanceType.Native: [POLY_BADGER], BalanceType.NonNative: []},
 }
 SANITY_TOKEN_AMOUNT = 4000 * 1e18
 BOOST_BLOCK_DELAY = 10

@@ -1,3 +1,4 @@
+from helpers.enums import BalanceType
 from rewards.classes.Snapshot import Snapshot
 from config.env_config import env_config
 from helpers.constants import (
@@ -81,7 +82,7 @@ def parse_sett_balances(
 def get_sett_info(sett_address: str) -> Tuple[str, float]:
     info = SETT_INFO.get(
         env_config.get_web3().toChecksumAddress(sett_address),
-        {"type": "nonNative", "ratio": 1},
+        {"type": BalanceType.NonNative, "ratio": 1},
     )
     console.log(sett_address, info)
     return info["type"], info["ratio"]
@@ -99,9 +100,9 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
             continue
         usd_snapshot = snapshot.convert_to_usd()
         balances = Counter(usd_snapshot.balances)
-        if usd_snapshot.type == "native":
+        if usd_snapshot.type == BalanceType.Native:
             native = native + balances
-        elif usd_snapshot.type == "nonNative":
+        elif usd_snapshot.type == BalanceType.NonNative:
             non_native = non_native + balances
 
     return native, non_native

@@ -21,7 +21,7 @@ from rewards.classes.Schedule import Schedule
 from rewards.classes.CycleLogger import cycle_logger
 from helpers.time_utils import to_utc_date, to_hours
 from helpers.digg_utils import digg_utils
-from helpers.enums import Network
+from helpers.enums import BalanceType, Network
 from config.env_config import env_config
 from rich.console import Console
 from typing import List, Tuple, Dict
@@ -249,7 +249,7 @@ class RewardsManager:
         return total_to_distribute
 
     def boost_sett(self, sett: str, snapshot: Snapshot):
-        if snapshot.type == "nonNative":
+        if snapshot.type == BalanceType.NonNative:
             pre_boost = {}
             for user, balance in snapshot:
                 pre_boost[user] = snapshot.percentage_of_total(user)
