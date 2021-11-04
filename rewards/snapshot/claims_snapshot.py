@@ -42,11 +42,17 @@ def claims_snapshot(chain: str) -> Dict[str, Snapshot]:
 
     for token, snapshot in claims_data.items():
         if token in native_tokens:
-            snapshots[token] = Snapshot(token, snapshot, ratio=1, type=BalanceType.Native)
+            snapshots[token] = Snapshot(
+                token, snapshot, ratio=1, type=BalanceType.Native
+            )
         elif token in non_native_tokens:
-            snapshots[token] = Snapshot(token, snapshot, ratio=1, type=BalanceType.NonNative)
+            snapshots[token] = Snapshot(
+                token, snapshot, ratio=1, type=BalanceType.NonNative
+            )
         else:
-            snapshots[token] = Snapshot(token, snapshot, ratio=1, type=BalanceType.Excluded)
+            snapshots[token] = Snapshot(
+                token, snapshot, ratio=1, type=BalanceType.Excluded
+            )
 
     return snapshots
 

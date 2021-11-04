@@ -13,6 +13,7 @@ class Network(str, Enum):
     def __str__(self):
         return self.value
 
+
 class BalanceType(str, Enum):
     Native = "native"
     NonNative = "non_native"

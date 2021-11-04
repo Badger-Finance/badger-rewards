@@ -51,7 +51,8 @@ def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
             s[2],
             s[3],
             s[4],
-            s[5])
+            s[5],
+        )
         if schedule.token not in schedules_by_token:
             schedules_by_token[schedule.token] = []
         schedules_by_token[schedule.token].append(schedule)
@@ -85,9 +86,7 @@ def fetch_setts(chain: str) -> List[str]:
     :param chain:
     """
     setts = list_setts(chain)
-    filtered_setts = list(
-        filter(lambda x: x not in DISABLED_VAULTS, setts)
-    )
+    filtered_setts = list(filter(lambda x: x not in DISABLED_VAULTS, setts))
     return [s for s in filtered_setts]
 
 
