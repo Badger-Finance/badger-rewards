@@ -86,8 +86,7 @@ def fetch_setts(chain: str) -> List[str]:
     :param chain:
     """
     setts = list_setts(chain)
-    filtered_setts = list(filter(lambda x: x not in DISABLED_VAULTS, setts))
-    return [s for s in filtered_setts]
+    return list(filter(lambda x: x not in DISABLED_VAULTS, setts))
 
 
 def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
