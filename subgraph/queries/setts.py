@@ -5,6 +5,7 @@ from rich.console import Console
 from typing import List, Dict
 from helpers.discord import send_error_to_discord
 import math
+from web3 import Web3
 
 console = Console()
 thegraph_client = make_gql_client("thegraph")
@@ -90,7 +91,7 @@ def list_setts(chain: str) -> List[str]:
     """
     )
     results = client.execute(query)
-    return list(map(lambda s: s["id"], results["setts"]))
+    return list(map(lambda s: Web3.toChecksumAddress(s["id"]), results["setts"]))
 
 
 def fetch_chain_balances(chain: str, block: int) -> Dict[str, Dict[str, int]]:

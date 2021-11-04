@@ -45,7 +45,13 @@ def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
     schedules_by_token = {}
     console.log("Fetching schedules...")
     for s in schedules:
-        schedule = Schedule(s[0], s[1], s[2], s[3], s[4], s[5])
+        schedule = Schedule(
+            Web3.toChecksumAddress(s[0]),
+            Web3.toChecksumAddress(s[1]),
+            s[2],
+            s[3],
+            s[4],
+            s[5])
         if schedule.token not in schedules_by_token:
             schedules_by_token[schedule.token] = []
         schedules_by_token[schedule.token].append(schedule)
@@ -65,6 +71,7 @@ def fetch_all_schedules(chain: str, setts: List[str]):
     setts_with_schedules = []
     for sett in setts:
         schedules = logger.getAllUnlockSchedulesFor(sett).call()
+        sett = Web3.toChecksumAddress(sett)
         if len(schedules) > 0:
             setts_with_schedules.append(sett)
         all_schedules[sett] = parse_schedules(schedules)
@@ -79,9 +86,9 @@ def fetch_setts(chain: str) -> List[str]:
     """
     setts = list_setts(chain)
     filtered_setts = list(
-        filter(lambda x: Web3.toChecksumAddress(x) not in DISABLED_VAULTS, setts)
+        filter(lambda x: x not in DISABLED_VAULTS, setts)
     )
-    return [env_config.get_web3().toChecksumAddress(s) for s in filtered_setts]
+    return [s for s in filtered_setts]
 
 
 def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:

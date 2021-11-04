@@ -1,7 +1,6 @@
 from gql import gql
-from subgraph.subgraph_utils import make_gql_client
-from config.env_config import env_config
 import math
+from web3 import Web3
 from rich.console import Console
 from typing import Dict, Tuple
 from helpers.discord import send_error_to_discord, send_message_to_discord
@@ -101,12 +100,12 @@ def fetch_fuse_pool_balances(client, chain, block):
 
     for symbol, data in ctoken_data.items():
         ftoken = make_contract(
-            env_config.get_web3().toChecksumAddress(data["contract"]),
+            Web3.toChecksumAddress(data["contract"]),
             abi_name="CErc20Delegator",
             chain=chain,
         )
         underlying = make_contract(
-            env_config.get_web3().toChecksumAddress(data["underlying_contract"]),
+            Web3.toChecksumAddress(data["underlying_contract"]),
             abi_name="ERC20",
             chain=chain,
         )

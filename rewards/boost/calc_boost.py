@@ -10,6 +10,7 @@ from rewards.boost.boost_utils import (
     calc_union_addresses,
     calc_boost_balances,
 )
+from web3 import Web3
 
 console = Console()
 
@@ -87,7 +88,7 @@ def badger_boost(current_block: int, chain: str):
 
     for addr, boost in badger_boost.items():
         boost_metadata = boost_info.get(addr, {})
-        boost_data[addr] = {
+        boost_data[Web3.toChecksumAddress(addr)] = {
             "boost": boost,
             "nativeBalance": boost_metadata.get("nativeBalance", 0),
             "nonNativeBalance": boost_metadata.get("nonNativeBalance", 0),
