@@ -91,12 +91,7 @@ def upload_tree(
         key = f"badger-tree-{chain_id}.json"
         rewards_bucket = f"badger-json-{chain}"
 
-    upload_targets = [
-        {
-            "bucket": "badger-staging-merkle-proofs",
-            "key": key,
-        }  # badger-api staging no matter what
-    ]
+    upload_targets = []
 
     if not staging:
         upload_targets.append(
@@ -111,6 +106,13 @@ def upload_tree(
                 "bucket": "badger-merkle-proofs",
                 "key": key,
             }  # badger-api production
+        )
+    if staging:
+        upload_targets.append(
+            {
+                "bucket": "badger-staging-merkle-proofs",
+                "key": key,
+            }
         )
 
     for target in upload_targets:
