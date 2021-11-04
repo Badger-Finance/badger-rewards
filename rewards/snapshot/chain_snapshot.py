@@ -93,7 +93,9 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
     native = Counter()
     non_native = Counter()
     for sett, snapshot in total_snapshot.items():
+        sett = env_config.get_web3().toChecksumAddress(sett)
         if sett in [*DISABLED_VAULTS, *PRO_RATA_VAULTS]:
+            console.log(f"{sett} is disabled")
             continue
         usd_snapshot = snapshot.convert_to_usd()
         balances = Counter(usd_snapshot.balances)
