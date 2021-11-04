@@ -5,6 +5,7 @@ from helpers.constants import (
     SETT_INFO,
     DISABLED_VAULTS,
     EMISSIONS_BLACKLIST,
+    PRO_RATA_VAULTS,
 )
 from helpers.web3_utils import make_contract
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
@@ -92,7 +93,9 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
     native = Counter()
     non_native = Counter()
     for sett, snapshot in total_snapshot.items():
-        if sett in DISABLED_VAULTS:
+        sett = env_config.get_web3().toChecksumAddress(sett)
+        if sett in [*DISABLED_VAULTS, *PRO_RATA_VAULTS]:
+            console.log(f"{sett} is disabled")
             continue
         usd_snapshot = snapshot.convert_to_usd()
         balances = Counter(usd_snapshot.balances)
