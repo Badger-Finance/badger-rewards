@@ -15,9 +15,11 @@ def upload_boosts(boost_data, chain: str):
     """
     chain_id = env_config.get_web3(chain).eth.chain_id
     boost_file_name = f"badger-boosts-{chain_id}.json"
-    buckets = ["badger-staging-merkle-proofs"]
+    buckets = []
     if not env_config.test:
         buckets.append("badger-merkle-proofs")
+    else:
+        buckets.append("badger-staging-merkle-proofs")
 
     for b in buckets:
         console.log(f"Uploading file to s3://{b}/{boost_file_name}")

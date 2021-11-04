@@ -255,7 +255,10 @@ MONITORING_SECRET_NAMES = {
 BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]
 
 CLAIMABLE_TOKENS = {
-    Network.Ethereum: {BalanceType.Native: [BADGER, DIGG], BalanceType.NonNative: [BCVXCRV]},
+    Network.Ethereum: {
+        BalanceType.Native: [BADGER, DIGG],
+        BalanceType.NonNative: [BCVXCRV],
+    },
     Network.Arbitrum: {BalanceType.Native: [ARB_BADGER], BalanceType.NonNative: []},
     Network.Polygon: {BalanceType.Native: [POLY_BADGER], BalanceType.NonNative: []},
 }
