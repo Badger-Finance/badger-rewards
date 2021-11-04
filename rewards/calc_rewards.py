@@ -12,10 +12,9 @@ from helpers.web3_utils import make_contract
 from helpers.constants import (
     DISABLED_VAULTS,
     EMISSIONS_CONTRACTS,
-    MONITORING_SECRET_NAMES,
 )
 from helpers.enums import Network
-from helpers.discord import send_message_to_discord
+from helpers.discord import get_discord_url, send_message_to_discord
 from subgraph.queries.setts import list_setts
 from rich.console import Console
 from config.env_config import env_config
@@ -30,9 +29,7 @@ console = Console()
 
 
 def console_and_discord(msg: str, chain: str):
-    url = get_secret(
-        MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", kube=env_config.kube
-    )
+    url = get_discord_url(chain)
     console.log(msg)
     send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
 

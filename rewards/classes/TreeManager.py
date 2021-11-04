@@ -1,16 +1,14 @@
 from eth_account import Account
 from web3.contract import ContractFunction
 from rewards.explorer import get_explorer_url
-from helpers.discord import send_message_to_discord
+from helpers.discord import get_discord_url, send_message_to_discord
 from eth_utils.hexadecimal import encode_hex
 from eth_utils import to_bytes
 from hexbytes import HexBytes
 from config.env_config import env_config
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
-from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_tree
 from helpers.web3_utils import get_badger_tree
-from helpers.constants import MONITORING_SECRET_NAMES
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
 from rewards.tx_utils import (
@@ -35,11 +33,7 @@ class TreeManager:
         self.next_cycle = self.get_current_cycle() + 1
         self.propose_account = cycle_account
         self.approve_account = cycle_account
-        self.discord_url = get_secret(
-            MONITORING_SECRET_NAMES.get(chain, ""),
-            "DISCORD_WEBHOOK_URL",
-            kube=env_config.kube,
-        )
+        self.discord_url = get_discord_url(chain)
 
     def convert_to_merkle_tree(self, rewardsList: RewardsList, start: int, end: int):
         return rewards_to_merkle_tree(rewardsList, start, end)
