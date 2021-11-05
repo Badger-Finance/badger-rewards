@@ -326,6 +326,7 @@ class RewardsManager:
             )
             block = int(event["blockNumber"])
             reward_amount = int(event["rewardAmount"])
+            total_from_rewards += reward_amount
             cycle_logger.add_sett_token_data(
                 sett, self.web3.toChecksumAddress(XSUSHI), reward_amount
             )
