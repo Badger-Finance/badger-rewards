@@ -72,7 +72,6 @@ def fetch_all_schedules(chain: str, setts: List[str]):
     setts_with_schedules = []
     for sett in setts:
         schedules = logger.getAllUnlockSchedulesFor(sett).call()
-        sett = Web3.toChecksumAddress(sett)
         if len(schedules) > 0:
             setts_with_schedules.append(sett)
         all_schedules[sett] = parse_schedules(schedules)
