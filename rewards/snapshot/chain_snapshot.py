@@ -50,7 +50,7 @@ def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> Snapsho
     console.log(
         f"Taking snapshot on {chain} of {token.name().call()} ({sett}) at {block}\n"
     )
-    sett_balances = fetch_sett_balances(chain, block - 50, sett)
+    sett_balances = fetch_sett_balances(chain, block, sett)
     return parse_sett_balances(sett, sett_balances, blacklist)
 
 
