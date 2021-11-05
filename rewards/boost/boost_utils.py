@@ -5,9 +5,6 @@ from collections import Counter
 from rewards.snapshot.chain_snapshot import chain_snapshot_usd
 from rewards.snapshot.claims_snapshot import claims_snapshot_usd
 
-
-from helpers.enums import Network
-
 console = Console()
 
 

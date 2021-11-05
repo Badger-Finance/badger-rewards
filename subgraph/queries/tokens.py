@@ -151,12 +151,12 @@ def fetch_fuse_pool_balances(client, chain, block):
                 symbol = result["symbol"]
                 ctoken_balance = float(result["cTokenBalance"])
                 balance = ctoken_balance * ctoken_data[symbol]["exchange_rate"]
-                account = result["account"]["id"].lower()
+                account = Web3.toChecksumAddress(result["account"]["id"])
 
                 if balance <= 0:
                     continue
 
-                sett = ctoken_data[symbol]["underlying_contract"]
+                sett = Web3.toChecksumAddress(ctoken_data[symbol]["underlying_contract"])
 
                 if sett not in balances:
                     balances[sett] = {}

@@ -44,6 +44,7 @@ def badger_boost(current_block: int, chain: str):
     )
 
     all_addresses = calc_union_addresses(native_setts, non_native_setts)
+    console.log(all_addresses)
     console.log(f"{len(all_addresses)} addresses fetched")
     badger_boost = {}
     boost_info = {}
@@ -88,7 +89,7 @@ def badger_boost(current_block: int, chain: str):
 
     for addr, boost in badger_boost.items():
         boost_metadata = boost_info.get(addr, {})
-        boost_data[Web3.toChecksumAddress(addr)] = {
+        boost_data[addr] = {
             "boost": boost,
             "nativeBalance": boost_metadata.get("nativeBalance", 0),
             "nonNativeBalance": boost_metadata.get("nonNativeBalance", 0),
