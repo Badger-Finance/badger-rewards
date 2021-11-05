@@ -1,5 +1,5 @@
 import requests
-from config.env_config import env_config
+from config.singletons import env_config
 from typing import Dict
 import time
 from helpers.enums import Network

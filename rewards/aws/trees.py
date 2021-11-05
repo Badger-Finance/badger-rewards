@@ -1,4 +1,4 @@
-from config.env_config import env_config
+from config.singletons import env_config
 from rich.console import Console
 from rewards.aws.helpers import get_bucket, s3
 import json

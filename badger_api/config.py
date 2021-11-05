@@ -1,4 +1,4 @@
-from config.env_config import env_config
+from config.singletons import env_config
 
 urls = {
     "staging": "https://staging-api.badger.com/v2",

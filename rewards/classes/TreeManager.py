@@ -5,7 +5,7 @@ from helpers.discord import send_message_to_discord
 from eth_utils.hexadecimal import encode_hex
 from eth_utils import to_bytes
 from hexbytes import HexBytes
-from config.env_config import env_config
+from config.singletons import env_config
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_tree

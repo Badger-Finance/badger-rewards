@@ -18,7 +18,7 @@ from helpers.enums import Network
 from helpers.discord import send_message_to_discord
 from subgraph.queries.setts import list_setts
 from rich.console import Console
-from config.env_config import env_config
+from config.singletons import env_config
 from config.rewards_config import rewards_config
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes

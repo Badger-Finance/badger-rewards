@@ -1,6 +1,6 @@
 from gql import gql
 from subgraph.subgraph_utils import make_gql_client
-from config.env_config import env_config
+from config.singletons import env_config
 import math
 from rich.console import Console
 from typing import Dict, Tuple
