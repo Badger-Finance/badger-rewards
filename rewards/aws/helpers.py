@@ -17,7 +17,7 @@ else:
     )
 
 
-def get_bucket(production: bool):
+def get_bucket(production: bool) -> str:
     return "badger-merkle-proofs" if production else "badger-staging-merkle-proofs"
 
 
