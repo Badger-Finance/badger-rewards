@@ -16,10 +16,10 @@ def upload_boosts(boost_data, chain: str):
     chain_id = env_config.get_web3(chain).eth.chain_id
     boost_file_name = f"badger-boosts-{chain_id}.json"
     buckets = []
-    if not env_config.test:
-        buckets.append("badger-merkle-proofs")
-    else:
+    if env_config.test or env_config.staging:
         buckets.append("badger-staging-merkle-proofs")
+    elif env_config.production:
+        buckets.append("badger-merkle-proofs")
 
     for b in buckets:
         console.log(f"Uploading file to s3://{b}/{boost_file_name}")
@@ -53,7 +53,7 @@ def download_boosts(chain: str):
     chain_id = env_config.get_web3(chain).eth.chain_id
 
     boost_file_name = f"badger-boosts-{chain_id}.json"
-    bucket = get_bucket(env_config.test)
+    bucket = get_bucket(env_config.production)
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boost_file_name)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
     console.log(f"Fetched {len(data['userData'])} boosts")

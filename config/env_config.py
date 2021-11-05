@@ -7,7 +7,10 @@ from helpers.enums import Network
 
 class EnvConfig:
     def __init__(self):
-        self.test = config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
+        environment = config("ENV", "TEST").lower()
+        self.test = environment in ["test", "dev", "development"]
+        self.production = environment in ["prd", "prod", "production"]
+        self.staging = environment in ["stg", "staging"]
         self.kube = config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]
         self.graph_api_key = get_secret(
             "boost-bot/graph-api-key-d", "GRAPH_API_KEY", kube=self.kube

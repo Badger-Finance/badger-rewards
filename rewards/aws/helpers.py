@@ -17,8 +17,8 @@ else:
     )
 
 
-def get_bucket(test):
-    return "badger-staging-merkle-proofs" if test else "badger-merkle-proofs"
+def get_bucket(production: bool):
+    return "badger-merkle-proofs" if production else "badger-staging-merkle-proofs"
 
 
 def get_secret(

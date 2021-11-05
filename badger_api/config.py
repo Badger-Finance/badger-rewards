@@ -7,4 +7,9 @@ urls = {
 
 
 def get_api_base_path() -> str:
-    return urls["staging"] if env_config.test else urls["prod"]
+    if env_config.test or env_config.staging:
+        return urls["staging"]
+    elif env_config.production:
+        return urls["prod"]
+
+    raise EnvironmentError("invalid environment set")

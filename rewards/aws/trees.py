@@ -20,7 +20,7 @@ def download_latest_tree(chain: str):
         key = f"badger-tree-{chain}.json"
 
     target = {
-        "bucket": get_bucket(env_config.test),
+        "bucket": get_bucket(env_config.production),
         "key": key,
     }  # badger-api production
 
