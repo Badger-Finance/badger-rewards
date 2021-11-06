@@ -17,9 +17,6 @@ def fuse_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     fuse_bals = fetch_fuse_pool_balances(fuse_client, chain, block)
     fuse_snapshots = {}
     for token, bals in fuse_bals.items():
-        if token == DIGG:
-            for addr, bal in bals.items():
-                bals[addr] = digg_utils.shares_to_fragments(bal)
         fuse_snapshots[token] = Snapshot(token, bals)
 
     return fuse_snapshots
