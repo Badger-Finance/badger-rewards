@@ -12,7 +12,7 @@ class DiggUtils:
     def shares_to_fragments(self, shares: int) -> float:
         if shares == 0:
             return 0
-        return self.shares_per_fragment / shares
+        return shares / self.shares_per_fragment
 
 
 digg_utils = DiggUtils()
