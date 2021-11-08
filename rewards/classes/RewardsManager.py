@@ -320,9 +320,12 @@ class RewardsManager:
             )
             block = int(event["blockNumber"])
             reward_amount = int(event["rewardAmount"])
+            cycle_logger.add_sett_token_data(sett, XSUSHI, reward_amount)
+            total_from_rewards += reward_amount
             cycle_logger.add_sett_token_data(
-                sett, XSUSHI, reward_amount
+                sett, self.web3.toChecksumAddress(XSUSHI), reward_amount
             )
+
             snapshot = self.fetch_sett_snapshot(block, sett)
             all_sushi_rewards.append(
                 self.distribute_rewards_to_snapshot(reward_amount, snapshot, XSUSHI)

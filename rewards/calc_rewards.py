@@ -51,7 +51,8 @@ def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
             s[2],
             s[3],
             s[4],
-            s[5])
+            s[5],
+        )
         if schedule.token not in schedules_by_token:
             schedules_by_token[schedule.token] = []
         schedules_by_token[schedule.token].append(schedule)
@@ -71,7 +72,6 @@ def fetch_all_schedules(chain: str, setts: List[str]):
     setts_with_schedules = []
     for sett in setts:
         schedules = logger.getAllUnlockSchedulesFor(sett).call()
-        sett = Web3.toChecksumAddress(sett)
         if len(schedules) > 0:
             setts_with_schedules.append(sett)
         all_schedules[sett] = parse_schedules(schedules)
@@ -85,10 +85,7 @@ def fetch_setts(chain: str) -> List[str]:
     :param chain:
     """
     setts = list_setts(chain)
-    filtered_setts = list(
-        filter(lambda x: x not in DISABLED_VAULTS, setts)
-    )
-    return [s for s in filtered_setts]
+    return list(filter(lambda x: x not in DISABLED_VAULTS, setts))
 
 
 def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:

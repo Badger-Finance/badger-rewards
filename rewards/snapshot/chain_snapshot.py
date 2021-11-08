@@ -51,7 +51,7 @@ def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> Snapsho
     console.log(
         f"Taking snapshot on {chain} of {token.name().call()} ({sett}) at {block}\n"
     )
-    sett_balances = fetch_sett_balances(chain, block - 50, sett)
+    sett_balances = fetch_sett_balances(chain, block, sett)
     return parse_sett_balances(sett, sett_balances, blacklist)
 
 
@@ -67,12 +67,8 @@ def parse_sett_balances(
         addresses_to_blacklist = {**REWARDS_BLACKLIST, **EMISSIONS_BLACKLIST}
     else:
         addresses_to_blacklist = REWARDS_BLACKLIST
-
-    for addr, balance in list(balances.items()):
-        addr = Web3.toChecksumAddress(addr)
-        if addr in addresses_to_blacklist:
-            console.log(f"Removing {addresses_to_blacklist[addr]} from balances")
-            del balances[addr.lower()]
+        
+    balances = {addr: bal for addr, bal in balances.items() if addr not in addresses_to_blacklist}
 
     sett_type, sett_ratio = get_sett_info(sett_address)
     console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
