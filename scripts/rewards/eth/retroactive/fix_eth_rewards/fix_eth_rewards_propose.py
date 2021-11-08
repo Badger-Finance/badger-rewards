@@ -1,4 +1,4 @@
-from config.env_config import env_config
+from config.singletons import env_config
 from rewards.classes.TreeManager import TreeManager
 from rewards.aws.helpers import get_secret
 from eth_account import Account

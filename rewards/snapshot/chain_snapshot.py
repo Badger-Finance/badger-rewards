@@ -1,6 +1,6 @@
 from helpers.enums import BalanceType
 from rewards.classes.Snapshot import Snapshot
-from config.env_config import env_config
+from config.singletons import env_config
 from helpers.constants import (
     REWARDS_BLACKLIST,
     SETT_INFO,
@@ -50,7 +50,7 @@ def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> Snapsho
     console.log(
         f"Taking snapshot on {chain} of {token.name().call()} ({sett}) at {block}\n"
     )
-    sett_balances = fetch_sett_balances(chain, block - 50, sett)
+    sett_balances = fetch_sett_balances(chain, block, sett)
     return parse_sett_balances(sett, sett_balances, blacklist)
 
 

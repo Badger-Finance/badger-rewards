@@ -1,7 +1,7 @@
 from rewards.classes.RewardsList import RewardsList
 from itertools import zip_longest
 from eth_utils import encode_hex
-from config.env_config import env_config
+from config.singletons import env_config
 from rich.console import Console
 
 console = Console()

@@ -1,8 +1,8 @@
 from rewards.classes.TreeManager import TreeManager
 from rewards.tree_utils import get_last_proposed_cycle
 from rewards.aws.helpers import get_secret
-from config.env_config import env_config
 from helpers.discord import get_discord_url, send_message_to_discord
+from config.singletons import env_config
 from eth_account import Account
 from rewards.calc_rewards import approve_root
 from rich.console import Console

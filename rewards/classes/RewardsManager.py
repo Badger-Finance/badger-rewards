@@ -22,7 +22,7 @@ from rewards.classes.CycleLogger import cycle_logger
 from helpers.time_utils import to_utc_date, to_hours
 from helpers.digg_utils import digg_utils
 from helpers.enums import BalanceType, Network
-from config.env_config import env_config
+from config.singletons import env_config
 from rich.console import Console
 from typing import List, Tuple, Dict
 
@@ -326,6 +326,7 @@ class RewardsManager:
             )
             block = int(event["blockNumber"])
             reward_amount = int(event["rewardAmount"])
+            total_from_rewards += reward_amount
             cycle_logger.add_sett_token_data(
                 sett, self.web3.toChecksumAddress(XSUSHI), reward_amount
             )

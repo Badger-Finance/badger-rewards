@@ -13,10 +13,20 @@ class Network(str, Enum):
     def __str__(self):
         return self.value
 
+
 class BalanceType(str, Enum):
     Native = "native"
     NonNative = "non_native"
     Excluded = "excluded"
+
+    def __str__(self):
+        return self.value
+
+
+class Environment(str, Enum):
+    Test = "test"
+    Staging = "stg"
+    Production = "prod"
 
     def __str__(self):
         return self.value

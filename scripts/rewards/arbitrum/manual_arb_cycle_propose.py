@@ -1,6 +1,6 @@
 from rewards.classes.TreeManager import TreeManager
 from rewards.aws.helpers import get_secret
-from config.env_config import env_config
+from config.singletons import env_config
 from eth_account import Account
 from rewards.calc_rewards import propose_root
 from rich.console import Console

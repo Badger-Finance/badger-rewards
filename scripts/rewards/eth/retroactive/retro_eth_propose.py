@@ -1,7 +1,7 @@
 from rewards.aws.trees import upload_tree
 from rewards.aws.boost import add_multipliers
 from rewards.calc_rewards import generate_rewards_in_range
-from config.env_config import env_config
+from config.singletons import env_config
 from rewards.classes.TreeManager import TreeManager
 from decouple import config
 import json
