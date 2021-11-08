@@ -45,7 +45,14 @@ def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
     schedules_by_token = {}
     console.log("Fetching schedules...")
     for s in schedules:
-        schedule = Schedule(s[0], s[1], s[2], s[3], s[4], s[5])
+        schedule = Schedule(
+            Web3.toChecksumAddress(s[0]),
+            Web3.toChecksumAddress(s[1]),
+            s[2],
+            s[3],
+            s[4],
+            s[5],
+        )
         if schedule.token not in schedules_by_token:
             schedules_by_token[schedule.token] = []
         schedules_by_token[schedule.token].append(schedule)
@@ -78,10 +85,7 @@ def fetch_setts(chain: str) -> List[str]:
     :param chain:
     """
     setts = list_setts(chain)
-    filtered_setts = list(
-        filter(lambda x: Web3.toChecksumAddress(x) not in DISABLED_VAULTS, setts)
-    )
-    return [env_config.get_web3().toChecksumAddress(s) for s in filtered_setts]
+    return list(filter(lambda x: x not in DISABLED_VAULTS, setts))
 
 
 def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:

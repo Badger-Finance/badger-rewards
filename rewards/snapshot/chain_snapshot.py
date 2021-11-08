@@ -31,6 +31,7 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     balances_by_sett = {}
 
     for sett_addr, balances in list(chain_balances.items()):
+        sett_addr = Web3.toChecksumAddress(sett_addr)
         sett_balances = parse_sett_balances(sett_addr, balances)
         token = make_contract(sett_addr, abi_name="ERC20", chain=chain)
         console.log(f"Fetched {len(balances)} balances for sett {token.name().call()}")
@@ -66,12 +67,8 @@ def parse_sett_balances(
         addresses_to_blacklist = {**REWARDS_BLACKLIST, **EMISSIONS_BLACKLIST}
     else:
         addresses_to_blacklist = REWARDS_BLACKLIST
-
-    for addr, balance in list(balances.items()):
-        addr = Web3.toChecksumAddress(addr)
-        if addr in addresses_to_blacklist:
-            console.log(f"Removing {addresses_to_blacklist[addr]} from balances")
-            del balances[addr.lower()]
+        
+    balances = {addr: bal for addr, bal in balances.items() if addr not in addresses_to_blacklist}
 
     sett_type, sett_ratio = get_sett_info(sett_address)
     console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
@@ -81,7 +78,7 @@ def parse_sett_balances(
 
 def get_sett_info(sett_address: str) -> Tuple[str, float]:
     info = SETT_INFO.get(
-        env_config.get_web3().toChecksumAddress(sett_address),
+        sett_address,
         {"type": BalanceType.NonNative, "ratio": 1},
     )
     console.log(sett_address, info)
@@ -94,7 +91,6 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
     native = Counter()
     non_native = Counter()
     for sett, snapshot in total_snapshot.items():
-        sett = env_config.get_web3().toChecksumAddress(sett)
         if sett in [*DISABLED_VAULTS, *PRO_RATA_VAULTS]:
             console.log(f"{sett} is disabled")
             continue

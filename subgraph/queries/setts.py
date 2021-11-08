@@ -1,10 +1,12 @@
 from gql import gql
 from graphql.language.ast import DocumentNode
+from helpers.constants import BDIGG
 from subgraph.subgraph_utils import make_gql_client
 from rich.console import Console
 from typing import List, Dict
 from helpers.discord import send_error_to_discord
 import math
+from web3 import Web3
 
 console = Console()
 thegraph_client = make_gql_client("thegraph")
@@ -90,7 +92,7 @@ def list_setts(chain: str) -> List[str]:
     """
     )
     results = client.execute(query)
-    return list(map(lambda s: s["id"], results["setts"]))
+    return list(map(lambda s: Web3.toChecksumAddress(s["id"]), results["setts"]))
 
 
 def fetch_chain_balances(chain: str, block: int) -> Dict[str, Dict[str, int]]:
@@ -110,10 +112,10 @@ def fetch_chain_balances(chain: str, block: int) -> Dict[str, Dict[str, int]]:
             results = client.execute(query, variable_values=variables)
             balance_data = results["userSettBalances"]
             for result in balance_data:
-                account = result["user"]["id"].lower()
+                account = Web3.toChecksumAddress(result["user"]["id"])
                 decimals = int(result["sett"]["token"]["decimals"])
-                sett = result["sett"]["id"]
-                if sett == "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a".lower():
+                sett = Web3.toChecksumAddress(result["sett"]["id"])
+                if sett == BDIGG:
                     decimals = 18
                 deposit = float(result["netShareDeposit"]) / math.pow(10, decimals)
                 if deposit > 0:
@@ -158,10 +160,10 @@ def fetch_sett_balances(chain: str, block: int, sett: str):
             results = client.execute(query, variable_values=variables)
             balance_data = results["userSettBalances"]
             for result in balance_data:
-                account = result["user"]["id"].lower()
+                account = Web3.toChecksumAddress(result["user"]["id"])
                 decimals = int(result["sett"]["token"]["decimals"])
-                sett = result["sett"]["id"]
-                if sett == "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a".lower():
+                sett = Web3.toChecksumAddress(result["sett"]["id"])
+                if sett == BDIGG:
                     decimals = 18
                 deposit = float(result["netShareDeposit"]) / math.pow(10, decimals)
                 if deposit > 0:

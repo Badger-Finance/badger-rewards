@@ -82,11 +82,10 @@ class RewardsManager:
         we want them to be calculated pro-rata
         rather than boosted
         """
-        if self.web3.toChecksumAddress(sett) not in PRO_RATA_VAULTS:
+        if sett not in PRO_RATA_VAULTS:
             sett_snapshot = self.boost_sett(sett, sett_snapshot)
 
         for token, schedules in schedules_by_token.items():
-            token = self.web3.toChecksumAddress(token)
             end_dist = self.get_distributed_for_token_at(
                 token, end_time, schedules, sett
             )
@@ -105,15 +104,12 @@ class RewardsManager:
                 cycle_logger.add_sett_token_data(sett, token, token_distribution)
 
             if token_distribution > 0:
-                sett = self.web3.toChecksumAddress(sett)
                 total = sett_snapshot.total_balance()
                 if total == 0:
                     unit = 0
                 else:
                     unit = token_distribution / total
-                    for user, balance in sett_snapshot:
-                        addr = self.web3.toChecksumAddress(user)
-                        token = self.web3.toChecksumAddress(token)
+                    for addr, balance in sett_snapshot:
                         reward_amount = balance * unit
                         if addr == EMISSIONS_CONTRACTS[Network.Ethereum]["BadgerTree"]:
                             if sett == BCVX:
@@ -159,9 +155,7 @@ class RewardsManager:
             unit = 0
         else:
             unit = amount / total
-        for user, balance in snapshot:
-            addr = self.web3.toChecksumAddress(user)
-            token = self.web3.toChecksumAddress(token)
+        for addr, balance in snapshot:
             reward_amount = balance * unit
             assert reward_amount >= 0
             rewards.increase_user_rewards(addr, token, int(reward_amount))
@@ -326,10 +320,12 @@ class RewardsManager:
             )
             block = int(event["blockNumber"])
             reward_amount = int(event["rewardAmount"])
+            cycle_logger.add_sett_token_data(sett, XSUSHI, reward_amount)
             total_from_rewards += reward_amount
             cycle_logger.add_sett_token_data(
                 sett, self.web3.toChecksumAddress(XSUSHI), reward_amount
             )
+
             snapshot = self.fetch_sett_snapshot(block, sett)
             all_sushi_rewards.append(
                 self.distribute_rewards_to_snapshot(reward_amount, snapshot, XSUSHI)

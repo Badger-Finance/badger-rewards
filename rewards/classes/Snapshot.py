@@ -4,7 +4,7 @@ from config.singletons import env_config
 from badger_api.requests import fetch_token_prices
 from helpers.discord import send_message_to_discord
 from rich.console import Console
-from helpers.web3_utils import make_token
+from web3 import Web3
 import json
 
 console = Console()
@@ -14,7 +14,7 @@ class Snapshot:
     def __init__(self, token, balances, ratio=1, type="none"):
         self.type = type
         self.ratio = ratio
-        self.token = env_config.get_web3().toChecksumAddress(token)
+        self.token = Web3.toChecksumAddress(token)
         self.balances = self.parse_balances(balances)
 
     def __repr__(self) -> str:
@@ -23,7 +23,7 @@ class Snapshot:
     def parse_balances(self, bals) -> Dict[str, float]:
         new_bals = {}
         for addr, balance in bals.items():
-            new_bals[env_config.get_web3().toChecksumAddress(addr)] = balance
+            new_bals[Web3.toChecksumAddress(addr)] = balance
         return new_bals
 
     def total_balance(self) -> float:
@@ -33,7 +33,7 @@ class Snapshot:
         self.balances[user] = self.balances[user] * multiple
 
     def percentage_of_total(self, addr) -> float:
-        addr = env_config.get_web3().toChecksumAddress(addr)
+        addr = Web3.toChecksumAddress(addr)
         return self.balances[addr] / self.total_balance()
 
     def __iter__(self) -> Tuple[str, float]:
