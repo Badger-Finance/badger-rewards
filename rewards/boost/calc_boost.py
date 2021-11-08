@@ -10,8 +10,6 @@ from rewards.boost.boost_utils import (
     calc_union_addresses,
     calc_boost_balances,
 )
-from web3 import Web3
-
 console = Console()
 
 
