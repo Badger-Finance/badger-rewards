@@ -57,7 +57,6 @@ def test_boost_sett(rewards_manager: RewardsManager, balances):
         "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0": 1600000
     }
     boosted = rewards_manager.boost_sett(sett, Snapshot(sett, balances, ratio=1, type=BalanceType.NonNative))
-    print(boosted)
     TestCase().assertDictEqual(d1=boosted.balances, d2=boosted_bals)
     
 
