@@ -1,5 +1,5 @@
 from decimal import Decimal
-from helpers.discord import send_message_to_discord
+from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.web3_utils import make_contract
 from helpers.constants import EMISSIONS_CONTRACTS
 from hexbytes import HexBytes
@@ -117,32 +117,33 @@ def get_priority_fee(
 
 
 def is_transaction_found(
-    web3: Web3, tx_hash: HexBytes, timeout: int, tries: int = 5
+    web3: Web3, tx_hash: HexBytes, timeout: int, chain: str, tries: int = 5,
 ) -> bool:
     attempt = 0
     error = None
+    discord_url = get_discord_url(chain)
     while attempt < tries:
         try:
             web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)
             web3.eth.get_transaction(tx_hash)
             msg = f"Transaction {tx_hash} succeeded!"
-            send_message_to_discord("Transaction Success", msg, [], "Rewards Bot")
+            send_message_to_discord("Transaction Success", msg, [], "Rewards Bot", discord_url)
             return True
         except Exception as e:
             msg = f"Error waiting for {tx_hash}. Error: {e}. \n Retrying..."
             attempt += 1
             error = e
             logger.error(msg)
-            send_message_to_discord("Transaction Error", msg, [], "Rewards Bot")
+            send_message_to_discord("Transaction Error", msg, [], "Rewards Bot", discord_url)
             time.sleep(5)
 
     msg = f"Error waiting for {tx_hash} after {tries} tries"
-    send_message_to_discord("Transaction Error", msg, [], "Rewards Bot")
+    send_message_to_discord("Transaction Error", msg, [], "Rewards Bot", discord_url)
     raise error
 
 
 def confirm_transaction(
-    web3: Web3, tx_hash: HexBytes, timeout: int = 60, max_block: int = None
+    web3: Web3, tx_hash: HexBytes, chain: str, timeout: int = 60
 ) -> Tuple[bool, str]:
     """Waits for transaction to appear within a given timeframe or before a given block (if specified), and then times out.
 
@@ -159,7 +160,7 @@ def confirm_transaction(
     logger.info(f"tx_hash before confirm: {tx_hash}")
 
     try:
-        is_transaction_found(web3, tx_hash, timeout)
+        is_transaction_found(web3, tx_hash, timeout, chain)
         msg = f"Transaction {tx_hash} succeeded!"
         logger.info(msg)
         return True, msg

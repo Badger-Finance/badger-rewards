@@ -1,9 +1,8 @@
 from rewards.classes.TreeManager import TreeManager
 from rewards.tree_utils import get_last_proposed_cycle
 from rewards.aws.helpers import get_secret
+from helpers.discord import get_discord_url, send_message_to_discord
 from config.singletons import env_config
-from helpers.discord import send_message_to_discord
-from helpers.constants import MONITORING_SECRET_NAMES
 from eth_account import Account
 from rewards.calc_rewards import approve_root
 from rich.console import Console
@@ -12,9 +11,7 @@ console = Console()
 
 
 def approve_rewards(chain):
-    discord_url = get_secret(
-        MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", kube=env_config.kube
-    )
+    discord_url = get_discord_url(chain)
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
         "private",
