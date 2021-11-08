@@ -1,7 +1,7 @@
 from subgraph.config import subgraph_ids, subgraph_urls
 from gql import Client
 from gql.transport.aiohttp import AIOHTTPTransport
-from config.env_config import env_config
+from config.singletons import env_config
 
 
 def subgraph_url(name):

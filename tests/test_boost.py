@@ -49,6 +49,8 @@ def mock_env_config():
     class MockEnvConfig:
         def __init__(self):
             self.test = True
+            self.staging = False
+            self.production = False
 
         def get_web3(self, chain: str):
             return MockWeb3()
@@ -79,6 +81,7 @@ def test_upload_boost_staging(monkeypatch):
 def test_upload_boost_prod(monkeypatch):
     mock_env_config_obj = mock_env_config()
     mock_env_config_obj.test = False
+    mock_env_config_obj.production = True
     monkeypatch.setattr(
         "rewards.aws.boost.send_message_to_discord", mock_send_message_to_discord_prod
     )

@@ -1,6 +1,6 @@
 from helpers.enums import BalanceType
 from rewards.classes.Snapshot import Snapshot
-from config.env_config import env_config
+from config.singletons import env_config
 from helpers.constants import (
     REWARDS_BLACKLIST,
     SETT_INFO,

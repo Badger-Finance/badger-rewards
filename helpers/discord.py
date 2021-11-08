@@ -1,5 +1,5 @@
 from discord import Webhook, RequestsWebhookAdapter, Embed
-from config.env_config import env_config
+from config.singletons import env_config
 from rewards.aws.helpers import get_secret
 
 

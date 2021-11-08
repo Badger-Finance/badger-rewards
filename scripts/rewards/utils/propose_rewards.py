@@ -5,7 +5,7 @@ from helpers.constants import MONITORING_SECRET_NAMES
 from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import propose_root
 from rewards.classes.TreeManager import TreeManager
-from config.env_config import env_config
+from config.singletons import env_config
 from rich.console import Console
 
 console = Console()

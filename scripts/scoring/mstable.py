@@ -1,7 +1,7 @@
 from scoring.scoring_utils import get_nft_owners
 from rewards.explorer import fetch_block_by_timestamp, get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import chain_snapshot
-from config.env_config import env_config
+from config.singletons import env_config
 import json
 
 if __name__ == "__main__":

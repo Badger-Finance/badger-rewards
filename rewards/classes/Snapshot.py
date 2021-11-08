@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Tuple, Dict
-from config.env_config import env_config
+from config.singletons import env_config
 from badger_api.requests import fetch_token_prices
 from helpers.discord import send_message_to_discord
 from rich.console import Console

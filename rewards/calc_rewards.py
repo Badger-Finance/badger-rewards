@@ -18,7 +18,7 @@ from helpers.enums import Network
 from helpers.discord import send_message_to_discord
 from subgraph.queries.setts import list_setts
 from rich.console import Console
-from config.env_config import env_config
+from config.singletons import env_config
 from config.rewards_config import rewards_config
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
@@ -145,7 +145,7 @@ def propose_root(
     console.log(
         f"\n==== Proposing root with rootHash {rewards_data['rootHash']} ====\n"
     )
-    if not env_config.test:
+    if env_config.production:
         tx_hash, success = tree_manager.propose_root(rewards_data)
 
 
@@ -169,7 +169,7 @@ def approve_root(
         past_tree=current_rewards,
         tree_manager=tree_manager,
     )
-    if env_config.test:
+    if env_config.test or env_config.staging:
         add_multipliers(
             rewards_data["multiplierData"],
             rewards_data["userMultipliers"],
@@ -189,7 +189,7 @@ def approve_root(
                 rewards_data["fileName"],
                 rewards_data["merkleTree"],
                 chain,
-                staging=env_config.test,
+                staging=env_config.test or env_config.staging,
             )
 
             add_multipliers(
