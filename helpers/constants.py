@@ -264,15 +264,15 @@ MONITORING_SECRET_NAMES = {
     Environment.Staging: {
         Network.Ethereum: {
             BotType.Cycle: "cycle-bot/test-discord-url",
-            BotType.Boost: "boost-bot/test-discord-url",
+            BotType.Boost: "boost-bot/eth/prod-discord-url",
         },
         Network.Polygon: {
             BotType.Cycle: "cycle-bot/test-discord-url",
-            BotType.Boost: "boost-bot/test-discord-url",
+            BotType.Boost: "boost-bot/polygon/prod-discord-url",
         },
         Network.Arbitrum: {
             BotType.Cycle: "cycle-bot/test-discord-url",
-            BotType.Boost: "boost-bot/test-discord-url",
+            BotType.Boost: "boost-bot/arbitrum/prod-discord-url",
         },
     },
     Environment.Test: {
