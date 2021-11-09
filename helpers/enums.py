@@ -38,3 +38,11 @@ class BotType(str, Enum):
 
     def __str__(self):
         return self.value
+
+
+class BucketType(str, Enum):
+    Merkle = "merkle"
+    Json = "json"
+
+    def __str__(self):
+        return self.value
