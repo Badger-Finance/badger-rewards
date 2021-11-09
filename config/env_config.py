@@ -63,3 +63,4 @@ class EnvConfig:
 
     def is_valid_config(self):
         assert self.test or self.staging or self.production, "Valid environment not set"
+        return True
