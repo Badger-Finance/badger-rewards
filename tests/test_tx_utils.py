@@ -1,6 +1,6 @@
 import pytest
 import logging
-from brownie import web3
+from config.singletons import env_config
 from helpers.enums import Network
 from tests.utils import set_env_vars
 
@@ -26,6 +26,7 @@ def test_check_tx_receipt():
         },
     ]
     for network_info in active_networks:
+        web3 = env_config.get_web3(network_info['network'])
         logger.info(
             f"Checking to see if valid tx {network_info['valid_tx']} is on the {network_info['network']} network"
         )

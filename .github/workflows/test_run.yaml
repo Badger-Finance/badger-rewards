@@ -4,7 +4,7 @@ name: main workflow
 
 env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+    DISCORD_WEBHOOK_URL: ${{ secrets.TEST_DISCORD_WEBHOOK }}
     NODE_URL: ${{ secrets.NODE_URL }}
     POLYGON_NODE_URL: ${{ secrets.POLYGON_NODE_URL }}
     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
