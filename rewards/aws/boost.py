@@ -1,4 +1,5 @@
-from helpers.discord import send_message_to_discord
+from helpers.discord import send_message_to_discord, get_discord_url
+from helpers.enums import BotType
 from rewards.aws.helpers import s3, get_bucket
 from config.singletons import env_config
 from rich.console import Console
@@ -13,6 +14,7 @@ def upload_boosts(boost_data, chain: str):
     :param test:
     :param boost_data: calculated boost information
     """
+    discord_url = get_discord_url(chain, BotType.Boost)
     chain_id = env_config.get_web3(chain).eth.chain_id
     boost_file_name = f"badger-boosts-{chain_id}.json"
     buckets = []
@@ -41,6 +43,7 @@ def upload_boosts(boost_data, chain: str):
                 }
             ],
             "Boost Bot",
+            url=discord_url,
         )
 
 

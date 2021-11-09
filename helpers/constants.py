@@ -1,6 +1,6 @@
 from web3 import Web3
 from dotmap import DotMap
-from helpers.enums import BalanceType, Network
+from helpers.enums import BalanceType, Network, BotType
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -247,9 +247,18 @@ DISABLED_VAULTS = [
 PRO_RATA_VAULTS = [BVECVX, BBVECVX_CVX]
 
 MONITORING_SECRET_NAMES = {
-    Network.Ethereum: "cycle-bot/eth/prod-discord-url",
-    Network.Polygon: "cycle-bot/prod-discord-url",
-    Network.Arbitrum: "cycle-bot/arbitrum/prod-discord-url",
+    Network.Ethereum: {
+        BotType.Cycle: "cycle-bot/eth/prod-discord-url",
+        BotType.Boost: "boost-bot/eth/prod-discord-url",
+    },
+    Network.Polygon: {
+        BotType.Cycle: "cycle-bot/prod-discord-url",
+        BotType.Boost: "boost-bot/polygon/prod-discord-url",
+    },
+    Network.Arbitrum: {
+        BotType.Cycle: "cycle-bot/arbitrum/prod-discord-url",
+        BotType.Boost: "boost-bot/arbitrum/prod-discord-url",
+    },
 }
 
 BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]

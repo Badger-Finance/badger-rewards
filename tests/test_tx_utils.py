@@ -4,6 +4,7 @@ import os
 from eth_account import Account
 from brownie import web3
 from tests.utils import set_env_vars
+from helpers.enums import Network
 
 set_env_vars()
 
@@ -15,6 +16,6 @@ def test_check_tx_receipt():
     valid_tx_hash = "0xc1d6fb782044679da2af2aa7dc5721b53c9557727d3abc9839aaf10c2bd56454"
     invalid_tx_hash = "0xc1d6fb782044679da2af2aa7dc5721b53c9557727d3abc9839aaf10c2bd"
 
-    assert is_transaction_found(web3, valid_tx_hash, 2)
+    assert is_transaction_found(web3, valid_tx_hash, 2, Network.Ethereum)
     with pytest.raises(Exception):
-        is_transaction_found(web3, invalid_tx_hash, 2)
+        is_transaction_found(web3, invalid_tx_hash, 2, Network.Ethereum)
