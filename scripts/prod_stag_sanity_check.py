@@ -4,8 +4,10 @@ import os
 import random
 
 import boto3
-from helpers.enums import Network
+from helpers.constants import CHAIN_IDS, BOOST_CHAINS, S3_BUCKETS
 from dotenv import load_dotenv
+
+from helpers.enums import BucketType, Environment
 
 load_dotenv()
 
@@ -17,13 +19,8 @@ def download_boosts(chain: str, bucket: str):
         aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
     )
 
-    print("DOWNLOADING BOOST")
-    chain_ids = {
-        Network.Ethereum: 1,
-        Network.Arbitrum: 42161,
-        Network.Polygon: 137,
-    }
-    chain_id = chain_ids[chain]
+    print(f"DOWNLOADING BOOST FOR {chain.upper()} FROM {bucket}")
+    chain_id = CHAIN_IDS[chain]
 
     boost_file_name = f"badger-boosts-{chain_id}.json"
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boost_file_name)
@@ -31,11 +28,13 @@ def download_boosts(chain: str, bucket: str):
     return data
 
 
-supported_chains = [Network.Ethereum, Network.Arbitrum, Network.Polygon]
-for chain in supported_chains:
-
-    prod_boosts = download_boosts(chain, "badger-merkle-proofs")
-    stag_boosts = download_boosts(chain, "badger-staging-merkle-proofs")
+for chain in BOOST_CHAINS:
+    prod_boosts = download_boosts(
+        chain, S3_BUCKETS[BucketType.Merkle][Environment.Production]
+    )
+    stag_boosts = download_boosts(
+        chain, S3_BUCKETS[BucketType.Merkle][Environment.Staging]
+    )
 
     assert len(prod_boosts["userData"].keys()) == len(stag_boosts["userData"].keys())
 

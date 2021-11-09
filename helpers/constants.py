@@ -1,6 +1,6 @@
 from web3 import Web3
 from dotmap import DotMap
-from helpers.enums import BalanceType, Network, BotType, Environment
+from helpers.enums import BalanceType, BucketType, Network, BotType, Environment
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -292,6 +292,19 @@ MONITORING_SECRET_NAMES = {
 }
 
 BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]
+
+CHAIN_IDS = {
+    Network.Ethereum: 1,
+    Network.Arbitrum: 42161,
+    Network.Polygon: 137,
+}
+
+S3_BUCKETS = {
+    BucketType.Merkle: {
+        Environment.Staging: "badger-staging-merkle-proofs",
+        Environment.Production: "badger-merkle-proofs",
+    }
+}
 
 CLAIMABLE_TOKENS = {
     Network.Ethereum: {
