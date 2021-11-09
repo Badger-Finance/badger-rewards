@@ -4,7 +4,11 @@ from tabulate import tabulate
 from rich.console import Console
 from config.singletons import env_config
 from helpers.constants import SANITY_TOKEN_AMOUNT, TOKENS_TO_CHECK
-from helpers.discord import get_discord_url, send_code_block_to_discord, send_error_to_discord
+from helpers.discord import (
+    get_discord_url,
+    send_code_block_to_discord,
+    send_error_to_discord,
+)
 from helpers.digg_utils import digg_utils
 import json
 
@@ -84,7 +88,5 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
         else:
             diff, table = token_diff_table(name, total_before_token, total_after_token)
         send_code_block_to_discord(
-            msg=table,
-            username="Rewards Bot",
-            url=get_discord_url(chain)
+            msg=table, username="Rewards Bot", url=get_discord_url(chain)
         )

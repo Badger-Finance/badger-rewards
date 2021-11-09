@@ -63,7 +63,9 @@ def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str
                             if entry["balance"] == 0:
                                 fragment_balance = 0
                             else:
-                                fragment_balance = digg_utils.shares_to_fragments(int(amount))
+                                fragment_balance = digg_utils.shares_to_fragments(
+                                    int(amount)
+                                )
                             digg_balances[address] = float(fragment_balance) / 1e9
     except Exception as e:
         send_error_to_discord(e, "Error in Fetching Token Balance", "Subgraph Error")
@@ -148,7 +150,9 @@ def fetch_fuse_pool_balances(client, chain, block):
                 if balance <= 0:
                     continue
 
-                sett = Web3.toChecksumAddress(ctoken_data[symbol]["underlying_contract"])
+                sett = Web3.toChecksumAddress(
+                    ctoken_data[symbol]["underlying_contract"]
+                )
 
                 if sett not in balances:
                     balances[sett] = {}
