@@ -2,6 +2,7 @@ import discord
 from eth_account import Account
 from rewards.tree_utils import calc_next_cycle_range
 from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import BotType
 from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import propose_root
 from rewards.classes.TreeManager import TreeManager
@@ -12,7 +13,7 @@ console = Console()
 
 
 def propose_rewards(chain):
-    discord_url = get_discord_url(chain)
+    discord_url = get_discord_url(chain, BotType.Cycle)
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
         "private",

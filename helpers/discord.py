@@ -59,8 +59,9 @@ def send_code_block_to_discord(
 
 
 def get_discord_url(chain: str, bot_type: str = BotType.Cycle) -> str:
+    environment = env_config.get_environment()
     return get_secret(
-        MONITORING_SECRET_NAMES[chain][bot_type],
+        MONITORING_SECRET_NAMES[environment][chain][bot_type],
         "DISCORD_WEBHOOK_URL",
         kube=env_config.kube,
     )
