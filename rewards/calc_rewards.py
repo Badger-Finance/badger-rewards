@@ -3,7 +3,7 @@ from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
-from rewards.rewards_utils import combine_rewards
+from rewards.utils.rewards_utils import combine_rewards
 from rewards.rewards_checker import verify_rewards
 from rewards.aws.boost import add_multipliers, download_boosts
 from rewards.aws.helpers import get_secret

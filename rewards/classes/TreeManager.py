@@ -13,7 +13,7 @@ from helpers.web3_utils import get_badger_tree
 from helpers.constants import MONITORING_SECRET_NAMES
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
-from rewards.tx_utils import (
+from rewards.utils.tx_utils import (
     get_effective_gas_price,
     get_priority_fee,
     confirm_transaction,

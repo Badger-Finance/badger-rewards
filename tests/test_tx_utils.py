@@ -7,7 +7,7 @@ from tests.utils import set_env_vars
 
 set_env_vars()
 
-from rewards.tx_utils import is_transaction_found
+from rewards.utils.tx_utils import is_transaction_found
 
 
 @pytest.mark.require_network("hardhat-fork")

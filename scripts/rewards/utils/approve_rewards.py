@@ -1,5 +1,5 @@
 from rewards.classes.TreeManager import TreeManager
-from rewards.tree_utils import get_last_proposed_cycle
+from rewards.utils.tree_utils import get_last_proposed_cycle
 from rewards.aws.helpers import get_secret
 from config.env_config import env_config
 from helpers.discord import send_message_to_discord

@@ -1,5 +1,5 @@
 from eth_account import Account
-from rewards.tree_utils import calc_next_cycle_range
+from rewards.utils.tree_utils import calc_next_cycle_range
 from helpers.discord import send_message_to_discord
 from helpers.constants import MONITORING_SECRET_NAMES
 from rewards.aws.helpers import get_secret

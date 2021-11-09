@@ -5,7 +5,7 @@ from tests.utils import test_address, test_key, chains, mock_tree, set_env_vars
 
 set_env_vars()
 
-from rewards.tree_utils import get_last_proposed_cycle, calc_next_cycle_range
+from rewards.utils.tree_utils import get_last_proposed_cycle, calc_next_cycle_range
 from rewards.classes.TreeManager import TreeManager
 
 
