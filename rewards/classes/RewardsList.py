@@ -7,7 +7,7 @@ console = Console()
 
 
 class RewardsList:
-    def __init__(self, cycle) -> None:
+    def __init__(self, cycle: int = 0) -> None:
         self.claims = DotMap()
         self.tokens = DotMap()
         self.totals = DotMap()

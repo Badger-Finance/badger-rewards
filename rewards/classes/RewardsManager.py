@@ -1,16 +1,17 @@
+from rewards.emission_handlers import tree_handler
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import (
     BCVX,
     BCVXCRV,
+    EMISSIONS_CONTRACTS,
+    FLAT_EMISSIONS_RATE,
     PRO_RATA_VAULTS,
     XSUSHI,
-    EMISSIONS_CONTRACTS,
-    DIGG,
 )
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
-from rewards.rewards_utils import combine_rewards
+from rewards.utils.rewards_utils import combine_rewards
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from subgraph.queries.harvests import (
     fetch_sushi_harvest_events,
@@ -20,11 +21,10 @@ from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.CycleLogger import cycle_logger
 from helpers.time_utils import to_utc_date, to_hours
-from helpers.digg_utils import digg_utils
 from helpers.enums import BalanceType, Network
 from config.env_config import env_config
 from rich.console import Console
-from typing import List, Tuple, Dict
+from typing import Callable, List, Tuple, Dict
 
 console = Console()
 
@@ -68,15 +68,20 @@ class RewardsManager:
         want = strategy.want().call()
         sett = controller.vaults(want).call()
         return sett
-
+    
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
     ) -> RewardsList:
         start_time = self.web3.eth.getBlock(self.start)["timestamp"]
         end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
-        rewards = RewardsList(self.cycle)
-        extra_rewards = []
+        flat_rewards_list = []
+        boosted_rewards_list = []
+        
+        custom_behaviour = {
+            EMISSIONS_CONTRACTS[Network.Ethereum]["BadgerTree"]: tree_handler
+        }
+        
         """
         When distributing rewards to the bcvx vault,
         we want them to be calculated pro-rata
@@ -92,64 +97,38 @@ class RewardsManager:
             start_dist = self.get_distributed_for_token_at(
                 token, start_time, schedules, sett
             )
-            for schedule in schedules:
-                if schedule.startTime <= end_time and schedule.endTime >= end_time:
-                    cycle_logger.add_schedule(sett, schedule)
             token_distribution = int(end_dist) - int(start_dist)
-            if token == DIGG:
-                cycle_logger.add_sett_token_data(
-                    sett, token, digg_utils.shares_to_fragments(token_distribution)
+            emissions_rate = FLAT_EMISSIONS_RATE.get(sett, 0)
+            flat_emissions = token_distribution * emissions_rate
+            boosted_emissions = token_distribution * (1 - emissions_rate)
+            flat_rewards_list.append(
+                self.distribute_rewards_to_snapshot(
+                    amount=flat_emissions,
+                    snapshot=sett_snapshot,
+                    token=token,
+                    custom_rewards=custom_behaviour
                 )
-            else:
-                cycle_logger.add_sett_token_data(sett, token, token_distribution)
+            )
+            boosted_rewards_list.append(
+                self.distribute_rewards_to_snapshot(
+                    boosted_emissions,
+                    snapshot=self.boost_sett(sett, sett_snapshot),
+                    token=token,
+                    custom_rewards=custom_behaviour
+                )
+            )
 
-            if token_distribution > 0:
-                total = sett_snapshot.total_balance()
-                if total == 0:
-                    unit = 0
-                else:
-                    unit = token_distribution / total
-                    for addr, balance in sett_snapshot:
-                        reward_amount = balance * unit
-                        if addr == EMISSIONS_CONTRACTS[Network.Ethereum]["BadgerTree"]:
-                            if sett == BCVX:
-                                extra_rewards.append(
-                                    self.distribute_rewards_to_snapshot(
-                                        reward_amount,
-                                        self.bcvx_claims_snapshot(),
-                                        token,
-                                    )
-                                )
-                                console.log(
-                                    f"{reward_amount} distributed to bcvxcrv holders"
-                                )
-
-                            if sett == BCVXCRV:
-
-                                extra_rewards.append(
-                                    self.distribute_rewards_to_snapshot(
-                                        reward_amount,
-                                        self.bcvxcrv_claims_snapshot(),
-                                        token,
-                                    )
-                                )
-                                console.log(
-                                    f"{reward_amount} distributed to bcvxcrv holders"
-                                )
-                        else:
-                            rewards.increase_user_rewards(
-                                addr, token, int(reward_amount)
-                            )
-
-        return combine_rewards([rewards, *extra_rewards], self.cycle)
+        return combine_rewards([*flat_rewards_list, *boosted_rewards_list], self.cycle)
 
     def distribute_rewards_to_snapshot(
-        self, amount: float, snapshot: Snapshot, token: str
+        self, amount: float, snapshot: Snapshot, token: str,
+        custom_rewards: Dict[str, Callable] = {}
     ):
         """
         Distribute a certain amount of rewards to a snapshot of users
         """
         rewards = RewardsList(self.cycle)
+        custom_rewards_list = []
         total = snapshot.total_balance()
         if total == 0:
             unit = 0
@@ -158,8 +137,14 @@ class RewardsManager:
         for addr, balance in snapshot:
             reward_amount = balance * unit
             assert reward_amount >= 0
-            rewards.increase_user_rewards(addr, token, int(reward_amount))
-        return rewards
+            if addr in custom_rewards:
+                custom_rewards_calc = custom_rewards[addr]
+                custom_rewards_list.append(
+                   custom_rewards_calc(amount, token, snapshot.token)
+                )
+            else:
+                rewards.increase_user_rewards(addr, token, int(reward_amount))
+        return combine_rewards([rewards, *custom_rewards], self.cycle)
 
     def calculate_all_sett_rewards(
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
