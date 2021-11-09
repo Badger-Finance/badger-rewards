@@ -11,7 +11,7 @@ from helpers.constants import (
 )
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
-from rewards.utils.rewards_utils import combine_rewards
+from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from subgraph.queries.harvests import (
     fetch_sushi_harvest_events,
@@ -24,7 +24,7 @@ from helpers.time_utils import to_utc_date, to_hours
 from helpers.enums import BalanceType, Network
 from config.env_config import env_config
 from rich.console import Console
-from typing import Callable, List, Tuple, Dict
+from typing import List, Tuple, Dict
 
 console = Console()
 
@@ -101,50 +101,26 @@ class RewardsManager:
             emissions_rate = FLAT_EMISSIONS_RATE.get(sett, 0)
             flat_emissions = token_distribution * emissions_rate
             boosted_emissions = token_distribution * (1 - emissions_rate)
-            flat_rewards_list.append(
-                self.distribute_rewards_to_snapshot(
-                    amount=flat_emissions,
-                    snapshot=sett_snapshot,
-                    token=token,
-                    custom_rewards=custom_behaviour
+            if flat_emissions > 0:
+                flat_rewards_list.append(
+                    distribute_rewards_to_snapshot(
+                        amount=flat_emissions,
+                        snapshot=sett_snapshot,
+                        token=token,
+                        custom_rewards=custom_behaviour
+                    )
                 )
-            )
-            boosted_rewards_list.append(
-                self.distribute_rewards_to_snapshot(
-                    boosted_emissions,
-                    snapshot=self.boost_sett(sett, sett_snapshot),
-                    token=token,
-                    custom_rewards=custom_behaviour
+            if boosted_emissions > 0:
+                boosted_rewards_list.append(
+                    distribute_rewards_to_snapshot(
+                        boosted_emissions,
+                        snapshot=self.boost_sett(sett, sett_snapshot),
+                        token=token,
+                        custom_rewards=custom_behaviour
+                    )
                 )
-            )
 
         return combine_rewards([*flat_rewards_list, *boosted_rewards_list], self.cycle)
-
-    def distribute_rewards_to_snapshot(
-        self, amount: float, snapshot: Snapshot, token: str,
-        custom_rewards: Dict[str, Callable] = {}
-    ):
-        """
-        Distribute a certain amount of rewards to a snapshot of users
-        """
-        rewards = RewardsList(self.cycle)
-        custom_rewards_list = []
-        total = snapshot.total_balance()
-        if total == 0:
-            unit = 0
-        else:
-            unit = amount / total
-        for addr, balance in snapshot:
-            reward_amount = balance * unit
-            assert reward_amount >= 0
-            if addr in custom_rewards:
-                custom_rewards_calc = custom_rewards[addr]
-                custom_rewards_list.append(
-                   custom_rewards_calc(amount, token, snapshot.token)
-                )
-            else:
-                rewards.increase_user_rewards(addr, token, int(reward_amount))
-        return combine_rewards([rewards, *custom_rewards], self.cycle)
 
     def calculate_all_sett_rewards(
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
@@ -271,7 +247,7 @@ class RewardsManager:
                 sett, self.web3.toChecksumAddress(token), amount
             )
             all_dist_rewards.append(
-                self.distribute_rewards_to_snapshot(amount, snapshot, token)
+                distribute_rewards_to_snapshot(amount, snapshot, token)
             )
         return combine_rewards(all_dist_rewards, self.cycle)
 
@@ -313,7 +289,7 @@ class RewardsManager:
 
             snapshot = self.fetch_sett_snapshot(block, sett)
             all_sushi_rewards.append(
-                self.distribute_rewards_to_snapshot(reward_amount, snapshot, XSUSHI)
+                distribute_rewards_to_snapshot(reward_amount, snapshot, XSUSHI)
             )
 
         return combine_rewards(all_sushi_rewards, self.cycle), total_from_rewards
