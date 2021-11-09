@@ -5,8 +5,13 @@ import math
 from web3 import Web3
 from rich.console import Console
 from typing import Dict, Tuple
-from helpers.discord import send_error_to_discord, send_message_to_discord
+from helpers.discord import (
+    send_error_to_discord,
+    send_message_to_discord,
+    get_discord_url,
+)
 from helpers.digg_utils import digg_utils
+from helpers.enums import BotType
 from helpers.web3_utils import make_contract
 from functools import lru_cache
 from helpers.enums import Network
@@ -171,6 +176,7 @@ def fetch_fuse_pool_balances(client, chain, block):
         return balances
 
     except Exception as e:
+        discord_url = get_discord_url(chain, BotType.Boost)
         send_message_to_discord(
             "**BADGER BOOST ERROR**",
             f":x: Error in Fetching Fuse Token Balance",
@@ -185,5 +191,6 @@ def fetch_fuse_pool_balances(client, chain, block):
                 }
             ],
             "Boost Bot",
+            url=discord_url,
         )
         raise e

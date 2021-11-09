@@ -2,6 +2,7 @@ from discord import Webhook, RequestsWebhookAdapter, Embed
 from config.singletons import env_config
 from rewards.aws.helpers import get_secret
 from helpers.constants import MONITORING_SECRET_NAMES
+from helpers.enums import BotType
 
 
 def send_error_to_discord(e, error_msg, error_type):
@@ -57,9 +58,10 @@ def send_code_block_to_discord(
     webhook.send(username=username, content=msg)
 
 
-def get_discord_url(chain):
+def get_discord_url(chain: str, bot_type: str = BotType.Cycle) -> str:
+    environment = env_config.get_environment()
     return get_secret(
-        MONITORING_SECRET_NAMES.get(chain, ""),
+        MONITORING_SECRET_NAMES[environment][chain][bot_type],
         "DISCORD_WEBHOOK_URL",
         kube=env_config.kube,
     )

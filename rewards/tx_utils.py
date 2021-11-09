@@ -8,7 +8,7 @@ import time
 import requests
 from web3 import Web3, exceptions
 from typing import Tuple
-from helpers.enums import Network
+from helpers.enums import Network, BotType
 
 logger = logging.getLogger("tx-utils")
 
@@ -122,10 +122,11 @@ def is_transaction_found(
     timeout: int,
     chain: str,
     tries: int = 5,
+    bot_type: BotType = BotType.Cycle,
 ) -> bool:
     attempt = 0
     error = None
-    discord_url = get_discord_url(chain)
+    discord_url = get_discord_url(chain, bot_type)
     while attempt < tries:
         try:
             web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)

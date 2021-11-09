@@ -98,7 +98,7 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
         if sett in [*DISABLED_VAULTS, *PRO_RATA_VAULTS]:
             console.log(f"{sett} is disabled")
             continue
-        usd_snapshot = snapshot.convert_to_usd()
+        usd_snapshot = snapshot.convert_to_usd(chain)
         balances = Counter(usd_snapshot.balances)
         if usd_snapshot.type == BalanceType.Native:
             native = native + balances

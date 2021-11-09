@@ -13,7 +13,7 @@ from helpers.constants import (
     DISABLED_VAULTS,
     EMISSIONS_CONTRACTS,
 )
-from helpers.enums import Network
+from helpers.enums import Network, BotType
 from helpers.discord import get_discord_url, send_message_to_discord
 from subgraph.queries.setts import list_setts
 from rich.console import Console
@@ -28,8 +28,8 @@ import json
 console = Console()
 
 
-def console_and_discord(msg: str, chain: str):
-    url = get_discord_url(chain)
+def console_and_discord(msg: str, chain: str, bot_type: BotType = BotType.Cycle):
+    url = get_discord_url(chain, bot_type)
     console.log(msg)
     send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
 

@@ -9,7 +9,7 @@ from config.singletons import env_config
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.aws.trees import download_tree
 from helpers.web3_utils import get_badger_tree
-from helpers.enums import Network
+from helpers.enums import Network, BotType
 from rewards.classes.RewardsList import RewardsList
 from rewards.tx_utils import (
     get_effective_gas_price,
@@ -33,7 +33,7 @@ class TreeManager:
         self.next_cycle = self.get_current_cycle() + 1
         self.propose_account = cycle_account
         self.approve_account = cycle_account
-        self.discord_url = get_discord_url(chain)
+        self.discord_url = get_discord_url(chain, BotType.Cycle)
 
     def convert_to_merkle_tree(self, rewardsList: RewardsList, start: int, end: int):
         return rewards_to_merkle_tree(rewardsList, start, end)

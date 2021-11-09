@@ -3,6 +3,7 @@ import logging
 from config.singletons import env_config
 from helpers.enums import Network
 from tests.utils import set_env_vars
+from helpers.enums import Network
 
 set_env_vars()
 logger = logging.getLogger("tx-utils")
@@ -12,7 +13,6 @@ from rewards.tx_utils import is_transaction_found
 
 @pytest.mark.require_network("hardhat-fork")
 def test_check_tx_receipt():
-
     active_networks = [
         {
             "network": Network.Ethereum,

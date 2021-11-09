@@ -30,3 +30,11 @@ class Environment(str, Enum):
 
     def __str__(self):
         return self.value
+
+
+class BotType(str, Enum):
+    Cycle = "cycle"
+    Boost = "boost"
+
+    def __str__(self):
+        return self.value

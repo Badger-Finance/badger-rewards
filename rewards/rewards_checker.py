@@ -10,6 +10,7 @@ from helpers.discord import (
     send_error_to_discord,
 )
 from helpers.digg_utils import digg_utils
+from helpers.enums import BotType
 import json
 
 console = Console()
@@ -88,5 +89,5 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
         else:
             diff, table = token_diff_table(name, total_before_token, total_after_token)
         send_code_block_to_discord(
-            msg=table, username="Rewards Bot", url=get_discord_url(chain)
+            msg=table, username="Rewards Bot", url=get_discord_url(chain, BotType.Cycle)
         )
