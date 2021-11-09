@@ -67,8 +67,12 @@ def parse_sett_balances(
         addresses_to_blacklist = {**REWARDS_BLACKLIST, **EMISSIONS_BLACKLIST}
     else:
         addresses_to_blacklist = REWARDS_BLACKLIST
-        
-    balances = {addr: bal for addr, bal in balances.items() if addr not in addresses_to_blacklist}
+
+    balances = {
+        addr: bal
+        for addr, bal in balances.items()
+        if addr not in addresses_to_blacklist
+    }
 
     sett_type, sett_ratio = get_sett_info(sett_address)
     console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")

@@ -56,8 +56,10 @@ def send_code_block_to_discord(
     msg = f"```\n{msg}\n```"
     webhook.send(username=username, content=msg)
 
+
 def get_discord_url(chain):
     return get_secret(
-        MONITORING_SECRET_NAMES.get(chain,""), "DISCORD_WEBHOOK_URL", kube=env_config.kube
+        MONITORING_SECRET_NAMES.get(chain, ""),
+        "DISCORD_WEBHOOK_URL",
+        kube=env_config.kube,
     )
-    

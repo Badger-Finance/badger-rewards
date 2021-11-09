@@ -117,7 +117,11 @@ def get_priority_fee(
 
 
 def is_transaction_found(
-    web3: Web3, tx_hash: HexBytes, timeout: int, chain: str, tries: int = 5,
+    web3: Web3,
+    tx_hash: HexBytes,
+    timeout: int,
+    chain: str,
+    tries: int = 5,
 ) -> bool:
     attempt = 0
     error = None
@@ -127,14 +131,18 @@ def is_transaction_found(
             web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)
             web3.eth.get_transaction(tx_hash)
             msg = f"Transaction {tx_hash} succeeded!"
-            send_message_to_discord("Transaction Success", msg, [], "Rewards Bot", discord_url)
+            send_message_to_discord(
+                "Transaction Success", msg, [], "Rewards Bot", discord_url
+            )
             return True
         except Exception as e:
             msg = f"Error waiting for {tx_hash}. Error: {e}. \n Retrying..."
             attempt += 1
             error = e
             logger.error(msg)
-            send_message_to_discord("Transaction Error", msg, [], "Rewards Bot", discord_url)
+            send_message_to_discord(
+                "Transaction Error", msg, [], "Rewards Bot", discord_url
+            )
             time.sleep(5)
 
     msg = f"Error waiting for {tx_hash} after {tries} tries"
