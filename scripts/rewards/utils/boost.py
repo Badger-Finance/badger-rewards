@@ -1,4 +1,4 @@
-from helpers.constants import BOOST_CHAINS, BOOST_DISCORD_URLS
+from helpers.constants import BOOST_CHAINS
 from config.singletons import env_config
 from helpers.discord import send_message_to_discord, get_discord_url
 from helpers.enums import BotType
