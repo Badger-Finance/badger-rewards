@@ -1,8 +1,9 @@
 from __future__ import annotations
 from typing import Tuple, Dict
-from config.env_config import env_config
+from config.singletons import env_config
 from badger_api.requests import fetch_token_prices
-from helpers.discord import send_message_to_discord
+from helpers.discord import send_message_to_discord, get_discord_url
+from helpers.enums import Network, BotType
 from rich.console import Console
 from web3 import Web3
 import json
@@ -50,7 +51,10 @@ class Snapshot:
 
         return Snapshot(self.token, new_bals, self.ratio, self.type)
 
-    def convert_to_usd(self) -> Snapshot:
+    def convert_to_usd(
+        self, chain: Network, bot_type: BotType = BotType.Boost
+    ) -> Snapshot:
+        discord_url = get_discord_url(chain, bot_type)
         prices = fetch_token_prices()
         if self.token not in prices:
             price = 0
@@ -60,6 +64,7 @@ class Snapshot:
                 f"Cannot find pricing for {self.token}",
                 [],
                 "Boost Bot",
+                url=discord_url,
             )
         else:
             price = prices[self.token] * self.ratio

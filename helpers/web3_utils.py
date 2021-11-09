@@ -1,6 +1,6 @@
 from web3.contract import ContractFunctions
 from helpers.constants import EMISSIONS_CONTRACTS
-from config.env_config import env_config
+from config.singletons import env_config
 import json
 
 

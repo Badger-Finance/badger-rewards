@@ -36,6 +36,6 @@ def token_snapshot_usd(
         digg_snapshot = fuse_digg + digg_snapshot
 
     return (
-        badger_snapshot.convert_to_usd().balances,
-        digg_snapshot.convert_to_usd().balances,
+        badger_snapshot.convert_to_usd(chain).balances,
+        digg_snapshot.convert_to_usd(chain).balances,
     )
