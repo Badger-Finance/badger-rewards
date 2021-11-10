@@ -54,7 +54,7 @@ class TreeManager:
         return self.manage_root(rewards, self.badger_tree.proposeRoot, "Propose", chain)
 
     def manage_root(
-        self, rewards, contract_function: ContractFunction, action, chain: Network
+        self, rewards, contract_function: ContractFunction, action: str, chain: Network
     ):
         root_hash = rewards["rootHash"]
         merkle_root = rewards["merkleTree"]["merkleRoot"]
