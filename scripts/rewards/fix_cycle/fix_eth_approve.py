@@ -21,7 +21,7 @@ if __name__ == "__main__":
         assume_role_arn="arn:aws:iam::747584148381:role/cycle20210908001427790200000001",
         kube=env_config.kube,
     )
-
+    
     key_decrypt_password = get_secret(
         config("DECRYPT_PASSWORD_ARN"),
         config("DECRYPT_PASSWORD_KEY"),
