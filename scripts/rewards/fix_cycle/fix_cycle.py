@@ -1,17 +1,15 @@
-from scripts.rewards.utils.approve_rewards import approve_rewards
-from rewards.calc_rewards import generate_rewards_in_range
+from rewards.aws.trees import download_latest_tree
 from rewards.classes.TreeManager import TreeManager
-from rewards.tree_utils import get_last_proposed_cycle, calc_next_cycle_range
 from rewards.aws.helpers import get_secret
 from config.env_config import env_config
 from eth_account import Account
 from rewards.calc_rewards import approve_root, propose_root
 import time
-from scripts.rewards.utils.propose_rewards import propose_rewards
 from subgraph.queries.setts import last_synced_block
 
 
-def fix_cycle(chain, tree):
+def fix_cycle(chain):
+    tree = download_latest_tree(chain)
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
         "private",
