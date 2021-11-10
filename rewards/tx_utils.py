@@ -151,7 +151,7 @@ def get_transaction(
 
 def confirm_transaction(
     web3: Web3, tx_hash: HexBytes, chain: str, timeout: int = 60
-) -> Tuple[dict, str]:
+) -> Tuple[bool, str]:
     """Waits for transaction to appear within a given timeframe or before a given block (if specified), and then times out.
 
     Args:
@@ -161,7 +161,7 @@ def confirm_transaction(
         max_block (int, optional): Max block number to wait until. Defaults to None.
 
     Returns:
-        dict: Tx receipt obj if transaction was confirmed, None otherwise.
+        bool: True if transaction was confirmed, False otherwise.
         msg: Log message.
     """
     logger.info(f"tx_hash before confirm: {tx_hash}")
