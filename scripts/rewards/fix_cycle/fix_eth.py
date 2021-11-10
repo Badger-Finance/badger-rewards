@@ -5,4 +5,4 @@ import json
 
 
 if __name__ == "__main__":
-    fix_cycle(Network.Arbitrum)
+    fix_cycle(Network.Ethereum)
