@@ -143,7 +143,7 @@ def propose_root(
         f"\n==== Proposing root with rootHash {rewards_data['rootHash']} ====\n"
     )
     if env_config.production:
-        tx_hash, success = tree_manager.propose_root(rewards_data)
+        tx_hash, success = tree_manager.propose_root(rewards_data, chain)
 
 
 def approve_root(
@@ -178,7 +178,7 @@ def approve_root(
             f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
         )
 
-        tx_hash, success = tree_manager.approve_root(rewards_data)
+        tx_hash, success = tree_manager.approve_root(rewards_data, chain)
         cycle_logger.set_content_hash(rewards_data["rootHash"])
         cycle_logger.set_merkle_root(rewards_data["merkleTree"]["merkleRoot"])
         if success:

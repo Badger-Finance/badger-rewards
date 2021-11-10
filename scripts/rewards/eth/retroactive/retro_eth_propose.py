@@ -36,4 +36,4 @@ if __name__ == "__main__":
         past_tree=tree,
         tree_manager=tree_manager,
     )
-    tx_hash, propose_success = tree_manager.propose_root(rewards)
+    tx_hash, propose_success = tree_manager.propose_root(rewards, chain)
