@@ -6,4 +6,3 @@ import json
 
 if __name__ == "__main__":
     fix_cycle(Network.Arbitrum)
-    

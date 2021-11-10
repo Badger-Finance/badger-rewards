@@ -17,6 +17,7 @@ def get_gas_price_of_tx(
     web3: Web3,
     chain: str,
     tx_hash: HexBytes,
+    timeout: int = 60,
 ) -> Decimal:
     """Gets the actual amount of gas used by the transaction and converts
     it from gwei to USD value for monitoring.
@@ -30,11 +31,9 @@ def get_gas_price_of_tx(
     Returns:
         Decimal: USD value of gas used in tx
     """
-    try:
-        tx_receipt = web3.eth.get_transaction_receipt(tx_hash)
-    except exceptions.TransactionNotFound:
-        tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
-
+    tx, tx_receipt = get_transaction(
+        web3, tx_hash, timeout, chain, bot_type=BotType.Cycle
+    )
     logger.info(f"tx: {tx_receipt}")
     total_gas_used = Decimal(tx_receipt.get("gasUsed", 0))
     logger.info(f"gas used: {total_gas_used}")
@@ -45,7 +44,6 @@ def get_gas_price_of_tx(
     if chain == Network.Ethereum:
         gas_price_base = Decimal(tx_receipt.get("effectiveGasPrice", 0) / 10 ** 18)
     elif chain in [Network.Polygon, Network.Arbitrum]:
-        tx = web3.eth.get_transaction(tx_hash)
         gas_price_base = Decimal(tx.get("gasPrice", 0) / 10 ** 18)
 
     gas_usd = Decimal(
@@ -116,26 +114,26 @@ def get_priority_fee(
     return priority_fee
 
 
-def is_transaction_found(
+def get_transaction(
     web3: Web3,
     tx_hash: HexBytes,
     timeout: int,
     chain: str,
     tries: int = 5,
     bot_type: BotType = BotType.Cycle,
-) -> bool:
+) -> Tuple[dict, dict]:
     attempt = 0
     error = None
     discord_url = get_discord_url(chain, bot_type)
     while attempt < tries:
         try:
-            web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)
-            web3.eth.get_transaction(tx_hash)
+            receipt = web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)
+            tx = web3.eth.get_transaction(tx_hash)
             msg = f"Transaction {tx_hash} succeeded!"
             send_message_to_discord(
                 "Transaction Success", msg, [], "Rewards Bot", discord_url
             )
-            return True
+            return tx, receipt
         except Exception as e:
             msg = f"Error waiting for {tx_hash}. Error: {e}. \n Retrying..."
             attempt += 1
@@ -153,7 +151,7 @@ def is_transaction_found(
 
 def confirm_transaction(
     web3: Web3, tx_hash: HexBytes, chain: str, timeout: int = 60
-) -> Tuple[bool, str]:
+) -> Tuple[dict, str]:
     """Waits for transaction to appear within a given timeframe or before a given block (if specified), and then times out.
 
     Args:
@@ -163,20 +161,20 @@ def confirm_transaction(
         max_block (int, optional): Max block number to wait until. Defaults to None.
 
     Returns:
-        bool: True if transaction was confirmed, False otherwise.
+        dict: Tx receipt obj if transaction was confirmed, None otherwise.
         msg: Log message.
     """
     logger.info(f"tx_hash before confirm: {tx_hash}")
 
     try:
-        is_transaction_found(web3, tx_hash, timeout, chain)
+        get_transaction(web3, tx_hash, timeout, chain)
         msg = f"Transaction {tx_hash} succeeded!"
         logger.info(msg)
         return True, msg
     except exceptions.TimeExhausted:
         msg = f"Transaction {tx_hash} timed out, not included in block yet."
-        return False, msg
+        return None, msg
     except Exception as e:
         msg = f"Error waiting for {tx_hash}. Error: {e}."
         logger.error(msg)
-        return False, msg
+        return None, msg

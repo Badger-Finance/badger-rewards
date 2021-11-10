@@ -8,7 +8,7 @@ from helpers.enums import Network
 set_env_vars()
 logger = logging.getLogger("tx-utils")
 
-from rewards.tx_utils import is_transaction_found
+from rewards.tx_utils import get_transaction
 
 
 @pytest.mark.require_network("hardhat-fork")
@@ -35,10 +35,10 @@ def test_check_tx_receipt():
         logger.info(
             f"Checking to see if valid tx {network_info['valid_tx']} is on the {network_info['network']} network"
         )
-        assert is_transaction_found(
+        assert get_transaction(
             web3, network_info["valid_tx"], 2, network_info["network"]
         )
         with pytest.raises(Exception):
-            is_transaction_found(
+            get_transaction(
                 web3, network_info["invalid_tx"], 2, network_info["network"]
             )

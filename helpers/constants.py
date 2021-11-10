@@ -142,7 +142,7 @@ TOKENS_TO_CHECK = {
         "Dfd": DFD,
         "bCvxCrv": BCVXCRV,
         "bCvx": BCVX,
-        "bveCVX": BVECVX
+        "bveCVX": BVECVX,
     },
     Network.Arbitrum: {
         "Badger": ARB_BADGER,
