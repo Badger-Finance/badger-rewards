@@ -1,5 +1,6 @@
 import math
 from badger_api.requests import fetch_all_claimable_balances
+from helpers.enums import BalanceType
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import BADGER, DIGG, BCVX, BCVXCRV, ARB_BADGER, POLY_BADGER
 from typing import Dict, Tuple
@@ -14,8 +15,8 @@ from collections import Counter
 def claims_snapshot(chain: str) -> Dict[str, Snapshot]:
     all_claims = fetch_all_claimable_balances(chain)
     chain_claimable_tokens = CLAIMABLE_TOKENS[chain]
-    native_tokens = chain_claimable_tokens["native"]
-    non_native_tokens = chain_claimable_tokens["non_native"]
+    native_tokens = chain_claimable_tokens[BalanceType.Native]
+    non_native_tokens = chain_claimable_tokens[BalanceType.NonNative]
     claims_data = {}
     snapshots = {}
     token_decimals = {}
@@ -41,11 +42,17 @@ def claims_snapshot(chain: str) -> Dict[str, Snapshot]:
 
     for token, snapshot in claims_data.items():
         if token in native_tokens:
-            snapshots[token] = Snapshot(token, snapshot, ratio=1, type="native")
+            snapshots[token] = Snapshot(
+                token, snapshot, ratio=1, type=BalanceType.Native
+            )
         elif token in non_native_tokens:
-            snapshots[token] = Snapshot(token, snapshot, ratio=1, type="nonNative")
+            snapshots[token] = Snapshot(
+                token, snapshot, ratio=1, type=BalanceType.NonNative
+            )
         else:
-            snapshots[token] = Snapshot(token, snapshot, ratio=1, type="other")
+            snapshots[token] = Snapshot(
+                token, snapshot, ratio=1, type=BalanceType.Excluded
+            )
 
     return snapshots
 
@@ -56,10 +63,10 @@ def claims_snapshot_usd(chain: str) -> Tuple[Counter, Counter]:
     native = Counter()
     non_native = Counter()
     for sett, claims in snapshot.items():
-        usd_claims = claims.convert_to_usd()
-        if usd_claims.type == "native":
+        usd_claims = claims.convert_to_usd(chain)
+        if usd_claims.type == BalanceType.Native:
             native = native + Counter(usd_claims.balances)
-        elif usd_claims.type == "nonNative":
+        elif usd_claims.type == BalanceType.NonNative:
             non_native = non_native + Counter(usd_claims.balances)
 
     return native, non_native

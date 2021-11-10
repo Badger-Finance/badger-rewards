@@ -1,20 +1,19 @@
+import discord
 from eth_account import Account
 from rewards.tree_utils import calc_next_cycle_range
-from helpers.discord import send_message_to_discord
-from helpers.constants import MONITORING_SECRET_NAMES
+from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import BotType
 from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import propose_root
 from rewards.classes.TreeManager import TreeManager
-from config.env_config import env_config
+from config.singletons import env_config
 from rich.console import Console
 
 console = Console()
 
 
 def propose_rewards(chain):
-    discord_url = get_secret(
-        MONITORING_SECRET_NAMES[chain], "DISCORD_WEBHOOK_URL", kube=env_config.kube
-    )
+    discord_url = get_discord_url(chain, BotType.Cycle)
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
         "private",

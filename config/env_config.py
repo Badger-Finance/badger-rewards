@@ -2,12 +2,16 @@ from rewards.aws.helpers import get_secret
 from decouple import config
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
-from helpers.enums import Network
+from helpers.enums import Network, Environment, BotType
+from helpers.constants import MONITORING_SECRET_NAMES
 
 
 class EnvConfig:
     def __init__(self):
-        self.test = config("TEST", "False").lower() in ["true", "1", "t", "y", "yes"]
+        environment = config("ENV", "").lower()
+        self.test = environment == Environment.Test
+        self.staging = environment == Environment.Staging
+        self.production = environment == Environment.Production
         self.kube = config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]
         self.graph_api_key = get_secret(
             "boost-bot/graph-api-key-d", "GRAPH_API_KEY", kube=self.kube
@@ -30,7 +34,9 @@ class EnvConfig:
                 "keepers/arbiscan", "ARBISCAN_TOKEN", kube=self.kube
             ),
         }
-        polygon = self.make_provider("quiknode/poly-node-url", "POLYGON_NODE_URL")
+        # TODO: set polygon back to paid node
+        # polygon = self.make_provider("quiknode/poly-node-url", "POLYGON_NODE_URL")
+        polygon = Web3(Web3.HTTPProvider("https://polygon-rpc.com/"))
         polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
 
         self.web3 = {
@@ -38,6 +44,8 @@ class EnvConfig:
             Network.Arbitrum: Web3(Web3.HTTPProvider("https://arb1.arbitrum.io/rpc")),
             Network.Polygon: polygon,
         }
+
+        self.is_valid_config()
 
     def get_web3(self, chain: str = Network.Ethereum) -> Web3:
         return self.web3[chain]
@@ -56,5 +64,14 @@ class EnvConfig:
         else:
             return self.discord_webhook_url
 
+    def get_environment(self) -> Environment:
+        if self.test:
+            return Environment.Test
+        elif self.staging:
+            return Environment.Staging
+        elif self.production:
+            return Environment.Production
 
-env_config = EnvConfig()
+    def is_valid_config(self):
+        assert self.test or self.staging or self.production, "Valid environment not set"
+        return True

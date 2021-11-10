@@ -4,7 +4,6 @@ from rewards.classes.TreeManager import TreeManager
 from rewards.tree_utils import get_last_proposed_cycle, calc_next_cycle_range
 from rewards.aws.helpers import get_secret
 from config.env_config import env_config
-from helpers.constants import MONITORING_SECRET_NAMES
 from eth_account import Account
 from rewards.calc_rewards import approve_root, propose_root
 import time

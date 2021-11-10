@@ -7,7 +7,7 @@ metadata:
 spec:
   schedule: "*/20 * * * *"
   startingDeadlineSeconds: 180
-  suspend: true
+  suspend: false
   jobTemplate:
     spec:
       template:
@@ -21,8 +21,8 @@ spec:
             env:
               - name: LOG_LEVEL
                 value: 'info'
-              - name: TEST
-                value: 'True'
+              - name: ENV
+                value: 'STG'
               - name: KUBE
                 value: 'True'
           restartPolicy: OnFailure

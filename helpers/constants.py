@@ -1,6 +1,6 @@
 from web3 import Web3
 from dotmap import DotMap
-from helpers.enums import Network
+from helpers.enums import BalanceType, BucketType, Network, BotType, Environment
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -142,6 +142,7 @@ TOKENS_TO_CHECK = {
         "Dfd": DFD,
         "bCvxCrv": BCVXCRV,
         "bCvx": BCVX,
+        "bveCVX": BVECVX
     },
     Network.Arbitrum: {
         "Badger": ARB_BADGER,
@@ -247,17 +248,72 @@ DISABLED_VAULTS = [
 PRO_RATA_VAULTS = [BVECVX, BBVECVX_CVX]
 
 MONITORING_SECRET_NAMES = {
-    Network.Ethereum: "cycle-bot/eth/prod-discord-url",
-    Network.Polygon: "cycle-bot/prod-discord-url",
-    Network.Arbitrum: "cycle-bot/arbitrum/prod-discord-url",
+    Environment.Production: {
+        Network.Ethereum: {
+            BotType.Cycle: "cycle-bot/eth/prod-discord-url",
+            BotType.Boost: "boost-bot/eth/prod-discord-url",
+        },
+        Network.Polygon: {
+            BotType.Cycle: "cycle-bot/prod-discord-url",
+            BotType.Boost: "boost-bot/polygon/prod-discord-url",
+        },
+        Network.Arbitrum: {
+            BotType.Cycle: "cycle-bot/arbitrum/prod-discord-url",
+            BotType.Boost: "boost-bot/arbitrum/prod-discord-url",
+        },
+    },
+    Environment.Staging: {
+        Network.Ethereum: {
+            BotType.Cycle: "cycle-bot/test-discord-url",
+            BotType.Boost: "boost-bot/eth/prod-discord-url",
+        },
+        Network.Polygon: {
+            BotType.Cycle: "cycle-bot/test-discord-url",
+            BotType.Boost: "boost-bot/polygon/prod-discord-url",
+        },
+        Network.Arbitrum: {
+            BotType.Cycle: "cycle-bot/test-discord-url",
+            BotType.Boost: "boost-bot/arbitrum/prod-discord-url",
+        },
+    },
+    Environment.Test: {
+        Network.Ethereum: {
+            BotType.Cycle: "cycle-bot/test-discord-url",
+            BotType.Boost: "boost-bot/test-discord-url",
+        },
+        Network.Polygon: {
+            BotType.Cycle: "cycle-bot/test-discord-url",
+            BotType.Boost: "boost-bot/test-discord-url",
+        },
+        Network.Arbitrum: {
+            BotType.Cycle: "cycle-bot/test-discord-url",
+            BotType.Boost: "boost-bot/test-discord-url",
+        },
+    },
 }
 
 BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]
 
+CHAIN_IDS = {
+    Network.Ethereum: 1,
+    Network.Arbitrum: 42161,
+    Network.Polygon: 137,
+}
+
+S3_BUCKETS = {
+    BucketType.Merkle: {
+        Environment.Staging: "badger-staging-merkle-proofs",
+        Environment.Production: "badger-merkle-proofs",
+    }
+}
+
 CLAIMABLE_TOKENS = {
-    Network.Ethereum: {"native": [BADGER, DIGG], "non_native": [BCVXCRV]},
-    Network.Arbitrum: {"native": [ARB_BADGER], "non_native": []},
-    Network.Polygon: {"native": [POLY_BADGER], "non_native": []},
+    Network.Ethereum: {
+        BalanceType.Native: [BADGER, DIGG],
+        BalanceType.NonNative: [BCVXCRV],
+    },
+    Network.Arbitrum: {BalanceType.Native: [ARB_BADGER], BalanceType.NonNative: []},
+    Network.Polygon: {BalanceType.Native: [POLY_BADGER], BalanceType.NonNative: []},
 }
 SANITY_TOKEN_AMOUNT = 4000 * 1e18
 BOOST_BLOCK_DELAY = 10

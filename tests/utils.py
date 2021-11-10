@@ -6,7 +6,7 @@ from helpers.enums import Network
 
 
 def set_env_vars():
-    os.environ["TEST"] = "True"
+    os.environ["ENV"] = "TEST"
     os.environ["KUBE"] = "False"
     os.environ["AWS_SECRET_ACCESS_KEY"] = ""
     os.environ["AWS_ACCESS_KEY_ID"] = ""
@@ -25,6 +25,7 @@ mock_tree = get_mock_json("mock_tree")
 mock_boosts = get_mock_json("mock_boosts")
 mock_claimed_for = get_mock_json("mock_claimed_for")
 mock_claimable_bals = get_mock_json("mock_claimable_bals")
+mock_balances = get_mock_json("mock_balances")
 test_start = int(mock_tree["startBlock"])
 test_end = int(mock_tree["endBlock"])
 test_cycle = int(mock_tree["cycle"])

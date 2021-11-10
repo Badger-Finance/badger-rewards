@@ -1,11 +1,17 @@
 from gql import gql
 from subgraph.subgraph_utils import make_gql_client
-from config.env_config import env_config
+from config.singletons import env_config
 import math
+from web3 import Web3
 from rich.console import Console
 from typing import Dict, Tuple
-from helpers.discord import send_error_to_discord, send_message_to_discord
+from helpers.discord import (
+    send_error_to_discord,
+    send_message_to_discord,
+    get_discord_url,
+)
 from helpers.digg_utils import digg_utils
+from helpers.enums import BotType
 from helpers.web3_utils import make_contract
 from functools import lru_cache
 from helpers.enums import Network
@@ -62,7 +68,9 @@ def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str
                             if entry["balance"] == 0:
                                 fragment_balance = 0
                             else:
-                                fragment_balance = digg_utils.shares_to_fragments(int(amount))
+                                fragment_balance = digg_utils.shares_to_fragments(
+                                    int(amount)
+                                )
                             digg_balances[address] = float(fragment_balance) / 1e9
     except Exception as e:
         send_error_to_discord(e, "Error in Fetching Token Balance", "Subgraph Error")
@@ -91,12 +99,12 @@ def fetch_fuse_pool_balances(client, chain, block):
 
     for symbol, data in ctoken_data.items():
         ftoken = make_contract(
-            env_config.get_web3().toChecksumAddress(data["contract"]),
+            Web3.toChecksumAddress(data["contract"]),
             abi_name="CErc20Delegator",
             chain=chain,
         )
         underlying = make_contract(
-            env_config.get_web3().toChecksumAddress(data["underlying_contract"]),
+            Web3.toChecksumAddress(data["underlying_contract"]),
             abi_name="ERC20",
             chain=chain,
         )
@@ -142,12 +150,14 @@ def fetch_fuse_pool_balances(client, chain, block):
                 symbol = result["symbol"]
                 ctoken_balance = float(result["cTokenBalance"])
                 balance = ctoken_balance * ctoken_data[symbol]["exchange_rate"]
-                account = result["account"]["id"].lower()
+                account = Web3.toChecksumAddress(result["account"]["id"])
 
                 if balance <= 0:
                     continue
 
-                sett = ctoken_data[symbol]["underlying_contract"]
+                sett = Web3.toChecksumAddress(
+                    ctoken_data[symbol]["underlying_contract"]
+                )
 
                 if sett not in balances:
                     balances[sett] = {}
@@ -166,6 +176,7 @@ def fetch_fuse_pool_balances(client, chain, block):
         return balances
 
     except Exception as e:
+        discord_url = get_discord_url(chain, BotType.Boost)
         send_message_to_discord(
             "**BADGER BOOST ERROR**",
             f":x: Error in Fetching Fuse Token Balance",
@@ -180,5 +191,6 @@ def fetch_fuse_pool_balances(client, chain, block):
                 }
             ],
             "Boost Bot",
+            url=discord_url,
         )
         raise e

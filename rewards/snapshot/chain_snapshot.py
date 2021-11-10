@@ -1,5 +1,6 @@
+from helpers.enums import BalanceType
 from rewards.classes.Snapshot import Snapshot
-from config.env_config import env_config
+from config.singletons import env_config
 from helpers.constants import (
     REWARDS_BLACKLIST,
     SETT_INFO,
@@ -30,6 +31,7 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     balances_by_sett = {}
 
     for sett_addr, balances in list(chain_balances.items()):
+        sett_addr = Web3.toChecksumAddress(sett_addr)
         sett_balances = parse_sett_balances(sett_addr, balances)
         token = make_contract(sett_addr, abi_name="ERC20", chain=chain)
         console.log(f"Fetched {len(balances)} balances for sett {token.name().call()}")
@@ -66,11 +68,11 @@ def parse_sett_balances(
     else:
         addresses_to_blacklist = REWARDS_BLACKLIST
 
-    for addr, balance in list(balances.items()):
-        addr = Web3.toChecksumAddress(addr)
-        if addr in addresses_to_blacklist:
-            console.log(f"Removing {addresses_to_blacklist[addr]} from balances")
-            del balances[addr.lower()]
+    balances = {
+        addr: bal
+        for addr, bal in balances.items()
+        if addr not in addresses_to_blacklist
+    }
 
     sett_type, sett_ratio = get_sett_info(sett_address)
     console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
@@ -80,8 +82,8 @@ def parse_sett_balances(
 
 def get_sett_info(sett_address: str) -> Tuple[str, float]:
     info = SETT_INFO.get(
-        env_config.get_web3().toChecksumAddress(sett_address),
-        {"type": "nonNative", "ratio": 1},
+        sett_address,
+        {"type": BalanceType.NonNative, "ratio": 1},
     )
     console.log(sett_address, info)
     return info["type"], info["ratio"]
@@ -93,15 +95,14 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
     native = Counter()
     non_native = Counter()
     for sett, snapshot in total_snapshot.items():
-        sett = env_config.get_web3().toChecksumAddress(sett)
         if sett in [*DISABLED_VAULTS, *PRO_RATA_VAULTS]:
             console.log(f"{sett} is disabled")
             continue
-        usd_snapshot = snapshot.convert_to_usd()
+        usd_snapshot = snapshot.convert_to_usd(chain)
         balances = Counter(usd_snapshot.balances)
-        if usd_snapshot.type == "native":
+        if usd_snapshot.type == BalanceType.Native:
             native = native + balances
-        elif usd_snapshot.type == "nonNative":
+        elif usd_snapshot.type == BalanceType.NonNative:
             non_native = non_native + balances
 
     return native, non_native
