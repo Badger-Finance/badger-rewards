@@ -34,7 +34,6 @@ def fix_cycle(chain):
         approve_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
     else:
         approve_tree_manager = propose_tree_manager
-
     end_block = last_synced_block(chain)
     start_block = int(tree["endBlock"]) + 1
 
