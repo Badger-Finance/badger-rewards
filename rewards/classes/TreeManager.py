@@ -47,11 +47,11 @@ class TreeManager:
 
     def approve_root(self, rewards) -> Tuple[str, bool]:
         console.log("Approving root")
-        return self.manage_root(rewards, self.badger_tree.approveRoot, "Approve")
+        return self.manage_root(rewards, self.badger_tree.approveRoot, action="Approve")
 
     def propose_root(self, rewards):
         console.log("Proposing root")
-        return self.manage_root(rewards, self.badger_tree.proposeRoot, "Propose")
+        return self.manage_root(rewards, self.badger_tree.proposeRoot, action="Propose")
 
     def manage_root(self, rewards, contract_function: ContractFunction, action: str):
         root_hash = rewards["rootHash"]
