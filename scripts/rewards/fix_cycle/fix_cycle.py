@@ -21,23 +21,11 @@ def fix_cycle(chain):
         kube=env_config.kube,
     )
     
-    propose_tree_manager = TreeManager(cycle_key)
-    if chain == Network.Ethereum:
-        key_decrypt_password = get_secret(
-            config("DECRYPT_PASSWORD_ARN"),
-            config("DECRYPT_PASSWORD_KEY"),
-            region_name="us-west-2",
-        )
-        with open(config("KEYFILE")) as key_file:
-            key_file_json = json.load(key_file)
-        cycle_key = Account.decrypt(key_file_json, key_decrypt_password)
-        approve_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
-    else:
-        approve_tree_manager = propose_tree_manager
-
+    tree_manager = TreeManager(cycle_key)
+    
     end_block = last_synced_block(chain)
     start_block = int(tree["endBlock"]) + 1
 
-    propose_root(chain, start_block, end_block, tree, propose_tree_manager)
+    propose_root(chain, start_block, end_block, tree, tree_manager)
     time.sleep(10)
-    approve_root(chain, start_block, end_block, tree, approve_tree_manager)
+    approve_root(chain, start_block, end_block, tree, tree_manager)
