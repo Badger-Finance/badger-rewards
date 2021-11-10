@@ -71,7 +71,7 @@ class TreeManager:
             tx_hash = self.build_function_and_send(self.approve_account, func=root_func)
             # Wait 5 seconds before confirming a transaction to make sure the node can see the tx receipt
             time.sleep(5)
-            tx_receipt, msg = confirm_transaction(
+            success, msg = confirm_transaction(
                 self.w3,
                 tx_hash,
             )
@@ -80,8 +80,8 @@ class TreeManager:
             description = f"Calculated rewards between {start_block} and {end_block} \n\n {approve_info} "
             console.log(f"Cycle {action.lower()} : {tx_hash}")
 
-            if tx_receipt:
-                gas_price_of_tx = get_gas_price_of_tx(self.w3, self.chain, tx_receipt)
+            if success:
+                gas_price_of_tx = get_gas_price_of_tx(self.w3, self.chain, tx_hash)
                 console.log(f"got gas price of tx: {gas_price_of_tx}")
                 send_message_to_discord(
                     title,

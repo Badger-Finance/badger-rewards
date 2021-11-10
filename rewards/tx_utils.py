@@ -173,8 +173,8 @@ def confirm_transaction(
         return True, msg
     except exceptions.TimeExhausted:
         msg = f"Transaction {tx_hash} timed out, not included in block yet."
-        return None, msg
+        return False, msg
     except Exception as e:
         msg = f"Error waiting for {tx_hash}. Error: {e}."
         logger.error(msg)
-        return None, msg
+        return False, msg
