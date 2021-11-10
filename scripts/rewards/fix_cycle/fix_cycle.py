@@ -20,7 +20,7 @@ def fix_cycle(chain):
         assume_role_arn="arn:aws:iam::747584148381:role/cycle20210908001427790200000001",
         kube=env_config.kube,
     )
-    
+
     propose_tree_manager = TreeManager(cycle_key)
     if chain == Network.Ethereum:
         key_decrypt_password = get_secret(
