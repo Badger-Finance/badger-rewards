@@ -17,7 +17,7 @@ def download_latest_tree(chain: str):
     if chain == Network.Ethereum:
         key = "badger-tree.json"
     else:
-        key = f"badger-tree-{chain}.json"
+        key = f"badger-tree-{env_config.get_web3(chain).eth.chain_id}.json"
 
     target = {
         "bucket": get_bucket(env_config.production),

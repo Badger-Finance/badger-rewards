@@ -2,7 +2,7 @@ from helpers.enums import Network
 from rewards.aws.trees import download_latest_tree
 from rewards.classes.TreeManager import TreeManager
 from rewards.aws.helpers import get_secret
-from config.env_config import env_config
+from config.singletons import env_config
 from eth_account import Account
 from rewards.calc_rewards import approve_root, propose_root
 import time
