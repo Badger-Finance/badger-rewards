@@ -115,7 +115,6 @@ def get_priority_fee(
 
 
 def get_transaction(
-
     web3: Web3,
     tx_hash: HexBytes,
     timeout: int,
