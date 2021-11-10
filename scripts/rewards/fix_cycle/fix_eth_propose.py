@@ -23,4 +23,4 @@ if __name__ == "__main__":
     end_block = last_synced_block(chain)
     start_block = int(tree["endBlock"]) + 1
 
-    approve_root(chain, start_block, end_block, tree, propose_tree_manager)
+    propose_root(chain, start_block, end_block, tree, propose_tree_manager)
