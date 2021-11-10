@@ -5,6 +5,7 @@ import json
 from typing import Dict
 from rewards.aws.helpers import s3
 from helpers.enums import Network
+from helpers.constants import CHAIN_IDS
 
 console = Console()
 
@@ -17,7 +18,7 @@ def download_latest_tree(chain: str):
     if chain == Network.Ethereum:
         key = "badger-tree.json"
     else:
-        key = f"badger-tree-{env_config.get_web3(chain).eth.chain_id}.json"
+        key = f"badger-tree-{CHAIN_IDS[chain]}.json"
 
     target = {
         "bucket": get_bucket(env_config.production),
