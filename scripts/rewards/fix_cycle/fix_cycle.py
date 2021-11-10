@@ -21,7 +21,7 @@ def fix_cycle(chain):
         kube=env_config.kube,
     )
     
-    tree_manager = TreeManager(cycle_key)
+    tree_manager = TreeManager(chain, Account.from_key(cycle_key))
     
     end_block = last_synced_block(chain)
     start_block = int(tree["endBlock"]) + 1
