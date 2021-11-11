@@ -36,7 +36,7 @@ class RewardsList:
 
         if token in self.totals:
             self.totals[token] -= to_decrease
-            if self.totals[token] == 0:
+            if self.totals[token] == 0 and self.totals[Web3.toChecksumAddress(token)] > 0:
                 del self.totals[token]
         
     def increase_user_rewards(self, user, token, toAdd):
