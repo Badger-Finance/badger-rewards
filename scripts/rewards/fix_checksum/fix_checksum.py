@@ -35,6 +35,7 @@ def fix_checksum(chain):
     tree_manager = TreeManager(chain, Account.from_key(cycle_key))
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
+    rewards.cycle += 1
                 
     fixed_tree = tree_manager.convert_to_merkle_tree(rewards, start_block, end_block)
     
