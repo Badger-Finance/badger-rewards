@@ -165,7 +165,6 @@ EMISSIONS_BLACKLIST = {
 REWARDS_BLACKLIST = {
     CREAM_BBADGER: "Cream bBadger",
     SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
-    ETH_BADGER_TREE: "Badger Tree",
     BADGER_VAULT: "Badger Vault",
     IBBTC_PEAK: "IBBTC Peak",
     IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
