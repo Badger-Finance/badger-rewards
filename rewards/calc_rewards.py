@@ -1,12 +1,10 @@
 from rewards.aws.trees import upload_tree
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager
-from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
-from rewards.rewards_utils import combine_rewards
+from rewards.rewards_utils import combine_rewards, process_cumulative_rewards
 from rewards.rewards_checker import verify_rewards
 from rewards.aws.boost import add_multipliers, download_boosts
-from rewards.aws.helpers import get_secret
 from rewards.classes.CycleLogger import cycle_logger
 from helpers.web3_utils import make_contract
 from helpers.constants import (
@@ -84,29 +82,6 @@ def fetch_setts(chain: str) -> List[str]:
     setts = list_setts(chain)
     return list(filter(lambda x: x not in DISABLED_VAULTS, setts))
 
-
-def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
-    """Combine past rewards with new rewards
-
-    :param current: current rewards
-    :param new: new rewards
-    """
-    result = RewardsList(new.cycle)
-
-    # Add new rewards
-    for user, claims in new.claims.items():
-        for token, claim in claims.items():
-            result.increase_user_rewards(user, token, claim)
-
-    # Add existing rewards
-    for user, user_data in current["claims"].items():
-        for i in range(len(user_data["tokens"])):
-            token = user_data["tokens"][i]
-            amount = user_data["cumulativeAmounts"][i]
-            result.increase_user_rewards(user, token, int(amount))
-
-    # result.printState()
-    return result
 
 
 def propose_root(
