@@ -25,4 +25,8 @@ spec:
                 value: 'STG'
               - name: KUBE
                 value: 'True'
+            resources:
+              requests:
+                memory: "2000m"
+                cpu: "500m"
           restartPolicy: OnFailure

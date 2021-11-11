@@ -1,30 +1,32 @@
-from rewards.snapshot.claims_snapshot import claims_snapshot
-from rewards.classes.Snapshot import Snapshot
-from helpers.constants import (
-    BCVX,
-    BCVXCRV,
-    PRO_RATA_VAULTS,
-    XSUSHI,
-    EMISSIONS_CONTRACTS,
-    DIGG,
-)
-from rewards.explorer import get_block_by_timestamp
+from typing import Dict
+from typing import List
+from typing import Tuple
+
+from rich.console import Console
+
+from config.singletons import env_config
+from helpers.constants import BCVX
+from helpers.constants import BCVXCRV
+from helpers.constants import DIGG
+from helpers.constants import EMISSIONS_CONTRACTS
+from helpers.constants import PRO_RATA_VAULTS
+from helpers.constants import XSUSHI
+from helpers.digg_utils import digg_utils
+from helpers.enums import BalanceType
+from helpers.enums import Network
+from helpers.time_utils import to_hours
+from helpers.time_utils import to_utc_date
 from helpers.web3_utils import make_contract
-from rewards.rewards_utils import combine_rewards
-from rewards.snapshot.chain_snapshot import sett_snapshot
-from subgraph.queries.harvests import (
-    fetch_sushi_harvest_events,
-    fetch_tree_distributions,
-)
+from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
-from rewards.classes.CycleLogger import cycle_logger
-from helpers.time_utils import to_utc_date, to_hours
-from helpers.digg_utils import digg_utils
-from helpers.enums import BalanceType, Network
-from config.singletons import env_config
-from rich.console import Console
-from typing import List, Tuple, Dict
+from rewards.classes.Snapshot import Snapshot
+from rewards.explorer import get_block_by_timestamp
+from rewards.rewards_utils import combine_rewards
+from rewards.snapshot.chain_snapshot import sett_snapshot
+from rewards.snapshot.claims_snapshot import claims_snapshot
+from subgraph.queries.harvests import fetch_sushi_harvest_events
+from subgraph.queries.harvests import fetch_tree_distributions
 
 console = Console()
 
@@ -44,13 +46,13 @@ class RewardsManager:
     ) -> Snapshot:
         return sett_snapshot(self.chain, block, sett, blacklist)
 
-    def bcvx_claims_snapshot(self):
-        bcvx = claims_snapshot()[BCVX]
+    def bcvx_claims_snapshot(self) -> Snapshot:
+        bcvx = claims_snapshot(self.chain)[BCVX]
         console.log(bcvx)
         return bcvx
 
-    def bcvxcrv_claims_snapshot(self):
-        bcvxcrv = claims_snapshot()[BCVXCRV]
+    def bcvxcrv_claims_snapshot(self) -> Snapshot:
+        bcvxcrv = claims_snapshot(self.chain)[BCVXCRV]
         console.log(bcvxcrv)
         return bcvxcrv
 
