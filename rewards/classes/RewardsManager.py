@@ -1,4 +1,4 @@
-from rewards.emission_handlers import tree_handler
+from rewards.emission_handlers import eth_tree_handler
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import (
@@ -44,16 +44,6 @@ class RewardsManager:
     ) -> Snapshot:
         return sett_snapshot(self.chain, block, sett, blacklist)
 
-    def bcvx_claims_snapshot(self):
-        bcvx = claims_snapshot()[BCVX]
-        console.log(bcvx)
-        return bcvx
-
-    def bcvxcrv_claims_snapshot(self):
-        bcvxcrv = claims_snapshot()[BCVXCRV]
-        console.log(bcvxcrv)
-        return bcvxcrv
-
     def get_sett_from_strategy(self, strat: str) -> str:
         """Go from strategy -> want -> controller -> want -> sett
 
@@ -79,7 +69,7 @@ class RewardsManager:
         boosted_rewards_list = []
         
         custom_behaviour = {
-            EMISSIONS_CONTRACTS[Network.Ethereum]["BadgerTree"]: tree_handler
+            EMISSIONS_CONTRACTS[Network.Ethereum]["BadgerTree"]: eth_tree_handler
         }
         
         """
