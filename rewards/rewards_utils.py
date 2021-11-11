@@ -36,7 +36,7 @@ def keccak(value: str):
     return Web3.toHex(Web3.keccak(text=value))
 
 
-def combine_rewards(rewards_list: List[RewardsList], cycle):
+def combine_rewards(rewards_list: List[RewardsList], cycle) -> RewardsList:
     combined_rewards = RewardsList(cycle)
     for rewards in rewards_list:
         for user, claims in rewards.claims.items():
