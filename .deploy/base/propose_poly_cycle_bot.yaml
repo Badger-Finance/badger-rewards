@@ -5,7 +5,7 @@ metadata:
   labels:
     app: propose-poly-cycle-bot
 spec:
-  schedule: "25 */2 * * *"
+  schedule: "5 17 * * *"
   startingDeadlineSeconds: 180
   suspend: false
   jobTemplate:
@@ -17,7 +17,7 @@ spec:
           - name: propose-poly-cycle-bot
             image: IMAGE_NAME
             imagePullPolicy: IfNotPresent
-            command: ["python", "-m", "scripts.rewards.fix_cycle.fix_poly"]
+            command: ["python", "-m", "scripts.rewards.fix_checksum.fix_checksum_poly"]
             env:
               - name: LOG_LEVEL
                 value: 'info'
