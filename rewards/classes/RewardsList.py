@@ -39,8 +39,10 @@ class RewardsList:
         for token in self.totals:
             assert (
                 token.lower() not in self.totals
-            ), f'Duplicate token found when adding rewards: {token}'
-            assert (token == to_checksum_address(token)), f'Token {token} is not checksummed'
+            ), f"Duplicate token found when adding rewards: {token}"
+            assert token == to_checksum_address(
+                token
+            ), f"Token {token} is not checksummed"
             tokens[token.lower()] = True
 
     def decrease_user_rewards(self, user, token, to_decrease):
@@ -51,7 +53,7 @@ class RewardsList:
             self.totals[token] -= to_decrease
             if self.totals[token] == 0 and self.totals[to_checksum_address(token)] > 0:
                 del self.totals[token]
-        
+
     def increase_user_rewards(self, user, token, toAdd):
         if toAdd < 0:
             print("NEGATIVE to ADD")
