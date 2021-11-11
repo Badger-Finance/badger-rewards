@@ -149,6 +149,7 @@ class RewardsManager:
         """
         Distribute a certain amount of rewards to a snapshot of users
         """
+        console.log(amount, token)
         rewards = RewardsList(self.cycle)
         total = snapshot.total_balance()
         if total == 0:

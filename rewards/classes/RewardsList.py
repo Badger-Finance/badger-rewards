@@ -2,6 +2,7 @@ from dotmap import DotMap
 from rich.console import Console
 from eth_utils.hexadecimal import encode_hex
 from eth_abi import encode_abi
+from web3 import Web3
 
 console = Console()
 
@@ -29,6 +30,15 @@ class RewardsList:
             self.sourceMetadata[source][user][metadata] = DotMap()
         self.sourceMetadata[source][user][metadata] = metadata
 
+    def decrease_user_rewards(self, user, token, to_decrease):
+        if user in self.claims and token in self.claims[user]:
+            self.claims[user][token] -= to_decrease
+
+        if token in self.totals:
+            self.totals[token] -= to_decrease
+            if self.totals[token] == 0 and self.totals[Web3.toChecksumAddress(token)] > 0:
+                del self.totals[token]
+        
     def increase_user_rewards(self, user, token, toAdd):
         if toAdd < 0:
             print("NEGATIVE to ADD")
@@ -73,9 +83,10 @@ class RewardsList:
         }
         intAmounts = []
         for tokenAddress, cumulativeAmount in userData.items():
-            nodeEntry["tokens"].append(tokenAddress)
-            nodeEntry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
-            intAmounts.append(int(cumulativeAmount))
+            if cumulativeAmount > 0:
+                nodeEntry["tokens"].append(tokenAddress)
+                nodeEntry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
+                intAmounts.append(int(cumulativeAmount))
 
         # console.print(
         #     "Encoding Node entry...",
