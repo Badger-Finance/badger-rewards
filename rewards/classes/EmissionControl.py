@@ -10,7 +10,8 @@ class EmissionControl:
         )
         
     def get_token_weight(self, token):
-        return self.contract.tokenWeight.call(token) / 1e4
-    
+        token_weight = self.contract.tokenWeight.call(token) / 1e4
+        return 1 if token_weight == 0 else token_weight
+        
     def get_flat_emission_rate(self, sett):
         return self.contract.proRataEmissionRate.call(sett) / 1e4

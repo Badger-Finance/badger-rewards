@@ -1,3 +1,4 @@
+from rewards.classes.EmissionControl import EmissionControl
 from rewards.emission_handlers import eth_tree_handler
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.classes.Snapshot import Snapshot
@@ -33,6 +34,7 @@ class RewardsManager:
     def __init__(self, chain: str, cycle: int, start: int, end: int, boosts):
         self.chain = chain
         self.web3 = env_config.get_web3(chain)
+        self.emission_control = EmissionControl(self.chain)
         self.cycle = cycle
         self.start = int(start)
         self.end = int(end)
@@ -88,7 +90,7 @@ class RewardsManager:
                 token, start_time, schedules, sett
             )
             token_distribution = int(end_dist) - int(start_dist)
-            emissions_rate = FLAT_EMISSIONS_RATE.get(sett, 0)
+            emissions_rate = self.emission_control.get_flat_emission_rate(sett)
             flat_emissions = token_distribution * emissions_rate
             boosted_emissions = token_distribution * (1 - emissions_rate)
             if flat_emissions > 0:
