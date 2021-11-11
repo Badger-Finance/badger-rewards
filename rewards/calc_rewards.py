@@ -83,7 +83,6 @@ def fetch_setts(chain: str) -> List[str]:
     return list(filter(lambda x: x not in DISABLED_VAULTS, setts))
 
 
-
 def propose_root(
     chain: str,
     start: int,
