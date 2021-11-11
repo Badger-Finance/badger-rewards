@@ -36,9 +36,10 @@ class RewardsList:
         """
         tokens = {}
         for token in self.totals:
-            assert token.lower() not in self.totals, "Duplicate token found when adding rewards"
+            assert (
+                token.lower() not in self.totals
+            ), "Duplicate token found when adding rewards"
             tokens[token.lower()] = True
-        
 
     def increase_user_rewards(self, user, token, toAdd):
         if toAdd < 0:
@@ -48,7 +49,7 @@ class RewardsList:
         """
         If user has rewards, increase. If not, set their rewards to this initial value
         """
-        # TODO: Update these to checksum at source rather than in this function        
+        # TODO: Update these to checksum at source rather than in this function
         user = to_checksum_address(user)
         token = to_checksum_address(token)
         if user in self.claims and token in self.claims[user]:
@@ -60,7 +61,7 @@ class RewardsList:
             self.totals[token] += toAdd
         else:
             self.totals[token] = toAdd
-        
+
         self.user_rewards_sanity_check()
 
     def hasToken(self, token):
