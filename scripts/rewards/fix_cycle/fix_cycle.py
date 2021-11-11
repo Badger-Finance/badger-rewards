@@ -20,9 +20,9 @@ def fix_cycle(chain):
         assume_role_arn="arn:aws:iam::747584148381:role/cycle20210908001427790200000001",
         kube=env_config.kube,
     )
-    
+
     tree_manager = TreeManager(chain, Account.from_key(cycle_key))
-    
+
     end_block = last_synced_block(chain)
     start_block = int(tree["endBlock"]) + 1
 

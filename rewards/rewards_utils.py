@@ -43,6 +43,7 @@ def combine_rewards(rewards_list: List[RewardsList], cycle):
                 combined_rewards.increase_user_rewards(user, token, claim)
     return combined_rewards
 
+
 def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
     """Combine past rewards with new rewards
 
