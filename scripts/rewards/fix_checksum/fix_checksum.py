@@ -39,11 +39,8 @@ def fix_checksum(chain):
     fixed_tree = tree_manager.convert_to_merkle_tree(rewards, start_block, end_block)
     
     for token, total_amount in fixed_tree["tokenTotals"].items():
-        if token.islower():
-            continue
         print(total_amount)
-        print(tree["tokenTotals"][token])
-        print(tree["tokenTotals"].get(token.lower(), 0))
+        print(tree["tokenTotals"][token] + tree["tokenTotals"].get(token.lower(), 0))
         assert total_amount == tree["tokenTotals"][token] + tree["tokenTotals"].get(token.lower(), 0) 
     
     root_hash = Web3.keccak(text=fixed_tree["merkleRoot"])
