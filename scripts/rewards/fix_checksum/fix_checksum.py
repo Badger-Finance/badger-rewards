@@ -53,23 +53,23 @@ def fix_checksum(chain):
         "multiplierData": {},
         "userMultipliers": {},
     }
-    with open("t.json", "w") as fp:
+    with open("fixed.json", "w") as fp:
         json.dump(fixed_tree, fp)
-    #
-    #tx_hash, success = tree_manager.propose_root(
-    #   rewards
-    #)
-    #if success:
-    #    tx_hash2, approve_success = tree_manager.approve_root(
-    #        rewards
-    #    )
-    #    if approve_success:
-    #        upload_tree(
-    #            rewards["fileName"],
-    #            rewards["merkleTree"],
-    #            chain,
-    #            staging=env_config.test or env_config.staging,
-    #        )
+    
+    tx_hash, success = tree_manager.propose_root(
+       rewards
+    )
+    if success:
+        tx_hash2, approve_success = tree_manager.approve_root(
+            rewards
+        )
+        if approve_success:
+            upload_tree(
+                rewards["fileName"],
+                rewards["merkleTree"],
+                chain,
+                staging=env_config.test or env_config.staging,
+            )
 
             
 
