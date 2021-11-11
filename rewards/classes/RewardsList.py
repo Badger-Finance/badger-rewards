@@ -2,6 +2,8 @@ from dotmap import DotMap
 from rich.console import Console
 from eth_utils.hexadecimal import encode_hex
 from eth_abi import encode_abi
+from eth_utils.address import to_checksum_address
+
 
 console = Console()
 
@@ -29,6 +31,29 @@ class RewardsList:
             self.sourceMetadata[source][user][metadata] = DotMap()
         self.sourceMetadata[source][user][metadata] = metadata
 
+    def user_rewards_sanity_check(self):
+        """
+        Check to make sure that no duplicate tokens have been added
+        """
+        tokens = {}
+        for token in self.totals:
+            assert (
+                token.lower() not in self.totals
+            ), f"Duplicate token found when adding rewards: {token}"
+            assert token == to_checksum_address(
+                token
+            ), f"Token {token} is not checksummed"
+            tokens[token.lower()] = True
+
+    def decrease_user_rewards(self, user, token, to_decrease):
+        if user in self.claims and token in self.claims[user]:
+            self.claims[user][token] -= to_decrease
+
+        if token in self.totals:
+            self.totals[token] -= to_decrease
+            if self.totals[token] == 0 and self.totals[to_checksum_address(token)] > 0:
+                del self.totals[token]
+
     def increase_user_rewards(self, user, token, toAdd):
         if toAdd < 0:
             print("NEGATIVE to ADD")
@@ -37,6 +62,9 @@ class RewardsList:
         """
         If user has rewards, increase. If not, set their rewards to this initial value
         """
+        # TODO: Update these to checksum at source rather than in this function
+        user = to_checksum_address(user)
+        token = to_checksum_address(token)
         if user in self.claims and token in self.claims[user]:
             self.claims[user][token] += toAdd
         else:
@@ -46,6 +74,8 @@ class RewardsList:
             self.totals[token] += toAdd
         else:
             self.totals[token] = toAdd
+
+        self.user_rewards_sanity_check()
 
     def hasToken(self, token):
         if self.tokens[token]:
@@ -73,9 +103,10 @@ class RewardsList:
         }
         intAmounts = []
         for tokenAddress, cumulativeAmount in userData.items():
-            nodeEntry["tokens"].append(tokenAddress)
-            nodeEntry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
-            intAmounts.append(int(cumulativeAmount))
+            if cumulativeAmount > 0:
+                nodeEntry["tokens"].append(tokenAddress)
+                nodeEntry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
+                intAmounts.append(int(cumulativeAmount))
 
         # console.print(
         #     "Encoding Node entry...",
