@@ -11,6 +11,7 @@ from subgraph.queries.setts import last_synced_block
 from decouple import config
 from eth_account import Account
 from web3 import Web3
+import json
 from eth_utils.hexadecimal import encode_hex
 
 def fix_checksum(chain):
@@ -25,11 +26,11 @@ def fix_checksum(chain):
     rewards = merkle_tree_to_rewards_list(tree)
     tokens = list(tree["tokenTotals"].keys())
     tokens_to_fix = [t for t in tokens if t.islower()] 
-    for user, claims in rewards.claims():
-        for token, amount in claims.items():
+    for user, claims in rewards.claims.items():
+        for token, amount in list(claims.items()):
             if token in tokens_to_fix:
                 rewards.decrease_user_rewards(user, token, amount)
-                rewards.increase_user_rewards(user, Web3.toChecksum(token), amount)
+                rewards.increase_user_rewards(user, Web3.toChecksumAddress(token), amount)
                 
     tree_manager = TreeManager(chain, Account.from_key(cycle_key))
     start_block = int(tree["endBlock"]) + 1
@@ -38,6 +39,11 @@ def fix_checksum(chain):
     fixed_tree = tree_manager.convert_to_merkle_tree(rewards, start_block, end_block)
     
     for token, total_amount in fixed_tree["tokenTotals"].items():
+        if token.islower():
+            continue
+        print(total_amount)
+        print(tree["tokenTotals"][token])
+        print(tree["tokenTotals"].get(token.lower(), 0))
         assert total_amount == tree["tokenTotals"][token] + tree["tokenTotals"].get(token.lower(), 0) 
     
     root_hash = Web3.keccak(text=fixed_tree["merkleRoot"])
@@ -50,20 +56,23 @@ def fix_checksum(chain):
         "multiplierData": {},
         "userMultipliers": {},
     }
-    tx_hash, success = tree_manager.propose_root(
-       rewards
-    )
-    if success:
-        tx_hash2, approve_success = tree_manager.approve_root(
-            rewards
-        )
-        if approve_success:
-            upload_tree(
-                rewards["fileName"],
-                rewards["merkleTree"],
-                chain,
-                staging=env_config.test or env_config.staging,
-            )
+    with open("t.json", "w") as fp:
+        json.dump(fixed_tree, fp)
+    #
+    #tx_hash, success = tree_manager.propose_root(
+    #   rewards
+    #)
+    #if success:
+    #    tx_hash2, approve_success = tree_manager.approve_root(
+    #        rewards
+    #    )
+    #    if approve_success:
+    #        upload_tree(
+    #            rewards["fileName"],
+    #            rewards["merkleTree"],
+    #            chain,
+    #            staging=env_config.test or env_config.staging,
+    #        )
 
             
 

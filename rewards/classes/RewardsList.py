@@ -33,13 +33,11 @@ class RewardsList:
     def decrease_user_rewards(self, user, token, to_decrease):
         if user in self.claims and token in self.claims[user]:
             self.claims[user][token] -= to_decrease
-        else:
-            self.claims[user][token] = 0
 
         if token in self.totals:
             self.totals[token] -= to_decrease
-        else:
-            self.totals[token] = 0
+            if self.totals[token] == 0:
+                del self.totals[token]
         
     def increase_user_rewards(self, user, token, toAdd):
         if toAdd < 0:
@@ -85,9 +83,10 @@ class RewardsList:
         }
         intAmounts = []
         for tokenAddress, cumulativeAmount in userData.items():
-            nodeEntry["tokens"].append(tokenAddress)
-            nodeEntry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
-            intAmounts.append(int(cumulativeAmount))
+            if cumulativeAmount > 0:
+                nodeEntry["tokens"].append(tokenAddress)
+                nodeEntry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
+                intAmounts.append(int(cumulativeAmount))
 
         # console.print(
         #     "Encoding Node entry...",

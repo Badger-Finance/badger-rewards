@@ -74,6 +74,7 @@ def rewards_to_merkle_tree(rewards: RewardsList, startBlock, endBlock):
         },
     """
     tree = MerkleTree(encodedNodes)
+    
     distribution = {
         "merkleRoot": encode_hex(tree.root),
         "cycle": nodes[0]["cycle"],
