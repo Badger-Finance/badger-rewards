@@ -36,6 +36,10 @@ def fix_checksum(chain):
     end_block = start_block
                 
     fixed_tree = tree_manager.convert_to_merkle_tree(rewards, start_block, end_block)
+    
+    for token, total_amount in fixed_tree["tokenTotals"].items():
+        assert total_amount == tree["tokenTotals"][token] + tree["tokenTotals"].get(token.lower(), 0) 
+    
     root_hash = Web3.keccak(text=fixed_tree["merkleRoot"])
     chain_id = CHAIN_IDS[chain]
     file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
