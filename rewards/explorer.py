@@ -1,7 +1,10 @@
-import requests
-from config.singletons import env_config
-from typing import Dict
 import time
+from typing import Dict
+from typing import Optional
+
+import requests
+
+from config.singletons import env_config
 from helpers.enums import Network
 
 urls = {
@@ -11,7 +14,7 @@ urls = {
 }
 
 
-def fetch_block_by_timestamp(chain: str, timestamp: int):
+def fetch_block_by_timestamp(chain: str, timestamp: int) -> Optional[Dict]:
     chain_url = f"https://api.{urls[chain]}"
     url = (
         f"api?module=block&action=getblocknobytime&timestamp={timestamp}&closest=before"

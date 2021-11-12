@@ -131,13 +131,15 @@ def propose_root(
 
 
 def approve_root(
-    chain: str, start: int, end: int, current_rewards, tree_manager: TreeManager
+    chain: str, start: int, end: int, current_rewards: Dict, tree_manager: TreeManager
 ):
     """Approve latest root on a chain
 
     :param chain: chain to approve root
     :param start: start block for rewards
     :param end: end block for rewards
+    :param current_rewards: past rewards merkle tree
+    :param tree_manager: TreeManager object
     """
     cycle_logger.set_start_block(start)
     cycle_logger.set_end_block(end)
@@ -192,7 +194,7 @@ def approve_root(
 
 
 def generate_rewards_in_range(
-    chain: str, start: int, end: int, save: bool, past_tree, tree_manager: TreeManager
+    chain: str, start: int, end: int, save: bool, past_tree: Dict, tree_manager: TreeManager
 ):
     """Generate chain rewards for a chain within two blocks
 
@@ -200,6 +202,8 @@ def generate_rewards_in_range(
     :param start: start block for rewards
     :param end: end block for rewards
     :param save: flag to save file locally
+    :param past_tree: past rewards merkle tree
+    :param tree_manager: TreeManager object
     """
     all_schedules, setts = fetch_all_schedules(chain, fetch_setts(chain))
 
