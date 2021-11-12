@@ -1,4 +1,4 @@
-import requests
+from config.singletons import http
 from badger_api.config import get_api_base_path
 from helpers.constants import BOOST_CHAINS
 from typing import Tuple, Dict, List
@@ -12,9 +12,10 @@ def fetch_ppfs() -> Tuple[float, float]:
     """
     Fetch ppfs for bbadger and bdigg
     """
-    response = requests.get(f"{badger_api}/setts").json()
-    badger = [s for s in response if s["asset"] == "BADGER"][0]
-    digg = [s for s in response if s["asset"] == "DIGG"][0]
+    response = http.get(f"{badger_api}/setts")
+    json = response.json()
+    badger = [s for s in json if s["asset"] == "BADGER"][0]
+    digg = [s for s in json if s["asset"] == "DIGG"][0]
     return badger["ppfs"], digg["ppfs"]
 
 
@@ -26,7 +27,8 @@ def fetch_token_prices() -> Dict[str, float]:
     chains = BOOST_CHAINS
     prices = {}
     for chain in chains:
-        chain_prices = requests.get(f"{badger_api}/prices?chain={chain}").json()
+        response = http.get(f"{badger_api}/prices?chain={chain}")
+        chain_prices = response.json()
         prices = {**prices, **chain_prices}
 
     return prices
@@ -37,10 +39,10 @@ def fetch_claimable(page: int, chain: str):
     Fetch claimable data from account data
     :param page: page to fetch data from
     """
-    data = requests.get(
+    response = http.get(
         f"{badger_api}/accounts/allClaimable?page={page}&chain={chain}"
-    ).json()
-    return data
+    )
+    return response.json()
 
 
 def fetch_total_claimable_pages(chain: str) -> int:
