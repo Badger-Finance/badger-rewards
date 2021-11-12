@@ -94,7 +94,9 @@ class RewardsList:
         else:
             return 0
 
-    def to_node_entry(self, user, user_data, cycle, index) -> Tuple[Dict[str, Any], str]:
+    def to_node_entry(
+        self, user, user_data, cycle, index
+    ) -> Tuple[Dict[str, Any], str]:
         """
         Use abi.encode() to encode data into the hex format used as raw node information in the tree
         This is the value that will be hashed to form the rest of the tree

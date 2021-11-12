@@ -194,7 +194,12 @@ def approve_root(
 
 
 def generate_rewards_in_range(
-    chain: str, start: int, end: int, save: bool, past_tree: Dict, tree_manager: TreeManager
+    chain: str,
+    start: int,
+    end: int,
+    save: bool,
+    past_tree: Dict,
+    tree_manager: TreeManager,
 ):
     """Generate chain rewards for a chain within two blocks
 

@@ -9,7 +9,9 @@ from helpers.enums import Network
 console = Console()
 
 
-def get_last_proposed_cycle(chain: str, tree_manager: TreeManager) -> Tuple[Dict, int, int]:
+def get_last_proposed_cycle(
+    chain: str, tree_manager: TreeManager
+) -> Tuple[Dict, int, int]:
     if not tree_manager.has_pending_root():
         console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
         return {}, 0, 0
@@ -32,7 +34,9 @@ def get_last_proposed_cycle(chain: str, tree_manager: TreeManager) -> Tuple[Dict
     return current_rewards, last_claim_start, last_claim_end
 
 
-def calc_next_cycle_range(chain: str, tree_manager: TreeManager) -> Tuple[Dict, int, int]:
+def calc_next_cycle_range(
+    chain: str, tree_manager: TreeManager
+) -> Tuple[Dict, int, int]:
     # Fetch the appropriate file
     current_rewards = tree_manager.fetch_current_tree()
 

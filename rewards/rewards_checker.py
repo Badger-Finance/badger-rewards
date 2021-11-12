@@ -43,7 +43,8 @@ def val(amount, decimals=18):
 
 
 def token_diff_table(
-        name: str, before: float, after: float, decimals: Optional[int] = 18) -> Tuple[float, str]:
+    name: str, before: float, after: float, decimals: Optional[int] = 18
+) -> Tuple[float, str]:
     diff = after - before
     console.print(f"Diff for {name} \n")
     table = []

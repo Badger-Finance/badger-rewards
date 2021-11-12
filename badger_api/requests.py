@@ -39,9 +39,7 @@ def fetch_claimable(page: int, chain: str):
     Fetch claimable data from account data
     :param page: page to fetch data from
     """
-    response = http.get(
-        f"{badger_api}/accounts/allClaimable?page={page}&chain={chain}"
-    )
+    response = http.get(f"{badger_api}/accounts/allClaimable?page={page}&chain={chain}")
     return response.json()
 
 
