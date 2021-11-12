@@ -79,10 +79,10 @@ class RewardsManager:
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(
-                token, end_time, schedules, sett
+                token, end_time, schedules
             )
             start_dist = self.get_distributed_for_token_at(
-                token, start_time, schedules, sett
+                token, start_time, schedules
             )
             token_distribution = int(end_dist) - int(start_dist)
             emissions_rate = get_flat_emission_rate(sett, self.chain)
@@ -149,7 +149,7 @@ class RewardsManager:
         return user_multipliers
 
     def get_distributed_for_token_at(
-        self, token: str, end_time: int, schedules: List[Schedule], sett: str
+        self, token: str, end_time: int, schedules: List[Schedule]
     ) -> float:
         total_to_distribute = 0
         for index, schedule in enumerate(schedules):
