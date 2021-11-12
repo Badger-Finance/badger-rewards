@@ -1,9 +1,35 @@
+import json
+from typing import Dict
+from typing import List
+from typing import Tuple
+
+from eth_utils.hexadecimal import encode_hex
+from hexbytes import HexBytes
+from rich.console import Console
+from web3 import Web3
+
+from config.rewards_config import rewards_config
+from config.singletons import env_config
+from helpers.constants import DISABLED_VAULTS
+from helpers.constants import EMISSIONS_CONTRACTS
+from helpers.discord import get_discord_url
+from helpers.discord import send_message_to_discord
+from helpers.enums import BotType
+from helpers.enums import Network
+from helpers.web3_utils import make_contract
+from rewards.aws.boost import add_multipliers
+from rewards.aws.boost import download_boosts
 from rewards.aws.trees import upload_tree
+from rewards.classes.CycleLogger import cycle_logger
+from rewards.classes.RewardsList import RewardsList
+from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager
 from rewards.classes.Schedule import Schedule
+from rewards.classes.TreeManager import TreeManager
 from rewards.rewards_utils import combine_rewards, process_cumulative_rewards
 from rewards.rewards_checker import verify_rewards
+from rewards.rewards_utils import combine_rewards
 from rewards.aws.boost import add_multipliers, download_boosts
 from rewards.classes.CycleLogger import cycle_logger
 from helpers.web3_utils import make_contract
@@ -14,14 +40,6 @@ from helpers.constants import (
 from helpers.enums import Network, BotType
 from helpers.discord import get_discord_url, send_message_to_discord
 from subgraph.queries.setts import list_setts
-from rich.console import Console
-from config.singletons import env_config
-from config.rewards_config import rewards_config
-from eth_utils.hexadecimal import encode_hex
-from hexbytes import HexBytes
-from typing import List, Dict
-from web3 import Web3
-import json
 
 console = Console()
 
@@ -39,14 +57,14 @@ def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
     """
     schedules_by_token = {}
     console.log("Fetching schedules...")
-    for s in schedules:
+    for schedule in schedules:
         schedule = Schedule(
-            Web3.toChecksumAddress(s[0]),
-            Web3.toChecksumAddress(s[1]),
-            s[2],
-            s[3],
-            s[4],
-            s[5],
+            Web3.toChecksumAddress(schedule[0]),
+            Web3.toChecksumAddress(schedule[1]),
+            schedule[2],
+            schedule[3],
+            schedule[4],
+            schedule[5],
         )
         if schedule.token not in schedules_by_token:
             schedules_by_token[schedule.token] = []
@@ -54,7 +72,9 @@ def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
     return schedules_by_token
 
 
-def fetch_all_schedules(chain: str, setts: List[str]):
+def fetch_all_schedules(
+    chain: str, setts: List[str]
+) -> Tuple[Dict[str, Dict[str, List[Schedule]]], List[str]]:
     """
     Fetch all schedules on a particular chain
     :param chain: chain to fetch from
@@ -81,6 +101,30 @@ def fetch_setts(chain: str) -> List[str]:
     """
     setts = list_setts(chain)
     return list(filter(lambda x: x not in DISABLED_VAULTS, setts))
+
+
+def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
+    """Combine past rewards with new rewards
+
+    :param current: current rewards
+    :param new: new rewards
+    """
+    result = RewardsList(new.cycle)
+
+    # Add new rewards
+    for user, claims in new.claims.items():
+        for token, claim in claims.items():
+            result.increase_user_rewards(user, token, claim)
+
+    # Add existing rewards
+    for user, user_data in current["claims"].items():
+        for i in range(len(user_data["tokens"])):
+            token = user_data["tokens"][i]
+            amount = user_data["cumulativeAmounts"][i]
+            result.increase_user_rewards(user, token, int(amount))
+
+    # result.printState()
+    return result
 
 
 def propose_root(

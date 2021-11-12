@@ -1,17 +1,18 @@
+import json
+from typing import Optional
+from typing import Tuple
+
+from rich.console import Console
+from tabulate import tabulate
+
+from helpers.constants import TOKENS_TO_CHECK
+from helpers.digg_utils import digg_utils
+from helpers.discord import get_discord_url
+from helpers.discord import send_code_block_to_discord
+from helpers.discord import send_error_to_discord
+from helpers.enums import BotType
 from rewards.classes.TreeManager import TreeManager
 from rewards.snapshot.claims_snapshot import claims_snapshot
-from tabulate import tabulate
-from rich.console import Console
-from config.singletons import env_config
-from helpers.constants import SANITY_TOKEN_AMOUNT, TOKENS_TO_CHECK
-from helpers.discord import (
-    get_discord_url,
-    send_code_block_to_discord,
-    send_error_to_discord,
-)
-from helpers.digg_utils import digg_utils
-from helpers.enums import BotType
-import json
 
 console = Console()
 
@@ -41,7 +42,8 @@ def val(amount, decimals=18):
     return f"{amount / 10 ** decimals:,.18f}"
 
 
-def token_diff_table(name, before, after, decimals=18):
+def token_diff_table(
+        name: str, before: float, after: float, decimals: Optional[int] = 18) -> Tuple[float, str]:
     diff = after - before
     console.print(f"Diff for {name} \n")
     table = []
