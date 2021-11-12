@@ -69,7 +69,6 @@ def badger_boost(current_block: int, chain: str):
         boost_info[user]["stakeRatio"] = ratio
 
     stake_data = {}
-    console.log(STAKE_RATIO_RANGES)
     for addr, stake_ratio in stake_ratios.items():
         if stake_ratio == 0:
             badger_boost[addr] = 1

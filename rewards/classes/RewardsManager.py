@@ -1,17 +1,13 @@
-from rewards.classes.EmissionControl import EmissionControl
 from rewards.emission_handlers import eth_tree_handler
-from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import (
-    BCVX,
-    BCVXCRV,
     EMISSIONS_CONTRACTS,
-    FLAT_EMISSIONS_RATE,
     PRO_RATA_VAULTS,
     XSUSHI,
 )
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
+from rewards.utils.emisson_utils import get_flat_emission_rate
 from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from subgraph.queries.harvests import (
@@ -34,7 +30,6 @@ class RewardsManager:
     def __init__(self, chain: str, cycle: int, start: int, end: int, boosts):
         self.chain = chain
         self.web3 = env_config.get_web3(chain)
-        self.emission_control = EmissionControl(self.chain)
         self.cycle = cycle
         self.start = int(start)
         self.end = int(end)
@@ -90,7 +85,7 @@ class RewardsManager:
                 token, start_time, schedules, sett
             )
             token_distribution = int(end_dist) - int(start_dist)
-            emissions_rate = self.emission_control.get_flat_emission_rate(sett)
+            emissions_rate = get_flat_emission_rate(sett, self.chain)
             flat_emissions = token_distribution * emissions_rate
             boosted_emissions = token_distribution * (1 - emissions_rate)
             if flat_emissions > 0:
