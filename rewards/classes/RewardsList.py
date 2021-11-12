@@ -22,7 +22,7 @@ class RewardsList:
         self.sources[source][user][token] += toAdd
 
     def __repr__(self):
-        return self.claims()
+        return self.claims
 
     def track_user_metadata_source(self, source, user, metadata):
         if not self.sourceMetadata[source][user][metadata]:

@@ -8,9 +8,9 @@ def get_emission_control(chain):
 
 
 def get_token_weight(token, chain):
-    token_weight = get_emission_control(chain).get_token_weight(token)
+    token_weight = get_emission_control(chain).tokenWeight(token).call()
     return 1 if token_weight == 0 else token_weight
 
 
 def get_flat_emission_rate(token, chain):
-    return get_emission_control(chain).proRataEmissionRate(token) / 1e4
+    return get_emission_control(chain).proRataEmissionRate(token).call() / 1e4
