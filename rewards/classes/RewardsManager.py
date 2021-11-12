@@ -175,7 +175,7 @@ class RewardsManager:
 
         return combine_rewards(all_rewards, self.cycle + 1)
 
-    def get_sett_multipliers(self):
+    def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
         sett_multipliers = {}
         for sett, user_apy_boosts in self.apy_boosts.items():
             sett_multipliers[sett] = {
