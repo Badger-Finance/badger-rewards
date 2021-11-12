@@ -1,17 +1,15 @@
 from eth_account import Account
 from web3.contract import ContractFunction
 from rewards.explorer import get_explorer_url
-from helpers.discord import send_message_to_discord
+from helpers.discord import get_discord_url, send_message_to_discord
 from eth_utils.hexadecimal import encode_hex
 from eth_utils import to_bytes
 from hexbytes import HexBytes
-from config.env_config import env_config
+from config.singletons import env_config
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
-from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_tree
 from helpers.web3_utils import get_badger_tree
-from helpers.constants import MONITORING_SECRET_NAMES
-from helpers.enums import Network
+from helpers.enums import Network, BotType
 from rewards.classes.RewardsList import RewardsList
 from rewards.utils.tx_utils import (
     get_effective_gas_price,
@@ -35,11 +33,7 @@ class TreeManager:
         self.next_cycle = self.get_current_cycle() + 1
         self.propose_account = cycle_account
         self.approve_account = cycle_account
-        self.discord_url = get_secret(
-            MONITORING_SECRET_NAMES.get(chain, ""),
-            "DISCORD_WEBHOOK_URL",
-            kube=env_config.kube,
-        )
+        self.discord_url = get_discord_url(chain, BotType.Cycle)
 
     def convert_to_merkle_tree(self, rewardsList: RewardsList, start: int, end: int):
         return rewards_to_merkle_tree(rewardsList, start, end)
@@ -59,7 +53,7 @@ class TreeManager:
         console.log("Proposing root")
         return self.manage_root(rewards, self.badger_tree.proposeRoot, action="Propose")
 
-    def manage_root(self, rewards, contract_function: ContractFunction, action):
+    def manage_root(self, rewards, contract_function: ContractFunction, action: str):
         root_hash = rewards["rootHash"]
         merkle_root = rewards["merkleTree"]["merkleRoot"]
         start_block = rewards["merkleTree"]["startBlock"]
@@ -77,10 +71,7 @@ class TreeManager:
             tx_hash = self.build_function_and_send(self.approve_account, func=root_func)
             # Wait 5 seconds before confirming a transaction to make sure the node can see the tx receipt
             time.sleep(5)
-            succeeded, msg = confirm_transaction(
-                self.w3,
-                tx_hash,
-            )
+            succeeded, msg = confirm_transaction(self.w3, tx_hash, self.chain)
             title = f"**{action} Rewards on {self.chain}**"
             approve_info = f"TX Hash: {tx_hash} \n\n Root: {merkle_root} \n\n Content Hash: {root_hash} \n\n"
             description = f"Calculated rewards between {start_block} and {end_block} \n\n {approve_info} "

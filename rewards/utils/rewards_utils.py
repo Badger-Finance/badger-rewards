@@ -1,6 +1,6 @@
-from rewards.classes.Snapshot import Snapshot
 from rich.console import Console
 from rewards.classes.RewardsList import RewardsList
+from rewards.classes.Snapshot import Snapshot
 from web3 import Web3
 from typing import List, Dict, Callable
 
@@ -74,3 +74,31 @@ def distribute_rewards_to_snapshot(
         else:
             rewards.increase_user_rewards(addr, token, int(reward_amount))
     return combine_rewards([rewards] + custom_rewards_list, 0)
+
+
+def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
+    """Combine past rewards with new rewards
+
+    :param current: current rewards
+    :param new: new rewards
+    """
+    result = RewardsList(new.cycle)
+
+    # Add new rewards
+    for user, claims in new.claims.items():
+        for token, claim in claims.items():
+            result.increase_user_rewards(user, token, claim)
+
+    # Add existing rewards
+    for user, user_data in current["claims"].items():
+        for i in range(len(user_data["tokens"])):
+            token = user_data["tokens"][i]
+            amount = user_data["cumulativeAmounts"][i]
+            result.increase_user_rewards(user, token, int(amount))
+
+    # result.printState()
+    return result
+
+
+def merkle_tree_to_rewards_list(tree):
+    return process_cumulative_rewards(tree, RewardsList(int(tree["cycle"])))

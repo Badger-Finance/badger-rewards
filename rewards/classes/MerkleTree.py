@@ -1,7 +1,7 @@
 from rewards.classes.RewardsList import RewardsList
 from itertools import zip_longest
 from eth_utils import encode_hex
-from config.env_config import env_config
+from config.singletons import env_config
 from rich.console import Console
 
 console = Console()
@@ -74,6 +74,7 @@ def rewards_to_merkle_tree(rewards: RewardsList, startBlock, endBlock):
         },
     """
     tree = MerkleTree(encodedNodes)
+
     distribution = {
         "merkleRoot": encode_hex(tree.root),
         "cycle": nodes[0]["cycle"],

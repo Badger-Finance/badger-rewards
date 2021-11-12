@@ -67,6 +67,7 @@ def parse_sett_balances(
         for addr, bal in balances.items()
         if addr not in addresses_to_blacklist
     }
+
     sett_type = BalanceType.Native if sett_address in NATIVE else BalanceType.NonNative
     sett_ratio = get_token_weight(sett_address, chain)
 
@@ -84,7 +85,7 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
         if sett in NO_BOOST:
             console.log(f"{sett} is disabled")
             continue
-        usd_snapshot = snapshot.convert_to_usd()
+        usd_snapshot = snapshot.convert_to_usd(chain)
         balances = Counter(usd_snapshot.balances)
         if usd_snapshot.type == BalanceType.Native:
             native = native + balances

@@ -63,7 +63,7 @@ def claims_snapshot_usd(chain: str) -> Tuple[Counter, Counter]:
     native = Counter()
     non_native = Counter()
     for sett, claims in snapshot.items():
-        usd_claims = claims.convert_to_usd()
+        usd_claims = claims.convert_to_usd(chain)
         if usd_claims.type == BalanceType.Native:
             native = native + Counter(usd_claims.balances)
         elif usd_claims.type == BalanceType.NonNative:

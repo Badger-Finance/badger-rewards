@@ -1,3 +1,4 @@
+from helpers.discord import get_discord_url
 from rewards.emission_handlers import eth_tree_handler
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import (
@@ -19,7 +20,7 @@ from rewards.classes.Schedule import Schedule
 from rewards.classes.CycleLogger import cycle_logger
 from helpers.time_utils import to_utc_date, to_hours
 from helpers.enums import BalanceType, Network
-from config.env_config import env_config
+from config.singletons import env_config
 from rich.console import Console
 from typing import List, Tuple, Dict
 
@@ -30,6 +31,7 @@ class RewardsManager:
     def __init__(self, chain: str, cycle: int, start: int, end: int, boosts):
         self.chain = chain
         self.web3 = env_config.get_web3(chain)
+        self.discord_url = get_discord_url(chain)
         self.cycle = cycle
         self.start = int(start)
         self.end = int(end)

@@ -5,7 +5,8 @@ from helpers.constants import (
 )
 from typing import Dict
 from tabulate import tabulate
-from helpers.discord import send_code_block_to_discord
+from helpers.discord import send_code_block_to_discord, get_discord_url
+from helpers.enums import BotType
 from rewards.boost.boost_utils import (
     calc_union_addresses,
     calc_boost_balances,
@@ -37,6 +38,7 @@ def badger_boost(current_block: int, chain: str):
     Calculate badger boost multipliers based on stake ratios
     :param current_block: block to calculate boost at
     """
+    discord_url = get_discord_url(chain, BotType.Boost)
     console.log(f"Calculating boost at block {current_block} ...")
     native_setts, non_native_setts = calc_boost_balances(
         current_block - BOOST_BLOCK_DELAY, chain
@@ -101,6 +103,6 @@ def badger_boost(current_block: int, chain: str):
         headers=["range", "amount of users"],
     )
     print(stake_data_table)
-    send_code_block_to_discord(stake_data_table, username="Boost Bot")
+    send_code_block_to_discord(stake_data_table, username="Boost Bot", url=discord_url)
 
     return boost_data

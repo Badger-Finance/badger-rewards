@@ -1,10 +1,17 @@
 from gql import gql
+from subgraph.subgraph_utils import make_gql_client
+from config.singletons import env_config
 import math
 from web3 import Web3
 from rich.console import Console
 from typing import Dict, Tuple
-from helpers.discord import send_error_to_discord, send_message_to_discord
+from helpers.discord import (
+    send_error_to_discord,
+    send_message_to_discord,
+    get_discord_url,
+)
 from helpers.digg_utils import digg_utils
+from helpers.enums import BotType
 from helpers.web3_utils import make_contract
 from functools import lru_cache
 from helpers.enums import Network
@@ -40,7 +47,7 @@ def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str
             variables = {
                 "firstAmount": increment,
                 "lastID": last_id,
-                "blockNumber": {"number": block_number - 50},
+                "blockNumber": {"number": block_number},
             }
             next_page = client.execute(query, variable_values=variables)
             if len(next_page["tokenBalances"]) == 0:
@@ -61,7 +68,9 @@ def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str
                             if entry["balance"] == 0:
                                 fragment_balance = 0
                             else:
-                                fragment_balance = shares_per_fragment / amount
+                                fragment_balance = digg_utils.shares_to_fragments(
+                                    int(amount)
+                                )
                             digg_balances[address] = float(fragment_balance) / 1e9
     except Exception as e:
         send_error_to_discord(e, "Error in Fetching Token Balance", "Subgraph Error")
@@ -76,16 +85,6 @@ def fetch_fuse_pool_balances(client, chain, block):
         return {}
 
     ctoken_data = {
-        "fBDIGG-22": {
-            "underlying_contract": "0x7e7e112a68d8d2e221e11047a72ffc1065c38e1a",
-            "symbol": "fBDIGG-22",
-            "contract": "0x4b789c1a3124e9c7945e24d20a5034a85ffb7535",
-        },
-        "fBBADGER-22": {
-            "underlying_contract": "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28",
-            "symbol": "fBBADGER-22",
-            "contract": "0x8c2ab59d5a0cff6b1d00ef7dd70d85db88483671",
-        },
         "fBADGER-22": {
             "underlying_contract": "0x3472A5A71965499acd81997a54BBA8D852C6E53d",
             "symbol": "fBADGER-22",
@@ -137,7 +136,7 @@ def fetch_fuse_pool_balances(client, chain, block):
 
     balances = {}
     variables = {
-        "block_number": {"number": block - 50},
+        "block_number": {"number": block},
         "token_filter": {"id_gt": last_token_id, "symbol_in": list(ctoken_data.keys())},
     }
     try:
@@ -177,6 +176,7 @@ def fetch_fuse_pool_balances(client, chain, block):
         return balances
 
     except Exception as e:
+        discord_url = get_discord_url(chain, BotType.Boost)
         send_message_to_discord(
             "**BADGER BOOST ERROR**",
             f":x: Error in Fetching Fuse Token Balance",
@@ -191,5 +191,6 @@ def fetch_fuse_pool_balances(client, chain, block):
                 }
             ],
             "Boost Bot",
+            url=discord_url,
         )
         raise e

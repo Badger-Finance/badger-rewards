@@ -1,10 +1,11 @@
-from config.env_config import env_config
+from config.singletons import env_config
 from rich.console import Console
 from rewards.aws.helpers import get_bucket, s3
 import json
 from typing import Dict
 from rewards.aws.helpers import s3
 from helpers.enums import Network
+from helpers.constants import CHAIN_IDS
 
 console = Console()
 
@@ -17,10 +18,10 @@ def download_latest_tree(chain: str):
     if chain == Network.Ethereum:
         key = "badger-tree.json"
     else:
-        key = f"badger-tree-{chain}.json"
+        key = f"badger-tree-{CHAIN_IDS[chain]}.json"
 
     target = {
-        "bucket": get_bucket(env_config.test),
+        "bucket": get_bucket(env_config.production),
         "key": key,
     }  # badger-api production
 
