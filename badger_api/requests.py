@@ -13,9 +13,9 @@ def fetch_ppfs() -> Tuple[float, float]:
     Fetch ppfs for bbadger and bdigg
     """
     response = http.get(f"{badger_api}/setts")
-    json = response.json()
-    badger = [s for s in json if s["asset"] == "BADGER"][0]
-    digg = [s for s in json if s["asset"] == "DIGG"][0]
+    setts = response.json()
+    badger = [sett for sett in setts if sett["asset"] == "BADGER"][0]
+    digg = [sett for sett in setts if sett["asset"] == "DIGG"][0]
     return badger["ppfs"], digg["ppfs"]
 
 
