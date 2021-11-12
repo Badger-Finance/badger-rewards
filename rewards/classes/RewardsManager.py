@@ -146,7 +146,8 @@ class RewardsManager:
         return combine_rewards([rewards, *extra_rewards], self.cycle)
 
     def distribute_rewards_to_snapshot(
-            self, amount: float, snapshot: Snapshot, token: str) -> RewardsList:
+        self, amount: float, snapshot: Snapshot, token: str
+    ) -> RewardsList:
         """
         Distribute a certain amount of rewards to a snapshot of users
         """
@@ -305,7 +306,9 @@ class RewardsManager:
         assert abs(all_from_events - all_from_rewards) < 1e9
         return combine_rewards(all_sushi_rewards, self.cycle)
 
-    def calc_sushi_distribution(self, strategy: str, events: List[Dict]) -> Tuple[RewardsList, int]:
+    def calc_sushi_distribution(
+        self, strategy: str, events: List[Dict]
+    ) -> Tuple[RewardsList, int]:
         sett = self.get_sett_from_strategy(strategy)
         total_from_rewards = 0
         all_sushi_rewards = []

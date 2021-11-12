@@ -94,7 +94,9 @@ class RewardsList:
         else:
             return 0
 
-    def to_node_entry(self, user, user_data, cycle, index) -> Tuple[Dict[str, Any], str]:
+    def to_node_entry(
+        self, user, user_data, cycle, index
+    ) -> Tuple[Dict[str, Any], str]:
         """
         Use abi.encode() to encode data into the hex format used as raw node information in the tree
         This is the value that will be hashed to form the rest of the tree
@@ -108,9 +110,10 @@ class RewardsList:
         }
         int_amounts = []
         for tokenAddress, cumulativeAmount in user_data.items():
-            node_entry["tokens"].append(tokenAddress)
-            node_entry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
-            int_amounts.append(int(cumulativeAmount))
+            if cumulativeAmount > 0:
+                node_entry["tokens"].append(tokenAddress)
+                node_entry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
+                int_amounts.append(int(cumulativeAmount))
 
         # console.print(
         #     "Encoding Node entry...",
