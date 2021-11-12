@@ -4,7 +4,7 @@ from rewards.classes.TreeManager import TreeManager
 from rewards.classes.Schedule import Schedule
 from rewards.rewards_utils import combine_rewards, process_cumulative_rewards
 from rewards.rewards_checker import verify_rewards
-from rewards.aws.boost import add_multipliers, download_boosts
+from rewards.aws.boost import add_multipliers, download_boosts, upload_boosts
 from rewards.classes.CycleLogger import cycle_logger
 from helpers.web3_utils import make_contract
 from helpers.constants import (
@@ -140,12 +140,15 @@ def approve_root(
         past_tree=current_rewards,
         tree_manager=tree_manager,
     )
+    boosts = download_boosts(chain)
     if env_config.test or env_config.staging:
-        add_multipliers(
+        boosts = add_multipliers(
+            boosts,
             rewards_data["multiplierData"],
             rewards_data["userMultipliers"],
             chain=chain,
         )
+        upload_boosts(boosts, chain)
         return rewards_data
     if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
         console.log(
@@ -163,11 +166,13 @@ def approve_root(
                 staging=env_config.test or env_config.staging,
             )
 
-            add_multipliers(
+            boosts = add_multipliers(
+                boosts,
                 rewards_data["multiplierData"],
                 rewards_data["userMultipliers"],
                 chain=chain,
             )
+            upload_boosts(boosts, chain)
             cycle_logger.save(tree_manager.next_cycle, chain)
             return rewards_data
     else:

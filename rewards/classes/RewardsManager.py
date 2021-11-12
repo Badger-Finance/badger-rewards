@@ -227,7 +227,10 @@ class RewardsManager:
                 if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     percentage_out_of_total = (
                         int(to_distribute) / int(schedule.initialTokensLocked) * 100
-                    )
+                    ) if int(schedule.initialTokensLocked) > 0 else 0
+                    percentage_total_duration = (
+                        range_duration/schedule.duration * 100 
+                    ) if schedule.duration > 0 else 0
                     console.log(
                         (
                             f"Token {token} distributed by schedule {index}"
@@ -239,7 +242,7 @@ class RewardsManager:
                     console.log(
                         f"Total duration of schedule elapsed is {to_hours(range_duration)}"
                         f" hours out of {to_hours(schedule.duration)} hours"
-                        f" or {range_duration/schedule.duration * 100}% of total duration.",
+                        f" or {percentage_total_duration}% of total duration.",
                     )
             total_to_distribute += to_distribute
 
