@@ -3,9 +3,8 @@ from rewards.classes.Snapshot import Snapshot
 from helpers.constants import (
     REWARDS_BLACKLIST,
     NATIVE,
-    DISABLED_VAULTS,
     EMISSIONS_BLACKLIST,
-    PRO_RATA_VAULTS,
+    NO_BOOST
 )
 from helpers.web3_utils import make_contract
 from rewards.utils.emisson_utils import get_token_weight
@@ -82,7 +81,7 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
     native = Counter()
     non_native = Counter()
     for sett, snapshot in total_snapshot.items():
-        if sett in [*DISABLED_VAULTS, *PRO_RATA_VAULTS]:
+        if sett in NO_BOOST:
             console.log(f"{sett} is disabled")
             continue
         usd_snapshot = snapshot.convert_to_usd()
