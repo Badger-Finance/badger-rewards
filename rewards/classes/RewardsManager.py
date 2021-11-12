@@ -146,8 +146,7 @@ class RewardsManager:
         return combine_rewards([rewards, *extra_rewards], self.cycle)
 
     def distribute_rewards_to_snapshot(
-        self, amount: float, snapshot: Snapshot, token: str
-    ):
+            self, amount: float, snapshot: Snapshot, token: str) -> RewardsList:
         """
         Distribute a certain amount of rewards to a snapshot of users
         """
