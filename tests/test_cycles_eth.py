@@ -28,7 +28,6 @@ from rewards.tree_utils import calc_next_cycle_range
 from scripts.rewards.utils.propose_rewards import propose_root
 from config.singletons import env_config
 
-logging.getLogger("gql.transport.aiohttp").setLevel(logging.WARNING)
 logger = logging.getLogger("test-cycles-eth")
 
 
