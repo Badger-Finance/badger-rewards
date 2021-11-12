@@ -55,7 +55,7 @@ class RewardsManager:
         want = strategy.want().call()
         sett = controller.vaults(want).call()
         return sett
-    
+
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
     ) -> RewardsList:
@@ -64,11 +64,11 @@ class RewardsManager:
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
         flat_rewards_list = []
         boosted_rewards_list = []
-        
+
         custom_behaviour = {
             EMISSIONS_CONTRACTS[Network.Ethereum]["BadgerTree"]: eth_tree_handler
         }
-        
+
         """
         When distributing rewards to the bcvx vault,
         we want them to be calculated pro-rata
@@ -78,12 +78,8 @@ class RewardsManager:
             sett_snapshot = self.boost_sett(sett, sett_snapshot)
 
         for token, schedules in schedules_by_token.items():
-            end_dist = self.get_distributed_for_token_at(
-                token, end_time, schedules
-            )
-            start_dist = self.get_distributed_for_token_at(
-                token, start_time, schedules
-            )
+            end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
+            start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
             token_distribution = int(end_dist) - int(start_dist)
             emissions_rate = get_flat_emission_rate(sett, self.chain)
             flat_emissions = token_distribution * emissions_rate
@@ -94,7 +90,7 @@ class RewardsManager:
                         amount=flat_emissions,
                         snapshot=sett_snapshot,
                         token=token,
-                        custom_rewards=custom_behaviour
+                        custom_rewards=custom_behaviour,
                     )
                 )
             if boosted_emissions > 0:
@@ -103,7 +99,7 @@ class RewardsManager:
                         boosted_emissions,
                         snapshot=self.boost_sett(sett, sett_snapshot),
                         token=token,
-                        custom_rewards=custom_behaviour
+                        custom_rewards=custom_behaviour,
                     )
                 )
 

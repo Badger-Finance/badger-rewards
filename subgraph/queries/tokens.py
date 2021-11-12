@@ -156,7 +156,9 @@ def fetch_fuse_pool_balances(client, chain, block):
                 if balance <= 0:
                     continue
 
-                sett = Web3.toChecksumAddress(ctoken_data[symbol]["underlying_contract"])
+                sett = Web3.toChecksumAddress(
+                    ctoken_data[symbol]["underlying_contract"]
+                )
 
                 if sett not in balances:
                     balances[sett] = {}

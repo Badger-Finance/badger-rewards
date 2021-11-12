@@ -1,11 +1,6 @@
 from helpers.enums import BalanceType
 from rewards.classes.Snapshot import Snapshot
-from helpers.constants import (
-    REWARDS_BLACKLIST,
-    NATIVE,
-    EMISSIONS_BLACKLIST,
-    NO_BOOST
-)
+from helpers.constants import REWARDS_BLACKLIST, NATIVE, EMISSIONS_BLACKLIST, NO_BOOST
 from helpers.web3_utils import make_contract
 from rewards.utils.emisson_utils import get_token_weight
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
@@ -55,7 +50,7 @@ def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> Snapsho
 
 
 def parse_sett_balances(
-    sett_address: str, balances: Dict[str, int], chain:str, blacklist: bool = True
+    sett_address: str, balances: Dict[str, int], chain: str, blacklist: bool = True
 ) -> Snapshot:
     """
     Blacklist balances and add metadata for boost
@@ -66,14 +61,19 @@ def parse_sett_balances(
         addresses_to_blacklist = {**REWARDS_BLACKLIST, **EMISSIONS_BLACKLIST}
     else:
         addresses_to_blacklist = REWARDS_BLACKLIST
-        
-    balances = {addr: bal for addr, bal in balances.items() if addr not in addresses_to_blacklist}
+
+    balances = {
+        addr: bal
+        for addr, bal in balances.items()
+        if addr not in addresses_to_blacklist
+    }
     sett_type = BalanceType.Native if sett_address in NATIVE else BalanceType.NonNative
     sett_ratio = get_token_weight(sett_address, chain)
-    
+
     console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
 
     return Snapshot(sett_address, balances, sett_ratio, sett_type)
+
 
 def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
     """Take a snapshot of a chains native/non native balances in usd"""

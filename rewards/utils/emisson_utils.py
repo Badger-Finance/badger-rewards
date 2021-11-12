@@ -2,9 +2,12 @@ from functools import lru_cache
 from helpers.constants import EMISSIONS_CONTRACTS
 from helpers.web3_utils import make_contract
 
+
 @lru_cache
 def get_emission_control(chain: str):
-    return make_contract(EMISSIONS_CONTRACTS[chain]["EmissionControl"], "EmissionControl", chain)
+    return make_contract(
+        EMISSIONS_CONTRACTS[chain]["EmissionControl"], "EmissionControl", chain
+    )
 
 
 def get_token_weight(token: str, chain: str):

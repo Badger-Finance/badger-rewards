@@ -10,6 +10,7 @@ from rewards.boost.boost_utils import (
     calc_union_addresses,
     calc_boost_balances,
 )
+
 console = Console()
 
 

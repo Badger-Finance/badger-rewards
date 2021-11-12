@@ -1,6 +1,13 @@
 import pytest
 from rewards.classes.Snapshot import Snapshot
-from tests.utils import mock_boosts, test_cycle, test_start, test_end, set_env_vars, mock_balances
+from tests.utils import (
+    mock_boosts,
+    test_cycle,
+    test_start,
+    test_end,
+    set_env_vars,
+    mock_balances,
+)
 from unittest import TestCase
 from helpers.enums import Network, BalanceType
 
@@ -28,9 +35,11 @@ def end() -> bool:
 def boosts():
     return mock_boosts
 
+
 @pytest.fixture
 def balances():
     return mock_balances
+
 
 def mock_get_sett_multipliers():
     return mock_boosts["multiplierData"]
@@ -44,6 +53,7 @@ def rewards_manager(cycle, start, end, boosts, request) -> RewardsManager:
     rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
     return rewards_manager
 
+
 @pytest.mark.parametrize(
     "rewards_manager",
     [Network.Ethereum],
@@ -54,11 +64,13 @@ def test_boost_sett(rewards_manager: RewardsManager, balances):
     boosted_bals = {
         "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": 200000,
         "0xbC641f6C6957096857358Cc70df3623715A2ae45": 50000,
-        "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0": 1600000
+        "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0": 1600000,
     }
-    boosted = rewards_manager.boost_sett(sett, Snapshot(sett, balances, ratio=1, type=BalanceType.NonNative))
+    boosted = rewards_manager.boost_sett(
+        sett, Snapshot(sett, balances, ratio=1, type=BalanceType.NonNative)
+    )
     TestCase().assertDictEqual(d1=boosted.balances, d2=boosted_bals)
-    
+
 
 @pytest.mark.parametrize(
     "rewards_manager",
