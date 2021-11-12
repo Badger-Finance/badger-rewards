@@ -244,7 +244,7 @@ class RewardsManager:
 
         return total_to_distribute
 
-    def boost_sett(self, sett: str, snapshot: Snapshot):
+    def boost_sett(self, sett: str, snapshot: Snapshot) -> Snapshot:
         if snapshot.type == BalanceType.NonNative:
             pre_boost = {}
             for user, balance in snapshot:
