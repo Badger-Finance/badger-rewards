@@ -9,6 +9,7 @@ from helpers.constants import MONITORING_SECRET_NAMES
 
 logging.getLogger("gql.transport.aiohttp").setLevel("WARNING")
 
+
 class EnvConfig:
     def __init__(self):
         environment = config("ENV", "").lower()

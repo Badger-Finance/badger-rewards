@@ -42,5 +42,7 @@ if __name__ == "__main__":
     if approve_success:
         upload_tree(rewards["fileName"], rewards["merkleTree"], chain, False)
         boosts = download_boosts(chain)
-        boosts = add_multipliers(boosts, rewards["multiplierData"], rewards["userMultipliers"])
+        boosts = add_multipliers(
+            boosts, rewards["multiplierData"], rewards["userMultipliers"]
+        )
         upload_boosts(boosts, chain)

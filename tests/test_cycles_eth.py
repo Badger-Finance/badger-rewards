@@ -33,19 +33,26 @@ from config.singletons import env_config
 
 logger = logging.getLogger("test-cycles-eth")
 
+
 class MockCycleLogger:
     def __init__(self):
         pass
+
     def save(self, *args, **kwargs):
         pass
+
     def set_start_block(self, start):
         pass
+
     def set_end_block(self, end):
         pass
+
     def set_content_hash(self, root_hash):
         pass
+
     def set_merkle_root(self, root):
         pass
+
 
 def mock_fetch_current_tree(*args, **kwargs):
     return mock_tree
@@ -54,13 +61,16 @@ def mock_fetch_current_tree(*args, **kwargs):
 def mock_download_boosts(*args, **kwargs):
     return mock_boosts
 
+
 def mock_upload_boosts(boosts, chain: str):
     for user in list(boosts["userData"].keys()):
         # will throw key error if multipliers data not added
         boosts["userData"][user]["multipliers"]
 
+
 def mock_upload_tree(*args, **kwargs):
     pass
+
 
 @pytest.fixture(autouse=True)
 def mock_fns(monkeypatch):
@@ -68,6 +78,7 @@ def mock_fns(monkeypatch):
     monkeypatch.setattr("rewards.calc_rewards.upload_boosts", mock_upload_boosts)
     monkeypatch.setattr("rewards.calc_rewards.upload_tree", mock_upload_tree)
     monkeypatch.setattr("rewards.calc_rewards.cycle_logger", MockCycleLogger())
+
 
 @pytest.fixture(autouse=True)
 def set_env_config(monkeypatch):
@@ -135,6 +146,8 @@ def tree_manager(chain, cycle_account, badger_tree):
     ).functions
 
     return tree_manager
+
+
 # @pytest.mark.require_network("hardhat-fork")
 # def test_propose_root(tree_manager, badger_tree, keeper_address):
 #     assert keeper_address == tree_manager.approve_account.address
@@ -166,6 +179,7 @@ def tree_manager(chain, cycle_account, badger_tree):
 #     assert pending_hash_before != pending_hash_after
 #     assert pending_root_before != pending_root_after
 #     assert timestamp_after > timestamp_before
+
 
 @pytest.mark.require_network("hardhat-fork")
 def test_cycle(tree_manager, badger_tree, keeper_address):
