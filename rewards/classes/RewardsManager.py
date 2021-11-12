@@ -292,7 +292,7 @@ class RewardsManager:
             )
         return combine_rewards(all_dist_rewards, self.cycle)
 
-    def calc_sushi_distributions(self) -> Tuple[RewardsList, float]:
+    def calc_sushi_distributions(self) -> RewardsList:
         sushi_events = fetch_sushi_harvest_events(self.start, self.end)
         all_from_events = 0
         all_sushi_rewards = []
@@ -305,7 +305,7 @@ class RewardsManager:
         assert abs(all_from_events - all_from_rewards) < 1e9
         return combine_rewards(all_sushi_rewards, self.cycle)
 
-    def calc_sushi_distribution(self, strategy: str, events):
+    def calc_sushi_distribution(self, strategy: str, events: List[Dict]) -> Tuple[RewardsList, int]:
         sett = self.get_sett_from_strategy(strategy)
         total_from_rewards = 0
         all_sushi_rewards = []
