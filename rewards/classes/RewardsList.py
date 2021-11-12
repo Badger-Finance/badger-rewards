@@ -108,9 +108,10 @@ class RewardsList:
         }
         int_amounts = []
         for tokenAddress, cumulativeAmount in user_data.items():
-            node_entry["tokens"].append(tokenAddress)
-            node_entry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
-            int_amounts.append(int(cumulativeAmount))
+            if cumulativeAmount > 0:
+                node_entry["tokens"].append(tokenAddress)
+                node_entry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
+                int_amounts.append(int(cumulativeAmount))
 
         # console.print(
         #     "Encoding Node entry...",
