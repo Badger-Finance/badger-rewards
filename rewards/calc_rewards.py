@@ -21,24 +21,12 @@ from rewards.aws.boost import add_multipliers
 from rewards.aws.boost import download_boosts
 from rewards.aws.trees import upload_tree
 from rewards.classes.CycleLogger import cycle_logger
-from rewards.classes.RewardsList import RewardsList
 from rewards.classes.RewardsManager import RewardsManager
-from rewards.classes.RewardsManager import RewardsManager
-from rewards.classes.TreeManager import TreeManager
 from rewards.classes.Schedule import Schedule
 from rewards.classes.TreeManager import TreeManager
-from rewards.rewards_utils import combine_rewards, process_cumulative_rewards
 from rewards.rewards_checker import verify_rewards
 from rewards.rewards_utils import combine_rewards
-from rewards.aws.boost import add_multipliers, download_boosts
-from rewards.classes.CycleLogger import cycle_logger
-from helpers.web3_utils import make_contract
-from helpers.constants import (
-    DISABLED_VAULTS,
-    EMISSIONS_CONTRACTS,
-)
-from helpers.enums import Network, BotType
-from helpers.discord import get_discord_url, send_message_to_discord
+from rewards.rewards_utils import process_cumulative_rewards
 from subgraph.queries.setts import list_setts
 
 console = Console()
@@ -103,38 +91,14 @@ def fetch_setts(chain: str) -> List[str]:
     return list(filter(lambda x: x not in DISABLED_VAULTS, setts))
 
 
-def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
-    """Combine past rewards with new rewards
-
-    :param current: current rewards
-    :param new: new rewards
-    """
-    result = RewardsList(new.cycle)
-
-    # Add new rewards
-    for user, claims in new.claims.items():
-        for token, claim in claims.items():
-            result.increase_user_rewards(user, token, claim)
-
-    # Add existing rewards
-    for user, user_data in current["claims"].items():
-        for i in range(len(user_data["tokens"])):
-            token = user_data["tokens"][i]
-            amount = user_data["cumulativeAmounts"][i]
-            result.increase_user_rewards(user, token, int(amount))
-
-    # result.printState()
-    return result
-
-
 def propose_root(
     chain: str,
     start: int,
     end: int,
-    past_rewards,
+    past_rewards: Dict,
     tree_manager: TreeManager,
     save=False,
-):
+) -> None:
     """
     Propose a root on a chain
 
@@ -142,6 +106,8 @@ def propose_root(
     :param start: start block for rewards
     :param end: end block for rewards
     :param save: flag to save rewards file locally, defaults to False
+    :param past_rewards: past rewards merkle tree
+    :param tree_manager: TreeManager object
     :type save: bool, optional
     """
     current_merkle_data = tree_manager.fetch_current_merkle_data()
