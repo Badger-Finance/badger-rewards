@@ -146,8 +146,7 @@ class RewardsManager:
         return combine_rewards([rewards, *extra_rewards], self.cycle)
 
     def distribute_rewards_to_snapshot(
-        self, amount: float, snapshot: Snapshot, token: str
-    ):
+            self, amount: float, snapshot: Snapshot, token: str) -> RewardsList:
         """
         Distribute a certain amount of rewards to a snapshot of users
         """
@@ -176,7 +175,7 @@ class RewardsManager:
 
         return combine_rewards(all_rewards, self.cycle + 1)
 
-    def get_sett_multipliers(self):
+    def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
         sett_multipliers = {}
         for sett, user_apy_boosts in self.apy_boosts.items():
             sett_multipliers[sett] = {
@@ -245,7 +244,7 @@ class RewardsManager:
 
         return total_to_distribute
 
-    def boost_sett(self, sett: str, snapshot: Snapshot):
+    def boost_sett(self, sett: str, snapshot: Snapshot) -> Snapshot:
         if snapshot.type == BalanceType.NonNative:
             pre_boost = {}
             for user, balance in snapshot:
@@ -293,7 +292,7 @@ class RewardsManager:
             )
         return combine_rewards(all_dist_rewards, self.cycle)
 
-    def calc_sushi_distributions(self) -> Tuple[RewardsList, float]:
+    def calc_sushi_distributions(self) -> RewardsList:
         sushi_events = fetch_sushi_harvest_events(self.start, self.end)
         all_from_events = 0
         all_sushi_rewards = []
@@ -306,7 +305,7 @@ class RewardsManager:
         assert abs(all_from_events - all_from_rewards) < 1e9
         return combine_rewards(all_sushi_rewards, self.cycle)
 
-    def calc_sushi_distribution(self, strategy: str, events):
+    def calc_sushi_distribution(self, strategy: str, events: List[Dict]) -> Tuple[RewardsList, int]:
         sett = self.get_sett_from_strategy(strategy)
         total_from_rewards = 0
         all_sushi_rewards = []
