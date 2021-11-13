@@ -66,17 +66,12 @@ def fetch_all_claimable_balances(chain: str):
             results = {**results, **data}
     return results
 
+
 @lru_cache
 def fetch_token_names(chain: str):
     return requests.get(f"{badger_api}/tokens?chain={chain}").json()
-    
-    
-def fetch_token(chain: str, token: str):
-    token_names =  fetch_token_names(chain)
-    return token_names.get(token,{})
-    
-    
-    
-    
-    
 
+
+def fetch_token(chain: str, token: str):
+    token_names = fetch_token_names(chain)
+    return token_names.get(token, {})
