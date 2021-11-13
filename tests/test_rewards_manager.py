@@ -1,4 +1,5 @@
 import pytest
+from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
 from tests.utils import (
     mock_boosts,
@@ -9,7 +10,9 @@ from tests.utils import (
     mock_balances,
 )
 from unittest import TestCase
+from unittest.mock import patch
 from helpers.enums import Network, BalanceType
+from helpers.constants import BADGER
 
 set_env_vars()
 
@@ -45,12 +48,44 @@ def mock_get_sett_multipliers():
     return mock_boosts["multiplierData"]
 
 
+def mock_fetch_snapshot(block, sett):
+    return Snapshot(
+        "0xaE96fF08771a109dc6650a1BdCa62F2d558E40af",
+        mock_balances,
+        ratio=1,
+        type=BalanceType.NonNative,
+    )
+
+
+def mock_get_flat_emission_rate(sett, chain):
+    if sett == "0xaE96fF08771a109dc6650a1BdCa62F2d558E40af":
+        return 0.49
+
+
+def mock_send_message_to_discord(
+    title: str, description: str, fields: list, username: str, url: str = ""
+):
+    return True
+
+
+@pytest.fixture(autouse=True)
+def mock_fns(monkeypatch):
+    monkeypatch.setattr(
+        "rewards.utils.emission_utils.get_flat_emission_rate",
+        mock_get_flat_emission_rate,
+    )
+    monkeypatch.setattr(
+        "helpers.discord.send_message_to_discord", mock_send_message_to_discord
+    )
+
+
 @pytest.fixture
 def rewards_manager(cycle, start, end, boosts, request) -> RewardsManager:
     rewards_manager = RewardsManager(
         request.param, cycle, start, end, boosts["userData"]
     )
     rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
+
     return rewards_manager
 
 
@@ -83,3 +118,36 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
         for sett, mult in data.items():
             if sett in boosts["userData"][user]["multipliers"]:
                 assert mult == boosts["userData"][user]["multipliers"][sett]
+
+
+@pytest.mark.parametrize(
+    "rewards_manager",
+    [Network.Ethereum],
+    indirect=True,
+)
+def test_calculate_sett_rewards_ibbtc(rewards_manager: RewardsManager):
+    start_time = 1636827266
+    end_time = 1636828770
+    sett = "0xaE96fF08771a109dc6650a1BdCa62F2d558E40af"
+    rewards_manager.fetch_sett_snapshot = mock_fetch_snapshot
+    rewards_manager.start = 13609200
+    rewards_manager.end = 13609300
+    mock_schedule = {
+        BADGER: [
+            Schedule(
+                sett,
+                BADGER,
+                100 * 1e18,
+                startTime=start_time,
+                endTime=end_time,
+                duration=10,
+            )
+        ]
+    }
+
+    rewards, flat, boosted = rewards_manager.calculate_sett_rewards(
+        sett, schedules_by_token=mock_schedule
+    )
+    total_flat = sum(flat.totals.values())
+    total_boosted = sum(boosted.totals.values())
+    total_rewards = sum(rewards.totals.values())

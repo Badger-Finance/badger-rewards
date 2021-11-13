@@ -4,12 +4,11 @@ from rewards.emission_handlers import eth_tree_handler
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import (
     EMISSIONS_CONTRACTS,
-    PRO_RATA_VAULTS,
     XSUSHI,
 )
 from rewards.explorer import get_block_by_timestamp
 from helpers.web3_utils import make_contract
-from rewards.utils.emisson_utils import get_flat_emission_rate
+from rewards.utils.emission_utils import get_flat_emission_rate
 from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from subgraph.queries.harvests import (
@@ -77,9 +76,6 @@ class RewardsManager:
         we want them to be calculated pro-rata
         rather than boosted
         """
-        if sett not in PRO_RATA_VAULTS:
-            sett_snapshot = self.boost_sett(sett, sett_snapshot)
-
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
@@ -108,18 +104,12 @@ class RewardsManager:
 
         flat_rewards = combine_rewards(flat_rewards_list, self.cycle)
         boosted_rewards = combine_rewards(boosted_rewards_list, self.cycle)
-        desc = f"**Boosted Rewards**\n\n{boosted_rewards.totals_info(self.chain)}\n\n**Flat Rewards**\n\n{flat_rewards.totals_info(self.chain)}"
-        sett_token = fetch_token(self.chain, sett)
-        console.log(sett_token)
-        sett_name = sett_token.get("name", "")
-        send_message_to_discord(
-            f"Rewards for {sett_name}",
-            description=desc,
-            fields=[],
-            username="Rewards Bot",
-            url=self.discord_url,
+
+        return (
+            combine_rewards([flat_rewards, boosted_rewards], self.cycle),
+            flat_rewards,
+            boosted_rewards,
         )
-        return combine_rewards([flat_rewards, boosted_rewards], self.cycle)
 
     def calculate_all_sett_rewards(
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
@@ -128,7 +118,20 @@ class RewardsManager:
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
             console.log(f"Calculating rewards for {token.name().call()}")
-            all_rewards.append(self.calculate_sett_rewards(sett, all_schedules[sett]))
+            rewards, flat, boosted = self.calculate_sett_rewards(
+                sett, all_schedules[sett]
+            )
+            desc = f"**Boosted Rewards**\n\n{boosted.totals_info(self.chain)}\n\n**Flat Rewards**\n\n{flat.totals_info(self.chain)}"
+            sett_token = fetch_token(self.chain, sett)
+            sett_name = sett_token.get("name", "")
+            send_message_to_discord(
+                f"Rewards for {sett_name}",
+                description=desc,
+                fields=[],
+                username="Rewards Bot",
+                url=self.discord_url,
+            )
+            all_rewards.append(rewards)
 
         return combine_rewards(all_rewards, self.cycle)
 

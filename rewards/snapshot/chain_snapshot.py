@@ -2,7 +2,7 @@ from helpers.enums import BalanceType
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import REWARDS_BLACKLIST, NATIVE, EMISSIONS_BLACKLIST, NO_BOOST
 from helpers.web3_utils import make_contract
-from rewards.utils.emisson_utils import get_token_weight
+from rewards.utils.emission_utils import get_token_weight
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
 from rich.console import Console
 from typing import Dict, Tuple
