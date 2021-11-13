@@ -1,4 +1,5 @@
-from helpers.discord import get_discord_url
+from badger_api.requests import fetch_token
+from helpers.discord import get_discord_url, send_message_to_discord
 from rewards.emission_handlers import eth_tree_handler
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import (
@@ -105,7 +106,20 @@ class RewardsManager:
                     )
                 )
 
-        return combine_rewards([*flat_rewards_list, *boosted_rewards_list], self.cycle)
+        flat_rewards = combine_rewards(flat_rewards_list, self.cycle)
+        boosted_rewards = combine_rewards(boosted_rewards_list, self.cycle)
+        desc = f"**Boosted Rewards**\n\n{boosted_rewards.totals_info(self.chain)}\n\n**Flat Rewards**\n\n{flat_rewards.totals_info(self.chain)}"
+        sett_token = fetch_token(self.chain, sett)
+        console.log(sett_token)
+        sett_name = sett_token.get("name", "")
+        send_message_to_discord(
+            f"Rewards for {sett_name}",
+            description=desc,
+            fields=[],
+            username="Rewards Bot",
+            url=self.discord_url,
+        )
+        return combine_rewards([flat_rewards, boosted_rewards], self.cycle)
 
     def calculate_all_sett_rewards(
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
@@ -113,11 +127,10 @@ class RewardsManager:
         all_rewards = []
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
-
             console.log(f"Calculating rewards for {token.name().call()}")
             all_rewards.append(self.calculate_sett_rewards(sett, all_schedules[sett]))
 
-        return combine_rewards(all_rewards, self.cycle + 1)
+        return combine_rewards(all_rewards, self.cycle)
 
     def get_sett_multipliers(self):
         sett_multipliers = {}

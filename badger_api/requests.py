@@ -1,4 +1,5 @@
 import requests
+from toolz.itertoolz import cons
 from badger_api.config import get_api_base_path
 from helpers.constants import BOOST_CHAINS
 from typing import Tuple, Dict, List
@@ -64,3 +65,18 @@ def fetch_all_claimable_balances(chain: str):
             data = future.result()["rewards"]
             results = {**results, **data}
     return results
+
+@lru_cache
+def fetch_token_names(chain: str):
+    return requests.get(f"{badger_api}/tokens?chain={chain}").json()
+    
+    
+def fetch_token(chain: str, token: str):
+    token_names =  fetch_token_names(chain)
+    return token_names.get(token,{})
+    
+    
+    
+    
+    
+
