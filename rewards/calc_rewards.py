@@ -17,13 +17,10 @@ from rewards.aws.trees import upload_tree
 from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Schedule import Schedule
-
+from rewards.classes.TreeManager import TreeManager
+from rewards.rewards_checker import verify_rewards
 from rewards.utils.rewards_utils import (combine_rewards,
                                          process_cumulative_rewards)
-
-from rewards.classes.TreeManager import TreeManager
-
-from rewards.rewards_checker import verify_rewards
 from subgraph.queries.setts import list_setts
 
 console = Console()
