@@ -1,3 +1,6 @@
+from typing import Dict
+from typing import Tuple
+
 from subgraph.queries.setts import last_synced_block
 from rewards.classes.TreeManager import TreeManager
 from rich.console import Console
@@ -6,10 +9,12 @@ from helpers.enums import Network
 console = Console()
 
 
-def get_last_proposed_cycle(chain: str, tree_manager: TreeManager):
+def get_last_proposed_cycle(
+    chain: str, tree_manager: TreeManager
+) -> Tuple[Dict, int, int]:
     if not tree_manager.has_pending_root():
         console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
-        return ({}, 0, 0)
+        return {}, 0, 0
 
     console.log("Pending root found.. approving")
 
@@ -26,10 +31,12 @@ def get_last_proposed_cycle(chain: str, tree_manager: TreeManager):
     # assert lastClaimEnd > chain.height - rewards_config.maxStartBlockAge
 
     # Sanity check: Ensure start block is not too close to end block
-    return (current_rewards, last_claim_start, last_claim_end)
+    return current_rewards, last_claim_start, last_claim_end
 
 
-def calc_next_cycle_range(chain: str, tree_manager: TreeManager):
+def calc_next_cycle_range(
+    chain: str, tree_manager: TreeManager
+) -> Tuple[Dict, int, int]:
     # Fetch the appropriate file
     current_rewards = tree_manager.fetch_current_tree()
 
@@ -45,4 +52,4 @@ def calc_next_cycle_range(chain: str, tree_manager: TreeManager):
     assert start_block < end_block
 
     # Sanity check: Ensure start block is not too close to end block
-    return (current_rewards, start_block, end_block)
+    return current_rewards, start_block, end_block

@@ -1,28 +1,26 @@
+from typing import Dict, List, Tuple
+
+from rich.console import Console
+
 from badger_api.requests import fetch_token
+from config.singletons import env_config
+from helpers.constants import EMISSIONS_CONTRACTS, XSUSHI
 from helpers.discord import get_discord_url, send_message_to_discord
-from rewards.emission_handlers import eth_tree_handler
-from rewards.classes.Snapshot import Snapshot
-from helpers.constants import (
-    EMISSIONS_CONTRACTS,
-    XSUSHI,
-)
-from rewards.explorer import get_block_by_timestamp
+from helpers.enums import BalanceType, Network
+from helpers.time_utils import to_hours, to_utc_date
 from helpers.web3_utils import make_contract
-from rewards.utils.emission_utils import get_flat_emission_rate
-from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
-from rewards.snapshot.chain_snapshot import sett_snapshot
-from subgraph.queries.harvests import (
-    fetch_sushi_harvest_events,
-    fetch_tree_distributions,
-)
+from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
-from rewards.classes.CycleLogger import cycle_logger
-from helpers.time_utils import to_utc_date, to_hours
-from helpers.enums import BalanceType, Network
-from config.singletons import env_config
-from rich.console import Console
-from typing import List, Tuple, Dict
+from rewards.classes.Snapshot import Snapshot
+from rewards.emission_handlers import eth_tree_handler
+from rewards.explorer import get_block_by_timestamp
+from rewards.snapshot.chain_snapshot import sett_snapshot
+from rewards.utils.emission_utils import get_flat_emission_rate
+from rewards.utils.rewards_utils import (combine_rewards,
+                                         distribute_rewards_to_snapshot)
+from subgraph.queries.harvests import (fetch_sushi_harvest_events,
+                                       fetch_tree_distributions)
 
 console = Console()
 
@@ -111,6 +109,25 @@ class RewardsManager:
             boosted_rewards,
         )
 
+    def distribute_rewards_to_snapshot(
+        self, amount: float, snapshot: Snapshot, token: str
+    ) -> RewardsList:
+        """
+        Distribute a certain amount of rewards to a snapshot of users
+        """
+        console.log(amount, token)
+        rewards = RewardsList(self.cycle)
+        total = snapshot.total_balance()
+        if total == 0:
+            unit = 0
+        else:
+            unit = amount / total
+        for addr, balance in snapshot:
+            reward_amount = balance * unit
+            assert reward_amount >= 0
+            rewards.increase_user_rewards(addr, token, int(reward_amount))
+        return rewards
+
     def calculate_all_sett_rewards(
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
     ) -> RewardsList:
@@ -135,7 +152,7 @@ class RewardsManager:
 
         return combine_rewards(all_rewards, self.cycle)
 
-    def get_sett_multipliers(self):
+    def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
         sett_multipliers = {}
         for sett, user_apy_boosts in self.apy_boosts.items():
             sett_multipliers[sett] = {
@@ -204,7 +221,7 @@ class RewardsManager:
 
         return total_to_distribute
 
-    def boost_sett(self, sett: str, snapshot: Snapshot):
+    def boost_sett(self, sett: str, snapshot: Snapshot) -> Snapshot:
         if snapshot.type == BalanceType.NonNative:
             pre_boost = {}
             for user, balance in snapshot:
@@ -252,7 +269,7 @@ class RewardsManager:
             )
         return combine_rewards(all_dist_rewards, self.cycle)
 
-    def calc_sushi_distributions(self) -> Tuple[RewardsList, float]:
+    def calc_sushi_distributions(self) -> RewardsList:
         sushi_events = fetch_sushi_harvest_events(self.start, self.end)
         all_from_events = 0
         all_sushi_rewards = []
@@ -265,7 +282,9 @@ class RewardsManager:
         assert abs(all_from_events - all_from_rewards) < 1e9
         return combine_rewards(all_sushi_rewards, self.cycle)
 
-    def calc_sushi_distribution(self, strategy: str, events):
+    def calc_sushi_distribution(
+        self, strategy: str, events: List[Dict]
+    ) -> Tuple[RewardsList, int]:
         sett = self.get_sett_from_strategy(strategy)
         total_from_rewards = 0
         all_sushi_rewards = []

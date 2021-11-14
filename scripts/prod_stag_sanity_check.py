@@ -36,6 +36,12 @@ for chain in BOOST_CHAINS:
         chain, S3_BUCKETS[BucketType.Merkle][Environment.Staging]
     )
 
+    print(len(prod_boosts["userData"].keys()))
+    print(len(stag_boosts["userData"].keys()))
+    for addr in prod_boosts["userData"].keys():
+        if addr not in stag_boosts["userData"].keys():
+            print(addr)
+
     assert len(prod_boosts["userData"].keys()) == len(stag_boosts["userData"].keys())
 
     sample = random.sample(prod_boosts["userData"].keys(), 20)

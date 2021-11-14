@@ -1,13 +1,14 @@
+from typing import Any, Dict, List, Tuple
+
 from dotmap import DotMap
-from rich.console import Console
-from eth_utils.hexadecimal import encode_hex
 from eth_abi import encode_abi
-from helpers.constants import DIGG
-from helpers.digg_utils import digg_utils
 from eth_utils.address import to_checksum_address
+from eth_utils.hexadecimal import encode_hex
+from rich.console import Console
 
 from badger_api.requests import fetch_token
-
+from helpers.constants import DIGG
+from helpers.digg_utils import digg_utils
 
 console = Console()
 
@@ -105,24 +106,26 @@ class RewardsList:
         else:
             return 0
 
-    def to_node_entry(self, user, userData, cycle, index):
+    def to_node_entry(
+        self, user, user_data, cycle, index
+    ) -> Tuple[Dict[str, Any], str]:
         """
         Use abi.encode() to encode data into the hex format used as raw node information in the tree
         This is the value that will be hashed to form the rest of the tree
         """
-        nodeEntry = {
+        node_entry = {
             "user": user,
             "tokens": [],
             "cumulativeAmounts": [],
             "cycle": cycle,
             "index": index,
         }
-        intAmounts = []
-        for tokenAddress, cumulativeAmount in userData.items():
+        int_amounts = []
+        for tokenAddress, cumulativeAmount in user_data.items():
             if cumulativeAmount > 0:
-                nodeEntry["tokens"].append(tokenAddress)
-                nodeEntry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
-                intAmounts.append(int(cumulativeAmount))
+                node_entry["tokens"].append(tokenAddress)
+                node_entry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
+                int_amounts.append(int(cumulativeAmount))
 
         # console.print(
         #     "Encoding Node entry...",
@@ -140,16 +143,18 @@ class RewardsList:
             encode_abi(
                 ["uint", "address", "uint", "address[]", "uint[]"],
                 (
-                    int(nodeEntry["index"]),
-                    nodeEntry["user"],
-                    int(nodeEntry["cycle"]),
-                    nodeEntry["tokens"],
-                    intAmounts,
+                    int(node_entry["index"]),
+                    node_entry["user"],
+                    int(node_entry["cycle"]),
+                    node_entry["tokens"],
+                    int_amounts,
                 ),
             )
         )
 
-        # encoder = BadgerTree.at(web3.toChecksumAddress("0x660802Fc641b154aBA66a62137e71f331B6d787A"))
+        # encoder = BadgerTree.at(
+        #     web3.toChecksumAddress("0x660802Fc641b154aBA66a62137e71f331B6d787A")
+        # )
 
         # console.print("nodeEntry", nodeEntry)
         # console.print("encoded_local", encoded_local)
@@ -166,26 +171,26 @@ class RewardsList:
         # console.print("encoded_onchain", encoded_chain)
         # assert encoded_local == encoded_chain
 
-        return (nodeEntry, encoded_local)
+        return node_entry, encoded_local
 
-    def to_merkle_format(self):
+    def to_merkle_format(self) -> Tuple[List[Dict], List[str], List[Dict[str, Any]]]:
         """
         - Sort users into alphabetical order
         - Node entry = [cycle, user, index, token[], cumulativeAmount[]]
         """
         cycle = self.cycle
 
-        nodeEntries = []
-        encodedEntries = []
+        node_entries = []
+        encoded_entries = []
         entries = []
 
         index = 0
 
-        for user, userData in self.claims.items():
-            (nodeEntry, encoded) = self.to_node_entry(user, userData, cycle, index)
-            nodeEntries.append(nodeEntry)
-            encodedEntries.append(encoded)
-            entries.append({"node": nodeEntry, "encoded": encoded})
+        for user, user_data in self.claims.items():
+            (node_entry, encoded) = self.to_node_entry(user, user_data, cycle, index)
+            node_entries.append(node_entry)
+            encoded_entries.append(encoded)
+            entries.append({"node": node_entry, "encoded": encoded})
             index += 1
 
-        return (nodeEntries, encodedEntries, entries)
+        return node_entries, encoded_entries, entries
