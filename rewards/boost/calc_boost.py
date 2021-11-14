@@ -1,16 +1,12 @@
-from rich.console import Console
-from helpers.constants import (
-    BOOST_BLOCK_DELAY,
-    STAKE_RATIO_RANGES,
-)
 from typing import Dict
+
+from rich.console import Console
 from tabulate import tabulate
-from helpers.discord import send_code_block_to_discord, get_discord_url
+
+from helpers.constants import BOOST_BLOCK_DELAY, STAKE_RATIO_RANGES
+from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BotType
-from rewards.boost.boost_utils import (
-    calc_union_addresses,
-    calc_boost_balances,
-)
+from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses
 
 console = Console()
 

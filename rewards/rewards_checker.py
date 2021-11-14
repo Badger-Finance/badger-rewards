@@ -1,15 +1,16 @@
 import json
-from typing import Optional
-from typing import Tuple
+from typing import Optional, Tuple
 
 from rich.console import Console
 from tabulate import tabulate
 
 from helpers.constants import TOKENS_TO_CHECK
 from helpers.digg_utils import digg_utils
-from helpers.discord import get_discord_url
-from helpers.discord import send_code_block_to_discord
-from helpers.discord import send_error_to_discord
+from helpers.discord import (
+    get_discord_url,
+    send_code_block_to_discord,
+    send_error_to_discord,
+)
 from helpers.enums import BotType
 from rewards.classes.TreeManager import TreeManager
 from rewards.snapshot.claims_snapshot import claims_snapshot

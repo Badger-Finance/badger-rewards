@@ -1,7 +1,9 @@
-from scripts.rewards.eth.approve_eth import approve_rewards
 import time
+
 from rich.console import Console
+
 from helpers.enums import Network
+from scripts.rewards.eth.approve_eth import approve_rewards
 
 console = Console()
 

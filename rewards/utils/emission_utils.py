@@ -1,4 +1,5 @@
 from functools import lru_cache
+
 from helpers.constants import EMISSIONS_CONTRACTS
 from helpers.web3_utils import make_contract
 

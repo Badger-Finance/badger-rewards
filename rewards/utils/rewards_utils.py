@@ -1,8 +1,10 @@
+from typing import Callable, Dict, List
+
 from rich.console import Console
+from web3 import Web3
+
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
-from web3 import Web3
-from typing import List, Dict, Callable
 
 console = Console()
 

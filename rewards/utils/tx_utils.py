@@ -1,14 +1,16 @@
-from decimal import Decimal
-from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.web3_utils import make_contract
-from helpers.constants import EMISSIONS_CONTRACTS
-from hexbytes import HexBytes
 import logging
 import time
-import requests
-from web3 import Web3, exceptions
+from decimal import Decimal
 from typing import Tuple
-from helpers.enums import Network, BotType
+
+import requests
+from hexbytes import HexBytes
+from web3 import Web3, exceptions
+
+from helpers.constants import EMISSIONS_CONTRACTS
+from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import BotType, Network
+from helpers.web3_utils import make_contract
 
 logger = logging.getLogger("tx-utils")
 

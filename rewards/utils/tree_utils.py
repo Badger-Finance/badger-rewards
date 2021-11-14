@@ -1,10 +1,10 @@
-from typing import Dict
-from typing import Tuple
+from typing import Dict, Tuple
 
-from subgraph.queries.setts import last_synced_block
-from rewards.classes.TreeManager import TreeManager
 from rich.console import Console
+
 from helpers.enums import Network
+from rewards.classes.TreeManager import TreeManager
+from subgraph.queries.setts import last_synced_block
 
 console = Console()
 

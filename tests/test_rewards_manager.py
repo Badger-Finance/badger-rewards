@@ -1,18 +1,20 @@
+from unittest import TestCase
+from unittest.mock import patch
+
 import pytest
+
+from helpers.constants import BADGER
+from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
 from tests.utils import (
-    mock_boosts,
-    test_cycle,
-    test_start,
-    test_end,
-    set_env_vars,
     mock_balances,
+    mock_boosts,
+    set_env_vars,
+    test_cycle,
+    test_end,
+    test_start,
 )
-from unittest import TestCase
-from unittest.mock import patch
-from helpers.enums import Network, BalanceType
-from helpers.constants import BADGER
 
 set_env_vars()
 

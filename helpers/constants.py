@@ -1,6 +1,7 @@
-from web3 import Web3
 from dotmap import DotMap
-from helpers.enums import BalanceType, BucketType, Network, BotType, Environment
+from web3 import Web3
+
+from helpers.enums import BalanceType, BotType, BucketType, Environment, Network
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))

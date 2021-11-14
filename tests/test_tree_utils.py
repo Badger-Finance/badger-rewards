@@ -1,12 +1,14 @@
-import pytest
 import json
+
+import pytest
 from eth_account import Account
-from tests.utils import test_address, test_key, chains, mock_tree, set_env_vars
+
+from tests.utils import chains, mock_tree, set_env_vars, test_address, test_key
 
 set_env_vars()
 
-from rewards.utils.tree_utils import get_last_proposed_cycle, calc_next_cycle_range
 from rewards.classes.TreeManager import TreeManager
+from rewards.utils.tree_utils import calc_next_cycle_range, get_last_proposed_cycle
 
 
 def mock_download_tree(file_name: str, chain: str):

@@ -1,12 +1,14 @@
+import math
+from typing import Dict, List
+
 from gql import gql
 from graphql.language.ast import DocumentNode
-from helpers.constants import BDIGG
-from subgraph.subgraph_utils import make_gql_client
 from rich.console import Console
-from typing import List, Dict
-from helpers.discord import send_error_to_discord
-import math
 from web3 import Web3
+
+from helpers.constants import BDIGG
+from helpers.discord import send_error_to_discord
+from subgraph.subgraph_utils import make_gql_client
 
 console = Console()
 thegraph_client = make_gql_client("thegraph")

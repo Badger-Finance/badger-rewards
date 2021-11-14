@@ -1,13 +1,15 @@
+from collections import Counter
+from typing import Dict, Tuple
+
+from rich.console import Console
+from web3 import Web3
+
+from helpers.constants import EMISSIONS_BLACKLIST, NATIVE, NO_BOOST, REWARDS_BLACKLIST
 from helpers.enums import BalanceType
-from rewards.classes.Snapshot import Snapshot
-from helpers.constants import REWARDS_BLACKLIST, NATIVE, EMISSIONS_BLACKLIST, NO_BOOST
 from helpers.web3_utils import make_contract
+from rewards.classes.Snapshot import Snapshot
 from rewards.utils.emission_utils import get_token_weight
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
-from rich.console import Console
-from typing import Dict, Tuple
-from collections import Counter
-from web3 import Web3
 
 console = Console()
 

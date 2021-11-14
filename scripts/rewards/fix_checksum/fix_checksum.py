@@ -1,18 +1,18 @@
-from rewards.aws.trees import upload_tree
-from helpers.constants import CHAIN_IDS
-from rewards.aws.trees import download_latest_tree
-from rewards.classes.TreeManager import TreeManager
-from rewards.aws.helpers import get_secret
-from config.singletons import env_config
-from eth_account import Account
-from rewards.calc_rewards import approve_root, propose_root
-from rewards.rewards_utils import merkle_tree_to_rewards_list
-from subgraph.queries.setts import last_synced_block
+import json
+
 from decouple import config
 from eth_account import Account
-from web3 import Web3
-import json
 from eth_utils.hexadecimal import encode_hex
+from web3 import Web3
+
+from config.singletons import env_config
+from helpers.constants import CHAIN_IDS
+from rewards.aws.helpers import get_secret
+from rewards.aws.trees import download_latest_tree, upload_tree
+from rewards.calc_rewards import approve_root, propose_root
+from rewards.classes.TreeManager import TreeManager
+from rewards.rewards_utils import merkle_tree_to_rewards_list
+from subgraph.queries.setts import last_synced_block
 
 
 def fix_checksum(chain):

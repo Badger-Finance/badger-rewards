@@ -1,8 +1,9 @@
-from discord import Webhook, RequestsWebhookAdapter, Embed
+from discord import Embed, RequestsWebhookAdapter, Webhook
+
 from config.singletons import env_config
-from rewards.aws.helpers import get_secret
 from helpers.constants import MONITORING_SECRET_NAMES
 from helpers.enums import BotType
+from rewards.aws.helpers import get_secret
 
 
 def send_error_to_discord(e, error_msg, error_type):

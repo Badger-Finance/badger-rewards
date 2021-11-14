@@ -1,10 +1,12 @@
-import requests
-from toolz.itertoolz import cons
-from badger_api.config import get_api_base_path
-from helpers.constants import BOOST_CHAINS
-from typing import Tuple, Dict, List
 import concurrent.futures
 from functools import lru_cache
+from typing import Dict, List, Tuple
+
+import requests
+from toolz.itertoolz import cons
+
+from badger_api.config import get_api_base_path
+from helpers.constants import BOOST_CHAINS
 
 badger_api = get_api_base_path()
 

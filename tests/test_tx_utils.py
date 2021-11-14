@@ -1,15 +1,15 @@
-import pytest
 import logging
+
+import pytest
 
 from helpers.enums import Network
 from tests.utils import set_env_vars
-from helpers.enums import Network
 
 set_env_vars()
 logger = logging.getLogger("tx-utils")
 
-from rewards.utils.tx_utils import get_transaction
 from config.singletons import env_config
+from rewards.utils.tx_utils import get_transaction
 
 
 @pytest.mark.require_network("hardhat-fork")

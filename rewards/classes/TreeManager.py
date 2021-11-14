@@ -1,26 +1,28 @@
-from eth_account import Account
-from web3.contract import ContractFunction
-from rewards.explorer import get_explorer_url
-from helpers.discord import get_discord_url, send_message_to_discord
-from eth_utils.hexadecimal import encode_hex
-from eth_utils import to_bytes
-from hexbytes import HexBytes
-from config.singletons import env_config
-from rewards.classes.MerkleTree import rewards_to_merkle_tree
-from rewards.aws.trees import download_tree
-from helpers.web3_utils import get_badger_tree
-from helpers.enums import Network, BotType
-from rewards.classes.RewardsList import RewardsList
-from rewards.utils.tx_utils import (
-    get_effective_gas_price,
-    get_priority_fee,
-    confirm_transaction,
-    get_gas_price_of_tx,
-)
-from rich.console import Console
-from typing import List, Tuple
 import json
 import time
+from typing import List, Tuple
+
+from eth_account import Account
+from eth_utils import to_bytes
+from eth_utils.hexadecimal import encode_hex
+from hexbytes import HexBytes
+from rich.console import Console
+from web3.contract import ContractFunction
+
+from config.singletons import env_config
+from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import BotType, Network
+from helpers.web3_utils import get_badger_tree
+from rewards.aws.trees import download_tree
+from rewards.classes.MerkleTree import rewards_to_merkle_tree
+from rewards.classes.RewardsList import RewardsList
+from rewards.explorer import get_explorer_url
+from rewards.utils.tx_utils import (
+    confirm_transaction,
+    get_effective_gas_price,
+    get_gas_price_of_tx,
+    get_priority_fee,
+)
 
 console = Console()
 

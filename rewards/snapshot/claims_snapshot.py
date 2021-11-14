@@ -1,14 +1,22 @@
 import math
-from badger_api.requests import fetch_all_claimable_balances
-from helpers.enums import BalanceType
-from rewards.classes.Snapshot import Snapshot
-from helpers.constants import BADGER, DIGG, BCVX, BCVXCRV, ARB_BADGER, POLY_BADGER
-from typing import Dict, Tuple
-from helpers.web3_utils import make_token
-from helpers.digg_utils import digg_utils
-from helpers.constants import CLAIMABLE_TOKENS
-from functools import lru_cache
 from collections import Counter
+from functools import lru_cache
+from typing import Dict, Tuple
+
+from badger_api.requests import fetch_all_claimable_balances
+from helpers.constants import (
+    ARB_BADGER,
+    BADGER,
+    BCVX,
+    BCVXCRV,
+    CLAIMABLE_TOKENS,
+    DIGG,
+    POLY_BADGER,
+)
+from helpers.digg_utils import digg_utils
+from helpers.enums import BalanceType
+from helpers.web3_utils import make_token
+from rewards.classes.Snapshot import Snapshot
 
 
 @lru_cache(maxsize=None)

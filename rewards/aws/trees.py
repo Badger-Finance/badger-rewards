@@ -1,11 +1,12 @@
-from config.singletons import env_config
-from rich.console import Console
-from rewards.aws.helpers import get_bucket, s3
 import json
 from typing import Dict
-from rewards.aws.helpers import s3
-from helpers.enums import Network
+
+from rich.console import Console
+
+from config.singletons import env_config
 from helpers.constants import CHAIN_IDS
+from helpers.enums import Network
+from rewards.aws.helpers import get_bucket, s3
 
 console = Console()
 
