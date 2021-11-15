@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import pytest
 
-from helpers.constants import BADGER, BIBBTC_CURVE_LP, BSBTC, BVECVX
+from helpers.constants import BADGER, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
@@ -144,9 +144,9 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
 @pytest.mark.parametrize(
     "rewards_manager, emission_rate, sett",
     [
-        (Network.Ethereum, 0.49, BIBBTC_CURVE_LP),
-        (Network.Ethereum, 1, BVECVX),
-        (Network.Ethereum, 0, BSBTC),
+        (Network.Ethereum, 0.49, SETTS[Network.Ethereum]["ibbtc_crv"]),
+        (Network.Ethereum, 1, SETTS[Network.Ethereum]["bvecvx"]),
+        (Network.Ethereum, 0, SETTS[Network.Ethereum]["sbtc_crv"]),
     ],
     indirect=True,
 )
@@ -169,11 +169,8 @@ def test_calculate_sett_rewards(
     )
     test_case = TestCase()
     total_flat = sum(flat.totals.values()) / badger_decimals_conversion
-    print(total_flat)
     total_boosted = sum(boosted.totals.values()) / badger_decimals_conversion
-    print(total_boosted)
     total_rewards = sum(rewards.totals.values()) / badger_decimals_conversion
-    print(total_rewards)
     test_case.assertAlmostEqual(total_boosted + total_flat, total_rewards)
     test_case.assertAlmostEqual(total_boosted, (1 - emission_rate) * total_badger)
     test_case.assertAlmostEqual(total_flat, emission_rate * total_badger)

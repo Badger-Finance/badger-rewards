@@ -6,8 +6,9 @@ from graphql.language.ast import DocumentNode
 from rich.console import Console
 from web3 import Web3
 
-from helpers.constants import BDIGG
+from helpers.constants import SETTS
 from helpers.discord import send_error_to_discord
+from helpers.enums import Network
 from subgraph.subgraph_utils import make_gql_client
 
 console = Console()
@@ -117,7 +118,7 @@ def fetch_chain_balances(chain: str, block: int) -> Dict[str, Dict[str, int]]:
                 account = Web3.toChecksumAddress(result["user"]["id"])
                 decimals = int(result["sett"]["token"]["decimals"])
                 sett = Web3.toChecksumAddress(result["sett"]["id"])
-                if sett == BDIGG:
+                if sett == SETTS[Network.Ethereum]["digg"]:
                     decimals = 18
                 deposit = float(result["netShareDeposit"]) / math.pow(10, decimals)
                 if deposit > 0:
@@ -165,7 +166,7 @@ def fetch_sett_balances(chain: str, block: int, sett: str):
                 account = Web3.toChecksumAddress(result["user"]["id"])
                 decimals = int(result["sett"]["token"]["decimals"])
                 sett = Web3.toChecksumAddress(result["sett"]["id"])
-                if sett == BDIGG:
+                if sett == SETTS[Network.Ethereum]["digg"]:
                     decimals = 18
                 deposit = float(result["netShareDeposit"]) / math.pow(10, decimals)
                 if deposit > 0:
