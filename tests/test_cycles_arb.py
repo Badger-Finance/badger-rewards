@@ -86,7 +86,7 @@ def badger_tree(chain, keeper_address):
 
 @pytest.fixture
 def tree_manager(chain, cycle_account, badger_tree):
-    tree_manager = mock_tree_manager()
+    tree_manager = mock_tree_manager(chain, cycle_account, badger_tree)
     return tree_manager
 
 
