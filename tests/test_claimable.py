@@ -4,14 +4,8 @@ import os
 import pytest
 from eth_account import Account
 
-from tests.utils import (
-    mock_claimable_bals,
-    mock_claimed_for,
-    mock_tree,
-    set_env_vars,
-    test_address,
-    test_key,
-)
+from tests.utils import (mock_claimable_bals, mock_claimed_for, mock_tree,
+                         set_env_vars, test_address, test_key)
 
 set_env_vars()
 

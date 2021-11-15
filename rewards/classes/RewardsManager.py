@@ -17,11 +17,10 @@ from rewards.emission_handlers import eth_tree_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
-from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
-from subgraph.queries.harvests import (
-    fetch_sushi_harvest_events,
-    fetch_tree_distributions,
-)
+from rewards.utils.rewards_utils import (combine_rewards,
+                                         distribute_rewards_to_snapshot)
+from subgraph.queries.harvests import (fetch_sushi_harvest_events,
+                                       fetch_tree_distributions)
 
 console = Console()
 
