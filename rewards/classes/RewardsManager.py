@@ -62,18 +62,19 @@ class RewardsManager:
         start_time = self.web3.eth.getBlock(self.start)["timestamp"]
         end_time = self.web3.eth.getBlock(self.end)["timestamp"]
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
+
+        """
+        Vaults can have a split of boosted and non boosted emissions
+        which are calculated using the boosted balances and the normal
+        balances respectively
+        
+        """
         flat_rewards_list = []
         boosted_rewards_list = []
-
         custom_behaviour = {
             EMISSIONS_CONTRACTS[Network.Ethereum]["BadgerTree"]: eth_tree_handler
         }
 
-        """
-        When distributing rewards to the bcvx vault,
-        we want them to be calculated pro-rata
-        rather than boosted
-        """
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
