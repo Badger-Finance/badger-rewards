@@ -2,6 +2,7 @@ from typing import Dict, Tuple
 
 from rich.console import Console
 
+from config.singletons import env_config
 from helpers.enums import Network
 from rewards.classes.TreeManager import TreeManager
 from subgraph.queries.setts import last_synced_block
@@ -12,7 +13,7 @@ console = Console()
 def get_last_proposed_cycle(
     chain: str, tree_manager: TreeManager
 ) -> Tuple[Dict, int, int]:
-    if not tree_manager.has_pending_root():
+    if not tree_manager.has_pending_root() and env_config.production:
         console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
         return {}, 0, 0
 

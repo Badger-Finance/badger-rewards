@@ -150,6 +150,9 @@ def test_calculate_sett_rewards_ibbtc(rewards_manager: RewardsManager):
     rewards, flat, boosted = rewards_manager.calculate_sett_rewards(
         sett, schedules_by_token=mock_schedule
     )
-    total_flat = sum(flat.totals.values())
-    total_boosted = sum(boosted.totals.values())
-    total_rewards = sum(rewards.totals.values())
+    total_flat = sum(flat.totals.values()) / 1e18
+    total_boosted = sum(boosted.totals.values()) / 1e18
+    total_rewards = sum(rewards.totals.values()) / 1e18
+    assert total_boosted + total_flat == total_rewards
+    assert total_boosted == 51
+    assert total_flat == 49
