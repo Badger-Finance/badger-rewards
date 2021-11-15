@@ -13,7 +13,7 @@ console = Console()
 def get_last_proposed_cycle(
     chain: str, tree_manager: TreeManager
 ) -> Tuple[Dict, int, int]:
-    if not tree_manager.has_pending_root() and env_config.production:
+    if not tree_manager.has_pending_root():
         console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
         return {}, 0, 0
 
