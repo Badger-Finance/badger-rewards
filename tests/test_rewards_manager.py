@@ -1,3 +1,4 @@
+import logging
 from unittest import TestCase
 
 import pytest
@@ -5,13 +6,17 @@ import pytest
 from helpers.constants import BADGER, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
-from rewards.classes.Snapshot import Snapshot
-from tests.utils import (mock_balances, mock_boosts, set_env_vars, test_cycle,
-                         test_end, test_start)
+from tests.utils import (mock_balances, mock_boosts, mock_tree, set_env_vars,
+                         test_cycle, test_end, test_start)
 
 set_env_vars()
 
 from rewards.classes.RewardsManager import RewardsManager
+from rewards.classes.Snapshot import Snapshot
+from rewards.utils.rewards_utils import (combine_rewards,
+                                         process_cumulative_rewards)
+
+logger = logging.getLogger("test-rewards-manager")
 
 
 @pytest.fixture
@@ -97,11 +102,11 @@ def end_time() -> int:
 
 @pytest.fixture
 def schedule(start_time, end_time) -> int:
-    def _method(sett, total_amouht):
+    def _method(sett, total_amount):
         return Schedule(
             sett,
             BADGER,
-            total_amouht * 1e18,
+            total_amount * 1e18,
             startTime=start_time,
             endTime=end_time,
             duration=10,
@@ -169,8 +174,87 @@ def test_calculate_sett_rewards(
     )
     test_case = TestCase()
     total_flat = sum(flat.totals.values()) / badger_decimals_conversion
+    logger.info(total_flat)
     total_boosted = sum(boosted.totals.values()) / badger_decimals_conversion
+    logger.info(total_boosted)
     total_rewards = sum(rewards.totals.values()) / badger_decimals_conversion
+    logger.info(total_rewards)
     test_case.assertAlmostEqual(total_boosted + total_flat, total_rewards)
     test_case.assertAlmostEqual(total_boosted, (1 - emission_rate) * total_badger)
     test_case.assertAlmostEqual(total_flat, emission_rate * total_badger)
+
+
+@pytest.mark.parametrize(
+    "emission_rate",
+    [
+        0,  # flat
+        0.49,  # middle
+        1,  # full boost
+    ],
+    indirect=True,
+)
+def test_splits(schedule, rewards_manager, emission_rate, monkeypatch):
+    monkeypatch.setattr(
+        "rewards.utils.emission_utils.get_flat_emission_rate",
+        lambda s, c: emission_rate,
+    )
+
+    ###
+    total_badger = 100
+    schedule = {BADGER: [schedule(BIBBTC_CURVE_LP, total_badger)]}
+    all_schedules, setts = schedule, list(BIBBTC_CURVE_LP)
+
+    logger.info(f"Generating rewards for {len(setts)} setts on {Network.Ethereum}")
+
+    rewards_list = []
+    boosts = mock_boosts
+
+    logger.info("Calculating Tree Rewards...")
+    tree_rewards = rewards_manager.calculate_tree_distributions()
+    rewards_list.append(tree_rewards)
+
+    logger.info("Calculating Sett Rewards...")
+    sett_rewards = rewards_manager.calculate_all_sett_rewards(setts, all_schedules)
+    rewards_list.append(sett_rewards)
+
+    new_rewards = combine_rewards(rewards_list, rewards_manager.cycle)
+
+    start_block, end_block = 13609200, 13609300
+
+    logger.info("Combining cumulative rewards... \n")
+    cumulative_rewards = process_cumulative_rewards(mock_tree, new_rewards)
+
+    logger.info("Converting to merkle tree... \n")
+    merkle_tree = tree_manager.convert_to_merkle_tree(
+        cumulative_rewards, start_block, end_block
+    )
+    logger.info(merkle_tree)
+
+
+# def test_splits_sett_rewards(
+#     rewards_manager: RewardsManager, emission_rate, sett, monkeypatch, schedule
+# ):
+#     rewards_manager.fetch_sett_snapshot = mock_fetch_snapshot
+#     monkeypatch.setattr(
+#         "rewards.utils.emission_utils.get_flat_emission_rate",
+#         lambda s, c: emission_rate,
+#     )
+#     rewards_manager.start = 13609200
+#     rewards_manager.end = 13609300
+#     badger_decimals_conversion = 1e18
+#     total_badger = 100
+#     mock_schedule = {BADGER: [schedule(sett, total_badger)]}
+
+#     rewards, flat, boosted = rewards_manager.calculate_sett_rewards(
+#         sett, schedules_by_token=mock_schedule
+#     )
+#     test_case = TestCase()
+#     total_flat = sum(flat.totals.values()) / badger_decimals_conversion
+#     print(total_flat)
+#     total_boosted = sum(boosted.totals.values()) / badger_decimals_conversion
+#     print(total_boosted)
+#     total_rewards = sum(rewards.totals.values()) / badger_decimals_conversion
+#     print(total_rewards)
+#     test_case.assertAlmostEqual(total_boosted + total_flat, total_rewards)
+#     test_case.assertAlmostEqual(total_boosted, (1 - emission_rate) * total_badger)
+#     test_case.assertAlmostEqual(total_flat, emission_rate * total_badger)
