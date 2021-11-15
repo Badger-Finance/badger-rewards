@@ -1,9 +1,8 @@
 from unittest import TestCase
-from unittest.mock import patch
 
 import pytest
 
-from helpers.constants import BADGER
+from helpers.constants import BADGER, BIBBTC_CURVE_LP, BSBTC, BVECVX
 from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
@@ -52,16 +51,11 @@ def mock_get_sett_multipliers():
 
 def mock_fetch_snapshot(block, sett):
     return Snapshot(
-        "0xaE96fF08771a109dc6650a1BdCa62F2d558E40af",
+        sett,
         mock_balances,
         ratio=1,
         type=BalanceType.NonNative,
     )
-
-
-def mock_get_flat_emission_rate(sett, chain):
-    if sett == "0xaE96fF08771a109dc6650a1BdCa62F2d558E40af":
-        return 0.49
 
 
 def mock_send_message_to_discord(
@@ -72,10 +66,6 @@ def mock_send_message_to_discord(
 
 @pytest.fixture(autouse=True)
 def mock_fns(monkeypatch):
-    monkeypatch.setattr(
-        "rewards.utils.emission_utils.get_flat_emission_rate",
-        mock_get_flat_emission_rate,
-    )
     monkeypatch.setattr(
         "helpers.discord.send_message_to_discord", mock_send_message_to_discord
     )
@@ -89,6 +79,41 @@ def rewards_manager(cycle, start, end, boosts, request) -> RewardsManager:
     rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
 
     return rewards_manager
+
+
+@pytest.fixture()
+def emission_rate(request) -> float:
+    return request.param
+
+
+@pytest.fixture()
+def sett(request) -> str:
+    return request.param
+
+
+@pytest.fixture
+def start_time() -> int:
+    return 1636827266
+
+
+@pytest.fixture
+def end_time() -> int:
+    return 1636828770
+
+
+@pytest.fixture
+def schedule(start_time, end_time) -> int:
+    def _method(sett, total_amouht):
+        return Schedule(
+            sett,
+            BADGER,
+            total_amouht * 1e18,
+            startTime=start_time,
+            endTime=end_time,
+            duration=10,
+        )
+
+    return _method
 
 
 @pytest.mark.parametrize(
@@ -123,36 +148,38 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
 
 
 @pytest.mark.parametrize(
-    "rewards_manager",
-    [Network.Ethereum],
+    "rewards_manager, emission_rate, sett",
+    [
+        (Network.Ethereum, 0.49, BIBBTC_CURVE_LP),
+        (Network.Ethereum, 1, BVECVX),
+        (Network.Ethereum, 0, BSBTC),
+    ],
     indirect=True,
 )
-def test_calculate_sett_rewards_ibbtc(rewards_manager: RewardsManager):
-    start_time = 1636827266
-    end_time = 1636828770
-    sett = "0xaE96fF08771a109dc6650a1BdCa62F2d558E40af"
+def test_calculate_sett_rewards(
+    rewards_manager: RewardsManager, emission_rate, sett, monkeypatch, schedule
+):
     rewards_manager.fetch_sett_snapshot = mock_fetch_snapshot
+    monkeypatch.setattr(
+        "rewards.utils.emission_utils.get_flat_emission_rate",
+        lambda s, c: emission_rate,
+    )
     rewards_manager.start = 13609200
     rewards_manager.end = 13609300
-    mock_schedule = {
-        BADGER: [
-            Schedule(
-                sett,
-                BADGER,
-                100 * 1e18,
-                startTime=start_time,
-                endTime=end_time,
-                duration=10,
-            )
-        ]
-    }
+    badger_decimals_conversion = 1e18
+    total_badger = 100
+    mock_schedule = {BADGER: [schedule(sett, total_badger)]}
 
     rewards, flat, boosted = rewards_manager.calculate_sett_rewards(
         sett, schedules_by_token=mock_schedule
     )
-    total_flat = sum(flat.totals.values()) / 1e18
-    total_boosted = sum(boosted.totals.values()) / 1e18
-    total_rewards = sum(rewards.totals.values()) / 1e18
-    assert total_boosted + total_flat == total_rewards
-    assert total_boosted == 51
-    assert total_flat == 49
+    test_case = TestCase()
+    total_flat = sum(flat.totals.values()) / badger_decimals_conversion
+    print(total_flat)
+    total_boosted = sum(boosted.totals.values()) / badger_decimals_conversion
+    print(total_boosted)
+    total_rewards = sum(rewards.totals.values()) / badger_decimals_conversion
+    print(total_rewards)
+    test_case.assertAlmostEqual(total_boosted + total_flat, total_rewards)
+    test_case.assertAlmostEqual(total_boosted, (1 - emission_rate) * total_badger)
+    test_case.assertAlmostEqual(total_flat, emission_rate * total_badger)
