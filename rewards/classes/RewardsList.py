@@ -1,3 +1,4 @@
+import json
 from typing import Any, Dict, List, Tuple
 
 from dotmap import DotMap
@@ -22,6 +23,30 @@ class RewardsList:
         self.metadata = DotMap()
         self.sources = DotMap()
         self.sourceMetadata = DotMap()
+
+    def __repr__(self):
+        log_obj = {
+            "claims": self.claims.toDict(),
+            "tokens": self.tokens.toDict(),
+            "totals": self.totals.toDict(),
+            "cycle": self.cycle,
+            "metadata": self.metadata.toDict(),
+            "sources": self.sources.toDict(),
+            "sourcesMetadata": self.sourceMetadata.toDict(),
+        }
+        return json.dumps(log_obj, indent=4)
+
+    def __str__(self):
+        log_obj = {
+            "claims": self.claims.toDict(),
+            "tokens": self.tokens.toDict(),
+            "totals": self.totals.toDict(),
+            "cycle": self.cycle,
+            "metadata": self.metadata.toDict(),
+            "sources": self.sources.toDict(),
+            "sourcesMetadata": self.sourceMetadata.toDict(),
+        }
+        return json.dumps(log_obj, indent=4)
 
     def increase_user_rewards_source(self, source, user, token, toAdd):
         if not self.sources[source][user][token]:

@@ -27,6 +27,7 @@ chains = [Network.Ethereum, Network.Arbitrum, Network.Polygon]
 
 mock_tree = get_mock_json("mock_tree")
 mock_boosts = get_mock_json("mock_boosts")
+mock_boosts_split = get_mock_json("mock_boosts_split")
 mock_claimed_for = get_mock_json("mock_claimed_for")
 mock_claimable_bals = get_mock_json("mock_claimable_bals")
 mock_balances = get_mock_json("mock_balances")

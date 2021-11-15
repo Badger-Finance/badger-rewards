@@ -13,7 +13,7 @@
       "user": "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd",
       "cycle": "0x7f",
       "tokens": ["0x3472A5A71965499acd81997a54BBA8D852C6E53d"],
-      "cumulativeAmounts": ["0"],
+      "cumulativeAmounts": ["1000"],
       "proof": [
         "0x252cff88a03a6c15d1b243244107fbf91841ff598d00ec7fe5485e037e3f919f",
         "0x83795851012d4d8c99a6a64558ebdff436ab6d658b4594dd71600014da406b65",
@@ -32,7 +32,7 @@
       "user": "0xbC641f6C6957096857358Cc70df3623715A2ae45",
       "cycle": "0x7f",
       "tokens": ["0x3472A5A71965499acd81997a54BBA8D852C6E53d"],
-      "cumulativeAmounts": ["0"],
+      "cumulativeAmounts": ["1000"],
       "proof": [
         "0xf2a3d70a344dff3f0bc9eee2764d992e78ca1d101eb7aa891b9bd56ee616ae8c",
         "0x27bd3451d158bd65f39134635aac0d94ab86862b1c2e76c5a3f2bb4368075e03",
@@ -49,7 +49,7 @@
       "user": "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0",
       "cycle": "0x7f",
       "tokens": ["0x3472A5A71965499acd81997a54BBA8D852C6E53d"],
-      "cumulativeAmounts": ["0"],
+      "cumulativeAmounts": ["1000"],
       "proof": [
         "0x88208e13d63c31dcb218d46710353de0f819727c86c1b57c6ee97f30c3c6ee1a",
         "0x44e2462ad628beb66e0705e87eb4debc957867b2d6e6449e233fe8e461aef80f",

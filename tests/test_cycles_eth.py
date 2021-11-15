@@ -21,7 +21,8 @@ from helpers.constants import ABI_DIRS, EMISSIONS_CONTRACTS, ETH_BADGER_TREE
 from helpers.enums import Network
 from rewards.aws.helpers import get_secret
 from rewards.classes.TreeManager import TreeManager
-from rewards.tree_utils import calc_next_cycle_range, get_last_proposed_cycle
+from rewards.utils.tree_utils import (calc_next_cycle_range,
+                                      get_last_proposed_cycle)
 from scripts.rewards.utils.approve_rewards import approve_root
 from scripts.rewards.utils.propose_rewards import propose_root
 from tests.cycle_utils import (MockCycleLogger, mock_badger_tree, mock_cycle,

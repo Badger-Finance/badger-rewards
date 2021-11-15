@@ -8,8 +8,9 @@ from brownie import web3
 from helpers.constants import BADGER, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
-from tests.utils import (mock_balances, mock_boosts, mock_tree, set_env_vars,
-                         test_cycle, test_end, test_start)
+from tests.utils import (mock_balances, mock_boosts, mock_boosts_split,
+                         mock_tree, set_env_vars, test_account, test_cycle,
+                         test_end, test_start)
 
 set_env_vars()
 
@@ -18,6 +19,7 @@ from rewards.classes.Snapshot import Snapshot
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.rewards_utils import (combine_rewards,
                                          process_cumulative_rewards)
+from tests.cycle_utils import mock_badger_tree, mock_tree_manager
 
 logger = logging.getLogger("test-rewards-manager")
 
@@ -43,6 +45,11 @@ def boosts():
 
 
 @pytest.fixture
+def boosts_split():
+    return mock_boosts_split
+
+
+@pytest.fixture
 def balances():
     return mock_balances
 
@@ -51,16 +58,8 @@ def mock_get_sett_multipliers():
     return mock_boosts["multiplierData"]
 
 
-def mock_tree_manager(chain, cycle_account, badger_tree):
-    with open(f"abis/eth/BadgerTreeV2.json") as fp:
-        abi = json.load(fp)
-    tree_manager = TreeManager(chain, cycle_account)
-    tree_manager.fetch_current_tree = mock_fetch_current_tree
-    tree_manager.w3 = web3
-    tree_manager.badger_tree = web3.eth.contract(
-        address=EMISSIONS_CONTRACTS[chain]["BadgerTree"], abi=abi
-    ).functions
-    return tree_manager
+def mock_get_sett_multipliers_split():
+    return mock_boosts_split["multiplierData"]
 
 
 def mock_fetch_snapshot(block, sett):
@@ -93,6 +92,25 @@ def rewards_manager(cycle, start, end, boosts, request) -> RewardsManager:
     rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
 
     return rewards_manager
+
+
+@pytest.fixture
+def rewards_manager_split(cycle, start, end, boosts_split, request) -> RewardsManager:
+    rewards_manager_split = RewardsManager(
+        request.param, cycle, start, end, boosts_split["userData"]
+    )
+    rewards_manager_split.get_sett_multipliers = mock_get_sett_multipliers_split
+    rewards_manager_split.fetch_sett_snapshot = mock_fetch_snapshot
+    rewards_manager_split.start = 13609200
+    rewards_manager_split.end = 13609300
+
+    return rewards_manager_split
+
+
+@pytest.fixture
+def tree_manager():
+    tree_manager = mock_tree_manager(Network.Ethereum, test_account, mock_badger_tree)
+    return tree_manager
 
 
 @pytest.fixture()
@@ -200,76 +218,65 @@ def test_calculate_sett_rewards(
 
 
 @pytest.mark.parametrize(
-    "emission_rate",
+    "rewards_manager_split",
     [
-        0,  # flat
-        0.49,  # middle
-        1,  # full boost
+        Network.Ethereum,
     ],
     indirect=True,
 )
-def test_splits(schedule, rewards_manager, emission_rate, monkeypatch):
-    monkeypatch.setattr(
-        "rewards.utils.emission_utils.get_flat_emission_rate",
-        lambda s, c: emission_rate,
-    )
+def test_splits(
+    rewards_manager_split, schedule, tree_manager, boosts_split, monkeypatch
+):
+    rates = [0, 0.5, 1]
+    user_data = {}
+    for rate in rates:
+        monkeypatch.setattr(
+            "rewards.classes.RewardsManager.get_flat_emission_rate",
+            lambda s, c: rate,
+        )
+        sett = SETTS[Network.Ethereum]["ibbtc_crv"]
+        total_badger = 100
+        mock_schedule = {BADGER: [schedule(sett, total_badger)]}
+        all_schedules = {sett: mock_schedule}
+        all_setts = [sett]
 
-    ###
-    total_badger = 100
-    schedule = {BADGER: [schedule(BIBBTC_CURVE_LP, total_badger)]}
-    all_schedules, setts = schedule, list(BIBBTC_CURVE_LP)
+        logger.info(f"Generating rewards with {rate*100}% pro rata rewards")
+        rewards_list = []
+        tree_rewards = rewards_manager_split.calculate_tree_distributions()
+        sett_rewards = rewards_manager_split.calculate_all_sett_rewards(
+            all_setts, all_schedules
+        )
+        rewards_list.append(tree_rewards)
+        rewards_list.append(sett_rewards)
 
-    logger.info(f"Generating rewards for {len(setts)} setts on {Network.Ethereum}")
+        new_rewards = combine_rewards(rewards_list, rewards_manager_split.cycle)
+        cumulative_rewards = process_cumulative_rewards(mock_tree, new_rewards)
+        merkle_tree = tree_manager.convert_to_merkle_tree(
+            cumulative_rewards, rewards_manager_split.start, rewards_manager_split.end
+        )
 
-    rewards_list = []
-    boosts = mock_boosts
+        for user in merkle_tree["claims"]:
+            amount = merkle_tree["claims"][user]["cumulativeAmounts"]
+            if user not in user_data:
+                user_data[user] = {}
+            user_data[user]["boost"] = boosts_split["userData"][user]["boost"]
+            if "rewards" not in user_data[user]:
+                user_data[user]["rewards"] = []
+            user_data[user]["rewards"].append(int(amount[0]) / 10 ** 18)
 
-    logger.info("Calculating Tree Rewards...")
-    tree_rewards = rewards_manager.calculate_tree_distributions()
-    rewards_list.append(tree_rewards)
-
-    logger.info("Calculating Sett Rewards...")
-    sett_rewards = rewards_manager.calculate_all_sett_rewards(setts, all_schedules)
-    rewards_list.append(sett_rewards)
-
-    new_rewards = combine_rewards(rewards_list, rewards_manager.cycle)
-
-    start_block, end_block = 13609200, 13609300
-
-    logger.info("Combining cumulative rewards... \n")
-    cumulative_rewards = process_cumulative_rewards(mock_tree, new_rewards)
-
-    logger.info("Converting to merkle tree... \n")
-    merkle_tree = tree_manager.convert_to_merkle_tree(
-        cumulative_rewards, start_block, end_block
-    )
-    logger.info(merkle_tree)
-
-
-# def test_splits_sett_rewards(
-#     rewards_manager: RewardsManager, emission_rate, sett, monkeypatch, schedule
-# ):
-#     rewards_manager.fetch_sett_snapshot = mock_fetch_snapshot
-#     monkeypatch.setattr(
-#         "rewards.utils.emission_utils.get_flat_emission_rate",
-#         lambda s, c: emission_rate,
-#     )
-#     rewards_manager.start = 13609200
-#     rewards_manager.end = 13609300
-#     badger_decimals_conversion = 1e18
-#     total_badger = 100
-#     mock_schedule = {BADGER: [schedule(sett, total_badger)]}
-
-#     rewards, flat, boosted = rewards_manager.calculate_sett_rewards(
-#         sett, schedules_by_token=mock_schedule
-#     )
-#     test_case = TestCase()
-#     total_flat = sum(flat.totals.values()) / badger_decimals_conversion
-#     print(total_flat)
-#     total_boosted = sum(boosted.totals.values()) / badger_decimals_conversion
-#     print(total_boosted)
-#     total_rewards = sum(rewards.totals.values()) / badger_decimals_conversion
-#     print(total_rewards)
-#     test_case.assertAlmostEqual(total_boosted + total_flat, total_rewards)
-#     test_case.assertAlmostEqual(total_boosted, (1 - emission_rate) * total_badger)
-#     test_case.assertAlmostEqual(total_flat, emission_rate * total_badger)
+    logger.info(json.dumps(user_data, indent=2))
+    assert user_data["0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd"]["rewards"] == [
+        0.03332222592469277,
+        16.683327779629014,
+        33.333333333333336,
+    ]
+    assert user_data["0xbC641f6C6957096857358Cc70df3623715A2ae45"]["rewards"] == [
+        33.32222592469177,
+        33.327779629012554,
+        33.333333333333336,
+    ]
+    assert user_data["0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0"]["rewards"] == [
+        66.64445184938354,
+        49.988892591358436,
+        33.333333333333336,
+    ]
