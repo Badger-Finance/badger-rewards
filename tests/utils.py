@@ -2,6 +2,9 @@ from decimal import Decimal
 from hexbytes import HexBytes
 import json
 import os
+
+from eth_account import Account
+
 from helpers.enums import Network
 
 
@@ -17,8 +20,9 @@ def get_mock_json(name):
     return json.load(open(file_name))
 
 
-test_address = "0x05995bc5736707208EBDb18BC5bE812668b525B2"
 test_key = "0f0bdc830bde4be43c3a54c369c6f6a94ac9071911dc3913e35ce5ed8fe955b9"
+test_account = Account.from_key(test_key)
+test_address = test_account.address
 chains = [Network.Ethereum, Network.Arbitrum, Network.Polygon]
 
 mock_tree = get_mock_json("mock_tree")

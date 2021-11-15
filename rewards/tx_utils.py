@@ -66,10 +66,6 @@ def get_latest_base_fee(web3: Web3, default=int(100e9)):  # default to 100 gwei
     return base_fee
 
 
-def get_latest_arbitrum_fee(web3: Web3, default=int(5e9)):  # default to 5 gwei
-    latest = web3.eth.getBlock("latest")
-
-
 def get_effective_gas_price(web3: Web3, chain: str = Network.Ethereum) -> int:
     # TODO: Currently using max fee (per gas) that can be used for this tx. Maybe use base + priority (for average).
     if chain == Network.Ethereum:

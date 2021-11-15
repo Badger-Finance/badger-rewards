@@ -74,8 +74,8 @@ class RewardsManager:
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
     ) -> RewardsList:
-        start_time = self.web3.eth.getBlock(self.start)["timestamp"]
-        end_time = self.web3.eth.getBlock(self.end)["timestamp"]
+        start_time = self.web3.eth.get_block(self.start)["timestamp"]
+        end_time = self.web3.eth.get_block(self.end)["timestamp"]
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
         rewards = RewardsList(self.cycle)
         extra_rewards = []
@@ -226,7 +226,14 @@ class RewardsManager:
                     )
                 if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     percentage_out_of_total = (
-                        int(to_distribute) / int(schedule.initialTokensLocked) * 100
+                        (int(to_distribute) / int(schedule.initialTokensLocked) * 100)
+                        if int(schedule.initialTokensLocked) > 0
+                        else 0
+                    )
+                    percentage_total_duration = (
+                        (range_duration / schedule.duration * 100)
+                        if schedule.duration > 0
+                        else 0
                     )
                     console.log(
                         (
@@ -239,7 +246,7 @@ class RewardsManager:
                     console.log(
                         f"Total duration of schedule elapsed is {to_hours(range_duration)}"
                         f" hours out of {to_hours(schedule.duration)} hours"
-                        f" or {range_duration/schedule.duration * 100}% of total duration.",
+                        f" or {percentage_total_duration}% of total duration.",
                     )
             total_to_distribute += to_distribute
 
@@ -267,8 +274,8 @@ class RewardsManager:
 
     def calculate_tree_distributions(self) -> RewardsList:
         tree_distributions = fetch_tree_distributions(
-            self.web3.eth.getBlock(self.start)["timestamp"],
-            self.web3.eth.getBlock(self.end)["timestamp"],
+            self.web3.eth.get_block(self.start)["timestamp"],
+            self.web3.eth.get_block(self.end)["timestamp"],
             self.chain,
         )
         console.log(

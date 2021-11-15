@@ -315,5 +315,12 @@ CLAIMABLE_TOKENS = {
     Network.Arbitrum: {BalanceType.Native: [ARB_BADGER], BalanceType.NonNative: []},
     Network.Polygon: {BalanceType.Native: [POLY_BADGER], BalanceType.NonNative: []},
 }
+
+ABI_DIRS = {
+    Network.Ethereum: "eth",
+    Network.Polygon: "polygon",
+    Network.Arbitrum: "arbitrum",
+}
+
 SANITY_TOKEN_AMOUNT = 4000 * 1e18
 BOOST_BLOCK_DELAY = 10
