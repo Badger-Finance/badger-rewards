@@ -8,9 +8,8 @@ from rewards.aws.boost import add_multipliers
 from rewards.aws.helpers import get_secret
 from rewards.aws.trees import upload_tree
 from rewards.classes.TreeManager import TreeManager
-from scripts.rewards.eth.retroactive.fix_eth_rewards.fix_eth_rewards import (
-    fix_eth_rewards,
-)
+from scripts.rewards.eth.retroactive.fix_eth_rewards.fix_eth_rewards import \
+    fix_eth_rewards
 
 if __name__ == "__main__":
     chain = Network.Ethereum

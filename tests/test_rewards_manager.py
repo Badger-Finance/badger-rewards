@@ -7,14 +7,8 @@ from helpers.constants import BADGER
 from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
-from tests.utils import (
-    mock_balances,
-    mock_boosts,
-    set_env_vars,
-    test_cycle,
-    test_end,
-    test_start,
-)
+from tests.utils import (mock_balances, mock_boosts, set_env_vars, test_cycle,
+                         test_end, test_start)
 
 set_env_vars()
 
