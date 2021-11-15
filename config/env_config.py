@@ -9,6 +9,8 @@ from rewards.aws.helpers import get_secret
 
 logging.getLogger("gql.transport.aiohttp").setLevel(logging.WARNING)
 
+logging.getLogger("gql.transport.aiohttp").setLevel("WARNING")
+
 
 class EnvConfig:
     def __init__(self):

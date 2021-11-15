@@ -1,7 +1,9 @@
+import json
 import logging
 from unittest import TestCase
 
 import pytest
+from brownie import web3
 
 from helpers.constants import BADGER, SETTS
 from helpers.enums import BalanceType, Network
@@ -13,6 +15,7 @@ set_env_vars()
 
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Snapshot import Snapshot
+from rewards.classes.TreeManager import TreeManager
 from rewards.utils.rewards_utils import (combine_rewards,
                                          process_cumulative_rewards)
 
@@ -46,6 +49,18 @@ def balances():
 
 def mock_get_sett_multipliers():
     return mock_boosts["multiplierData"]
+
+
+def mock_tree_manager(chain, cycle_account, badger_tree):
+    with open(f"abis/eth/BadgerTreeV2.json") as fp:
+        abi = json.load(fp)
+    tree_manager = TreeManager(chain, cycle_account)
+    tree_manager.fetch_current_tree = mock_fetch_current_tree
+    tree_manager.w3 = web3
+    tree_manager.badger_tree = web3.eth.contract(
+        address=EMISSIONS_CONTRACTS[chain]["BadgerTree"], abi=abi
+    ).functions
+    return tree_manager
 
 
 def mock_fetch_snapshot(block, sett):

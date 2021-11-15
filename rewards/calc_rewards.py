@@ -12,7 +12,7 @@ from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
-from rewards.aws.boost import add_multipliers, download_boosts
+from rewards.aws.boost import add_multipliers, download_boosts, upload_boosts
 from rewards.aws.trees import upload_tree
 from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsManager import RewardsManager
@@ -107,7 +107,7 @@ def propose_root(
     current_merkle_data = tree_manager.fetch_current_merkle_data()
     w3 = env_config.get_web3(chain)
 
-    current_time = w3.eth.getBlock(w3.eth.block_number)["timestamp"]
+    current_time = w3.eth.get_block(w3.eth.block_number)["timestamp"]
     time_since_last_update = current_time - current_merkle_data["lastUpdateTime"]
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
@@ -146,12 +146,15 @@ def approve_root(
         past_tree=current_rewards,
         tree_manager=tree_manager,
     )
+    boosts = download_boosts(chain)
     if env_config.test or env_config.staging:
-        add_multipliers(
+        boosts = add_multipliers(
+            boosts,
             rewards_data["multiplierData"],
             rewards_data["userMultipliers"],
             chain=chain,
         )
+        upload_boosts(boosts, chain)
         return rewards_data
     if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
         console.log(
@@ -169,11 +172,13 @@ def approve_root(
                 staging=env_config.test or env_config.staging,
             )
 
-            add_multipliers(
+            boosts = add_multipliers(
+                boosts,
                 rewards_data["multiplierData"],
                 rewards_data["userMultipliers"],
                 chain=chain,
             )
+            upload_boosts(boosts, chain)
             cycle_logger.save(tree_manager.next_cycle, chain)
             return rewards_data
     else:
