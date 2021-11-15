@@ -12,7 +12,7 @@ def get_emission_control(chain: str):
 
 
 def get_token_weight(token: str, chain: str):
-    token_weight = get_emission_control(chain).tokenWeight(token).call()
+    token_weight = get_emission_control(chain).tokenWeight(token).call() / 1e4
     return 1 if token_weight == 0 else token_weight
 
 
