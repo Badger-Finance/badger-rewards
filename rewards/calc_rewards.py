@@ -103,7 +103,7 @@ def propose_root(
     current_merkle_data = tree_manager.fetch_current_merkle_data()
     w3 = env_config.get_web3(chain)
 
-    current_time = w3.eth.getBlock(w3.eth.block_number)["timestamp"]
+    current_time = w3.eth.get_block(w3.eth.block_number)["timestamp"]
     time_since_last_update = current_time - current_merkle_data["lastUpdateTime"]
 
     if time_since_last_update < rewards_config.root_update_interval(chain):

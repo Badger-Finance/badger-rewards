@@ -74,8 +74,8 @@ class RewardsManager:
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
     ) -> RewardsList:
-        start_time = self.web3.eth.getBlock(self.start)["timestamp"]
-        end_time = self.web3.eth.getBlock(self.end)["timestamp"]
+        start_time = self.web3.eth.get_block(self.start)["timestamp"]
+        end_time = self.web3.eth.get_block(self.end)["timestamp"]
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
         rewards = RewardsList(self.cycle)
         extra_rewards = []
@@ -274,8 +274,8 @@ class RewardsManager:
 
     def calculate_tree_distributions(self) -> RewardsList:
         tree_distributions = fetch_tree_distributions(
-            self.web3.eth.getBlock(self.start)["timestamp"],
-            self.web3.eth.getBlock(self.end)["timestamp"],
+            self.web3.eth.get_block(self.start)["timestamp"],
+            self.web3.eth.get_block(self.end)["timestamp"],
             self.chain,
         )
         console.log(

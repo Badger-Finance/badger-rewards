@@ -148,37 +148,37 @@ def tree_manager(chain, cycle_account, badger_tree):
     return tree_manager
 
 
-# @pytest.mark.require_network("hardhat-fork")
-# def test_propose_root(tree_manager, badger_tree, keeper_address):
-#     assert keeper_address == tree_manager.approve_account.address
-#     past_rewards, start_block, end_block = calc_next_cycle_range(
-#         tree_manager.chain, tree_manager
-#     )
+@pytest.mark.require_network("hardhat-fork")
+def test_propose_root(tree_manager, badger_tree, keeper_address):
+    assert keeper_address == tree_manager.approve_account.address
+    past_rewards, start_block, end_block = calc_next_cycle_range(
+        tree_manager.chain, tree_manager
+    )
 
-#     pending_hash_before = badger_tree.pendingMerkleContentHash()
-#     pending_root_before = badger_tree.pendingMerkleRoot()
-#     timestamp_before = badger_tree.lastProposeTimestamp()
+    pending_hash_before = badger_tree.pendingMerkleContentHash()
+    pending_root_before = badger_tree.pendingMerkleRoot()
+    timestamp_before = badger_tree.lastProposeTimestamp()
 
-#     logger.info(
-#         f"Generating rewards between {start_block} and {end_block} on {tree_manager.chain} chain"
-#     )
-#     logger.info(f"**Proposing Rewards on {tree_manager.chain}**")
-#     logger.info(f"Calculating rewards between {start_block} and {end_block}")
-#     propose_root(
-#         tree_manager.chain,
-#         start_block,
-#         end_block,
-#         past_rewards,
-#         tree_manager,
-#         save=False,
-#     )
+    logger.info(
+        f"Generating rewards between {start_block} and {end_block} on {tree_manager.chain} chain"
+    )
+    logger.info(f"**Proposing Rewards on {tree_manager.chain}**")
+    logger.info(f"Calculating rewards between {start_block} and {end_block}")
+    propose_root(
+        tree_manager.chain,
+        start_block,
+        end_block,
+        past_rewards,
+        tree_manager,
+        save=False,
+    )
 
-#     pending_hash_after = badger_tree.pendingMerkleContentHash()
-#     pending_root_after = badger_tree.pendingMerkleRoot()
-#     timestamp_after = badger_tree.lastProposeTimestamp()
-#     assert pending_hash_before != pending_hash_after
-#     assert pending_root_before != pending_root_after
-#     assert timestamp_after > timestamp_before
+    pending_hash_after = badger_tree.pendingMerkleContentHash()
+    pending_root_after = badger_tree.pendingMerkleRoot()
+    timestamp_after = badger_tree.lastProposeTimestamp()
+    assert pending_hash_before != pending_hash_after
+    assert pending_root_before != pending_root_after
+    assert timestamp_after > timestamp_before
 
 
 @pytest.mark.require_network("hardhat-fork")

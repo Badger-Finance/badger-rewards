@@ -34,7 +34,7 @@ def convert_from_eth(block) -> Dict[str, int]:
     """
     Convert block from eth to blocks on other chains
     """
-    timestamp = env_config.get_web3().eth.getBlock(block)["timestamp"]
+    timestamp = env_config.get_web3().eth.get_block(block)["timestamp"]
     return {
         Network.Ethereum: block,
         Network.Polygon: get_block_by_timestamp(Network.Polygon, timestamp) - 1000,
