@@ -98,4 +98,3 @@ def test_propose_root(tree_manager, badger_tree, keeper_address):
 @pytest.mark.require_network("hardhat-arbitrum-fork")
 def test_cycle(tree_manager, badger_tree, keeper_address):
     mock_cycle(tree_manager, badger_tree, keeper_address)
-

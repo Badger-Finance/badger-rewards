@@ -18,6 +18,7 @@ from tests.utils import mock_tree
 
 logger = logging.getLogger("cycle-utils")
 
+
 class MockCycleLogger:
     def __init__(self):
         pass
@@ -55,6 +56,7 @@ def mock_upload_boosts(boosts, chain: str):
 def mock_upload_tree(*args, **kwargs):
     pass
 
+
 def mock_badger_tree(chain: Network, keeper_address: str, account: Account):
     with open(f"abis/eth/BadgerTreeV2.json") as fp:
         abi = json.load(fp)
@@ -70,7 +72,7 @@ def mock_badger_tree(chain: Network, keeper_address: str, account: Account):
 
     if chain == Network.Ethereum:
         account.transfer(admin, "10 ether", priority_fee="2 gwei")
-    
+
         badger_tree.grantRole(
             proposer_role, keeper_address, {"from": admin, "priority_fee": "2 gwei"}
         )
@@ -78,15 +80,12 @@ def mock_badger_tree(chain: Network, keeper_address: str, account: Account):
             approver_role, keeper_address, {"from": admin, "priority_fee": "2 gwei"}
         )
     else:
-        badger_tree.grantRole(
-            proposer_role, keeper_address, {"from": admin}
-        )
-        badger_tree.grantRole(
-            approver_role, keeper_address, {"from": admin}
-        )
+        badger_tree.grantRole(proposer_role, keeper_address, {"from": admin})
+        badger_tree.grantRole(approver_role, keeper_address, {"from": admin})
     assert badger_tree.hasRole(proposer_role, keeper_address)
     assert badger_tree.hasRole(approver_role, keeper_address)
     return badger_tree
+
 
 def mock_tree_manager(chain, cycle_account, badger_tree):
     with open(f"abis/eth/BadgerTreeV2.json") as fp:
@@ -98,6 +97,7 @@ def mock_tree_manager(chain, cycle_account, badger_tree):
         address=EMISSIONS_CONTRACTS[chain]["BadgerTree"], abi=abi
     ).functions
     return tree_manager
+
 
 def mock_propose_root(tree_manager: TreeManager, badger_tree, keeper_address: str):
     assert keeper_address == tree_manager.approve_account.address
@@ -129,6 +129,7 @@ def mock_propose_root(tree_manager: TreeManager, badger_tree, keeper_address: st
     assert pending_hash_before != pending_hash_after
     assert pending_root_before != pending_root_after
     assert timestamp_after > timestamp_before
+
 
 def mock_cycle(tree_manager, badger_tree, keeper_address):
     past_rewards, start_block, end_block = calc_next_cycle_range(
