@@ -169,8 +169,6 @@ SETTS = {
 }
 
 
-BSBTC = "0xd04c48A53c111300aD41190D63681ed3dAd998eC"
-
 TOKENS_TO_CHECK = {
     Network.Ethereum: {
         "Badger": BADGER,
@@ -178,7 +176,7 @@ TOKENS_TO_CHECK = {
         "xSushi": XSUSHI,
         "Dfd": DFD,
         "bCvxCrv": SETTS[Network.Ethereum]["cvx_crv"],
-        "bCvx": SETTS[Network.Ethereum]["bcvx"],
+        "bCvx": SETTS[Network.Ethereum]["cvx"],
         "bveCVX": SETTS[Network.Ethereum]["bvecvx"],
     },
     Network.Arbitrum: {
@@ -243,7 +241,7 @@ NATIVE = [
     SETTS[Network.Ethereum]["digg"],
     SETTS[Network.Ethereum]["uni_digg_wbtc"],
     SETTS[Network.Ethereum]["sushi_digg_wbtc"],
-    SETTS[Network.Arbitrum]["badger"],
+    SETTS[Network.Arbitrum]["swapr_weth_badger"],
 ]
 
 EMISSIONS_CONTRACTS = {
@@ -283,7 +281,7 @@ DISABLED_VAULTS = [
 ]
 
 NO_BOOST = DISABLED_VAULTS + [
-    SETTS[Network.Ethereum]["bcvx"],
+    SETTS[Network.Ethereum]["cvx"],
     SETTS[Network.Ethereum]["bvecvx"],
     SETTS[Network.Ethereum]["bvecvx_cvx"],
     SETTS[Network.Ethereum]["ren_crv"],
@@ -298,10 +296,6 @@ NO_BOOST = DISABLED_VAULTS + [
     SETTS[Network.Ethereum]["sushi_ibbtc_wbtc"],
 ]
 
-PRO_RATA_VAULTS = [
-    SETTS[Network.Ethereum]["bvecvx"],
-    SETTS[Network.Ethereum]["bvecvx_cvx"],
-]
 
 MONITORING_SECRET_NAMES = {
     Environment.Production: {
