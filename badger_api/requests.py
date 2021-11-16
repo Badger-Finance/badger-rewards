@@ -2,8 +2,6 @@ import concurrent.futures
 from functools import lru_cache
 from typing import Dict, Tuple
 
-import requests
-
 from badger_api.config import get_api_base_path
 from helpers import http
 from helpers.constants import BOOST_CHAINS
@@ -17,6 +15,8 @@ def fetch_ppfs() -> Tuple[float, float]:
     """
     response = http.get(f"{badger_api}/setts")
     setts = response.json()
+    if not setts:
+        return
     badger = [sett for sett in setts if sett["asset"] == "BADGER"][0]
     digg = [sett for sett in setts if sett["asset"] == "DIGG"][0]
     return badger["ppfs"], digg["ppfs"]
