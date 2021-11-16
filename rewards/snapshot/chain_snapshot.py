@@ -29,7 +29,7 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
 
     for sett_addr, balances in list(chain_balances.items()):
         sett_addr = Web3.toChecksumAddress(sett_addr)
-        sett_balances = parse_sett_balances(sett_addr, balances)
+        sett_balances = parse_sett_balances(sett_addr, balances, chain)
         token = make_contract(sett_addr, abi_name="ERC20", chain=chain)
         console.log(f"Fetched {len(balances)} balances for sett {token.name().call()}")
         balances_by_sett[sett_addr] = sett_balances
