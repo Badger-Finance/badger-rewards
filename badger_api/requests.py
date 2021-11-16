@@ -1,6 +1,6 @@
 import concurrent.futures
 from functools import lru_cache
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 from badger_api.config import get_api_base_path
 from helpers import http
@@ -9,7 +9,7 @@ from helpers.constants import BOOST_CHAINS
 badger_api = get_api_base_path()
 
 
-def fetch_ppfs() -> Tuple[float, float]:
+def fetch_ppfs() -> Optional[Tuple[float, float]]:
     """
     Fetch ppfs for bbadger and bdigg
     """
@@ -32,6 +32,8 @@ def fetch_token_prices() -> Dict[str, float]:
     for chain in chains:
         response = http.get(f"{badger_api}/prices?chain={chain}")
         chain_prices = response.json()
+        if not chain_prices:
+            continue
         prices = {**prices, **chain_prices}
 
     return prices
