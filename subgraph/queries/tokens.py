@@ -8,8 +8,11 @@ from web3 import Web3
 
 from config.singletons import env_config
 from helpers.digg_utils import digg_utils
-from helpers.discord import (get_discord_url, send_error_to_discord,
-                             send_message_to_discord)
+from helpers.discord import (
+    get_discord_url,
+    send_error_to_discord,
+    send_message_to_discord,
+)
 from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
 from subgraph.subgraph_utils import make_gql_client

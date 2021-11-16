@@ -8,17 +8,24 @@ from brownie import web3
 from helpers.constants import BADGER, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
-from tests.utils import (mock_balances, mock_boosts, mock_boosts_split,
-                         mock_tree, set_env_vars, test_account, test_cycle,
-                         test_end, test_start)
+from tests.utils import (
+    mock_balances,
+    mock_boosts,
+    mock_boosts_split,
+    mock_tree,
+    set_env_vars,
+    test_account,
+    test_cycle,
+    test_end,
+    test_start,
+)
 
 set_env_vars()
 
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Snapshot import Snapshot
 from rewards.classes.TreeManager import TreeManager
-from rewards.utils.rewards_utils import (combine_rewards,
-                                         process_cumulative_rewards)
+from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewards
 from tests.cycle_utils import mock_badger_tree, mock_tree_manager
 
 logger = logging.getLogger("test-rewards-manager")

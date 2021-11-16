@@ -7,8 +7,7 @@ from eth_account import Account
 from helpers.constants import ABI_DIRS, EMISSIONS_CONTRACTS
 from helpers.enums import Network
 from rewards.classes.TreeManager import TreeManager
-from rewards.utils.tree_utils import (calc_next_cycle_range,
-                                      get_last_proposed_cycle)
+from rewards.utils.tree_utils import calc_next_cycle_range, get_last_proposed_cycle
 from scripts.rewards.utils.approve_rewards import approve_root
 from scripts.rewards.utils.propose_rewards import propose_root
 from tests.utils import mock_boosts, mock_tree

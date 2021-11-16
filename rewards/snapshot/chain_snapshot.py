@@ -4,8 +4,7 @@ from typing import Dict, Tuple
 from rich.console import Console
 from web3 import Web3
 
-from helpers.constants import (EMISSIONS_BLACKLIST, NATIVE, NO_BOOST,
-                               REWARDS_BLACKLIST)
+from helpers.constants import EMISSIONS_BLACKLIST, NATIVE, NO_BOOST, REWARDS_BLACKLIST
 from helpers.enums import BalanceType
 from helpers.web3_utils import make_contract
 from rewards.classes.Snapshot import Snapshot
