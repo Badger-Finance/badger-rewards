@@ -10,8 +10,7 @@ from eth_account import Account
 from hexbytes import HexBytes
 from web3 import contract
 
-from tests.utils import (mock_boosts, mock_tree, set_env_vars, test_address,
-                         test_key)
+from tests.utils import mock_boosts, mock_tree, set_env_vars, test_address, test_key
 
 set_env_vars()
 os.environ["private"] = test_key
@@ -21,14 +20,19 @@ from helpers.constants import ABI_DIRS, EMISSIONS_CONTRACTS, ETH_BADGER_TREE
 from helpers.enums import Network
 from rewards.aws.helpers import get_secret
 from rewards.classes.TreeManager import TreeManager
-from rewards.utils.tree_utils import (calc_next_cycle_range,
-                                      get_last_proposed_cycle)
+from rewards.utils.tree_utils import calc_next_cycle_range, get_last_proposed_cycle
 from scripts.rewards.utils.approve_rewards import approve_root
 from scripts.rewards.utils.propose_rewards import propose_root
-from tests.cycle_utils import (MockCycleLogger, mock_badger_tree, mock_cycle,
-                               mock_download_boosts, mock_propose_root,
-                               mock_tree_manager, mock_upload_boosts,
-                               mock_upload_tree)
+from tests.cycle_utils import (
+    MockCycleLogger,
+    mock_badger_tree,
+    mock_cycle,
+    mock_download_boosts,
+    mock_propose_root,
+    mock_tree_manager,
+    mock_upload_boosts,
+    mock_upload_tree,
+)
 
 logger = logging.getLogger("test-cycles-eth")
 

@@ -17,9 +17,12 @@ from rewards.aws.trees import download_tree
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.classes.RewardsList import RewardsList
 from rewards.explorer import get_explorer_url
-from rewards.utils.tx_utils import (confirm_transaction,
-                                    get_effective_gas_price,
-                                    get_gas_price_of_tx, get_priority_fee)
+from rewards.utils.tx_utils import (
+    confirm_transaction,
+    get_effective_gas_price,
+    get_gas_price_of_tx,
+    get_priority_fee,
+)
 
 console = Console()
 
