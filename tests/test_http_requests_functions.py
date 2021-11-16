@@ -1,13 +1,15 @@
 import pytest
 import responses
 
-from badger_api.requests import badger_api
-from badger_api.requests import fetch_claimable
-from badger_api.requests import fetch_ppfs
-from badger_api.requests import fetch_token
-from badger_api.requests import fetch_token_names
-from badger_api.requests import fetch_token_prices
-from badger_api.requests import fetch_total_claimable_pages
+from badger_api.requests import (
+    badger_api,
+    fetch_claimable,
+    fetch_ppfs,
+    fetch_token,
+    fetch_token_names,
+    fetch_token_prices,
+    fetch_total_claimable_pages,
+)
 from helpers.constants import BOOST_CHAINS
 from rewards.explorer import fetch_block_by_timestamp
 
