@@ -2,8 +2,7 @@ import pytest
 
 from helpers.constants import SETTS
 from helpers.enums import Network
-from rewards.utils.emission_utils import (get_flat_emission_rate,
-                                          get_token_weight)
+from rewards.utils.emission_utils import get_flat_emission_rate, get_token_weight
 from tests.utils import set_env_vars
 
 set_env_vars()

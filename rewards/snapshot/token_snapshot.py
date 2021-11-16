@@ -2,8 +2,7 @@ from typing import Dict, Tuple
 
 from helpers.constants import BADGER, DIGG
 from rewards.classes.Snapshot import Snapshot
-from subgraph.queries.tokens import (fetch_fuse_pool_balances,
-                                     fetch_token_balances)
+from subgraph.queries.tokens import fetch_fuse_pool_balances, fetch_token_balances
 from subgraph.subgraph_utils import make_gql_client
 
 
