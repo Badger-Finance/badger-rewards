@@ -4,11 +4,10 @@ from typing import Dict, List, Tuple
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
 from rich.console import Console
-from web3 import Web3
 
 from config.rewards_config import rewards_config
 from config.singletons import env_config
-from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS
+from helpers.constants import EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
@@ -19,6 +18,7 @@ from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Schedule import Schedule
 from rewards.classes.TreeManager import TreeManager
 from rewards.rewards_checker import verify_rewards
+from rewards.utils.emission_utils import fetch_setts, parse_schedules
 from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewards
 from subgraph.queries.setts import list_setts
 
@@ -29,28 +29,6 @@ def console_and_discord(msg: str, chain: str, bot_type: BotType = BotType.Cycle)
     url = get_discord_url(chain, bot_type)
     console.log(msg)
     send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
-
-
-def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
-    """
-    Parse unlock shcedules
-    :param schedules: schedules to parse
-    """
-    schedules_by_token = {}
-    console.log("Fetching schedules...")
-    for schedule in schedules:
-        schedule = Schedule(
-            Web3.toChecksumAddress(schedule[0]),
-            Web3.toChecksumAddress(schedule[1]),
-            schedule[2],
-            schedule[3],
-            schedule[4],
-            schedule[5],
-        )
-        if schedule.token not in schedules_by_token:
-            schedules_by_token[schedule.token] = []
-        schedules_by_token[schedule.token].append(schedule)
-    return schedules_by_token
 
 
 def fetch_all_schedules(
@@ -73,15 +51,6 @@ def fetch_all_schedules(
         all_schedules[sett] = parse_schedules(schedules)
     console.log(f"Fetched {len(all_schedules)} schedules")
     return all_schedules, setts_with_schedules
-
-
-def fetch_setts(chain: str) -> List[str]:
-    """
-    Fetch setts that are eligible for rewards
-    :param chain:
-    """
-    setts = list_setts(chain)
-    return list(filter(lambda x: x not in DISABLED_VAULTS, setts))
 
 
 def propose_root(

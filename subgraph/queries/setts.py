@@ -85,7 +85,7 @@ def list_setts(chain: str) -> List[str]:
     """
     client = make_gql_client(chain)
     query = gql(
-        """
+    """
     {
 	    setts(first:100) {
             id

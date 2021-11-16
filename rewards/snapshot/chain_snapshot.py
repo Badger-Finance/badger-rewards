@@ -4,11 +4,17 @@ from typing import Dict, Tuple
 from rich.console import Console
 from web3 import Web3
 
-from helpers.constants import EMISSIONS_BLACKLIST, NATIVE, NO_BOOST, REWARDS_BLACKLIST
+from helpers.constants import (
+    DISABLED_VAULTS,
+    EMISSIONS_BLACKLIST,
+    NATIVE,
+    PRO_RATA_VAULTS,
+    REWARDS_BLACKLIST,
+)
 from helpers.enums import BalanceType
 from helpers.web3_utils import make_contract
 from rewards.classes.Snapshot import Snapshot
-from rewards.utils.emission_utils import get_token_weight
+from rewards.utils.emission_utils import fetch_unboosted_vaults, get_token_weight
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
 
 console = Console()
@@ -83,8 +89,9 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
     total_snapshot = chain_snapshot(chain, block)
     native = Counter()
     non_native = Counter()
+    no_boost = DISABLED_VAULTS + fetch_unboosted_vaults(chain) + PRO_RATA_VAULTS
     for sett, snapshot in total_snapshot.items():
-        if sett in NO_BOOST:
+        if sett in no_boost:
             console.log(f"{sett} is disabled")
             continue
         usd_snapshot = snapshot.convert_to_usd(chain)
