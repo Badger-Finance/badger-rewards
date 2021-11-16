@@ -14,7 +14,7 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
     Fetch ppfs for bbadger and bdigg
     """
     response = http.get(f"{badger_api}/setts")
-    if response.status_code >= 400:
+    if not response.ok:
         return
     setts = response.json()
     if not setts:
@@ -33,7 +33,7 @@ def fetch_token_prices() -> Dict[str, float]:
     prices = {}
     for chain in chains:
         response = http.get(f"{badger_api}/prices?chain={chain}")
-        if response.status_code >= 400:
+        if not response.ok:
             continue
         chain_prices = response.json()
         if not chain_prices:
@@ -49,7 +49,7 @@ def fetch_claimable(page: int, chain: str) -> Optional[Dict]:
     :param page: page to fetch data from
     """
     response = http.get(f"{badger_api}/accounts/allClaimable?page={page}&chain={chain}")
-    if response.status_code >= 400:
+    if not response.ok:
         return
     return response.json()
 
@@ -85,7 +85,7 @@ def fetch_all_claimable_balances(chain: str) -> Optional[Dict]:
 @lru_cache
 def fetch_token_names(chain: str):
     response = http.get(f"{badger_api}/tokens?chain={chain}")
-    if response.status_code >= 400:
+    if not response.ok:
         return
     return response.json()
 
