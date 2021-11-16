@@ -1,13 +1,16 @@
-from functools import lru_cache
-from rich.console import Console
-from web3.contract import ContractFunctions
-from rewards.classes.Schedule import Schedule
-from helpers.constants import EMISSIONS_CONTRACTS, DISABLED_VAULTS, NATIVE
-from helpers.web3_utils import make_contract
-from typing import List, Dict
-from subgraph.queries.setts import list_setts
-from web3 import Web3
 import time
+from functools import lru_cache
+from typing import Dict, List
+
+from rich.console import Console
+from web3 import Web3
+from web3.contract import ContractFunctions
+
+from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS, NATIVE
+from helpers.web3_utils import make_contract
+from rewards.classes.Schedule import Schedule
+from subgraph.queries.setts import list_setts
+
 console = Console()
 
 
@@ -44,7 +47,6 @@ def fetch_unboosted_vaults(chain) -> List[str]:
         if not has_active_schedule and sett not in NATIVE:
             unboosted_vaults.append(sett)
     return unboosted_vaults
-
 
 
 def fetch_setts(chain: str) -> List[str]:

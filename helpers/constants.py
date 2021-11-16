@@ -279,6 +279,10 @@ DISABLED_VAULTS = [
     SETTS[Network.Ethereum]["tricrypto_crv"],
     SETTS[Network.Ethereum]["harvest_ren_crv"],
 ]
+PRO_RATA_VAULTS = [
+    SETTS[Network.Ethereum]["bvecvx"],
+    SETTS[Network.Ethereum]["bvecvx_cvx"],
+]
 
 MONITORING_SECRET_NAMES = {
     Environment.Production: {

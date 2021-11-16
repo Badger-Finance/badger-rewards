@@ -8,7 +8,6 @@ from rich.console import Console
 from config.rewards_config import rewards_config
 from config.singletons import env_config
 from helpers.constants import EMISSIONS_CONTRACTS
-from rewards.utils.emission_utils import fetch_setts, parse_schedules
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
@@ -19,6 +18,7 @@ from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Schedule import Schedule
 from rewards.classes.TreeManager import TreeManager
 from rewards.rewards_checker import verify_rewards
+from rewards.utils.emission_utils import fetch_setts, parse_schedules
 from rewards.utils.rewards_utils import (combine_rewards,
                                          process_cumulative_rewards)
 
@@ -29,8 +29,6 @@ def console_and_discord(msg: str, chain: str, bot_type: BotType = BotType.Cycle)
     url = get_discord_url(chain, bot_type)
     console.log(msg)
     send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
-
-
 
 
 def fetch_all_schedules(
@@ -53,7 +51,6 @@ def fetch_all_schedules(
         all_schedules[sett] = parse_schedules(schedules)
     console.log(f"Fetched {len(all_schedules)} schedules")
     return all_schedules, setts_with_schedules
-
 
 
 def propose_root(
