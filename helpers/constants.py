@@ -280,23 +280,6 @@ DISABLED_VAULTS = [
     SETTS[Network.Ethereum]["harvest_ren_crv"],
 ]
 
-NO_BOOST = DISABLED_VAULTS + [
-    SETTS[Network.Ethereum]["cvx"],
-    SETTS[Network.Ethereum]["bvecvx"],
-    SETTS[Network.Ethereum]["bvecvx_cvx"],
-    SETTS[Network.Ethereum]["ren_crv"],
-    SETTS[Network.Ethereum]["sbtc_crv"],
-    SETTS[Network.Ethereum]["tbtc_crv"],
-    SETTS[Network.Ethereum]["hbtc_crv"],
-    SETTS[Network.Ethereum]["bbtc_crv"],
-    SETTS[Network.Ethereum]["pbtc_crv"],
-    SETTS[Network.Ethereum]["obtc_crv"],
-    SETTS[Network.Ethereum]["yearn_wbtc"],
-    SETTS[Network.Ethereum]["sushi_wbtc_eth"],
-    SETTS[Network.Ethereum]["sushi_ibbtc_wbtc"],
-]
-
-
 MONITORING_SECRET_NAMES = {
     Environment.Production: {
         Network.Ethereum: {
