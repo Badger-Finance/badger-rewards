@@ -45,7 +45,7 @@ jobs:
                   python-version: 3.9.5
 
             - name: Install Requirements
-              run: pip install -r requirements.txt
+              run: pip install -r requirements.txt && pip install -r requirements-dev.txt
 
             - name: Run Tests
               run: brownie test

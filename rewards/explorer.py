@@ -1,9 +1,11 @@
 import time
 from typing import Dict, Optional
 
-import requests
+from decouple import config
+from requests import HTTPError
 
 from config.singletons import env_config, http
+from helpers.discord import send_message_to_discord
 from helpers.enums import Network
 
 urls = {
@@ -19,7 +21,17 @@ def fetch_block_by_timestamp(chain: str, timestamp: int) -> Optional[Dict]:
         f"api?module=block&action=getblocknobytime&timestamp={timestamp}&closest=before"
     )
     api_key = f"apikey={env_config.get_explorer_api_key(chain)}"
-    response = http.get(f"{chain_url}/{url}&{api_key}")
+    try:
+        response = http.get(f"{chain_url}/{url}&{api_key}")
+    except HTTPError:
+        send_message_to_discord(
+            "Request failed",
+            f"URL Called: {url}",
+            [],
+            "Rewards Bot",
+            url=config("DISCORD_WEBHOOK_URL"),
+        )
+        return
     return response.json()
 
 
