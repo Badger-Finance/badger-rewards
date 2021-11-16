@@ -39,12 +39,14 @@ def fetch_token_prices() -> Dict[str, float]:
     return prices
 
 
-def fetch_claimable(page: int, chain: str):
+def fetch_claimable(page: int, chain: str) -> Optional[Dict]:
     """
     Fetch claimable data from account data
     :param page: page to fetch data from
     """
     response = http.get(f"{badger_api}/accounts/allClaimable?page={page}&chain={chain}")
+    if not response:
+        return
     return response.json()
 
 
