@@ -5,7 +5,7 @@ from typing import Dict, Tuple
 import requests
 
 from badger_api.config import get_api_base_path
-from config.singletons import http
+from helpers import http
 from helpers.constants import BOOST_CHAINS
 
 badger_api = get_api_base_path()
