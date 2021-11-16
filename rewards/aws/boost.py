@@ -1,9 +1,11 @@
-from helpers.discord import send_message_to_discord, get_discord_url
-from helpers.enums import BotType
-from rewards.aws.helpers import s3, get_bucket
-from config.singletons import env_config
-from rich.console import Console
 import json
+
+from rich.console import Console
+
+from config.singletons import env_config
+from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import BotType
+from rewards.aws.helpers import get_bucket, s3
 
 console = Console()
 

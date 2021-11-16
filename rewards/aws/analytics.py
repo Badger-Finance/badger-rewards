@@ -1,6 +1,8 @@
-from rich.console import Console
-from rewards.aws.helpers import s3
 import json
+
+from rich.console import Console
+
+from rewards.aws.helpers import s3
 
 console = Console()
 analytics_bucket = "badger-analytics"

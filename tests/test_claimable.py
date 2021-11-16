@@ -1,22 +1,19 @@
-import pytest
 import json
 import os
+
+import pytest
 from eth_account import Account
-from tests.utils import (
-    test_address,
-    test_key,
-    mock_tree,
-    mock_claimable_bals,
-    mock_claimed_for,
-    set_env_vars,
-)
+
+from tests.utils import (mock_claimable_bals, mock_claimed_for, mock_tree,
+                         set_env_vars, test_address, test_key)
 
 set_env_vars()
 
-from badger_api.requests import fetch_all_claimable_balances
-from rewards.classes.TreeManager import TreeManager
-from helpers.constants import BOOST_CHAINS
 from unittest import TestCase
+
+from badger_api.requests import fetch_all_claimable_balances
+from helpers.constants import BOOST_CHAINS
+from rewards.classes.TreeManager import TreeManager
 
 
 def mock_download_tree(file_name: str, chain: str):

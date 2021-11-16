@@ -1,8 +1,10 @@
+import json
+
 from scoring.scoring_utils import get_nft_owners
+
+from config.singletons import env_config
 from rewards.explorer import fetch_block_by_timestamp, get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import chain_snapshot
-from config.singletons import env_config
-import json
 
 if __name__ == "__main__":
     w3 = env_config.get_web3()

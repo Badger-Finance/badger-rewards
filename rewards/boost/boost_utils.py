@@ -1,9 +1,11 @@
-from rewards.snapshot.token_snapshot import token_snapshot_usd
-from rich.console import Console
-from typing import Dict, List, Tuple
 from collections import Counter
+from typing import Dict, List, Tuple
+
+from rich.console import Console
+
 from rewards.snapshot.chain_snapshot import chain_snapshot_usd
 from rewards.snapshot.claims_snapshot import claims_snapshot_usd
+from rewards.snapshot.token_snapshot import token_snapshot_usd
 
 console = Console()
 

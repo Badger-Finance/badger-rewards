@@ -1,12 +1,15 @@
+import math
+from typing import Dict, List
+
 from gql import gql
 from graphql.language.ast import DocumentNode
-from helpers.constants import BDIGG
-from subgraph.subgraph_utils import make_gql_client
 from rich.console import Console
-from typing import List, Dict
-from helpers.discord import send_error_to_discord
-import math
 from web3 import Web3
+
+from helpers.constants import SETTS
+from helpers.discord import send_error_to_discord
+from helpers.enums import Network
+from subgraph.subgraph_utils import make_gql_client
 
 console = Console()
 thegraph_client = make_gql_client("thegraph")
@@ -115,7 +118,7 @@ def fetch_chain_balances(chain: str, block: int) -> Dict[str, Dict[str, int]]:
                 account = Web3.toChecksumAddress(result["user"]["id"])
                 decimals = int(result["sett"]["token"]["decimals"])
                 sett = Web3.toChecksumAddress(result["sett"]["id"])
-                if sett == BDIGG:
+                if sett == SETTS[Network.Ethereum]["digg"]:
                     decimals = 18
                 deposit = float(result["netShareDeposit"]) / math.pow(10, decimals)
                 if deposit > 0:
@@ -163,7 +166,7 @@ def fetch_sett_balances(chain: str, block: int, sett: str):
                 account = Web3.toChecksumAddress(result["user"]["id"])
                 decimals = int(result["sett"]["token"]["decimals"])
                 sett = Web3.toChecksumAddress(result["sett"]["id"])
-                if sett == BDIGG:
+                if sett == SETTS[Network.Ethereum]["digg"]:
                     decimals = 18
                 deposit = float(result["netShareDeposit"]) / math.pow(10, decimals)
                 if deposit > 0:

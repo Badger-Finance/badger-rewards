@@ -1,20 +1,18 @@
-from gql import gql
-from subgraph.subgraph_utils import make_gql_client
-from config.singletons import env_config
 import math
-from web3 import Web3
-from rich.console import Console
-from typing import Dict, Tuple
-from helpers.discord import (
-    send_error_to_discord,
-    send_message_to_discord,
-    get_discord_url,
-)
-from helpers.digg_utils import digg_utils
-from helpers.enums import BotType
-from helpers.web3_utils import make_contract
 from functools import lru_cache
-from helpers.enums import Network
+from typing import Dict, Tuple
+
+from gql import gql
+from rich.console import Console
+from web3 import Web3
+
+from config.singletons import env_config
+from helpers.digg_utils import digg_utils
+from helpers.discord import (get_discord_url, send_error_to_discord,
+                             send_message_to_discord)
+from helpers.enums import BotType, Network
+from helpers.web3_utils import make_contract
+from subgraph.subgraph_utils import make_gql_client
 
 console = Console()
 

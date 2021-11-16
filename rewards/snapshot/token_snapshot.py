@@ -1,8 +1,10 @@
-from rewards.classes.Snapshot import Snapshot
-from subgraph.queries.tokens import fetch_token_balances, fetch_fuse_pool_balances
-from subgraph.subgraph_utils import make_gql_client
-from helpers.constants import BADGER, DIGG
 from typing import Dict, Tuple
+
+from helpers.constants import BADGER, DIGG
+from rewards.classes.Snapshot import Snapshot
+from subgraph.queries.tokens import (fetch_fuse_pool_balances,
+                                     fetch_token_balances)
+from subgraph.subgraph_utils import make_gql_client
 
 
 def token_snapshot(chain: str, block: int) -> Tuple[Snapshot, Snapshot]:

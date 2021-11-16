@@ -1,43 +1,34 @@
 import json
 import logging
 import os
-import pytest
 from decimal import Decimal
-from hexbytes import HexBytes
 
-from brownie import accounts, Contract, web3
+import pytest
+from brownie import Contract, accounts, web3
 from brownie.network.gas.strategies import ExponentialScalingStrategy
-from web3 import contract
 from eth_account import Account
+from hexbytes import HexBytes
+from web3 import contract
 
-from tests.utils import (
-    test_address,
-    test_key,
-    mock_tree,
-    mock_boosts,
-    set_env_vars,
-)
+from tests.utils import (mock_boosts, mock_tree, set_env_vars, test_address,
+                         test_key)
 
 set_env_vars()
 os.environ["private"] = test_key
 
 from config.singletons import env_config
-from helpers.constants import EMISSIONS_CONTRACTS, ETH_BADGER_TREE, ABI_DIRS
+from helpers.constants import ABI_DIRS, EMISSIONS_CONTRACTS, ETH_BADGER_TREE
 from helpers.enums import Network
 from rewards.aws.helpers import get_secret
 from rewards.classes.TreeManager import TreeManager
-from rewards.tree_utils import calc_next_cycle_range
-from rewards.tree_utils import get_last_proposed_cycle
-from scripts.rewards.utils.propose_rewards import propose_root
+from rewards.utils.tree_utils import (calc_next_cycle_range,
+                                      get_last_proposed_cycle)
 from scripts.rewards.utils.approve_rewards import approve_root
-from tests.cycle_utils import mock_badger_tree
-from tests.cycle_utils import mock_cycle
-from tests.cycle_utils import mock_download_boosts
-from tests.cycle_utils import mock_propose_root
-from tests.cycle_utils import mock_tree_manager
-from tests.cycle_utils import mock_upload_boosts
-from tests.cycle_utils import mock_upload_tree
-from tests.cycle_utils import MockCycleLogger
+from scripts.rewards.utils.propose_rewards import propose_root
+from tests.cycle_utils import (MockCycleLogger, mock_badger_tree, mock_cycle,
+                               mock_download_boosts, mock_propose_root,
+                               mock_tree_manager, mock_upload_boosts,
+                               mock_upload_tree)
 
 logger = logging.getLogger("test-cycles-eth")
 

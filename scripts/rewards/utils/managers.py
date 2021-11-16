@@ -1,7 +1,8 @@
 from eth_account import Account
+
+from config.singletons import env_config
 from rewards.aws.helpers import get_secret
 from rewards.classes.TreeManager import TreeManager
-from config.singletons import env_config
 
 
 def get_tree_manager(chain: str):

@@ -1,15 +1,15 @@
-from rewards.aws.trees import upload_tree
-from rewards.aws.boost import add_multipliers, download_boosts, upload_boosts
-from rewards.calc_rewards import generate_rewards_in_range
-
-from rewards.classes.TreeManager import TreeManager
-from decouple import config
 import json
-from rewards.aws.helpers import get_secret
+
+from decouple import config
 from eth_account import Account
-from subgraph.queries.setts import last_synced_block
 
 from helpers.enums import Network
+from rewards.aws.boost import add_multipliers, download_boosts, upload_boosts
+from rewards.aws.helpers import get_secret
+from rewards.aws.trees import upload_tree
+from rewards.calc_rewards import generate_rewards_in_range
+from rewards.classes.TreeManager import TreeManager
+from subgraph.queries.setts import last_synced_block
 
 if __name__ == "__main__":
     chain = Network.Ethereum

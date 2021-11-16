@@ -4,17 +4,14 @@ import logging
 from brownie import Contract, web3
 from eth_account import Account
 
-from helpers.enums import Network
-
 from helpers.constants import ABI_DIRS, EMISSIONS_CONTRACTS
+from helpers.enums import Network
 from rewards.classes.TreeManager import TreeManager
-from rewards.tree_utils import calc_next_cycle_range
-from rewards.tree_utils import get_last_proposed_cycle
-from scripts.rewards.utils.propose_rewards import propose_root
+from rewards.utils.tree_utils import (calc_next_cycle_range,
+                                      get_last_proposed_cycle)
 from scripts.rewards.utils.approve_rewards import approve_root
-from tests.utils import mock_boosts
-from tests.utils import mock_tree
-
+from scripts.rewards.utils.propose_rewards import propose_root
+from tests.utils import mock_boosts, mock_tree
 
 logger = logging.getLogger("cycle-utils")
 

@@ -1,24 +1,20 @@
-import pytest
 import json
-import os
 import logging
+import os
+
+import pytest
 from brownie import web3
 from eth_account import Account
-from tests.utils import (
-    test_address,
-    test_key,
-    mock_tree,
-    mock_claimable_bals,
-    mock_claimed_for,
-    set_env_vars,
-)
+
+from tests.utils import (mock_claimable_bals, mock_claimed_for, mock_tree,
+                         set_env_vars, test_address, test_key)
 
 logger = logging.getLogger("test-boost")
 
 set_env_vars()
 
-from rewards.aws.boost import upload_boosts
 from helpers.enums import Network
+from rewards.aws.boost import upload_boosts
 
 
 def mock_send_message_to_discord_stg(

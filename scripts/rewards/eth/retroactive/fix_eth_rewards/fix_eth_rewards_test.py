@@ -1,12 +1,13 @@
-from rewards.classes.TreeManager import TreeManager
-from decouple import config
 import json
-from rewards.aws.helpers import get_secret
+
+from decouple import config
 from eth_account import Account
-from scripts.rewards.eth.retroactive.fix_eth_rewards.fix_eth_rewards import (
-    fix_eth_rewards,
-)
+
 from helpers.enums import Network
+from rewards.aws.helpers import get_secret
+from rewards.classes.TreeManager import TreeManager
+from scripts.rewards.eth.retroactive.fix_eth_rewards.fix_eth_rewards import \
+    fix_eth_rewards
 
 if __name__ == "__main__":
     chain = Network.Ethereum

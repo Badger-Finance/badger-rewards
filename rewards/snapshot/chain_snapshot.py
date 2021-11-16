@@ -1,19 +1,16 @@
-from helpers.enums import BalanceType
-from rewards.classes.Snapshot import Snapshot
-from config.singletons import env_config
-from helpers.constants import (
-    REWARDS_BLACKLIST,
-    SETT_INFO,
-    DISABLED_VAULTS,
-    EMISSIONS_BLACKLIST,
-    PRO_RATA_VAULTS,
-)
-from helpers.web3_utils import make_contract
-from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
-from rich.console import Console
-from typing import Dict, Tuple
 from collections import Counter
+from typing import Dict, Tuple
+
+from rich.console import Console
 from web3 import Web3
+
+from helpers.constants import (EMISSIONS_BLACKLIST, NATIVE, NO_BOOST,
+                               REWARDS_BLACKLIST)
+from helpers.enums import BalanceType
+from helpers.web3_utils import make_contract
+from rewards.classes.Snapshot import Snapshot
+from rewards.utils.emission_utils import get_token_weight
+from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
 
 console = Console()
 
@@ -52,11 +49,11 @@ def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> Snapsho
         f"Taking snapshot on {chain} of {token.name().call()} ({sett}) at {block}\n"
     )
     sett_balances = fetch_sett_balances(chain, block, sett)
-    return parse_sett_balances(sett, sett_balances, blacklist)
+    return parse_sett_balances(sett, sett_balances, chain, blacklist)
 
 
 def parse_sett_balances(
-    sett_address: str, balances: Dict[str, int], blacklist: bool = True
+    sett_address: str, balances: Dict[str, int], chain: str, blacklist: bool = True
 ) -> Snapshot:
     """
     Blacklist balances and add metadata for boost
@@ -74,19 +71,12 @@ def parse_sett_balances(
         if addr not in addresses_to_blacklist
     }
 
-    sett_type, sett_ratio = get_sett_info(sett_address)
+    sett_type = BalanceType.Native if sett_address in NATIVE else BalanceType.NonNative
+    sett_ratio = get_token_weight(sett_address, chain)
+
     console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
 
     return Snapshot(sett_address, balances, sett_ratio, sett_type)
-
-
-def get_sett_info(sett_address: str) -> Tuple[str, float]:
-    info = SETT_INFO.get(
-        sett_address,
-        {"type": BalanceType.NonNative, "ratio": 1},
-    )
-    console.log(sett_address, info)
-    return info["type"], info["ratio"]
 
 
 def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
@@ -95,7 +85,7 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
     native = Counter()
     non_native = Counter()
     for sett, snapshot in total_snapshot.items():
-        if sett in [*DISABLED_VAULTS, *PRO_RATA_VAULTS]:
+        if sett in NO_BOOST:
             console.log(f"{sett} is disabled")
             continue
         usd_snapshot = snapshot.convert_to_usd(chain)

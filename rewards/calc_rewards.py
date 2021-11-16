@@ -1,7 +1,5 @@
 import json
-from typing import Dict
-from typing import List
-from typing import Tuple
+from typing import Dict, List, Tuple
 
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
@@ -10,24 +8,19 @@ from web3 import Web3
 
 from config.rewards_config import rewards_config
 from config.singletons import env_config
-from helpers.constants import DISABLED_VAULTS
-from helpers.constants import EMISSIONS_CONTRACTS
-from helpers.discord import get_discord_url
-from helpers.discord import send_message_to_discord
-from helpers.enums import BotType
-from helpers.enums import Network
+from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS
+from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
-from rewards.aws.boost import add_multipliers
-from rewards.aws.boost import download_boosts
-from rewards.aws.boost import upload_boosts
+from rewards.aws.boost import add_multipliers, download_boosts, upload_boosts
 from rewards.aws.trees import upload_tree
 from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Schedule import Schedule
 from rewards.classes.TreeManager import TreeManager
 from rewards.rewards_checker import verify_rewards
-from rewards.rewards_utils import combine_rewards
-from rewards.rewards_utils import process_cumulative_rewards
+from rewards.utils.rewards_utils import (combine_rewards,
+                                         process_cumulative_rewards)
 from subgraph.queries.setts import list_setts
 
 console = Console()
