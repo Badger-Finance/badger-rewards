@@ -10,7 +10,7 @@ from helpers.discord import send_message_to_discord
 retry_strategy = Retry(
     total=3,
     status_forcelist=[429, 500, 502, 503, 504],
-    method_whitelist=["GET", "POST"],
+    allowed_methods=["GET", "POST"],
 )
 adapter = HTTPAdapter(max_retries=retry_strategy)
 
