@@ -137,29 +137,29 @@ class RewardsManager:
 
         return combine_rewards(all_rewards, self.cycle)
 
-    def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
+    def get_sett_multipliers(self) -> Dict[str, Dict[str, Decimal]]:
         sett_multipliers = {}
         for sett, user_apy_boosts in self.apy_boosts.items():
             sett_multipliers[sett] = {
-                "min": min(user_apy_boosts.values()),
-                "max": max(user_apy_boosts.values()),
+                "min": Decimal(min(user_apy_boosts.values())),
+                "max": Decimal(max(user_apy_boosts.values())),
             }
         return sett_multipliers
 
-    def get_user_multipliers(self) -> Dict[str, Dict[str, float]]:
+    def get_user_multipliers(self) -> Dict[str, Dict[str, Decimal]]:
         user_multipliers = {}
         for sett, multipliers in self.get_sett_multipliers().items():
-            min_mult = multipliers["min"]
-            max_mult = multipliers["max"]
+            min_mult = Decimal(multipliers["min"])
+            max_mult = Decimal(multipliers["max"])
             diff = max_mult - min_mult
             for user, boost_info in self.boosts.items():
                 if user not in user_multipliers:
                     user_multipliers[user] = {}
-                boost = boost_info.get("boost", 1)
+                boost = Decimal(boost_info.get("boost", 1))
                 if boost == 1:
-                    user_sett_multiplier = multipliers["min"]
+                    user_sett_multiplier = min_mult
                 else:
-                    user_sett_multiplier = multipliers["min"] + (boost / 2000) * diff
+                    user_sett_multiplier = min_mult + (boost / 2000) * diff
                 user_multipliers[user][sett] = user_sett_multiplier
 
         return user_multipliers

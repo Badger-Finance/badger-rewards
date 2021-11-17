@@ -1,6 +1,7 @@
 import json
 import logging
 from decimal import Decimal
+from math import isclose
 from unittest import TestCase
 
 import pytest
@@ -184,7 +185,8 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
     for user, data in user_multipliers.items():
         for sett, mult in data.items():
             if sett in boosts["userData"][user]["multipliers"]:
-                assert mult == boosts["userData"][user]["multipliers"][sett]
+                assert isclose(mult, boosts["userData"][user]["multipliers"][sett], abs_tol=1e-6)
+                #assert mult == boosts["userData"][user]["multipliers"][sett]
 
 
 @pytest.mark.parametrize(
