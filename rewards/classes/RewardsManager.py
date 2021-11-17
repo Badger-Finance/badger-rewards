@@ -83,7 +83,7 @@ class RewardsManager:
             token_distribution = Decimal(end_dist) - Decimal(start_dist)
             emissions_rate = get_flat_emission_rate(sett, self.chain)
             flat_emissions = token_distribution * emissions_rate
-            boosted_emissions = Decimal(token_distribution * (1 - emissions_rate))
+            boosted_emissions = token_distribution * (1 - emissions_rate)
             if flat_emissions > 0:
                 flat_rewards_list.append(
                     distribute_rewards_to_snapshot(
