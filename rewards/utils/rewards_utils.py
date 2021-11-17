@@ -59,7 +59,7 @@ def distribute_rewards_to_snapshot(
     """
     rewards = RewardsList()
     custom_rewards_list = []
-    total = Decimal(snapshot.total_balance())
+    total = snapshot.total_balance()
     if total == 0:
         unit = 0
     else:
