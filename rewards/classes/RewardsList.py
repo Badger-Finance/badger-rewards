@@ -94,8 +94,6 @@ class RewardsList:
         If user has rewards, increase. If not, set their rewards to this initial value
         """
         # TODO: Update these to checksum at source rather than in this function
-        if type(toAdd) == float:
-            raise Error()
         user = to_checksum_address(user)
         token = to_checksum_address(token)
         if user in self.claims and token in self.claims[user]:
