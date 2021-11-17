@@ -1,5 +1,6 @@
 import json
 import logging
+from decimal import Decimal
 from unittest import TestCase
 
 import pytest

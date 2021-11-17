@@ -10,12 +10,11 @@ from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import approve_root
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.tree_utils import get_last_proposed_cycle
-from scripts.rewards.utils.approve_rewards import approve_rewards
 
 console = Console()
 
 
-def approve_rewa2rds(chain):
+def approve_rewards(chain):
     discord_url = config("DISCORD_WEBHOOK_URL")
     key_decrypt_password = get_secret(
         config("DECRYPT_PASSWORD_ARN"),
