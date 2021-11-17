@@ -1,7 +1,10 @@
+from typing import Callable, Dict, List
+
 from rich.console import Console
-from rewards.classes.RewardsList import RewardsList
 from web3 import Web3
-from typing import List
+
+from rewards.classes.RewardsList import RewardsList
+from rewards.classes.Snapshot import Snapshot
 
 console = Console()
 
@@ -42,6 +45,37 @@ def combine_rewards(rewards_list: List[RewardsList], cycle) -> RewardsList:
             for token, claim in claims.items():
                 combined_rewards.increase_user_rewards(user, token, claim)
     return combined_rewards
+
+
+def distribute_rewards_to_snapshot(
+    amount: float,
+    snapshot: Snapshot,
+    token: str,
+    custom_rewards: Dict[str, Callable] = {},
+):
+    """
+    Distribute a certain amount of rewards to a snapshot of users
+    """
+    rewards = RewardsList()
+    custom_rewards_list = []
+    total = snapshot.total_balance()
+    if total == 0:
+        unit = 0
+    else:
+        unit = amount / total
+    for addr, balance in snapshot:
+        reward_amount = balance * unit
+        assert reward_amount >= 0
+        if addr in custom_rewards:
+            console.log(addr)
+            custom_rewards_calc = custom_rewards[addr]
+            console.log(token, amount, snapshot.token)
+            custom_rewards_list.append(
+                custom_rewards_calc(amount, token, snapshot.token)
+            )
+        else:
+            rewards.increase_user_rewards(addr, token, int(reward_amount))
+    return combine_rewards([rewards] + custom_rewards_list, 0)
 
 
 def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:

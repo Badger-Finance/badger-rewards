@@ -1,6 +1,7 @@
 from gql import gql
-from subgraph.subgraph_utils import make_gql_client
 from rich.console import Console
+
+from subgraph.subgraph_utils import make_gql_client
 
 console = Console()
 

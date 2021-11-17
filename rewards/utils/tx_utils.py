@@ -1,14 +1,16 @@
-from decimal import Decimal
-from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.web3_utils import make_contract
-from helpers.constants import EMISSIONS_CONTRACTS
-from hexbytes import HexBytes
 import logging
 import time
-import requests
-from web3 import Web3, exceptions
+from decimal import Decimal
 from typing import Tuple
-from helpers.enums import Network, BotType
+
+from hexbytes import HexBytes
+from web3 import Web3, exceptions
+
+from config.singletons import http
+from helpers.constants import EMISSIONS_CONTRACTS
+from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import BotType, Network
+from helpers.web3_utils import make_contract
 
 logger = logging.getLogger("tx-utils")
 
@@ -66,10 +68,6 @@ def get_latest_base_fee(web3: Web3, default=int(100e9)):  # default to 100 gwei
     return base_fee
 
 
-def get_latest_arbitrum_fee(web3: Web3, default=int(5e9)):  # default to 5 gwei
-    latest = web3.eth.getBlock("latest")
-
-
 def get_effective_gas_price(web3: Web3, chain: str = Network.Ethereum) -> int:
     # TODO: Currently using max fee (per gas) that can be used for this tx. Maybe use base + priority (for average).
     if chain == Network.Ethereum:
@@ -81,8 +79,9 @@ def get_effective_gas_price(web3: Web3, chain: str = Network.Ethereum) -> int:
         # max fee aka gas price enough to get included in next 6 blocks
         gas_price = 2 * base_fee + priority_fee
     elif chain == Network.Polygon:
-        response = requests.get("https://gasstation-mainnet.matic.network").json()
-        gas_price = web3.toWei(int(response.get("fast") * 1.1), "gwei")
+        response = http.get("https://gasstation-mainnet.matic.network")
+        json = response.json()
+        gas_price = web3.toWei(int(json.get("fast") * 1.1), "gwei")
     elif chain == Network.Arbitrum:
         gas_price = web3.eth.gas_price * 1.1
     return gas_price

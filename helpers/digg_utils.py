@@ -1,6 +1,6 @@
 from helpers.constants import DIGG
-from helpers.web3_utils import make_contract
 from helpers.enums import Network
+from helpers.web3_utils import make_contract
 
 
 class DiggUtils:

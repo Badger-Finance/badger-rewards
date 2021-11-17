@@ -1,9 +1,15 @@
-from rewards.aws.helpers import get_secret
+import logging
+
 from decouple import config
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
-from helpers.enums import Network, Environment, BotType
-from helpers.constants import MONITORING_SECRET_NAMES
+
+from helpers.enums import Environment, Network
+from rewards.aws.helpers import get_secret
+
+logging.getLogger("gql.transport.aiohttp").setLevel(logging.WARNING)
+
+logging.getLogger("gql.transport.aiohttp").setLevel("WARNING")
 
 
 class EnvConfig:

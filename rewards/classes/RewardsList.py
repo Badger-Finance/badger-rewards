@@ -1,20 +1,21 @@
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Tuple
+import json
+from typing import Any, Dict, List, Tuple
 
 from dotmap import DotMap
 from eth_abi import encode_abi
 from eth_utils.address import to_checksum_address
-
 from eth_utils.hexadecimal import encode_hex
 from rich.console import Console
+
+from badger_api.requests import fetch_token
+from helpers.constants import DIGG
+from helpers.digg_utils import digg_utils
 
 console = Console()
 
 
 class RewardsList:
-    def __init__(self, cycle) -> None:
+    def __init__(self, cycle: int = 0) -> None:
         self.claims = DotMap()
         self.tokens = DotMap()
         self.totals = DotMap()
@@ -23,13 +24,37 @@ class RewardsList:
         self.sources = DotMap()
         self.sourceMetadata = DotMap()
 
+    def __repr__(self):
+        return self.claims
+
+    def __str__(self):
+        log_obj = {
+            "claims": self.claims.toDict(),
+            "tokens": self.tokens.toDict(),
+            "totals": self.totals.toDict(),
+            "cycle": self.cycle,
+            "metadata": self.metadata.toDict(),
+            "sources": self.sources.toDict(),
+            "sourcesMetadata": self.sourceMetadata.toDict(),
+        }
+        return json.dumps(log_obj, indent=4)
+
     def increase_user_rewards_source(self, source, user, token, toAdd):
         if not self.sources[source][user][token]:
             self.sources[source][user][token] = 0
         self.sources[source][user][token] += toAdd
 
-    def __repr__(self):
-        return self.claims()
+    def totals_info(self, chain: str) -> str:
+        info = []
+        for token, amount in self.totals.items():
+            token_info = fetch_token(chain, token)
+            name = token_info.get("name", "")
+            decimals = token_info.get("decimals", 18)
+            if token == DIGG:
+                amount = digg_utils.shares_to_fragments(amount)
+
+            info.append(f"{name}: {round(amount/pow(10,decimals), 5)}")
+        return "\n".join(info)
 
     def track_user_metadata_source(self, source, user, metadata):
         if not self.sourceMetadata[source][user][metadata]:

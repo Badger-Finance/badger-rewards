@@ -1,11 +1,13 @@
-from rewards.classes.TreeManager import TreeManager
-from rewards.aws.helpers import get_secret
-from config.singletons import env_config
-from eth_account import Account
-from rewards.calc_rewards import propose_root
-from rich.console import Console
 import json
+
+from eth_account import Account
+from rich.console import Console
+
+from config.singletons import env_config
 from helpers.enums import Network
+from rewards.aws.helpers import get_secret
+from rewards.calc_rewards import propose_root
+from rewards.classes.TreeManager import TreeManager
 from scripts.rewards.utils.propose_rewards import propose_rewards
 
 console = Console()

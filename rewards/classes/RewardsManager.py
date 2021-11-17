@@ -1,32 +1,27 @@
-from typing import Dict
-from typing import List
-from typing import Tuple
+from typing import Dict, List, Tuple
 
 from rich.console import Console
 
+from badger_api.requests import fetch_token
 from config.singletons import env_config
-from helpers.constants import BCVX
-from helpers.constants import BCVXCRV
-from helpers.constants import DIGG
-from helpers.constants import EMISSIONS_CONTRACTS
-from helpers.constants import PRO_RATA_VAULTS
-from helpers.constants import XSUSHI
-from helpers.digg_utils import digg_utils
-from helpers.enums import BalanceType
-from helpers.enums import Network
-from helpers.time_utils import to_hours
-from helpers.time_utils import to_utc_date
+from helpers.constants import EMISSIONS_CONTRACTS, XSUSHI
+from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import BalanceType, Network
+from helpers.time_utils import to_hours, to_utc_date
 from helpers.web3_utils import make_contract
 from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
+from rewards.emission_handlers import eth_tree_handler
 from rewards.explorer import get_block_by_timestamp
-from rewards.rewards_utils import combine_rewards
 from rewards.snapshot.chain_snapshot import sett_snapshot
-from rewards.snapshot.claims_snapshot import claims_snapshot
-from subgraph.queries.harvests import fetch_sushi_harvest_events
-from subgraph.queries.harvests import fetch_tree_distributions
+from rewards.utils.emission_utils import get_flat_emission_rate
+from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
+from subgraph.queries.harvests import (
+    fetch_sushi_harvest_events,
+    fetch_tree_distributions,
+)
 
 console = Console()
 
@@ -35,6 +30,7 @@ class RewardsManager:
     def __init__(self, chain: str, cycle: int, start: int, end: int, boosts):
         self.chain = chain
         self.web3 = env_config.get_web3(chain)
+        self.discord_url = get_discord_url(chain)
         self.cycle = cycle
         self.start = int(start)
         self.end = int(end)
@@ -45,16 +41,6 @@ class RewardsManager:
         self, block: int, sett: str, blacklist: bool = True
     ) -> Snapshot:
         return sett_snapshot(self.chain, block, sett, blacklist)
-
-    def bcvx_claims_snapshot(self) -> Snapshot:
-        bcvx = claims_snapshot(self.chain)[BCVX]
-        console.log(bcvx)
-        return bcvx
-
-    def bcvxcrv_claims_snapshot(self) -> Snapshot:
-        bcvxcrv = claims_snapshot(self.chain)[BCVXCRV]
-        console.log(bcvxcrv)
-        return bcvxcrv
 
     def get_sett_from_strategy(self, strat: str) -> str:
         """Go from strategy -> want -> controller -> want -> sett
@@ -74,76 +60,56 @@ class RewardsManager:
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
     ) -> RewardsList:
-        start_time = self.web3.eth.getBlock(self.start)["timestamp"]
-        end_time = self.web3.eth.getBlock(self.end)["timestamp"]
+        start_time = self.web3.eth.get_block(self.start)["timestamp"]
+        end_time = self.web3.eth.get_block(self.end)["timestamp"]
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
-        rewards = RewardsList(self.cycle)
-        extra_rewards = []
+
         """
-        When distributing rewards to the bcvx vault,
-        we want them to be calculated pro-rata
-        rather than boosted
+        Vaults can have a split of boosted and non boosted emissions
+        which are calculated using the boosted balances and the normal
+        balances respectively
+        
         """
-        if sett not in PRO_RATA_VAULTS:
-            sett_snapshot = self.boost_sett(sett, sett_snapshot)
+        flat_rewards_list = []
+        boosted_rewards_list = []
+        custom_behaviour = {
+            EMISSIONS_CONTRACTS[Network.Ethereum]["BadgerTree"]: eth_tree_handler
+        }
 
         for token, schedules in schedules_by_token.items():
-            end_dist = self.get_distributed_for_token_at(
-                token, end_time, schedules, sett
-            )
-            start_dist = self.get_distributed_for_token_at(
-                token, start_time, schedules, sett
-            )
-            for schedule in schedules:
-                if schedule.startTime <= end_time and schedule.endTime >= end_time:
-                    cycle_logger.add_schedule(sett, schedule)
+            end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
+            start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
             token_distribution = int(end_dist) - int(start_dist)
-            if token == DIGG:
-                cycle_logger.add_sett_token_data(
-                    sett, token, digg_utils.shares_to_fragments(token_distribution)
+            emissions_rate = get_flat_emission_rate(sett, self.chain)
+            flat_emissions = token_distribution * emissions_rate
+            boosted_emissions = token_distribution * (1 - emissions_rate)
+            if flat_emissions > 0:
+                flat_rewards_list.append(
+                    distribute_rewards_to_snapshot(
+                        amount=flat_emissions,
+                        snapshot=sett_snapshot,
+                        token=token,
+                        custom_rewards=custom_behaviour,
+                    )
                 )
-            else:
-                cycle_logger.add_sett_token_data(sett, token, token_distribution)
+            if boosted_emissions > 0:
+                boosted_rewards_list.append(
+                    distribute_rewards_to_snapshot(
+                        boosted_emissions,
+                        snapshot=self.boost_sett(sett, sett_snapshot),
+                        token=token,
+                        custom_rewards=custom_behaviour,
+                    )
+                )
 
-            if token_distribution > 0:
-                total = sett_snapshot.total_balance()
-                if total == 0:
-                    unit = 0
-                else:
-                    unit = token_distribution / total
-                    for addr, balance in sett_snapshot:
-                        reward_amount = balance * unit
-                        if addr == EMISSIONS_CONTRACTS[Network.Ethereum]["BadgerTree"]:
-                            if sett == BCVX:
-                                extra_rewards.append(
-                                    self.distribute_rewards_to_snapshot(
-                                        reward_amount,
-                                        self.bcvx_claims_snapshot(),
-                                        token,
-                                    )
-                                )
-                                console.log(
-                                    f"{reward_amount} distributed to bcvxcrv holders"
-                                )
+        flat_rewards = combine_rewards(flat_rewards_list, self.cycle)
+        boosted_rewards = combine_rewards(boosted_rewards_list, self.cycle)
 
-                            if sett == BCVXCRV:
-
-                                extra_rewards.append(
-                                    self.distribute_rewards_to_snapshot(
-                                        reward_amount,
-                                        self.bcvxcrv_claims_snapshot(),
-                                        token,
-                                    )
-                                )
-                                console.log(
-                                    f"{reward_amount} distributed to bcvxcrv holders"
-                                )
-                        else:
-                            rewards.increase_user_rewards(
-                                addr, token, int(reward_amount)
-                            )
-
-        return combine_rewards([rewards, *extra_rewards], self.cycle)
+        return (
+            combine_rewards([flat_rewards, boosted_rewards], self.cycle),
+            flat_rewards,
+            boosted_rewards,
+        )
 
     def distribute_rewards_to_snapshot(
         self, amount: float, snapshot: Snapshot, token: str
@@ -170,11 +136,23 @@ class RewardsManager:
         all_rewards = []
         for sett in setts:
             token = make_contract(sett, "ERC20", self.chain)
-
             console.log(f"Calculating rewards for {token.name().call()}")
-            all_rewards.append(self.calculate_sett_rewards(sett, all_schedules[sett]))
+            rewards, flat, boosted = self.calculate_sett_rewards(
+                sett, all_schedules[sett]
+            )
+            desc = f"**Boosted Rewards**\n\n{boosted.totals_info(self.chain)}\n\n**Flat Rewards**\n\n{flat.totals_info(self.chain)}"
+            sett_token = fetch_token(self.chain, sett)
+            sett_name = sett_token.get("name", "")
+            send_message_to_discord(
+                f"Rewards for {sett_name}",
+                description=desc,
+                fields=[],
+                username="Rewards Bot",
+                url=self.discord_url,
+            )
+            all_rewards.append(rewards)
 
-        return combine_rewards(all_rewards, self.cycle + 1)
+        return combine_rewards(all_rewards, self.cycle)
 
     def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
         sett_multipliers = {}
@@ -204,7 +182,7 @@ class RewardsManager:
         return user_multipliers
 
     def get_distributed_for_token_at(
-        self, token: str, end_time: int, schedules: List[Schedule], sett: str
+        self, token: str, end_time: int, schedules: List[Schedule]
     ) -> float:
         total_to_distribute = 0
         for index, schedule in enumerate(schedules):
@@ -226,7 +204,14 @@ class RewardsManager:
                     )
                 if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     percentage_out_of_total = (
-                        int(to_distribute) / int(schedule.initialTokensLocked) * 100
+                        (int(to_distribute) / int(schedule.initialTokensLocked) * 100)
+                        if int(schedule.initialTokensLocked) > 0
+                        else 0
+                    )
+                    percentage_total_duration = (
+                        (range_duration / schedule.duration * 100)
+                        if schedule.duration > 0
+                        else 0
                     )
                     console.log(
                         (
@@ -239,7 +224,7 @@ class RewardsManager:
                     console.log(
                         f"Total duration of schedule elapsed is {to_hours(range_duration)}"
                         f" hours out of {to_hours(schedule.duration)} hours"
-                        f" or {range_duration/schedule.duration * 100}% of total duration.",
+                        f" or {percentage_total_duration}% of total duration.",
                     )
             total_to_distribute += to_distribute
 
@@ -267,8 +252,8 @@ class RewardsManager:
 
     def calculate_tree_distributions(self) -> RewardsList:
         tree_distributions = fetch_tree_distributions(
-            self.web3.eth.getBlock(self.start)["timestamp"],
-            self.web3.eth.getBlock(self.end)["timestamp"],
+            self.web3.eth.get_block(self.start)["timestamp"],
+            self.web3.eth.get_block(self.end)["timestamp"],
             self.chain,
         )
         console.log(
@@ -289,7 +274,7 @@ class RewardsManager:
                 sett, self.web3.toChecksumAddress(token), amount
             )
             all_dist_rewards.append(
-                self.distribute_rewards_to_snapshot(amount, snapshot, token)
+                distribute_rewards_to_snapshot(amount, snapshot, token)
             )
         return combine_rewards(all_dist_rewards, self.cycle)
 
@@ -333,7 +318,7 @@ class RewardsManager:
 
             snapshot = self.fetch_sett_snapshot(block, sett)
             all_sushi_rewards.append(
-                self.distribute_rewards_to_snapshot(reward_amount, snapshot, XSUSHI)
+                distribute_rewards_to_snapshot(reward_amount, snapshot, XSUSHI)
             )
 
         return combine_rewards(all_sushi_rewards, self.cycle), total_from_rewards

@@ -1,14 +1,15 @@
-from rewards.tree_utils import get_last_proposed_cycle
-from rewards.aws.helpers import get_secret
-from helpers.discord import send_message_to_discord
-from rewards.classes.TreeManager import TreeManager
-from rewards.calc_rewards import approve_root
-from rich.console import Console
-from helpers.enums import Network
+import json
 
 from decouple import config
 from eth_account import Account
-import json
+from rich.console import Console
+
+from helpers.discord import send_message_to_discord
+from helpers.enums import Network
+from rewards.aws.helpers import get_secret
+from rewards.calc_rewards import approve_root
+from rewards.classes.TreeManager import TreeManager
+from rewards.utils.tree_utils import get_last_proposed_cycle
 
 console = Console()
 

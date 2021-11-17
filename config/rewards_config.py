@@ -1,6 +1,5 @@
-from helpers.time_utils import hours
-
 from helpers.enums import Network
+from helpers.time_utils import hours
 
 
 class RewardsConfig:

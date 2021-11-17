@@ -1,9 +1,11 @@
-from helpers.discord import send_message_to_discord, get_discord_url
-from helpers.enums import BotType
-from rewards.aws.helpers import s3, get_bucket
-from config.singletons import env_config
-from rich.console import Console
 import json
+
+from rich.console import Console
+
+from config.singletons import env_config
+from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import BotType
+from rewards.aws.helpers import get_bucket, s3
 
 console = Console()
 
@@ -90,14 +92,13 @@ def add_user_data(user_data, chain):
     upload_boosts(boosts, chain)
 
 
-def add_multipliers(multiplier_data, user_multipliers, chain: str):
+def add_multipliers(boosts, multiplier_data, user_multipliers, chain: str):
     """Upload sett and user multipliers
 
     :param test:
     :param multiplier_data: sett multipliers
     :param user_multipliers: user multipliers
     """
-    boosts = download_boosts(chain)
     boosts["multiplierData"] = multiplier_data
     for user in list(boosts["userData"].keys()):
         if user in user_multipliers:
@@ -105,5 +106,4 @@ def add_multipliers(multiplier_data, user_multipliers, chain: str):
                 boosts["userData"][user]["multipliers"] = user_multipliers[user]
             else:
                 boosts["userData"][user]["multipliers"] = {}
-
-    upload_boosts(boosts, chain)
+    return boosts

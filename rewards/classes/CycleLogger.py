@@ -1,7 +1,7 @@
-from rewards.classes.Schedule import Schedule
-from rewards.aws.analytics import upload_analytics
 import dataclasses
-from rewards.aws.analytics import upload_schedules
+
+from rewards.aws.analytics import upload_analytics, upload_schedules
+from rewards.classes.Schedule import Schedule
 
 
 class CycleLogger:

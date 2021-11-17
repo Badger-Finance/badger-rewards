@@ -1,32 +1,25 @@
 import json
-from typing import Dict
-from typing import List
-from typing import Tuple
+from typing import Dict, List, Tuple
 
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
 from rich.console import Console
-from web3 import Web3
 
 from config.rewards_config import rewards_config
 from config.singletons import env_config
-from helpers.constants import DISABLED_VAULTS
 from helpers.constants import EMISSIONS_CONTRACTS
-from helpers.discord import get_discord_url
-from helpers.discord import send_message_to_discord
-from helpers.enums import BotType
-from helpers.enums import Network
+from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
-from rewards.aws.boost import add_multipliers
-from rewards.aws.boost import download_boosts
+from rewards.aws.boost import add_multipliers, download_boosts, upload_boosts
 from rewards.aws.trees import upload_tree
 from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Schedule import Schedule
 from rewards.classes.TreeManager import TreeManager
 from rewards.rewards_checker import verify_rewards
-from rewards.rewards_utils import combine_rewards
-from rewards.rewards_utils import process_cumulative_rewards
+from rewards.utils.emission_utils import fetch_setts, parse_schedules
+from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewards
 from subgraph.queries.setts import list_setts
 
 console = Console()
@@ -36,28 +29,6 @@ def console_and_discord(msg: str, chain: str, bot_type: BotType = BotType.Cycle)
     url = get_discord_url(chain, bot_type)
     console.log(msg)
     send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
-
-
-def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
-    """
-    Parse unlock shcedules
-    :param schedules: schedules to parse
-    """
-    schedules_by_token = {}
-    console.log("Fetching schedules...")
-    for schedule in schedules:
-        schedule = Schedule(
-            Web3.toChecksumAddress(schedule[0]),
-            Web3.toChecksumAddress(schedule[1]),
-            schedule[2],
-            schedule[3],
-            schedule[4],
-            schedule[5],
-        )
-        if schedule.token not in schedules_by_token:
-            schedules_by_token[schedule.token] = []
-        schedules_by_token[schedule.token].append(schedule)
-    return schedules_by_token
 
 
 def fetch_all_schedules(
@@ -82,15 +53,6 @@ def fetch_all_schedules(
     return all_schedules, setts_with_schedules
 
 
-def fetch_setts(chain: str) -> List[str]:
-    """
-    Fetch setts that are eligible for rewards
-    :param chain:
-    """
-    setts = list_setts(chain)
-    return list(filter(lambda x: x not in DISABLED_VAULTS, setts))
-
-
 def propose_root(
     chain: str,
     start: int,
@@ -113,7 +75,7 @@ def propose_root(
     current_merkle_data = tree_manager.fetch_current_merkle_data()
     w3 = env_config.get_web3(chain)
 
-    current_time = w3.eth.getBlock(w3.eth.block_number)["timestamp"]
+    current_time = w3.eth.get_block(w3.eth.block_number)["timestamp"]
     time_since_last_update = current_time - current_merkle_data["lastUpdateTime"]
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
@@ -152,12 +114,15 @@ def approve_root(
         past_tree=current_rewards,
         tree_manager=tree_manager,
     )
+    boosts = download_boosts(chain)
     if env_config.test or env_config.staging:
-        add_multipliers(
+        boosts = add_multipliers(
+            boosts,
             rewards_data["multiplierData"],
             rewards_data["userMultipliers"],
             chain=chain,
         )
+        upload_boosts(boosts, chain)
         return rewards_data
     if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
         console.log(
@@ -175,11 +140,13 @@ def approve_root(
                 staging=env_config.test or env_config.staging,
             )
 
-            add_multipliers(
+            boosts = add_multipliers(
+                boosts,
                 rewards_data["multiplierData"],
                 rewards_data["userMultipliers"],
                 chain=chain,
             )
+            upload_boosts(boosts, chain)
             cycle_logger.save(tree_manager.next_cycle, chain)
             return rewards_data
     else:

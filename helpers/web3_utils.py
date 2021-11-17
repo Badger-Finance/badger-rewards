@@ -1,7 +1,9 @@
-from web3.contract import ContractFunctions
-from helpers.constants import EMISSIONS_CONTRACTS
-from config.singletons import env_config
 import json
+
+from web3.contract import ContractFunctions
+
+from config.singletons import env_config
+from helpers.constants import EMISSIONS_CONTRACTS
 
 
 def make_contract(address: str, abi_name: str, chain: str) -> ContractFunctions:

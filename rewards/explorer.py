@@ -1,10 +1,9 @@
 import time
-from typing import Dict
-from typing import Optional
+from typing import Dict, Optional
 
 import requests
 
-from config.singletons import env_config
+from config.singletons import env_config, http
 from helpers.enums import Network
 
 urls = {
@@ -20,7 +19,8 @@ def fetch_block_by_timestamp(chain: str, timestamp: int) -> Optional[Dict]:
         f"api?module=block&action=getblocknobytime&timestamp={timestamp}&closest=before"
     )
     api_key = f"apikey={env_config.get_explorer_api_key(chain)}"
-    return requests.get(f"{chain_url}/{url}&{api_key}").json()
+    response = http.get(f"{chain_url}/{url}&{api_key}")
+    return response.json()
 
 
 def get_block_by_timestamp(chain: str, timestamp: int) -> int:
@@ -37,7 +37,7 @@ def convert_from_eth(block) -> Dict[str, int]:
     """
     Convert block from eth to blocks on other chains
     """
-    timestamp = env_config.get_web3().eth.getBlock(block)["timestamp"]
+    timestamp = env_config.get_web3().eth.get_block(block)["timestamp"]
     return {
         Network.Ethereum: block,
         Network.Polygon: get_block_by_timestamp(Network.Polygon, timestamp) - 1000,

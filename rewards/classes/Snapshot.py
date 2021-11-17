@@ -1,12 +1,15 @@
 from __future__ import annotations
-from typing import Tuple, Dict
-from config.singletons import env_config
-from badger_api.requests import fetch_token_prices
-from helpers.discord import send_message_to_discord, get_discord_url
-from helpers.enums import Network, BotType
+
+import json
+from typing import Dict, Tuple
+
 from rich.console import Console
 from web3 import Web3
-import json
+
+from badger_api.requests import fetch_token_prices
+from config.singletons import env_config
+from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import BotType, Network
 
 console = Console()
 
