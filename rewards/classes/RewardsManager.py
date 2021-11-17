@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Dict, List, Tuple
 
 from rich.console import Console
@@ -79,7 +80,7 @@ class RewardsManager:
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
-            token_distribution = int(end_dist) - int(start_dist)
+            token_distribution = end_dist - start_dist
             emissions_rate = get_flat_emission_rate(sett, self.chain)
             flat_emissions = token_distribution * emissions_rate
             boosted_emissions = token_distribution * (1 - emissions_rate)
@@ -111,24 +112,6 @@ class RewardsManager:
             boosted_rewards,
         )
 
-    def distribute_rewards_to_snapshot(
-        self, amount: float, snapshot: Snapshot, token: str
-    ) -> RewardsList:
-        """
-        Distribute a certain amount of rewards to a snapshot of users
-        """
-        console.log(amount, token)
-        rewards = RewardsList(self.cycle)
-        total = snapshot.total_balance()
-        if total == 0:
-            unit = 0
-        else:
-            unit = amount / total
-        for addr, balance in snapshot:
-            reward_amount = balance * unit
-            assert reward_amount >= 0
-            rewards.increase_user_rewards(addr, token, int(reward_amount))
-        return rewards
 
     def calculate_all_sett_rewards(
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
@@ -183,25 +166,25 @@ class RewardsManager:
 
     def get_distributed_for_token_at(
         self, token: str, end_time: int, schedules: List[Schedule]
-    ) -> float:
-        total_to_distribute = 0
+    ) -> Decimal:
+        total_to_distribute = Decimal(0)
         for index, schedule in enumerate(schedules):
             if end_time < schedule.startTime:
-                to_distribute = 0
+                to_distribute = Decimal(0)
                 console.log(f"\nSchedule {index} for {token} completed\n")
             else:
                 range_duration = end_time - schedule.startTime
                 if schedule.initialTokensLocked == 0:
-                    to_distribute = 0
+                    to_distribute = Decimal(0)
                 else:
-                    to_distribute = min(
+                    to_distribute = Decimal(min(
                         schedule.initialTokensLocked,
                         int(
                             schedule.initialTokensLocked
                             * range_duration
                             // schedule.duration
                         ),
-                    )
+                    ))
                 if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     percentage_out_of_total = (
                         (int(to_distribute) / int(schedule.initialTokensLocked) * 100)

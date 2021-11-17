@@ -1,5 +1,6 @@
 import json
 import logging
+from decimal import Decimal
 from unittest import TestCase
 
 import pytest
@@ -187,44 +188,6 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
 
 
 @pytest.mark.parametrize(
-    "rewards_manager, emission_rate, sett",
-    [
-        (Network.Ethereum, 0.49, SETTS[Network.Ethereum]["ibbtc_crv"]),
-        (Network.Ethereum, 1, SETTS[Network.Ethereum]["bvecvx"]),
-        (Network.Ethereum, 0, SETTS[Network.Ethereum]["sbtc_crv"]),
-    ],
-    indirect=True,
-)
-def test_calculate_sett_rewards(
-    rewards_manager: RewardsManager, emission_rate, sett, monkeypatch, schedule
-):
-    rewards_manager.fetch_sett_snapshot = mock_fetch_snapshot
-    monkeypatch.setattr(
-        "rewards.utils.emission_utils.get_flat_emission_rate",
-        lambda s, c: emission_rate,
-    )
-    rewards_manager.start = 13609200
-    rewards_manager.end = 13609300
-    badger_decimals_conversion = 1e18
-    total_badger = 100
-    mock_schedule = {BADGER: [schedule(sett, total_badger)]}
-
-    rewards, flat, boosted = rewards_manager.calculate_sett_rewards(
-        sett, schedules_by_token=mock_schedule
-    )
-    test_case = TestCase()
-    total_flat = sum(flat.totals.values()) / badger_decimals_conversion
-    logger.info(total_flat)
-    total_boosted = sum(boosted.totals.values()) / badger_decimals_conversion
-    logger.info(total_boosted)
-    total_rewards = sum(rewards.totals.values()) / badger_decimals_conversion
-    logger.info(total_rewards)
-    test_case.assertAlmostEqual(total_boosted + total_flat, total_rewards)
-    test_case.assertAlmostEqual(total_boosted, (1 - emission_rate) * total_badger)
-    test_case.assertAlmostEqual(total_flat, emission_rate * total_badger)
-
-
-@pytest.mark.parametrize(
     "rewards_manager_split",
     [
         Network.Ethereum,
@@ -234,7 +197,7 @@ def test_calculate_sett_rewards(
 def test_splits(
     rewards_manager_split, schedule, tree_manager, boosts_split, monkeypatch
 ):
-    rates = [0, 0.5, 1]
+    rates = [Decimal(0), Decimal(0.5), Decimal(1)]
     user_data = {}
     for rate in rates:
         monkeypatch.setattr(
