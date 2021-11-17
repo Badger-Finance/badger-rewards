@@ -6,7 +6,7 @@ from helpers.enums import BotType
 from rewards.aws.helpers import get_secret
 
 
-def send_error_to_discord(e, error_msg, error_type):
+def send_error_to_discord(e: Exception, error_msg: str, error_type: str, chain: str):
     send_message_to_discord(
         f"**{error_type}**",
         f":x: {error_msg}",
@@ -23,6 +23,7 @@ def send_error_to_discord(e, error_msg, error_type):
             },
         ],
         "Error Bot",
+        get_discord_url(chain, bot_type=BotType.Boost),
     )
 
 
