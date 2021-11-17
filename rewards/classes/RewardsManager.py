@@ -141,16 +141,16 @@ class RewardsManager:
         sett_multipliers = {}
         for sett, user_apy_boosts in self.apy_boosts.items():
             sett_multipliers[sett] = {
-                "min": Decimal(min(user_apy_boosts.values())),
-                "max": Decimal(max(user_apy_boosts.values())),
+                "min": min(user_apy_boosts.values()),
+                "max": max(user_apy_boosts.values()),
             }
         return sett_multipliers
 
     def get_user_multipliers(self) -> Dict[str, Dict[str, Decimal]]:
         user_multipliers = {}
         for sett, multipliers in self.get_sett_multipliers().items():
-            min_mult = Decimal(multipliers["min"])
-            max_mult = Decimal(multipliers["max"])
+            min_mult = multipliers["min"]
+            max_mult = multipliers["max"]
             diff = max_mult - min_mult
             for user, boost_info in self.boosts.items():
                 if user not in user_multipliers:
