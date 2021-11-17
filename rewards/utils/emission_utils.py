@@ -1,4 +1,5 @@
 import time
+from decimal import Decimal
 from functools import lru_cache
 from typing import Dict, List
 
@@ -26,8 +27,8 @@ def get_token_weight(token: str, chain: str) -> float:
     return 1 if token_weight == 0 else token_weight
 
 
-def get_flat_emission_rate(sett: str, chain: str) -> float:
-    return get_emission_control(chain).proRataEmissionRate(sett).call() / 1e4
+def get_flat_emission_rate(sett: str, chain: str) -> Decimal:
+    return Decimal(get_emission_control(chain).proRataEmissionRate(sett).call() / 1e4)
 
 
 def fetch_unboosted_vaults(chain) -> List[str]:

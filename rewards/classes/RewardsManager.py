@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Dict, List, Tuple
 
 from rich.console import Console
@@ -79,10 +80,10 @@ class RewardsManager:
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
-            token_distribution = int(end_dist) - int(start_dist)
+            token_distribution = Decimal(end_dist) - Decimal(start_dist)
             emissions_rate = get_flat_emission_rate(sett, self.chain)
             flat_emissions = token_distribution * emissions_rate
-            boosted_emissions = token_distribution * (1 - emissions_rate)
+            boosted_emissions = Decimal(token_distribution * (1 - emissions_rate))
             if flat_emissions > 0:
                 flat_rewards_list.append(
                     distribute_rewards_to_snapshot(
@@ -111,24 +112,6 @@ class RewardsManager:
             boosted_rewards,
         )
 
-    def distribute_rewards_to_snapshot(
-        self, amount: float, snapshot: Snapshot, token: str
-    ) -> RewardsList:
-        """
-        Distribute a certain amount of rewards to a snapshot of users
-        """
-        console.log(amount, token)
-        rewards = RewardsList(self.cycle)
-        total = snapshot.total_balance()
-        if total == 0:
-            unit = 0
-        else:
-            unit = amount / total
-        for addr, balance in snapshot:
-            reward_amount = balance * unit
-            assert reward_amount >= 0
-            rewards.increase_user_rewards(addr, token, int(reward_amount))
-        return rewards
 
     def calculate_all_sett_rewards(
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
