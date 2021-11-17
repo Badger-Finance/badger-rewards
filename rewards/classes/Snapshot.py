@@ -18,17 +18,17 @@ console = Console()
 class Snapshot:
     def __init__(self, token, balances, ratio=1, type="none"):
         self.type = type
-        self.ratio = ratio
+        self.ratio = Decimal(ratio)
         self.token = Web3.toChecksumAddress(token)
         self.balances = self.parse_balances(balances)
 
     def __repr__(self) -> str:
         return json.dumps(self.balances, indent=4)
 
-    def parse_balances(self, bals) -> Dict[str, float]:
+    def parse_balances(self, bals) -> Dict[str, Decimal]:
         new_bals = {}
         for addr, balance in bals.items():
-            new_bals[Web3.toChecksumAddress(addr)] = balance
+            new_bals[Web3.toChecksumAddress(addr)] = Decimal(str(balance))
         return new_bals
 
     def total_balance(self) -> Decimal:
@@ -37,11 +37,11 @@ class Snapshot:
     def boost_balance(self, user, multiple):
         self.balances[user] = self.balances[user] * multiple
 
-    def percentage_of_total(self, addr) -> float:
+    def percentage_of_total(self, addr) -> Decimal:
         addr = Web3.toChecksumAddress(addr)
         return self.balances[addr] / self.total_balance()
 
-    def __iter__(self) -> Tuple[str, float]:
+    def __iter__(self) -> Tuple[str, Decimal]:
         for user, balance in self.balances.items():
             yield user, balance
 
@@ -61,7 +61,7 @@ class Snapshot:
         discord_url = get_discord_url(chain, bot_type)
         prices = fetch_token_prices()
         if self.token not in prices:
-            price = 0
+            price = Decimal(0)
             console.log(f"CANT FIND PRICING FOR {self.token}")
             send_message_to_discord(
                 "**ERROR**",
@@ -71,7 +71,7 @@ class Snapshot:
                 url=discord_url,
             )
         else:
-            price = prices[self.token] * self.ratio
+            price = Decimal(prices[self.token]) * self.ratio
 
         new_bals = {}
         for addr, bal in self.balances.items():
