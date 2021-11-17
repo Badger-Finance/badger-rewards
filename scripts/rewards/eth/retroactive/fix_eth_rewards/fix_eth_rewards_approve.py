@@ -4,12 +4,13 @@ from decouple import config
 from eth_account import Account
 
 from helpers.enums import Network
-from rewards.aws.boost import add_multipliers
+from rewards.aws.boost import add_multipliers, download_boosts, upload_boosts
 from rewards.aws.helpers import get_secret
 from rewards.aws.trees import upload_tree
 from rewards.classes.TreeManager import TreeManager
-from scripts.rewards.eth.retroactive.fix_eth_rewards.fix_eth_rewards import \
-    fix_eth_rewards
+from scripts.rewards.eth.retroactive.fix_eth_rewards.fix_eth_rewards import (
+    fix_eth_rewards,
+)
 
 if __name__ == "__main__":
     chain = Network.Ethereum
@@ -30,4 +31,8 @@ if __name__ == "__main__":
         tx_hash, approve_success = tree_manager.approve_root(rewards)
         if approve_success:
             upload_tree(rewards["fileName"], rewards["merkleTree"], chain, False)
-            add_multipliers(rewards["multiplierData"], rewards["userMultipliers"])
+            boosts = download_boosts(chain)
+            boosts = add_multipliers(
+                boosts, rewards["multiplierData"], rewards["userMultipliers"]
+            )
+            upload_boosts(boosts, chain)

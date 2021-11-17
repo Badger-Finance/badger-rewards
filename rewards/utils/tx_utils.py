@@ -6,7 +6,7 @@ from typing import Tuple
 from hexbytes import HexBytes
 from web3 import Web3, exceptions
 
-from config.singletons import http
+from helpers import http
 from helpers.constants import EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
@@ -66,10 +66,6 @@ def get_latest_base_fee(web3: Web3, default=int(100e9)):  # default to 100 gwei
     else:
         base_fee = int(raw_base_fee)
     return base_fee
-
-
-def get_latest_arbitrum_fee(web3: Web3, default=int(5e9)):  # default to 5 gwei
-    latest = web3.eth.getBlock("latest")
 
 
 def get_effective_gas_price(web3: Web3, chain: str = Network.Ethereum) -> int:

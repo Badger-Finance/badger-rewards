@@ -1,8 +1,7 @@
 from dotmap import DotMap
 from web3 import Web3
 
-from helpers.enums import (BalanceType, BotType, BucketType, Environment,
-                           Network)
+from helpers.enums import BalanceType, BotType, BucketType, Environment, Network
 
 AddressZero = "0x0000000000000000000000000000000000000000"
 MaxUint256 = str(int(2 ** 256 - 1))
@@ -171,8 +170,6 @@ SETTS = {
 }
 
 
-BSBTC = "0xd04c48A53c111300aD41190D63681ed3dAd998eC"
-
 TOKENS_TO_CHECK = {
     Network.Ethereum: {
         "Badger": BADGER,
@@ -180,7 +177,7 @@ TOKENS_TO_CHECK = {
         "xSushi": XSUSHI,
         "Dfd": DFD,
         "bCvxCrv": SETTS[Network.Ethereum]["cvx_crv"],
-        "bCvx": SETTS[Network.Ethereum]["bcvx"],
+        "bCvx": SETTS[Network.Ethereum]["cvx"],
         "bveCVX": SETTS[Network.Ethereum]["bvecvx"],
     },
     Network.Arbitrum: {
@@ -247,7 +244,7 @@ NATIVE = [
     SETTS[Network.Ethereum]["digg"],
     SETTS[Network.Ethereum]["uni_digg_wbtc"],
     SETTS[Network.Ethereum]["sushi_digg_wbtc"],
-    SETTS[Network.Arbitrum]["badger"],
+    SETTS[Network.Arbitrum]["swapr_weth_badger"],
 ]
 
 EMISSIONS_CONTRACTS = {
@@ -285,23 +282,6 @@ DISABLED_VAULTS = [
     SETTS[Network.Ethereum]["tricrypto_crv"],
     SETTS[Network.Ethereum]["harvest_ren_crv"],
 ]
-
-NO_BOOST = DISABLED_VAULTS + [
-    SETTS[Network.Ethereum]["bcvx"],
-    SETTS[Network.Ethereum]["bvecvx"],
-    SETTS[Network.Ethereum]["bvecvx_cvx"],
-    SETTS[Network.Ethereum]["ren_crv"],
-    SETTS[Network.Ethereum]["sbtc_crv"],
-    SETTS[Network.Ethereum]["tbtc_crv"],
-    SETTS[Network.Ethereum]["hbtc_crv"],
-    SETTS[Network.Ethereum]["bbtc_crv"],
-    SETTS[Network.Ethereum]["pbtc_crv"],
-    SETTS[Network.Ethereum]["obtc_crv"],
-    SETTS[Network.Ethereum]["yearn_wbtc"],
-    SETTS[Network.Ethereum]["sushi_wbtc_eth"],
-    SETTS[Network.Ethereum]["sushi_ibbtc_wbtc"],
-]
-
 PRO_RATA_VAULTS = [
     SETTS[Network.Ethereum]["bvecvx"],
     SETTS[Network.Ethereum]["bvecvx_cvx"],
@@ -375,5 +355,12 @@ CLAIMABLE_TOKENS = {
     Network.Arbitrum: {BalanceType.Native: [ARB_BADGER], BalanceType.NonNative: []},
     Network.Polygon: {BalanceType.Native: [POLY_BADGER], BalanceType.NonNative: []},
 }
+
+ABI_DIRS = {
+    Network.Ethereum: "eth",
+    Network.Polygon: "polygon",
+    Network.Arbitrum: "arbitrum",
+}
+
 SANITY_TOKEN_AMOUNT = 4000 * 1e18
 BOOST_BLOCK_DELAY = 10

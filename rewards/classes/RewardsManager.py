@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Dict, List, Tuple
 
 from rich.console import Console
@@ -17,10 +18,11 @@ from rewards.emission_handlers import eth_tree_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
-from rewards.utils.rewards_utils import (combine_rewards,
-                                         distribute_rewards_to_snapshot)
-from subgraph.queries.harvests import (fetch_sushi_harvest_events,
-                                       fetch_tree_distributions)
+from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
+from subgraph.queries.harvests import (
+    fetch_sushi_harvest_events,
+    fetch_tree_distributions,
+)
 
 console = Console()
 
@@ -59,8 +61,8 @@ class RewardsManager:
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
     ) -> RewardsList:
-        start_time = self.web3.eth.getBlock(self.start)["timestamp"]
-        end_time = self.web3.eth.getBlock(self.end)["timestamp"]
+        start_time = self.web3.eth.get_block(self.start)["timestamp"]
+        end_time = self.web3.eth.get_block(self.end)["timestamp"]
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
 
         """
@@ -78,7 +80,7 @@ class RewardsManager:
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
-            token_distribution = int(end_dist) - int(start_dist)
+            token_distribution = end_dist - start_dist
             emissions_rate = get_flat_emission_rate(sett, self.chain)
             flat_emissions = token_distribution * emissions_rate
             boosted_emissions = token_distribution * (1 - emissions_rate)
@@ -110,24 +112,6 @@ class RewardsManager:
             boosted_rewards,
         )
 
-    def distribute_rewards_to_snapshot(
-        self, amount: float, snapshot: Snapshot, token: str
-    ) -> RewardsList:
-        """
-        Distribute a certain amount of rewards to a snapshot of users
-        """
-        console.log(amount, token)
-        rewards = RewardsList(self.cycle)
-        total = snapshot.total_balance()
-        if total == 0:
-            unit = 0
-        else:
-            unit = amount / total
-        for addr, balance in snapshot:
-            reward_amount = balance * unit
-            assert reward_amount >= 0
-            rewards.increase_user_rewards(addr, token, int(reward_amount))
-        return rewards
 
     def calculate_all_sett_rewards(
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
@@ -182,28 +166,35 @@ class RewardsManager:
 
     def get_distributed_for_token_at(
         self, token: str, end_time: int, schedules: List[Schedule]
-    ) -> float:
-        total_to_distribute = 0
+    ) -> Decimal:
+        total_to_distribute = Decimal(0)
         for index, schedule in enumerate(schedules):
             if end_time < schedule.startTime:
-                to_distribute = 0
+                to_distribute = Decimal(0)
                 console.log(f"\nSchedule {index} for {token} completed\n")
             else:
                 range_duration = end_time - schedule.startTime
                 if schedule.initialTokensLocked == 0:
-                    to_distribute = 0
+                    to_distribute = Decimal(0)
                 else:
-                    to_distribute = min(
+                    to_distribute = Decimal(min(
                         schedule.initialTokensLocked,
                         int(
                             schedule.initialTokensLocked
                             * range_duration
                             // schedule.duration
                         ),
-                    )
+                    ))
                 if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     percentage_out_of_total = (
-                        int(to_distribute) / int(schedule.initialTokensLocked) * 100
+                        (int(to_distribute) / int(schedule.initialTokensLocked) * 100)
+                        if int(schedule.initialTokensLocked) > 0
+                        else 0
+                    )
+                    percentage_total_duration = (
+                        (range_duration / schedule.duration * 100)
+                        if schedule.duration > 0
+                        else 0
                     )
                     console.log(
                         (
@@ -216,7 +207,7 @@ class RewardsManager:
                     console.log(
                         f"Total duration of schedule elapsed is {to_hours(range_duration)}"
                         f" hours out of {to_hours(schedule.duration)} hours"
-                        f" or {range_duration/schedule.duration * 100}% of total duration.",
+                        f" or {percentage_total_duration}% of total duration.",
                     )
             total_to_distribute += to_distribute
 
@@ -244,8 +235,8 @@ class RewardsManager:
 
     def calculate_tree_distributions(self) -> RewardsList:
         tree_distributions = fetch_tree_distributions(
-            self.web3.eth.getBlock(self.start)["timestamp"],
-            self.web3.eth.getBlock(self.end)["timestamp"],
+            self.web3.eth.get_block(self.start)["timestamp"],
+            self.web3.eth.get_block(self.end)["timestamp"],
             self.chain,
         )
         console.log(
