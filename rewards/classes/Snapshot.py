@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from decimal import Decimal
 from typing import Dict, Tuple
 
 from rich.console import Console
@@ -30,8 +31,8 @@ class Snapshot:
             new_bals[Web3.toChecksumAddress(addr)] = balance
         return new_bals
 
-    def total_balance(self) -> float:
-        return sum(list(self.balances.values()))
+    def total_balance(self) -> Decimal:
+        return Decimal(sum(list(self.balances.values())))
 
     def boost_balance(self, user, multiple):
         self.balances[user] = self.balances[user] * multiple

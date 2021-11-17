@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Callable, Dict, List
 
 from rich.console import Console
@@ -64,17 +65,16 @@ def distribute_rewards_to_snapshot(
     else:
         unit = amount / total
     for addr, balance in snapshot:
-        reward_amount = balance * unit
+        reward_amount = Decimal(balance) * unit
         assert reward_amount >= 0
         if addr in custom_rewards:
-            console.log(addr)
             custom_rewards_calc = custom_rewards[addr]
             console.log(token, amount, snapshot.token)
             custom_rewards_list.append(
                 custom_rewards_calc(amount, token, snapshot.token)
             )
         else:
-            rewards.increase_user_rewards(addr, token, int(reward_amount))
+            rewards.increase_user_rewards(addr, token, reward_amount)
     return combine_rewards([rewards] + custom_rewards_list, 0)
 
 
@@ -89,14 +89,14 @@ def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
     # Add new rewards
     for user, claims in new.claims.items():
         for token, claim in claims.items():
-            result.increase_user_rewards(user, token, claim)
+            result.increase_user_rewards(user, token, Decimal(claim))
 
     # Add existing rewards
     for user, user_data in current["claims"].items():
         for i in range(len(user_data["tokens"])):
             token = user_data["tokens"][i]
             amount = user_data["cumulativeAmounts"][i]
-            result.increase_user_rewards(user, token, int(amount))
+            result.increase_user_rewards(user, token, Decimal(amount))
 
     # result.printState()
     return result
