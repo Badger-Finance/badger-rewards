@@ -186,7 +186,6 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
         for sett, mult in data.items():
             if sett in boosts["userData"][user]["multipliers"]:
                 assert isclose(mult, boosts["userData"][user]["multipliers"][sett], abs_tol=1e-6)
-                #assert mult == boosts["userData"][user]["multipliers"][sett]
 
 
 @pytest.mark.parametrize(
