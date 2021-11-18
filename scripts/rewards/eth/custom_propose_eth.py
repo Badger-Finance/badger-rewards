@@ -1,4 +1,5 @@
-from rewards.aws.trees import upload_tree
+from subgraph.queries.setts import last_synced_block
+from rewards.aws.trees import download_latest_tree, upload_tree
 from eth_account import Account
 from rich.console import Console
 from config.singletons import env_config
@@ -22,9 +23,11 @@ if __name__ == "__main__":
         kube=env_config.kube,
     )
     cycle_account = Account.from_key(cycle_key)
-
     tree_manager = TreeManager(chain, cycle_account)
-    past_rewards, start_block, end_block = calc_next_cycle_range(chain, tree_manager)
+    end_block = last_synced_block(chain)
+
+    past_rewards = download_latest_tree(chain)
+    start_block = int(past_rewards["endBlock"]) + 1
 
     console.log(
         f"Generating rewards between {start_block} and {end_block} on {chain} chain"
@@ -38,9 +41,9 @@ if __name__ == "__main__":
     )
     rewards_data = propose_root(chain, start_block, end_block, past_rewards, tree_manager, save=False)
     upload_tree(
-            rewards_data["fileName"],
-            rewards_data["merkleTree"],
-            chain,
-            staging=env_config.test or env_config.staging,
-        )
+                rewards_data["fileName"],
+                rewards_data["merkleTree"],
+                chain,
+                staging=env_config.test or env_config.staging,
+            )
 

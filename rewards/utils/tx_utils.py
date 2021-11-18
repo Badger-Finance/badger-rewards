@@ -6,7 +6,7 @@ from typing import Tuple
 from hexbytes import HexBytes
 from web3 import Web3, exceptions
 
-from helpers import http
+from helpers.http_session import http
 from helpers.constants import EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
