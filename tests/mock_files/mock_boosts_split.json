@@ -2,9 +2,9 @@
   "userData": {
     "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": {
       "boost": 1,
-      "nativeBalance": 29826.781164428397,
-      "nonNativeBalance": 207852.65003658624,
-      "stakeRatio": 0.14349964342132893,
+      "nativeBalance": "29826.781164428397",
+      "nonNativeBalance": "207852.65003658624",
+      "stakeRatio": "0.14349964342132893",
       "multipliers": {
         "0x27E98fC7d05f54E544d16F58C194C2D7ba71e3B5": 0.2546147573689915,
         "0x2B5455aac8d64C14786c3a29858E43b5945819C0": 0.24593791386536037,
@@ -26,9 +26,9 @@
     },
     "0xbC641f6C6957096857358Cc70df3623715A2ae45": {
       "boost": 1000,
-      "nativeBalance": 3650.1023179078643,
-      "nonNativeBalance": 122868.31718694692,
-      "stakeRatio": 0.029707433140425867,
+      "nativeBalance": "3650.1023179078643",
+      "nonNativeBalance": "122868.31718694692",
+      "stakeRatio": "0.029707433140425867",
       "multipliers": {
         "0x27E98fC7d05f54E544d16F58C194C2D7ba71e3B5": 0.06460421730654227,
         "0x2B5455aac8d64C14786c3a29858E43b5945819C0": 0.06240261403328395,
@@ -50,9 +50,9 @@
     },
     "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0": {
       "boost": 2000,
-      "nativeBalance": 45974.71469362901,
-      "nonNativeBalance": 57238.37940252614,
-      "stakeRatio": 0.8032148214804274,
+      "nativeBalance": "45974.71469362901",
+      "nonNativeBalance": "57238.37940252614",
+      "stakeRatio": "0.8032148214804274",
       "multipliers": {
         "0x27E98fC7d05f54E544d16F58C194C2D7ba71e3B5": 2.0280464646185177,
         "0x2B5455aac8d64C14786c3a29858E43b5945819C0": 1.958934045631407,
