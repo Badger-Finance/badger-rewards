@@ -24,7 +24,7 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
     return badger["ppfs"], digg["ppfs"]
 
 
-@lru_cache()
+@lru_cache
 def fetch_token_prices() -> Dict[str, float]:
     """
     Fetch token prices for sett tokens
