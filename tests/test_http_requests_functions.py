@@ -14,11 +14,6 @@ from helpers.constants import BOOST_CHAINS
 from rewards.explorer import fetch_block_by_timestamp
 
 
-@pytest.fixture
-def mock_discord(mocker):
-    return mocker.patch("helpers.http_session.send_message_to_discord")
-
-
 @responses.activate
 def test_fetch_block_by_timestamp_handled(mock_discord):
     responses.add(
