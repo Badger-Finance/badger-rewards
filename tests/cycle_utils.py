@@ -1,5 +1,6 @@
 import json
 import logging
+from decimal import Decimal
 from typing import Dict
 
 from brownie import Contract, web3
@@ -45,9 +46,10 @@ def mock_download_boosts(*args, **kwargs):
 
 
 def mock_upload_boosts(boosts, chain: str):
-    for user in list(boosts["userData"].keys()):
-        # will throw key error if multipliers data not added
-        boosts["userData"][user]["multipliers"]
+    keys = list(boosts["userData"].keys())
+    for user in keys:
+        for _, v in boosts["userData"][user].items():
+           assert type(v) != Decimal
     with open(f"{chain}-boosts.json", "w") as f:
         json.dump(boosts, f)
 

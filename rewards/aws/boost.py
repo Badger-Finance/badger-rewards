@@ -87,9 +87,9 @@ def add_user_data(user_data, chain):
 
         boosts["userData"][user] = {
             "boost": data["boost"],
-            "nativeBalance": data["nativeBalance"],
-            "nonNativeBalance": data["nonNativeBalance"],
-            "stakeRatio": data["stakeRatio"],
+            "nativeBalance": str(data["nativeBalance"]),
+            "nonNativeBalance": str(data["nonNativeBalance"]),
+            "stakeRatio": str(data["stakeRatio"]),
             "multipliers": multipliers,
         }
     upload_boosts(boosts, chain)
