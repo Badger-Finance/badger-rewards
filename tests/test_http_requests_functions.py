@@ -47,6 +47,7 @@ def test_fetch_ppfs_handled(mock_discord):
 
 @responses.activate
 def test_fetch_token_prices_handled(mock_discord):
+    fetch_token_prices.cache_clear()
     for chain in BOOST_CHAINS:
         responses.add(
             responses.GET, f"{badger_api}/prices?chain={chain}",
@@ -75,6 +76,7 @@ def test_fetch_claimable_handled(mock_discord):
 
 @responses.activate
 def test_fetch_token_names_handled(mock_discord):
+    fetch_token_names.cache_clear()
     responses.add(
         responses.GET, f"{badger_api}/tokens?chain=ethereum",
         json={}, status=404

@@ -28,7 +28,6 @@ from tests.cycle_utils import (
     mock_badger_tree,
     mock_cycle,
     mock_download_boosts,
-    mock_propose_root,
     mock_tree_manager,
     mock_upload_boosts,
     mock_upload_tree,
@@ -85,13 +84,7 @@ def tree_manager(chain, cycle_account, badger_tree):
     return tree_manager
 
 
-# @pytest.mark.require_network("hardhat-fork")
-# def test_propose_root(tree_manager, badger_tree, keeper_address):
-#     accounts[2].transfer(keeper_address, "10 ether", priority_fee="2 gwei")
-#     mock_propose_root(tree_manager, badger_tree, keeper_address)
-
-
 @pytest.mark.require_network("hardhat-fork")
 def test_cycle(tree_manager, badger_tree, keeper_address):
-    accounts[1].transfer(keeper_address, "10 ether", priority_fee="2 gwei")
+    accounts[0].transfer(keeper_address, "10 ether", priority_fee="2 gwei")
     mock_cycle(tree_manager, badger_tree, keeper_address)
