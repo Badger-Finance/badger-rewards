@@ -137,7 +137,7 @@ class RewardsManager:
 
         return combine_rewards(all_rewards, self.cycle)
 
-    def get_sett_multipliers(self) -> Dict[str, Dict[str, Decimal]]:
+    def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
         sett_multipliers = {}
         for sett, user_apy_boosts in self.apy_boosts.items():
             sett_multipliers[sett] = {
@@ -146,7 +146,7 @@ class RewardsManager:
             }
         return sett_multipliers
 
-    def get_user_multipliers(self) -> Dict[str, Dict[str, Decimal]]:
+    def get_user_multipliers(self) -> Dict[str, Dict[str, float]]:
         user_multipliers = {}
         for sett, multipliers in self.get_sett_multipliers().items():
             min_mult = multipliers["min"]

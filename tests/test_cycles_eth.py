@@ -86,5 +86,5 @@ def tree_manager(chain, cycle_account, badger_tree):
 
 @pytest.mark.require_network("hardhat-fork")
 def test_cycle(tree_manager, badger_tree, keeper_address):
-    accounts[1].transfer(keeper_address, "10 ether", priority_fee="2 gwei")
+    accounts[0].transfer(keeper_address, "10 ether", priority_fee="2 gwei")
     mock_cycle(tree_manager, badger_tree, keeper_address)
