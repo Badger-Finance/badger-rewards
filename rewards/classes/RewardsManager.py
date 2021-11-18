@@ -141,8 +141,8 @@ class RewardsManager:
         sett_multipliers = {}
         for sett, user_apy_boosts in self.apy_boosts.items():
             sett_multipliers[sett] = {
-                "min": Decimal(min(user_apy_boosts.values())),
-                "max": Decimal(max(user_apy_boosts.values())),
+                "min": str(min(user_apy_boosts.values())),
+                "max": str(max(user_apy_boosts.values())),
             }
         return sett_multipliers
 
@@ -160,7 +160,7 @@ class RewardsManager:
                     user_sett_multiplier = min_mult
                 else:
                     user_sett_multiplier = min_mult + (boost / 2000) * diff
-                user_multipliers[user][sett] = user_sett_multiplier
+                user_multipliers[user][sett] = str(user_sett_multiplier)
 
         return user_multipliers
 

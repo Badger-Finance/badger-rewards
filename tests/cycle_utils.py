@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Dict
 
 from brownie import Contract, web3
 from eth_account import Account
@@ -47,10 +48,19 @@ def mock_upload_boosts(boosts, chain: str):
     for user in list(boosts["userData"].keys()):
         # will throw key error if multipliers data not added
         boosts["userData"][user]["multipliers"]
+    with open(f"{chain}-boosts.json", "w") as f:
+        json.dump(boosts, f)
 
 
-def mock_upload_tree(*args, **kwargs):
-    pass
+def mock_upload_tree(
+    file_name: str,
+    data: Dict,
+    chain: str,
+    bucket: str = "badger-json",
+    staging: bool = False,
+):
+    with open(f"{chain}-tree.json", "w") as f:
+        json.dump(data, f)
 
 
 def mock_badger_tree(chain: Network, keeper_address: str, account: Account):
@@ -95,39 +105,11 @@ def mock_tree_manager(chain, cycle_account, badger_tree):
     return tree_manager
 
 
-def mock_propose_root(tree_manager: TreeManager, badger_tree, keeper_address: str):
-    assert keeper_address == tree_manager.approve_account.address
-    past_rewards, start_block, end_block = calc_next_cycle_range(
-        tree_manager.chain, tree_manager
-    )
-
+def mock_cycle(tree_manager, badger_tree, keeper_address):
     pending_hash_before = badger_tree.pendingMerkleContentHash()
     pending_root_before = badger_tree.pendingMerkleRoot()
     timestamp_before = badger_tree.lastProposeTimestamp()
 
-    logger.info(
-        f"Generating rewards between {start_block} and {end_block} on {tree_manager.chain} chain"
-    )
-    logger.info(f"**Proposing Rewards on {tree_manager.chain}**")
-    logger.info(f"Calculating rewards between {start_block} and {end_block}")
-    propose_root(
-        tree_manager.chain,
-        start_block,
-        end_block,
-        past_rewards,
-        tree_manager,
-        save=False,
-    )
-
-    pending_hash_after = badger_tree.pendingMerkleContentHash()
-    pending_root_after = badger_tree.pendingMerkleRoot()
-    timestamp_after = badger_tree.lastProposeTimestamp()
-    assert pending_hash_before != pending_hash_after
-    assert pending_root_before != pending_root_after
-    assert timestamp_after > timestamp_before
-
-
-def mock_cycle(tree_manager, badger_tree, keeper_address):
     past_rewards, start_block, end_block = calc_next_cycle_range(
         tree_manager.chain, tree_manager
     )
@@ -148,8 +130,13 @@ def mock_cycle(tree_manager, badger_tree, keeper_address):
 
     proposed_hash = badger_tree.pendingMerkleContentHash()
     proposed_root = badger_tree.pendingMerkleRoot()
+    timestamp_after = badger_tree.lastProposeTimestamp()
     logger.info(f"proposed hash: {proposed_hash}")
     logger.info(f"proposed root: {proposed_root}")
+
+    assert pending_hash_before != proposed_hash
+    assert pending_root_before != proposed_root
+    assert timestamp_after > timestamp_before
 
     current_rewards, start_block, end_block = get_last_proposed_cycle(
         tree_manager.chain, tree_manager
