@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Dict
 
 from brownie import Contract, web3
 from eth_account import Account
@@ -47,10 +48,19 @@ def mock_upload_boosts(boosts, chain: str):
     for user in list(boosts["userData"].keys()):
         # will throw key error if multipliers data not added
         boosts["userData"][user]["multipliers"]
+    with open("eth-boosts.json", "w") as f:
+        json.dump(boosts, f)
 
 
-def mock_upload_tree(*args, **kwargs):
-    pass
+def mock_upload_tree(
+    file_name: str,
+    data: Dict,
+    chain: str,
+    bucket: str = "badger-json",
+    staging: bool = False,
+):
+    with open("eth-tree.json", "w") as f:
+        json.dump(data, f)
 
 
 def mock_badger_tree(chain: Network, keeper_address: str, account: Account):
