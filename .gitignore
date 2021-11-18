@@ -129,4 +129,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-badger-boosts.json
+# test files
+eth-boosts.json
+eth-tree.json
