@@ -2,8 +2,8 @@ import time
 from typing import Dict, Optional
 
 from config.singletons import env_config
-from helpers.http_session import http
 from helpers.enums import Network
+from helpers.http_session import http
 
 urls = {
     Network.Ethereum: "etherscan.io",

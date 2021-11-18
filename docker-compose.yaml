@@ -1,8 +1,8 @@
 version: '3.3'
 services:
-    boost-bot:
-        image: boost-bot
-        command: python -m scripts.rewards.propose_boost
+    eth-approve-bot:
+        image: eth-approve-bot
+        command: python -m scripts.rewards.eth.auto_approve_eth
         build: 
             context: .
             dockerfile: Dockerfile
