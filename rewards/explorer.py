@@ -2,7 +2,7 @@ import time
 from typing import Dict, Optional
 
 from config.singletons import env_config
-from helpers import http
+from helpers.http_session import http
 from helpers.enums import Network
 
 urls = {
