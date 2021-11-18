@@ -214,7 +214,6 @@ def generate_rewards_in_range(
     file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
 
     verify_rewards(past_tree, merkle_tree, tree_manager, chain)
-    print(merkle_tree)
     if save:
         with open(file_name, "w") as fp:
             json.dump(merkle_tree, fp, indent=4)
