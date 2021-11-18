@@ -1,6 +1,5 @@
 import json
 import logging
-
 from decimal import Decimal
 from typing import Dict
 
