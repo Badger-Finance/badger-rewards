@@ -216,8 +216,11 @@ def generate_rewards_in_range(
 
     verify_rewards(past_tree, merkle_tree, tree_manager, chain)
     if save:
+        tmp_file_name = "tmp-" + file_name
+        upload_tree(tmp_file_name, merkle_tree)
         with open(file_name, "w") as fp:
             json.dump(merkle_tree, fp, indent=4)
+
 
 
     return {
