@@ -198,7 +198,7 @@ class RewardsList:
         entries = []
 
         index = 0
-
+        self.claims = dict(sorted(self.claims.items()))
         for user, user_data in self.claims.items():
             (node_entry, encoded) = self.to_node_entry(user, user_data, cycle, index)
             node_entries.append(node_entry)
