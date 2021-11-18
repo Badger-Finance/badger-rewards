@@ -7,6 +7,7 @@ from brownie import web3
 from eth_account import Account
 
 from tests.utils import (
+    mock_boosts,
     mock_claimable_bals,
     mock_claimed_for,
     mock_tree,
@@ -76,8 +77,7 @@ def test_upload_boost_staging(monkeypatch):
     )
     monkeypatch.setattr("rewards.aws.boost.env_config", mock_env_config_obj)
 
-    mock_boost_data = {"userData": [1, 2, 3, 4]}
-    upload_boosts(mock_boost_data, Network.Ethereum)
+    upload_boosts(mock_boosts, Network.Ethereum)
 
 
 def test_upload_boost_prod(monkeypatch):
@@ -89,5 +89,4 @@ def test_upload_boost_prod(monkeypatch):
     )
     monkeypatch.setattr("rewards.aws.boost.env_config", mock_env_config_obj)
 
-    mock_boost_data = {"userData": [1, 2, 3, 4]}
-    upload_boosts(mock_boost_data, Network.Ethereum)
+    upload_boosts(mock_boosts, Network.Ethereum)

@@ -6,7 +6,9 @@ from tabulate import tabulate
 from helpers.constants import BOOST_BLOCK_DELAY, STAKE_RATIO_RANGES
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BotType
+from rewards.aws.boost import add_user_data
 from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses
+from rewards.boost.calc_boost import badger_boost
 
 console = Console()
 
