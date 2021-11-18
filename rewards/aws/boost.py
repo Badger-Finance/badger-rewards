@@ -19,6 +19,9 @@ def upload_boosts(boost_data, chain: str):
     discord_url = get_discord_url(chain, BotType.Boost)
     chain_id = env_config.get_web3(chain).eth.chain_id
     boost_file_name = f"badger-boosts-{chain_id}.json"
+    keys = list(boost_data["userData"].keys())
+    for k, v in boost_data["userData"][keys[0]].items():
+        console.log(f"{k}: {v} ({type(v)})")
     buckets = []
     if env_config.test or env_config.staging:
         buckets.append("badger-staging-merkle-proofs")

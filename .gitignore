@@ -132,3 +132,4 @@ dmypy.json
 # test files
 eth*-boosts.json
 eth*-tree.json 
+rewards-1-*.json
