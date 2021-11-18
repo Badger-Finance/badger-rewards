@@ -11,7 +11,6 @@ from helpers.web3_utils import make_token
 from rewards.classes.Snapshot import Snapshot
 
 
-@lru_cache(maxsize=None)
 def claims_snapshot(chain: str) -> Dict[str, Snapshot]:
     all_claims = fetch_all_claimable_balances(chain)
     chain_claimable_tokens = CLAIMABLE_TOKENS[chain]
