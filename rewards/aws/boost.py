@@ -75,7 +75,7 @@ def add_user_data(user_data, chain):
     boosts = {"userData": {}, "multiplierData": old_boosts["multiplierData"]}
     for user, data in user_data.items():
         if user in old_boosts["userData"]:
-            if old_boosts["userData"][user]["stakeRatio"] > 0:
+            if float(old_boosts["userData"][user]["stakeRatio"]) > 0:
                 multipliers = old_boosts["userData"][user]["multipliers"]
             else:
                 multipliers = {}
@@ -84,9 +84,9 @@ def add_user_data(user_data, chain):
 
         boosts["userData"][user] = {
             "boost": data["boost"],
-            "nativeBalance": data["nativeBalance"],
-            "nonNativeBalance": data["nonNativeBalance"],
-            "stakeRatio": data["stakeRatio"],
+            "nativeBalance": str(data["nativeBalance"]),
+            "nonNativeBalance": str(data["nonNativeBalance"]),
+            "stakeRatio": str(data["stakeRatio"]),
             "multipliers": multipliers,
         }
     upload_boosts(boosts, chain)
@@ -102,7 +102,7 @@ def add_multipliers(boosts, multiplier_data, user_multipliers, chain: str):
     boosts["multiplierData"] = multiplier_data
     for user in list(boosts["userData"].keys()):
         if user in user_multipliers:
-            if boosts["userData"][user]["stakeRatio"] > 0:
+            if float(boosts["userData"][user]["stakeRatio"]) > 0:
                 boosts["userData"][user]["multipliers"] = user_multipliers[user]
             else:
                 boosts["userData"][user]["multipliers"] = {}

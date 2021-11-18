@@ -130,5 +130,6 @@ dmypy.json
 .pyre/
 
 # test files
-eth-boosts.json
-eth-tree.json
+eth*-boosts.json
+eth*-tree.json 
+rewards-1-*.json

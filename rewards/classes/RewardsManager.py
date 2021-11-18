@@ -155,12 +155,12 @@ class RewardsManager:
             for user, boost_info in self.boosts.items():
                 if user not in user_multipliers:
                     user_multipliers[user] = {}
-                boost = Decimal(boost_info.get("boost", 1))
+                boost = boost_info.get("boost", 1)
                 if boost == 1:
                     user_sett_multiplier = min_mult
                 else:
-                    user_sett_multiplier = min_mult + (float(boost) / 2000) * diff
-                user_multipliers[user][sett] = float(user_sett_multiplier)
+                    user_sett_multiplier = min_mult + (boost / 2000) * diff
+                user_multipliers[user][sett] = user_sett_multiplier
 
         return user_multipliers
 

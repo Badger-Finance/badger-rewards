@@ -76,7 +76,7 @@ def rewards_to_merkle_tree(rewards: RewardsList, startBlock, endBlock):
         },
     """
     tree = MerkleTree(encodedNodes)
-    token_totals = {k: int(v) for k,v in rewards.totals.items() }
+    token_totals = {k: int(v) for k,v in rewards.totals.items()}
     distribution = {
         "merkleRoot": encode_hex(tree.root),
         "cycle": nodes[0]["cycle"],
