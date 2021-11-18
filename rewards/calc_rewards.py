@@ -81,7 +81,7 @@ def propose_root(
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager
+        chain, start, end, save=True, past_tree=past_rewards, tree_manager=tree_manager
     )
     console.log("Generated rewards")
 
@@ -90,6 +90,7 @@ def propose_root(
     )
     if env_config.production:
         tx_hash, success = tree_manager.propose_root(rewards_data)
+    return rewards_data
 
 
 def approve_root(
@@ -110,12 +111,15 @@ def approve_root(
         chain,
         start,
         end,
-        save=False,
+        save=True,
         past_tree=current_rewards,
         tree_manager=tree_manager,
     )
     boosts = download_boosts(chain)
     if env_config.test or env_config.staging:
+        console.log(
+            f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
+        )
         boosts = add_multipliers(
             boosts,
             rewards_data["multiplierData"],
@@ -211,10 +215,10 @@ def generate_rewards_in_range(
     file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
 
     verify_rewards(past_tree, merkle_tree, tree_manager, chain)
-
     if save:
         with open(file_name, "w") as fp:
             json.dump(merkle_tree, fp, indent=4)
+
 
     return {
         "merkleTree": merkle_tree,
