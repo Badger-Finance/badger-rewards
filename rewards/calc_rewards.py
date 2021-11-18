@@ -90,6 +90,7 @@ def propose_root(
     )
     if env_config.production:
         tx_hash, success = tree_manager.propose_root(rewards_data)
+    return rewards_data
 
 
 def approve_root(
