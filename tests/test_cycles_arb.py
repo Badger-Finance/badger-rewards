@@ -28,7 +28,6 @@ from tests.cycle_utils import (
     mock_badger_tree,
     mock_cycle,
     mock_download_boosts,
-    mock_propose_root,
     mock_tree_manager,
     mock_upload_boosts,
     mock_upload_tree,
@@ -83,11 +82,6 @@ def badger_tree(chain, keeper_address):
 def tree_manager(chain, cycle_account, badger_tree):
     tree_manager = mock_tree_manager(chain, cycle_account, badger_tree)
     return tree_manager
-
-
-@pytest.mark.require_network("hardhat-arbitrum-fork")
-def test_propose_root(tree_manager, badger_tree, keeper_address):
-    mock_propose_root(tree_manager, badger_tree, keeper_address)
 
 
 @pytest.mark.require_network("hardhat-arbitrum-fork")
