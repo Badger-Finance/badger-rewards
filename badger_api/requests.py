@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Dict, Optional, Tuple
 
 from badger_api.config import get_api_base_path
-from helpers import http
+from helpers.http_session import http
 from helpers.constants import BOOST_CHAINS
 
 badger_api = get_api_base_path()
@@ -24,7 +24,7 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
     return badger["ppfs"], digg["ppfs"]
 
 
-@lru_cache()
+@lru_cache
 def fetch_token_prices() -> Dict[str, float]:
     """
     Fetch token prices for sett tokens
