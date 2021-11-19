@@ -39,7 +39,9 @@ logger = logging.getLogger("test-cycles-eth")
 @pytest.fixture(autouse=True)
 def mock_fns(monkeypatch):
     monkeypatch.setattr("rewards.calc_rewards.download_boosts", mock_download_boosts)
+    monkeypatch.setattr("rewards.calc_rewards.download_proposed_boosts", mock_download_boosts)
     monkeypatch.setattr("rewards.calc_rewards.upload_boosts", mock_upload_boosts)
+    monkeypatch.setattr("rewards.calc_rewards.upload_proposed_boosts", mock_upload_boosts)
     monkeypatch.setattr("rewards.calc_rewards.upload_tree", mock_upload_tree)
     monkeypatch.setattr("rewards.calc_rewards.cycle_logger", MockCycleLogger())
 

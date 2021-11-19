@@ -74,7 +74,9 @@ def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str
                                 )
                             digg_balances[address] = float(fragment_balance) / 1e9
     except Exception as e:
-        send_error_to_discord(e, "Error in Fetching Token Balance", "Subgraph Error")
+        send_error_to_discord(
+            e, "Error in Fetching Token Balance", "Subgraph Error", chain
+        )
         raise e
 
     return badger_balances, digg_balances

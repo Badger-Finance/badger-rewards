@@ -84,7 +84,7 @@ def upload_tree(
     :param fileName: the filename of the uploaded bucket
     :param data: the data to push
     """
-    chain_id = env_config.get_web3(chain).eth.chain_id
+    chain_id = CHAIN_IDS[chain]
 
     if chain == Network.Ethereum:
         key = "badger-tree.json"

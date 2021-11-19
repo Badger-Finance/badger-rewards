@@ -10,6 +10,7 @@ from rich.console import Console
 from web3.contract import ContractFunction
 
 from config.singletons import env_config
+from helpers.constants import CHAIN_IDS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from helpers.web3_utils import get_badger_tree
@@ -141,7 +142,7 @@ class TreeManager:
         return self.badger_tree.hasPendingRoot().call()
 
     def fetch_tree(self, merkle):
-        chain_id = self.w3.eth.chain_id
+        chain_id = CHAIN_IDS[self.chain]
         file_name = f"rewards-{chain_id}-{merkle['contentHash']}.json"
         tree = json.loads(download_tree(file_name, self.chain))
         self.validate_tree(merkle, tree)
