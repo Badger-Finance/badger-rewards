@@ -11,7 +11,7 @@ from helpers.constants import CHAIN_IDS, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
-from rewards.aws.boost import add_multipliers, download_boosts, upload_boosts
+from rewards.aws.boost import add_multipliers, download_boosts, download_proposed_boosts, upload_boosts, upload_proposed_boosts
 from rewards.aws.trees import upload_tree
 from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsManager import RewardsManager
@@ -80,8 +80,10 @@ def propose_root(
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
+    boosts = download_boosts(chain)
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager
+        chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager,
+        boosts=boosts
     )
     console.log("Generated rewards")
 
@@ -90,6 +92,8 @@ def propose_root(
     )
     if env_config.production:
         tx_hash, success = tree_manager.propose_root(rewards_data)
+        if success:
+            upload_proposed_boosts(boosts,chain)
     return rewards_data
 
 
@@ -106,7 +110,7 @@ def approve_root(
     """
     cycle_logger.set_start_block(start)
     cycle_logger.set_end_block(end)
-
+    boosts = download_proposed_boosts(chain)
     rewards_data = generate_rewards_in_range(
         chain,
         start,
@@ -114,8 +118,8 @@ def approve_root(
         save=False,
         past_tree=current_rewards,
         tree_manager=tree_manager,
+        boosts=boosts
     )
-    boosts = download_boosts(chain)
     if env_config.test or env_config.staging:
         console.log(
             f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
@@ -124,7 +128,6 @@ def approve_root(
             boosts,
             rewards_data["multiplierData"],
             rewards_data["userMultipliers"],
-            chain=chain,
         )
         upload_boosts(boosts, chain)
         return rewards_data
@@ -148,7 +151,6 @@ def approve_root(
                 boosts,
                 rewards_data["multiplierData"],
                 rewards_data["userMultipliers"],
-                chain=chain,
             )
             upload_boosts(boosts, chain)
             cycle_logger.save(tree_manager.next_cycle, chain)
@@ -171,6 +173,7 @@ def generate_rewards_in_range(
     save: bool,
     past_tree: Dict,
     tree_manager: TreeManager,
+    boosts: Dict
 ):
     """Generate chain rewards for a chain within two blocks
 
@@ -186,7 +189,6 @@ def generate_rewards_in_range(
     console_and_discord(f"Generating rewards for {len(setts)} setts", chain)
 
     rewards_list = []
-    boosts = download_boosts(chain)
     rewards_manager = RewardsManager(
         chain, tree_manager.next_cycle, start, end, boosts["userData"]
     )
