@@ -13,7 +13,7 @@ class HTTPClient:
 
     All method signatures are matching respective requests.HTTP_method()
 
-    For example, self.get(self, url, **kwargs) is mathching requests.get(self, url, **kwargs)
+    For example, self.get(self, url, **kwargs) is matching requests.get(self, url, **kwargs)
     signature
 
     Implement more HTTP methods as needed
