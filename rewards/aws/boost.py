@@ -86,7 +86,7 @@ def download_proposed_boosts(chain: str) -> Dict:
     console.log("Downloading boosts ...")
     chain_id = CHAIN_IDS[chain]
 
-    boost_file_name = f"propose-boost-{chain_id}.json"
+    boost_file_name = f"propose-boosts-{chain_id}.json"
     bucket = get_bucket(env_config.production)
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boost_file_name)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
