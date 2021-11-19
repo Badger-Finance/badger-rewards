@@ -11,7 +11,13 @@ from helpers.constants import CHAIN_IDS, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
-from rewards.aws.boost import add_multipliers, download_boosts, download_proposed_boosts, upload_boosts, upload_proposed_boosts
+from rewards.aws.boost import (
+    add_multipliers,
+    download_boosts,
+    download_proposed_boosts,
+    upload_boosts,
+    upload_proposed_boosts,
+)
 from rewards.aws.trees import upload_tree
 from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsManager import RewardsManager

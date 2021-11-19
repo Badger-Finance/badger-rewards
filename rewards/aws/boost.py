@@ -1,7 +1,8 @@
-from helpers.constants import CHAIN_IDS
 import json
-from rich.console import Console
 from typing import Dict
+
+from rich.console import Console
+
 from config.singletons import env_config
 from helpers.constants import CHAIN_IDS
 from helpers.discord import get_discord_url, send_message_to_discord
