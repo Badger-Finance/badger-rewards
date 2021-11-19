@@ -3,6 +3,7 @@ import json
 from rich.console import Console
 
 from config.singletons import env_config
+from helpers.constants import CHAIN_IDS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType
 from rewards.aws.helpers import get_bucket, s3
@@ -17,7 +18,7 @@ def upload_boosts(boost_data, chain: str):
     :param boost_data: calculated boost information
     """
     discord_url = get_discord_url(chain, BotType.Boost)
-    chain_id = env_config.get_web3(chain).eth.chain_id
+    chain_id = CHAIN_IDS[chain]
     boost_file_name = f"badger-boosts-{chain_id}.json"
     buckets = []
     if env_config.test or env_config.staging:
@@ -55,7 +56,7 @@ def download_boosts(chain: str):
     :param test:
     """
     console.log("Downloading boosts ...")
-    chain_id = env_config.get_web3(chain).eth.chain_id
+    chain_id = CHAIN_IDS[chain]
 
     boost_file_name = f"badger-boosts-{chain_id}.json"
     bucket = get_bucket(env_config.production)

@@ -7,7 +7,7 @@ from rich.console import Console
 
 from config.rewards_config import rewards_config
 from config.singletons import env_config
-from helpers.constants import EMISSIONS_CONTRACTS
+from helpers.constants import CHAIN_IDS, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
@@ -210,7 +210,7 @@ def generate_rewards_in_range(
     console.log("Converting to merkle tree... \n")
     merkle_tree = tree_manager.convert_to_merkle_tree(cumulative_rewards, start, end)
     root_hash = rewards_manager.web3.keccak(text=merkle_tree["merkleRoot"])
-    chain_id = rewards_manager.web3.eth.chain_id
+    chain_id = CHAIN_IDS[chain]
 
     file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
 
