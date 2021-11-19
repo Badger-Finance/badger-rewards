@@ -128,7 +128,6 @@ def approve_root(
             boosts,
             rewards_data["multiplierData"],
             rewards_data["userMultipliers"],
-            chain=chain,
         )
         upload_boosts(boosts, chain)
         return rewards_data
@@ -152,7 +151,6 @@ def approve_root(
                 boosts,
                 rewards_data["multiplierData"],
                 rewards_data["userMultipliers"],
-                chain=chain,
             )
             upload_boosts(boosts, chain)
             cycle_logger.save(tree_manager.next_cycle, chain)

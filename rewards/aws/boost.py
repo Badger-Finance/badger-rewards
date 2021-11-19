@@ -25,7 +25,7 @@ def upload_proposed_boosts(boost_data, chain: str):
         "propose-boosts"
     )
 
-def upload_boosts_to_aws(boost_data, chain: str, file_name):
+def upload_boosts_to_aws(boost_data, chain: str, file_name: str):
     """Upload boosts file to aws bucket
 
     :param test:
@@ -119,7 +119,7 @@ def add_user_data(user_data, chain):
     upload_boosts(boosts, chain)
 
 
-def add_multipliers(boosts, multiplier_data, user_multipliers, chain: str):
+def add_multipliers(boosts, multiplier_data, user_multipliers):
     """Upload sett and user multipliers
 
     :param test:
