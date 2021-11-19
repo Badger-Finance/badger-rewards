@@ -1,7 +1,7 @@
+from helpers.constants import CHAIN_IDS
 import json
-
 from rich.console import Console
-
+from typing import Dict
 from config.singletons import env_config
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType
@@ -10,7 +10,7 @@ from rewards.aws.helpers import get_bucket, s3
 console = Console()
 
 
-def upload_boosts(boost_data, chain):
+def upload_boosts(boost_data, chain: str):
     upload_boosts_to_aws(
         boost_data,
         chain,
@@ -32,7 +32,7 @@ def upload_boosts_to_aws(boost_data, chain: str, file_name):
     :param boost_data: calculated boost information
     """
     discord_url = get_discord_url(chain, BotType.Boost)
-    chain_id = env_config.get_web3(chain).eth.chain_id
+    chain_id = CHAIN_IDS[chain]
     boost_file_name = f"{file_name}-{chain_id}.json"
     buckets = []
     if env_config.test or env_config.staging:
@@ -64,13 +64,13 @@ def upload_boosts_to_aws(boost_data, chain: str, file_name):
         )
 
 
-def download_boosts(chain: str):
+def download_boosts(chain: str) -> Dict:
     """Download latest boosts file
 
     :param test:
     """
     console.log("Downloading boosts ...")
-    chain_id = env_config.get_web3(chain).eth.chain_id
+    chain_id = CHAIN_IDS[chain]
 
     boost_file_name = f"badger-boosts-{chain_id}.json"
     bucket = get_bucket(env_config.production)
@@ -80,9 +80,9 @@ def download_boosts(chain: str):
     return data
 
 
-def download_proposed_boosts(chain: str):
+def download_proposed_boosts(chain: str) -> Dict:
     console.log("Downloading boosts ...")
-    chain_id = env_config.get_web3(chain).eth.chain_id
+    chain_id = CHAIN_IDS[chain]
 
     boost_file_name = f"propose-boost-{chain_id}.json"
     bucket = get_bucket(env_config.production)

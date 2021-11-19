@@ -83,7 +83,7 @@ def propose_root(
     boosts = download_boosts(chain)
     rewards_data = generate_rewards_in_range(
         chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager,
-        boosts=chain
+        boosts=boosts
     )
     console.log("Generated rewards")
 
