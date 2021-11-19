@@ -11,7 +11,7 @@ from helpers.constants import EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
-from rewards.aws.boost import add_multipliers, download_boosts, download_proposed_boost, upload_boosts, upload_proposed_boost
+from rewards.aws.boost import add_multipliers, download_boosts, download_proposed_boosts, upload_boosts, upload_proposed_boosts
 from rewards.aws.trees import upload_tree
 from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsManager import RewardsManager
@@ -93,7 +93,7 @@ def propose_root(
     if env_config.production:
         tx_hash, success = tree_manager.propose_root(rewards_data)
         if success:
-            upload_proposed_boost(boosts,chain)
+            upload_proposed_boosts(boosts,chain)
     return rewards_data
 
 
@@ -110,7 +110,7 @@ def approve_root(
     """
     cycle_logger.set_start_block(start)
     cycle_logger.set_end_block(end)
-    boosts = download_proposed_boost(chain)
+    boosts = download_proposed_boosts(chain)
     rewards_data = generate_rewards_in_range(
         chain,
         start,

@@ -10,7 +10,7 @@ from rewards.aws.helpers import get_bucket, s3
 console = Console()
 
 
-def upload_boost(boost_data, chain):
+def upload_boosts(boost_data, chain):
     upload_boosts_to_aws(
         boost_data,
         chain,
@@ -18,7 +18,7 @@ def upload_boost(boost_data, chain):
     )
     
 
-def upload_proposed_boost(boost_data, chain: str):
+def upload_proposed_boosts(boost_data, chain: str):
     upload_boosts_to_aws(
         boost_data,
         chain,
@@ -80,7 +80,7 @@ def download_boosts(chain: str):
     return data
 
 
-def download_proposed_boost(chain: str):
+def download_proposed_boosts(chain: str):
     console.log("Downloading boosts ...")
     chain_id = env_config.get_web3(chain).eth.chain_id
 
@@ -116,7 +116,7 @@ def add_user_data(user_data, chain):
             "stakeRatio": str(data["stakeRatio"]),
             "multipliers": multipliers,
         }
-    upload_boost(boosts, chain)
+    upload_boosts(boosts, chain)
 
 
 def add_multipliers(boosts, multiplier_data, user_multipliers, chain: str):
