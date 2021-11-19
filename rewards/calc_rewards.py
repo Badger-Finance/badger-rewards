@@ -81,7 +81,7 @@ def propose_root(
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=True, past_tree=past_rewards, tree_manager=tree_manager
+        chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager
     )
     console.log("Generated rewards")
 
@@ -111,7 +111,7 @@ def approve_root(
         chain,
         start,
         end,
-        save=True,
+        save=False,
         past_tree=current_rewards,
         tree_manager=tree_manager,
     )
@@ -216,12 +216,8 @@ def generate_rewards_in_range(
 
     verify_rewards(past_tree, merkle_tree, tree_manager, chain)
     if save:
-        tmp_file_name = "tmp-" + file_name
-        upload_tree(tmp_file_name, merkle_tree, chain)
         with open(file_name, "w") as fp:
             json.dump(merkle_tree, fp, indent=4)
-
-
 
     return {
         "merkleTree": merkle_tree,
