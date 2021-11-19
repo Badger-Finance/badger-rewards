@@ -138,7 +138,9 @@ def fetch_chain_balances(chain: str, block: int) -> Dict[str, Dict[str, int]]:
         console.log(f"Fetched {len(balances)} total setts")
         return balances
     except Exception as e:
-        send_error_to_discord(e, "Error in Fetching Sett Balance", "Subgraph Error")
+        send_error_to_discord(
+            e, "Error in Fetching Sett Balance", "Subgraph Error", chain
+        )
         raise e
 
 
@@ -185,5 +187,7 @@ def fetch_sett_balances(chain: str, block: int, sett: str):
         return balances
 
     except Exception as e:
-        send_error_to_discord(e, "Error in Fetching Sett Balance", "Subgraph Error")
+        send_error_to_discord(
+            e, "Error in Fetching Sett Balance", "Subgraph Error", chain
+        )
         raise e
