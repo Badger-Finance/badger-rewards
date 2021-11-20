@@ -73,9 +73,7 @@ class RewardsManager:
         """
         flat_rewards_list = []
         boosted_rewards_list = []
-        custom_behaviour = {
-            EMISSIONS_CONTRACTS[Network.Ethereum]["BadgerTree"]: eth_tree_handler
-        }
+        custom_behaviour = {}
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
@@ -111,7 +109,6 @@ class RewardsManager:
             flat_rewards,
             boosted_rewards,
         )
-
 
     def calculate_all_sett_rewards(
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
@@ -177,14 +174,16 @@ class RewardsManager:
                 if schedule.initialTokensLocked == 0:
                     to_distribute = Decimal(0)
                 else:
-                    to_distribute = Decimal(min(
-                        schedule.initialTokensLocked,
-                        int(
-                            schedule.initialTokensLocked
-                            * range_duration
-                            // schedule.duration
-                        ),
-                    ))
+                    to_distribute = Decimal(
+                        min(
+                            schedule.initialTokensLocked,
+                            int(
+                                schedule.initialTokensLocked
+                                * range_duration
+                                // schedule.duration
+                            ),
+                        )
+                    )
                 if schedule.startTime <= end_time and schedule.endTime >= end_time:
                     percentage_out_of_total = (
                         (int(to_distribute) / int(schedule.initialTokensLocked) * 100)
