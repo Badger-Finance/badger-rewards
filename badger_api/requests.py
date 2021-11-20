@@ -1,10 +1,10 @@
 import concurrent.futures
 from functools import lru_cache
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from badger_api.config import get_api_base_path
 from helpers.constants import BOOST_CHAINS
-from helpers.http_session import http
+from helpers.http_client import http_client
 
 badger_api = get_api_base_path()
 
@@ -13,10 +13,7 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
     """
     Fetch ppfs for bbadger and bdigg
     """
-    response = http.get(f"{badger_api}/setts")
-    if not response.ok:
-        return
-    setts = response.json()
+    setts = http_client.get(f"{badger_api}/setts")
     if not setts:
         return
     badger = [sett for sett in setts if sett["asset"] == "BADGER"][0]
@@ -32,10 +29,7 @@ def fetch_token_prices() -> Dict[str, float]:
     chains = BOOST_CHAINS
     prices = {}
     for chain in chains:
-        response = http.get(f"{badger_api}/prices?chain={chain}")
-        if not response.ok:
-            continue
-        chain_prices = response.json()
+        chain_prices = http_client.get(f"{badger_api}/prices?chain={chain}")
         if not chain_prices:
             continue
         prices = {**prices, **chain_prices}
@@ -48,10 +42,7 @@ def fetch_claimable(page: int, chain: str) -> Optional[Dict]:
     Fetch claimable data from account data
     :param page: page to fetch data from
     """
-    response = http.get(f"{badger_api}/accounts/allClaimable?page={page}&chain={chain}")
-    if not response.ok:
-        return
-    return response.json()
+    return http_client.get(f"{badger_api}/accounts/allClaimable?page={page}&chain={chain}")
 
 
 def fetch_total_claimable_pages(chain: str) -> Optional[int]:
@@ -83,11 +74,8 @@ def fetch_all_claimable_balances(chain: str) -> Optional[Dict]:
 
 
 @lru_cache
-def fetch_token_names(chain: str):
-    response = http.get(f"{badger_api}/tokens?chain={chain}")
-    if not response.ok:
-        return
-    return response.json()
+def fetch_token_names(chain: str) -> Optional[Union[Dict, List]]:
+    return http_client.get(f"{badger_api}/tokens?chain={chain}")
 
 
 def fetch_token(chain: str, token: str):
