@@ -1,4 +1,11 @@
-on: ['pull_request']
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - development
+      - main
+  pull_request:
 
 name: main workflow
 
@@ -49,4 +56,9 @@ jobs:
               run: pip install -r requirements.txt && pip install -r requirements-dev.txt
 
             - name: Run Tests
-              run: brownie test
+              run: brownie test --cov-report=xml --cov=.
+
+            - uses: codecov/codecov-action@v2
+              with:
+                fail_ci_if_error: false
+                token: ${{ secrets.CODECOV_TOKEN }}
