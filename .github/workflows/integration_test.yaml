@@ -2,12 +2,10 @@ on:
     # Trigger the workflow on push or pull request,
     # but only for the main branch
     push:
-        branches:
-            - development
-            - main
     pull_request:
+        branches: -main
 
-name: main workflow
+name: integration test
 
 env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -24,7 +22,7 @@ env:
     NODE_OPTIONS: --max_old_space_size=4096
 
 jobs:
-    tests:
+    integration-tests:
         runs-on: ubuntu-latest
 
         steps:
@@ -48,9 +46,4 @@ jobs:
               run: pip install -r requirements.txt && pip install -r requirements-dev.txt
 
             - name: Run Tests
-              run: brownie test --cov-report=xml --cov=.
-
-            - uses: codecov/codecov-action@v1
-              with:
-                  fail_ci_if_error: false
-                  token: ${{ secrets.CODECOV_TOKEN }}
+              run: brownie test integration_tests
