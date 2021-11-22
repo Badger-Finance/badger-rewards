@@ -94,6 +94,7 @@ def test_upload_boost_prod(monkeypatch):
 
     upload_boosts(mock_boosts, Network.Ethereum)
 
+
 def test_boost_workflow(monkeypatch):
     monkeypatch.setattr(
         "rewards.aws.boost.send_message_to_discord", mock_send_message_to_discord_prod
