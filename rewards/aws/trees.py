@@ -86,11 +86,11 @@ def upload_tree(
     chain_id = CHAIN_IDS[chain]
 
     if chain == Network.Ethereum:
-        key = "badger-tree.json"
         rewards_bucket = "badger-json"
     else:
-        key = f"badger-tree-{chain_id}.json"
         rewards_bucket = f"badger-json-{chain}"
+    
+    key = f"badger-tree-{chain_id}.json"
 
     upload_targets = [
         {

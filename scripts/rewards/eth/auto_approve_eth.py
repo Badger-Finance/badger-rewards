@@ -2,9 +2,9 @@ import time
 
 from rich.console import Console
 
+from config.singletons import env_config
 from helpers.enums import Network
 from scripts.rewards.eth.approve_eth import approve_rewards
-from config.singletons import env_config
 
 console = Console()
 
