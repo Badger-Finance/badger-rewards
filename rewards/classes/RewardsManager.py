@@ -7,7 +7,7 @@ from badger_api.requests import fetch_token
 from config.singletons import env_config
 from helpers.constants import EMISSIONS_CONTRACTS, XSUSHI
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import BalanceType, Network
+from helpers.enums import Abi, BalanceType, Network
 from helpers.time_utils import to_hours, to_utc_date
 from helpers.web3_utils import make_contract
 from rewards.classes.CycleLogger import cycle_logger
@@ -50,9 +50,9 @@ class RewardsManager:
         :type strat: str
         :rtype: str
         """
-        strategy = make_contract(strat, "BaseStrategy", self.chain)
+        strategy = make_contract(strat, Abi.Strategy, self.chain)
         controller = make_contract(
-            strategy.controller().call(), "Controller", self.chain
+            strategy.controller().call(), Abi.Controller, self.chain
         )
         want = strategy.want().call()
         sett = controller.vaults(want).call()
@@ -118,14 +118,14 @@ class RewardsManager:
     ) -> RewardsList:
         all_rewards = []
         for sett in setts:
-            token = make_contract(sett, "ERC20", self.chain)
-            console.log(f"Calculating rewards for {token.name().call()}")
+            sett_token = fetch_token(self.chain, sett)
+            sett_name = sett_token.get("name", "")
+            console.log(f"Calculating rewards for {sett_name}")
             rewards, flat, boosted = self.calculate_sett_rewards(
                 sett, all_schedules[sett]
             )
             desc = f"**Boosted Rewards**\n\n{boosted.totals_info(self.chain)}\n\n**Flat Rewards**\n\n{flat.totals_info(self.chain)}"
-            sett_token = fetch_token(self.chain, sett)
-            sett_name = sett_token.get("name", "")
+          
             send_message_to_discord(
                 f"Rewards for {sett_name}",
                 description=desc,

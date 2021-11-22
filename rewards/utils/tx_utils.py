@@ -8,7 +8,7 @@ from web3 import Web3, exceptions
 
 from helpers.constants import EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import BotType, Network
+from helpers.enums import Abi, BotType, Network
 from helpers.http_session import http
 from helpers.web3_utils import make_contract
 
@@ -40,7 +40,7 @@ def get_gas_price_of_tx(
     total_gas_used = Decimal(tx_receipt.get("gasUsed", 0))
     logger.info(f"gas used: {total_gas_used}")
     gas_oracle = make_contract(
-        EMISSIONS_CONTRACTS[chain]["GasOracle"], abi_name="ChainlinkOracle", chain=chain
+        EMISSIONS_CONTRACTS[chain]["GasOracle"], abi_name=Abi.ChainlinkOracle, chain=chain
     )
 
     if chain == Network.Ethereum:

@@ -83,13 +83,13 @@ def fetch_all_claimable_balances(chain: str) -> Optional[Dict]:
 
 
 @lru_cache
-def fetch_token_names(chain: str):
+def fetch_token_names(chain: str) -> Dict:
     response = http.get(f"{badger_api}/tokens?chain={chain}")
     if not response.ok:
         return
     return response.json()
 
 
-def fetch_token(chain: str, token: str):
+def fetch_token(chain: str, token: str) -> Dict:
     token_names = fetch_token_names(chain)
     return token_names.get(token, {}) if token_names else None
