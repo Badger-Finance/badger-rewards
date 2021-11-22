@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from decimal import Decimal
 
@@ -46,3 +47,27 @@ def mock_send_discord(
     url: str = None,
 ):
     print("sent")
+    
+
+def mock_send_message_to_discord_stg(
+    title: str, description: str, fields: list, username: str, url: str = ""
+):
+    logger = logging.getLogger("mock-discord-stag-message")
+    logger.info(description)
+    assert "s3://badger-staging-merkle-proofs/" in description
+    assert "s3://badger-merkle-proofs/" not in description
+
+
+def mock_send_message_to_discord_prod(
+    title: str, description: str, fields: list, username: str, url: str = ""
+):
+    logger = logging.getLogger("mock-discord-prod-message")
+    logger.info(description)
+    assert "s3://badger-staging-merkle-proofs/" not in description
+    assert "s3://badger-merkle-proofs/" in description
+
+def mock_send_code_block_to_discord(
+    msg: str, username: str, url: str = None
+):
+    logger = logging.getLogger("mock-discord-code-block")
+    logger.info(msg)
