@@ -1,11 +1,11 @@
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
-  push:
-    branches:
-      - development
-      - main
-  pull_request:
+    # Trigger the workflow on push or pull request,
+    # but only for the main branch
+    push:
+        branches:
+            - development
+            - main
+    pull_request:
 
 name: main workflow
 
@@ -18,7 +18,7 @@ env:
     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     WEB3_INFURA_PROJECT_ID: ${{ secrets.WEB3_INFURA_PROJECT_ID }}
     ENV: TEST
-    KUBE: "False"
+    KUBE: 'False'
     # increasing available memory for node reduces issues with ganache crashing
     # https://nodejs.org/api/cli.html#cli_max_old_space_size_size_in_megabytes
     NODE_OPTIONS: --max_old_space_size=4096
@@ -29,14 +29,6 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-
-            - name: Cache Compiler Installations
-              uses: actions/cache@v2
-              with:
-                  path: |
-                      ~/.solcx
-                      ~/.vvm
-                  key: compiler-cache
 
             - name: Setup Node.js
               uses: actions/setup-node@v1
@@ -60,5 +52,31 @@ jobs:
 
             - uses: codecov/codecov-action@v1
               with:
-                fail_ci_if_error: false
-                token: ${{ secrets.CODECOV_TOKEN }}
+                  fail_ci_if_error: false
+                  token: ${{ secrets.CODECOV_TOKEN }}
+
+    integration-tests:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v1
+
+            - name: npm install
+              run: npm install
+
+            - name: Install Ganache
+              run: npm install -g ganache-cli@6.10.2
+
+            - name: Setup Python 3.9
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9.5
+
+            - name: Install Requirements
+              run: pip install -r requirements.txt && pip install -r requirements-dev.txt
+
+            - name: Run Tests
+              run: brownie test integration_tests --cov-report=xml --cov=.
