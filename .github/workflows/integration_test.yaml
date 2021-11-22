@@ -3,7 +3,8 @@ on:
     # but only for the main branch
     push:
     pull_request:
-        branches: -main
+        branches:
+            - main
 
 name: integration test
 
