@@ -20,8 +20,6 @@ class MerkleTree:
         self.elements = sorted(set(web3.keccak(hexstr=el) for el in elements))
         self.layers = MerkleTree.get_layers(self.elements)
 
-        # console.log(self.elements, self.layers)
-
     @property
     def root(self):
         return self.layers[-1][0]
@@ -64,11 +62,6 @@ def rewards_to_merkle_tree(rewards: RewardsList, startBlock, endBlock):
     (nodes, encodedNodes, entries) = rewards.to_merkle_format()
 
     # For each user, encode their data into a node
-
-    # Put the nodes into a tree
-
-    # elements = [(index, account, amount) for index, (account, amount) in enumerate(rewards.items())]
-    # nodes = [encode_hex(encode_abi_packed(['uint', 'address', 'uint'], el)) for el in elements]
     """
     'claims': {
             user: {'index': index, 'amount': hex(amount), 'proof': tree.get_proof(nodes[index])}
@@ -90,7 +83,6 @@ def rewards_to_merkle_tree(rewards: RewardsList, startBlock, endBlock):
     for entry in entries:
         node = entry["node"]
         encoded = entry["encoded"]
-        # console.log(node)
         distribution["claims"][node["user"]] = {
             "index": hex(node["index"]),
             "user": node["user"],
@@ -101,10 +93,5 @@ def rewards_to_merkle_tree(rewards: RewardsList, startBlock, endBlock):
             "node": encoded,
         }
     print(f"merkle root: {encode_hex(tree.root)}")
-
-    # Print to file with content hash
-    # hash(distribution)
-
-    # console.log(distribution)
 
     return distribution
