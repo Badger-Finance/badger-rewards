@@ -36,7 +36,7 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
         sett_addr = Web3.toChecksumAddress(sett_addr)
         sett_balances = parse_sett_balances(sett_addr, balances, chain)
         token = fetch_token(chain, sett_addr)
-        name = token.get("name","")
+        name = token.get("name", "")
         console.log(f"Fetched {len(balances)} balances for sett {name}")
         balances_by_sett[sett_addr] = sett_balances
 
@@ -53,7 +53,7 @@ def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> Snapsho
     token = fetch_token(chain, sett)
     name = token.get("name", "")
     console.log(
-        f"Taking snapshot on {chain} of {name)} ({sett}) at {block}\n"
+        f"Taking snapshot on {chain} of {name} ({sett}) at {block}\n"
     )
     sett_balances = fetch_sett_balances(chain, block, sett)
     return parse_sett_balances(sett, sett_balances, chain, blacklist)
