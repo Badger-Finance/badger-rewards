@@ -1,6 +1,6 @@
 import math
 from functools import lru_cache
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 from gql import Client, gql
 from rich.console import Console
