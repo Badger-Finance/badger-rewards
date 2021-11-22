@@ -4,6 +4,7 @@ from typing import Dict, Tuple
 from rich.console import Console
 from web3 import Web3
 
+from badger_api.requests import fetch_token
 from helpers.constants import (
     DISABLED_VAULTS,
     EMISSIONS_BLACKLIST,
@@ -12,7 +13,6 @@ from helpers.constants import (
     REWARDS_BLACKLIST,
 )
 from helpers.enums import BalanceType
-from helpers.web3_utils import make_contract
 from rewards.classes.Snapshot import Snapshot
 from rewards.utils.emission_utils import fetch_unboosted_vaults, get_token_weight
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
@@ -35,8 +35,9 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     for sett_addr, balances in list(chain_balances.items()):
         sett_addr = Web3.toChecksumAddress(sett_addr)
         sett_balances = parse_sett_balances(sett_addr, balances, chain)
-        token = make_contract(sett_addr, abi_name="ERC20", chain=chain)
-        console.log(f"Fetched {len(balances)} balances for sett {token.name().call()}")
+        token = fetch_token(chain, sett_addr)
+        name = token.get("name", "")
+        console.log(f"Fetched {len(balances)} balances for sett {name}")
         balances_by_sett[sett_addr] = sett_balances
 
     return balances_by_sett
@@ -49,9 +50,10 @@ def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> Snapsho
     :param block:
     :param sett:
     """
-    token = make_contract(sett, abi_name="ERC20", chain=chain)
+    token = fetch_token(chain, sett)
+    name = token.get("name", "")
     console.log(
-        f"Taking snapshot on {chain} of {token.name().call()} ({sett}) at {block}\n"
+        f"Taking snapshot on {chain} of {name} ({sett}) at {block}\n"
     )
     sett_balances = fetch_sett_balances(chain, block, sett)
     return parse_sett_balances(sett, sett_balances, chain, blacklist)
