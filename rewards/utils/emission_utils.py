@@ -32,6 +32,10 @@ def get_flat_emission_rate(sett: str, chain: str) -> Decimal:
     return Decimal(get_emission_control(chain).proRataEmissionRate(sett).call() / 1e4)
 
 
+def get_nft_score(nft_address: str, nft_id: int):
+    return 0
+
+
 def fetch_unboosted_vaults(chain) -> List[str]:
     all_setts = fetch_setts(chain)
     logger = make_contract(
