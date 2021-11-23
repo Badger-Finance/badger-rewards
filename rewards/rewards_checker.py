@@ -72,6 +72,7 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
             e,
             f"Negative Claimable \n ```{json.dumps(negative_claimable,indent=4)}```",
             "Negative Rewards Error",
+            chain
         )
         raise e
 

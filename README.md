@@ -1,5 +1,7 @@
 ![Badger Logo](./images/badger-logo.png)
 
+### Test coverage:
+[![codecov](https://codecov.io/gh/Badger-Finance/badger-rewards/branch/development/graph/badge.svg?token=0JIZAA720B)](https://codecov.io/gh/Badger-Finance/badger-rewards)
 # Badger Rewards
 
 Badger Rewards hosts scripts directly related to the Badger Rewards system, including:

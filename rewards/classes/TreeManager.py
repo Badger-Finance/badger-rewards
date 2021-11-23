@@ -165,7 +165,6 @@ class TreeManager:
         last_update = int(tree["endBlock"])
         assert last_update_publish > last_update
         # Ensure file tracks block within 1 day of upload
-        # assert abs(lastUpdate - lastUpdatePublish) < 6500
 
     def fetch_current_merkle_data(self):
         root = self.badger_tree.merkleRoot().call()
