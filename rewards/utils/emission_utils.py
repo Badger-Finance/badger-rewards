@@ -8,7 +8,7 @@ from web3 import Web3
 from web3.contract import ContractFunctions
 
 from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS, NATIVE
-from helpers.enums import Abi
+from helpers.enums import Abi, Network
 from helpers.web3_utils import make_contract
 from rewards.classes.Schedule import Schedule
 from subgraph.queries.setts import list_setts
@@ -17,7 +17,7 @@ console = Console()
 
 
 @lru_cache
-def get_emission_control(chain: str) -> ContractFunctions:
+def get_emission_control(chain: Network) -> ContractFunctions:
     return make_contract(
         EMISSIONS_CONTRACTS[chain]["EmissionControl"], Abi.EmissionControl, chain
     )
@@ -32,8 +32,15 @@ def get_flat_emission_rate(sett: str, chain: str) -> Decimal:
     return Decimal(get_emission_control(chain).proRataEmissionRate(sett).call() / 1e4)
 
 
-def get_nft_score(nft_address: str, nft_id: int):
-    return 0
+@lru_cache
+def get_nft_control(chain: Network) -> ContractFunctions:
+    return make_contract(
+        EMISSIONS_CONTRACTS[chain]["NFTControl"], Abi.NFTControl, chain
+    )
+
+
+def get_nft_score(chain: str, nft_address: str, nft_id: int) -> Decimal:
+    return Decimal(get_nft_control(chain).nftWeight(nft_address, nft_id).call() / 1e18)
 
 
 def fetch_unboosted_vaults(chain) -> List[str]:
