@@ -8,8 +8,8 @@ from rewards.utils.emission_utils import get_nft_score
 from subgraph.queries.nfts import fetch_nfts
 
 
-def nft_snapshot(chain: Network) -> Snapshot:
-    nfts = fetch_nfts(chain)
+def nft_snapshot(chain: Network, block: int) -> Snapshot:
+    nfts = fetch_nfts(chain, block)
     bals = {}
     for user, nft_balances in nfts.items():
         for nft_balance in nft_balances:
@@ -19,5 +19,5 @@ def nft_snapshot(chain: Network) -> Snapshot:
     return Snapshot(BADGER, bals, ratio=1, type=BalanceType.Native)
 
 
-def nft_snapshot_usd(chain: Network) -> Dict[str, Decimal]:
-    return nft_snapshot(chain).convert_to_usd(chain).balances
+def nft_snapshot_usd(chain: Network, block: int) -> Dict[str, Decimal]:
+    return nft_snapshot(chain, block).convert_to_usd(chain).balances

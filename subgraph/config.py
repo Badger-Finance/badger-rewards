@@ -21,4 +21,5 @@ subgraph_urls = {
     f"harvests-{Network.Arbitrum}": "https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-arbitrum",
     "fuse": "https://api.thegraph.com/subgraphs/name/darruma/fuse-subgraph-badger",
     "thegraph": "https://api.thegraph.com/index-node/graphql",
+    "nfts": "https://api.thegraph.com/subgraphs/name/darruma/badger-nfts"
 }
