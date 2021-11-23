@@ -3,3 +3,5 @@ omit =
     abis/*
     deploy/*
     images/*
+    tests/*
+    integration_tests/*
