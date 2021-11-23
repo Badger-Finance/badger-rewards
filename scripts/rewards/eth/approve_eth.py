@@ -11,7 +11,6 @@ from rewards.calc_rewards import approve_root
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.tree_utils import get_last_proposed_cycle
 
-
 console = Console()
 
 

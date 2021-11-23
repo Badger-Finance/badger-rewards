@@ -1,5 +1,5 @@
 from gql import Client
-from gql.transport.aiohttp import AIOHTTPTransport
+from gql.transport.requests import RequestsHTTPTransport
 
 from config.singletons import env_config
 from subgraph.config import subgraph_ids, subgraph_urls
@@ -18,7 +18,7 @@ def subgraph_url(name: str) -> str:
 
 def make_gql_client(name: str) -> Client:
     url = subgraph_url(name)
-    transport = AIOHTTPTransport(url=url)
+    transport = RequestsHTTPTransport(url=url, retries=3)
     return Client(
         transport=transport, fetch_schema_from_transport=True, execute_timeout=30
     )
