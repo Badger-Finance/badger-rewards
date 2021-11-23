@@ -1,3 +1,4 @@
+from decimal import Decimal, DecimalException
 from typing import Dict
 
 from helpers.constants import BADGER
@@ -12,12 +13,11 @@ def nft_snapshot(chain: Network) -> Snapshot:
     bals = {}
     for user, nft_balances in nfts.items():
         for nft_balance in nft_balances:
-            data = nft_balance.split("-")
-            nft_address = data[0]
-            nft_id = data[1]
+            nft_address = nft_balance["address"]
+            nft_id = nft_balance["id"]
             bals[user] = bals.get(user, 0) + get_nft_score(nft_address, nft_id)
     return Snapshot(BADGER, bals, ratio=1, type=BalanceType.Native)
 
 
-def nft_snapshot_usd(chain: Network) -> Dict[str, float]:
+def nft_snapshot_usd(chain: Network) -> Dict[str, Decimal]:
     return nft_snapshot(chain).convert_to_usd(chain).balances
