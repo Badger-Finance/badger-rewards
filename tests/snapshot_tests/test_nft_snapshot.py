@@ -69,7 +69,6 @@ def test_nft_snapshot_usd():
         "0x320C24c9d6a2B2337F883c51d857D92f9aBFF8DD": Decimal(0)
     }
     snapshot_usd = nft_snapshot_usd(chain)
-    print(snapshot_usd)
     TestCase().assertDictEqual(d1=snapshot_usd, d2=expected_snapshot_usd)    
     
 
