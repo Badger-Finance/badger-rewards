@@ -1,3 +1,5 @@
+from decimal import Decimal
+from typing import Dict
 from unittest import TestCase
 
 import pytest
@@ -20,7 +22,7 @@ def mock_fns(monkeypatch):
 def mock_get_nft_score(nft_address, nft_id):
     nft_scores = {
         "0xe1e546e25A5eD890DFf8b8D005537c0d373497F8-1": 200,
-        "0xe4605d46Fd0B3f8329d936a8b258D69276cBa264-97": 200
+        "0xe4605d46Fd0B3f8329d936a8b258D69276cBa264-97": 10
     }
     return nft_scores.get(f"{nft_address}-{nft_id}", 0)
     
@@ -61,12 +63,13 @@ def mock_send_message_to_discord(
 def test_nft_snapshot_usd():
     chain = Network.Ethereum
     expected_snapshot_usd = {
-        "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": 210 * 10,
-        "0xbC641f6C6957096857358Cc70df3623715A2ae45": 10 * 10,
-        "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0": 200 * 10,
-        "0x320C24c9d6a2B2337F883c51d857D92f9aBFF8DD": 0
+        "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": Decimal(210 * 10),
+        "0xbC641f6C6957096857358Cc70df3623715A2ae45": Decimal(10 * 10),
+        "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0": Decimal(200 * 10),
+        "0x320C24c9d6a2B2337F883c51d857D92f9aBFF8DD": Decimal(0)
     }
     snapshot_usd = nft_snapshot_usd(chain)
-    TestCase.assertDictEqual(snapshot_usd, expected_snapshot_usd)    
+    print(snapshot_usd)
+    TestCase().assertDictEqual(d1=snapshot_usd, d2=expected_snapshot_usd)    
     
 

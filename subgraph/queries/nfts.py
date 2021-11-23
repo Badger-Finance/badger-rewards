@@ -1,3 +1,5 @@
+from typing import Dict
+
 from gql import gql
 
 from helpers.enums import Network
