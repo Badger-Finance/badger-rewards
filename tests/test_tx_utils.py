@@ -1,9 +1,15 @@
 from decimal import Decimal
+from unittest.mock import MagicMock
 
 import pytest
 
 from helpers.enums import Network
-from rewards.utils.tx_utils import confirm_transaction, get_gas_price_of_tx
+from rewards.utils.tx_utils import (
+    confirm_transaction,
+    get_gas_price_of_tx,
+    get_latest_base_fee,
+    get_priority_fee,
+)
 from tests.utils import set_env_vars
 
 set_env_vars()
@@ -81,3 +87,27 @@ def test_confirm_transaction__unhappy_path(discord_mocker, network_info):
         web3, network_info['invalid_tx'], network_info["network"], retries_on_failure=0,
     )
     assert not success
+
+
+def test_get_priority_fee():
+    reward = 11e9
+    web3 = MagicMock(
+        eth=MagicMock(
+            fee_history=MagicMock(return_value={'reward': [[reward]]})
+        )
+    )
+    assert get_priority_fee(web3) == reward / 1
+
+
+@pytest.mark.parametrize(
+    "fee", [1000000, "0x174876e800"]
+)
+def test_get_latest_base_fee(fee):
+    web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(return_value={'baseFeePerGas': fee})
+        )
+    )
+    if type(fee) == str and fee.startswith("0x"):
+        fee = int(fee, 0)
+    assert get_latest_base_fee(web3) == int(fee)
