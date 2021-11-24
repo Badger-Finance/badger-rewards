@@ -3,6 +3,7 @@ import time
 from decimal import Decimal
 from typing import Tuple
 
+from eth_typing import HexStr
 from hexbytes import HexBytes
 from web3 import Web3, exceptions
 
@@ -115,7 +116,7 @@ def get_priority_fee(
 
 def get_transaction(
     web3: Web3,
-    tx_hash: HexBytes,
+    tx_hash: HexStr,
     timeout: int,
     chain: str,
     tries: int = 5,
