@@ -1,7 +1,7 @@
 import logging
 import time
 from decimal import Decimal
-from typing import Tuple
+from typing import Optional, Tuple
 
 from eth_typing import HexStr
 from hexbytes import HexBytes
@@ -19,9 +19,10 @@ logger = logging.getLogger("tx-utils")
 def get_gas_price_of_tx(
     web3: Web3,
     chain: str,
-    tx_hash: HexBytes,
+    tx_hash: HexStr,
     timeout: int = 60,
-) -> Decimal:
+    retries_on_failure: Optional[int] = 5,
+) -> Optional[Decimal]:
     """Gets the actual amount of gas used by the transaction and converts
     it from gwei to USD value for monitoring.
 
@@ -30,12 +31,12 @@ def get_gas_price_of_tx(
         tx_hash (HexBytes): tx id of target transaction
         chain (str): chain of tx (valid: eth, poly)
         timeout(int): time to wait on tx fetch failure
-
+        retries_on_failure(int): retry amount of times if tx fetching fails
     Returns:
         Decimal: USD value of gas used in tx
     """
     tx, tx_receipt = get_transaction(
-        web3, tx_hash, timeout, chain, bot_type=BotType.Cycle
+        web3, tx_hash, timeout, chain, bot_type=BotType.Cycle, tries=retries_on_failure
     )
     logger.info(f"tx: {tx_receipt}")
     total_gas_used = Decimal(tx_receipt.get("gasUsed", 0))
@@ -48,7 +49,8 @@ def get_gas_price_of_tx(
         gas_price_base = Decimal(tx_receipt.get("effectiveGasPrice", 0) / DECIMAL_MAPPING[chain])
     elif chain in [Network.Polygon, Network.Arbitrum]:
         gas_price_base = Decimal(tx.get("gasPrice", 0) / DECIMAL_MAPPING[chain])
-
+    else:
+        return
     gas_usd = Decimal(
         gas_oracle.latestAnswer().call() / 10 ** gas_oracle.decimals().call()
     )

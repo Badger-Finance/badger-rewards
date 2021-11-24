@@ -1,6 +1,9 @@
+from decimal import Decimal
+
 import pytest
 
 from helpers.enums import Network
+from rewards.utils.tx_utils import get_gas_price_of_tx
 from tests.utils import set_env_vars
 
 set_env_vars()
@@ -9,9 +12,12 @@ from config.singletons import env_config
 from rewards.utils.tx_utils import get_transaction
 
 
-@pytest.mark.parametrize(
-    "network_info",
-    [
+@pytest.fixture
+def discord_mocker(mocker):
+    return mocker.patch("rewards.utils.tx_utils.send_message_to_discord")
+
+
+TEST_NETWORK_INFO = [
         {
             "network": Network.Ethereum,
             "valid_tx": "0xc1d6fb782044679da2af2aa7dc5721b53c9557727d3abc9839aaf10c2bd56454",
@@ -29,9 +35,9 @@ from rewards.utils.tx_utils import get_transaction
         },
     ]
 
-)
-def test_check_tx_receipt(mocker, network_info):
-    discord = mocker.patch("rewards.utils.tx_utils.send_message_to_discord")
+
+@pytest.mark.parametrize("network_info", TEST_NETWORK_INFO)
+def test_check_tx_receipt(discord_mocker, network_info):
     web3 = env_config.get_web3(network_info["network"])
     assert get_transaction(
         web3, network_info["valid_tx"], 2, network_info["network"]
@@ -39,6 +45,23 @@ def test_check_tx_receipt(mocker, network_info):
     with pytest.raises(Exception):
         get_transaction(
             web3, network_info["invalid_tx"], 2, network_info["network"],
-            tries=1
+            tries=0
         )
-    assert discord.called
+    assert discord_mocker.called
+
+
+@pytest.mark.parametrize("network_info", TEST_NETWORK_INFO)
+def test_get_gas_price_of_tx(discord_mocker, network_info):
+    web3 = env_config.get_web3(network_info["network"])
+    price = get_gas_price_of_tx(web3, network_info["network"], network_info["valid_tx"])
+    assert price != Decimal(0.0)
+
+
+@pytest.mark.parametrize("network_info", TEST_NETWORK_INFO)
+def test_get_gas_price_of_tx__invalid_tx(discord_mocker, network_info):
+    web3 = env_config.get_web3(network_info["network"])
+    with pytest.raises(Exception):
+        get_gas_price_of_tx(
+            web3, network_info["network"], network_info["invalid_tx"],
+            retries_on_failure=0,
+        )
