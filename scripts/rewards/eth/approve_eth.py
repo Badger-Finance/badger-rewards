@@ -14,13 +14,12 @@ from rewards.utils.tree_utils import get_last_proposed_cycle
 console = Console()
 
 
-def approve_rewards(chain, kube):
+def approve_rewards(chain):
     discord_url = config("DISCORD_WEBHOOK_URL")
     key_decrypt_password = get_secret(
-        "DECRYPT_PASSWORD_ARN",
-        "DECRYPT_PASSWORD_KEY",
+        config("DECRYPT_PASSWORD_ARN"),
+        config("DECRYPT_PASSWORD_KEY"),
         region_name="us-west-2",
-        kube=kube
     )
 
     with open(config("KEYFILE")) as key_file:
@@ -55,4 +54,4 @@ def approve_rewards(chain, kube):
 
 
 if __name__ == "__main__":
-    approve_rewards(Network.Ethereum, kube=False)
+    approve_rewards(Network.Ethereum)

@@ -25,6 +25,12 @@ def get_last_proposed_cycle(
     last_claim_end = tree_manager.last_propose_end_block()
     last_claim_start = tree_manager.last_propose_start_block()
 
+    # Sanity check: Ensure previous cycle was not too long
+    # assert lastClaimStart > lastClaimEnd - rewards_config.maxStartBlockAge
+
+    # Sanity check: Ensure previous end block is not too far in the past
+    # assert lastClaimEnd > chain.height - rewards_config.maxStartBlockAge
+
     # Sanity check: Ensure start block is not too close to end block
     return current_rewards, last_claim_start, last_claim_end
 

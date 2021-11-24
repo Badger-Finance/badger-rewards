@@ -46,19 +46,3 @@ class BucketType(str, Enum):
 
     def __str__(self):
         return self.value
-
-
-class Abi(str, Enum):
-    ERC20 = "ERC20"
-    Digg = "Digg"
-    BadgerTree = "BadgerTreeV2"
-    ChainlinkOracle = "ChainlinkOracle"
-    RewardsLogger = "RewardsLogger"
-    EmissionControl = "EmissionControl"
-    Strategy = "BaseStrategy"
-    Controller = "Controller"
-    CErc20Delegator = "CErc20Delegator"
-    
-    def __str__(self) -> str:
-        return self.value
-    

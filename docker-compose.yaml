@@ -2,7 +2,7 @@ version: '3.3'
 services:
     eth-approve-bot:
         image: eth-approve-bot
-        command: python -m scripts.rewards.eth.approve_eth
+        command: python -m scripts.rewards.eth.auto_approve_eth
         build: 
             context: .
             dockerfile: Dockerfile

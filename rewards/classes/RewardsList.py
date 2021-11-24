@@ -140,6 +140,18 @@ class RewardsList:
                 node_entry["cumulativeAmounts"].append(str(int(cumulativeAmount)))
                 int_amounts.append(int(cumulativeAmount))
 
+        # console.print(
+        #     "Encoding Node entry...",
+        #     {
+        #         "index": int(nodeEntry["index"]),
+        #         "account": nodeEntry["user"],
+        #         "cycle": int(nodeEntry["cycle"]),
+        #         "tokens": nodeEntry["tokens"],
+        #         "cumulativeAmounts": nodeEntry["cumulativeAmounts"],
+        #         "(integer encoded)": intAmounts,
+        #     }
+        # )
+
         encoded_local = encode_hex(
             encode_abi(
                 ["uint", "address", "uint", "address[]", "uint[]"],
@@ -152,6 +164,25 @@ class RewardsList:
                 ),
             )
         )
+
+        # encoder = BadgerTree.at(
+        #     web3.toChecksumAddress("0x660802Fc641b154aBA66a62137e71f331B6d787A")
+        # )
+
+        # console.print("nodeEntry", nodeEntry)
+        # console.print("encoded_local", encoded_local)
+
+        # ===== Verify encoding on-chain =====
+        # encoded_chain = encoder.encodeClaim(
+        #     nodeEntry["tokens"],
+        #     nodeEntry["cumulativeAmounts"],
+        #     nodeEntry["user"],
+        #     nodeEntry["index"],
+        #     nodeEntry["cycle"],
+        # )[0]
+
+        # console.print("encoded_onchain", encoded_chain)
+        # assert encoded_local == encoded_chain
 
         return node_entry, encoded_local
 

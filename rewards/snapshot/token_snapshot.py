@@ -8,7 +8,7 @@ from subgraph.subgraph_utils import make_gql_client
 
 def token_snapshot(chain: str, block: int) -> Tuple[Snapshot, Snapshot]:
     token_client = make_gql_client(f"tokens-{chain}")
-    badger_bals, digg_bals = fetch_token_balances(token_client, block, chain)
+    badger_bals, digg_bals = fetch_token_balances(token_client, block)
     return Snapshot(BADGER, badger_bals), Snapshot(DIGG, digg_bals)
 
 

@@ -97,6 +97,8 @@ def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
             token = user_data["tokens"][i]
             amount = user_data["cumulativeAmounts"][i]
             result.increase_user_rewards(user, token, Decimal(amount))
+
+    # result.printState()
     return result
 
 

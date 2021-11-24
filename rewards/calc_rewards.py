@@ -9,7 +9,7 @@ from config.rewards_config import rewards_config
 from config.singletons import env_config
 from helpers.constants import CHAIN_IDS, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import Abi, BotType, Network
+from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
 from rewards.aws.boost import (
     add_multipliers,
@@ -46,7 +46,7 @@ def fetch_all_schedules(
     :param setts: setts from which schedule to pull
     """
     logger = make_contract(
-        EMISSIONS_CONTRACTS[chain]["RewardsLogger"], Abi.RewardsLogger, chain
+        EMISSIONS_CONTRACTS[chain]["RewardsLogger"], "RewardsLogger", chain
     )
     all_schedules = {}
     setts_with_schedules = []

@@ -1,6 +1,6 @@
 import concurrent.futures
 from functools import lru_cache
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from badger_api.config import get_api_base_path
 from helpers.constants import BOOST_CHAINS
@@ -74,10 +74,10 @@ def fetch_all_claimable_balances(chain: str) -> Optional[Dict]:
 
 
 @lru_cache
-def fetch_token_names(chain: str) -> Optional[Dict]:
+def fetch_token_names(chain: str) -> Optional[Union[Dict, List]]:
     return http_client.get(f"{badger_api}/tokens?chain={chain}")
 
 
-def fetch_token(chain: str, token: str) -> Optional[Dict]:
+def fetch_token(chain: str, token: str):
     token_names = fetch_token_names(chain)
     return token_names.get(token, {}) if token_names else None

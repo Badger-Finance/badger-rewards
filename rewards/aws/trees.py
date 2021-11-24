@@ -64,6 +64,7 @@ def download_past_trees(test: bool, number: int):
     versions = response["Versions"][:number]
     for version in versions:
         console.log(version["Key"], version["VersionId"])
+        # yield version
         s3_client_obj = s3.get_object(
             Bucket=bucket, Key=version["Key"], VersionId=version["VersionId"]
         )

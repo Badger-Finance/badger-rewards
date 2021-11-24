@@ -1,25 +1,28 @@
 import math
 from functools import lru_cache
-from typing import Dict, Optional, Tuple
+from typing import Dict, Tuple
 
-from gql import Client, gql
+from gql import gql
 from rich.console import Console
 from web3 import Web3
 
+from config.singletons import env_config
 from helpers.digg_utils import digg_utils
 from helpers.discord import (
     get_discord_url,
     send_error_to_discord,
     send_message_to_discord,
 )
-from helpers.enums import Abi, BotType, Network
+from helpers.enums import BotType, Network
 from helpers.web3_utils import make_contract
+from subgraph.subgraph_utils import make_gql_client
 
 console = Console()
 
 
 @lru_cache(maxsize=None)
-def fetch_token_balances(client: Client, block_number: int, chain: str) -> Tuple[Dict[str, int], Dict[str, int]]:
+def fetch_token_balances(client, block_number) -> Tuple[Dict[str, int], Dict[str, int]]:
+    shares_per_fragment = digg_utils.shares_per_fragment
     increment = 1000
     query = gql(
         """
@@ -100,12 +103,12 @@ def fetch_fuse_pool_balances(client, chain, block):
     for symbol, data in ctoken_data.items():
         ftoken = make_contract(
             Web3.toChecksumAddress(data["contract"]),
-            abi_name=Abi.CErc20Delegator,
+            abi_name="CErc20Delegator",
             chain=chain,
         )
         underlying = make_contract(
             Web3.toChecksumAddress(data["underlying_contract"]),
-            abi_name=Abi.ERC20,
+            abi_name="ERC20",
             chain=chain,
         )
 

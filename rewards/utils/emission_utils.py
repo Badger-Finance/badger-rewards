@@ -8,7 +8,6 @@ from web3 import Web3
 from web3.contract import ContractFunctions
 
 from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS, NATIVE
-from helpers.enums import Abi
 from helpers.web3_utils import make_contract
 from rewards.classes.Schedule import Schedule
 from subgraph.queries.setts import list_setts
@@ -19,7 +18,7 @@ console = Console()
 @lru_cache
 def get_emission_control(chain: str) -> ContractFunctions:
     return make_contract(
-        EMISSIONS_CONTRACTS[chain]["EmissionControl"], Abi.EmissionControl, chain
+        EMISSIONS_CONTRACTS[chain]["EmissionControl"], "EmissionControl", chain
     )
 
 
@@ -35,7 +34,7 @@ def get_flat_emission_rate(sett: str, chain: str) -> Decimal:
 def fetch_unboosted_vaults(chain) -> List[str]:
     all_setts = fetch_setts(chain)
     logger = make_contract(
-        EMISSIONS_CONTRACTS[chain]["RewardsLogger"], Abi.RewardsLogger, chain
+        EMISSIONS_CONTRACTS[chain]["RewardsLogger"], "RewardsLogger", chain
     )
     unboosted_vaults = []
     now = time.time()

@@ -1,3 +1,2 @@
 responses==0.16.0
 pytest-mock==3.6.1
-pytest-cov==3.0.0

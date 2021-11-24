@@ -110,7 +110,6 @@ ENV/
 env.bak/
 venv.bak/
 node_modules/
-secrets/
 
 # Spyder project settings
 .spyderproject

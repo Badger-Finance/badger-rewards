@@ -72,6 +72,25 @@ def tree_manager(cycle_key) -> TreeManager:
     return tree_manager
 
 
+# TODO: write new test for claimable since function changed
+# def test_user_claimable_balances(
+#     tree_manager: TreeManager, tokens_to_check, expected_user_claimable
+# ):
+#     claimable_bals = user_claimable_balances(
+#         test_address, mock_tree["claims"][test_address], tree_manager, tokens_to_check
+#     )
+#     TestCase().assertDictEqual(expected_user_claimable, claimable_bals)
+
+# TODO: write new test for claimable since function changed
+# def test_calc_claimable_balances(
+#     tree_manager: TreeManager, tree, tokens_to_check, expected_claimable_bals
+# ):
+#     all_claimable_bals = calc_claimable_balances(tree_manager, tokens_to_check, tree)
+#     print(all_claimable_bals)
+#     print(expected_claimable_bals)
+#     TestCase().assertDictEqual(expected_claimable_bals, all_claimable_bals)
+
+
 @pytest.mark.parametrize(
     "chain",
     BOOST_CHAINS,

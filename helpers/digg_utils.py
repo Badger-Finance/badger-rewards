@@ -1,11 +1,11 @@
 from helpers.constants import DIGG
-from helpers.enums import Abi, Network
+from helpers.enums import Network
 from helpers.web3_utils import make_contract
 
 
 class DiggUtils:
     def __init__(self):
-        self.digg = make_contract(DIGG, abi_name=Abi.Digg, chain=Network.Ethereum)
+        self.digg = make_contract(DIGG, abi_name="Digg", chain=Network.Ethereum)
         self.shares_per_fragment = self.digg._sharesPerFragment().call()
         self.initial_shares = self.digg._initialSharesPerFragment().call()
 
