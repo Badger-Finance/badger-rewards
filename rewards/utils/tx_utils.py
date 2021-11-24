@@ -6,7 +6,7 @@ from typing import Tuple
 from hexbytes import HexBytes
 from web3 import Web3, exceptions
 
-from helpers.constants import EMISSIONS_CONTRACTS
+from helpers.constants import DECIMAL_MAPPING, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BotType, Network
 from helpers.http_session import http
@@ -26,9 +26,9 @@ def get_gas_price_of_tx(
 
     Args:
         web3 (Web3): web3 node instance
-        gas_oracle (contract): web3 contract for chainlink gas unit / usd oracle
         tx_hash (HexBytes): tx id of target transaction
         chain (str): chain of tx (valid: eth, poly)
+        timeout(int): time to wait on tx fetch failure
 
     Returns:
         Decimal: USD value of gas used in tx
@@ -44,9 +44,9 @@ def get_gas_price_of_tx(
     )
 
     if chain == Network.Ethereum:
-        gas_price_base = Decimal(tx_receipt.get("effectiveGasPrice", 0) / 10 ** 18)
+        gas_price_base = Decimal(tx_receipt.get("effectiveGasPrice", 0) / DECIMAL_MAPPING[chain])
     elif chain in [Network.Polygon, Network.Arbitrum]:
-        gas_price_base = Decimal(tx.get("gasPrice", 0) / 10 ** 18)
+        gas_price_base = Decimal(tx.get("gasPrice", 0) / DECIMAL_MAPPING[chain])
 
     gas_usd = Decimal(
         gas_oracle.latestAnswer().call() / 10 ** gas_oracle.decimals().call()
