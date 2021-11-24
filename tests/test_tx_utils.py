@@ -3,7 +3,7 @@ from decimal import Decimal
 import pytest
 
 from helpers.enums import Network
-from rewards.utils.tx_utils import get_gas_price_of_tx
+from rewards.utils.tx_utils import confirm_transaction, get_gas_price_of_tx
 from tests.utils import set_env_vars
 
 set_env_vars()
@@ -65,3 +65,19 @@ def test_get_gas_price_of_tx__invalid_tx(discord_mocker, network_info):
             web3, network_info["network"], network_info["invalid_tx"],
             retries_on_failure=0,
         )
+
+
+@pytest.mark.parametrize("network_info", TEST_NETWORK_INFO)
+def test_confirm_transaction__happy_path(discord_mocker, network_info):
+    web3 = env_config.get_web3(network_info["network"])
+    success, __ = confirm_transaction(web3, network_info['valid_tx'], network_info["network"])
+    assert success
+
+
+@pytest.mark.parametrize("network_info", TEST_NETWORK_INFO)
+def test_confirm_transaction__unhappy_path(discord_mocker, network_info):
+    web3 = env_config.get_web3(network_info["network"])
+    success, __ = confirm_transaction(
+        web3, network_info['invalid_tx'], network_info["network"], retries_on_failure=0,
+    )
+    assert not success
