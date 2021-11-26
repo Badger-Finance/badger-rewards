@@ -13,8 +13,8 @@ console = Console()
 
 
 def calc_stake_ratio(
-    address: str, native_setts: Dict[str, int], non_native_setts: Dict[str, int]
-):
+    address: str, native_setts: Dict[str, float], non_native_setts: Dict[str, float]
+) -> int:
     """
     Calculate the stake ratio for an address
     :param address: address to find stake ratio for
@@ -26,7 +26,7 @@ def calc_stake_ratio(
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
-        stake_ratio = (native_balance) / non_native_balance
+        stake_ratio = native_balance / non_native_balance
     return stake_ratio
 
 
