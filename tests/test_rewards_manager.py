@@ -7,7 +7,7 @@ from unittest import TestCase
 import pytest
 from brownie import web3
 
-from helpers.constants import BADGER, SETTS
+from helpers.constants import BADGER, DECIMAL_MAPPING, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
 from tests.utils import (
@@ -233,7 +233,8 @@ def test_splits(
             user_data[user]["boost"] = boosts_split["userData"][user]["boost"]
             if "rewards" not in user_data[user]:
                 user_data[user]["rewards"] = []
-            user_data[user]["rewards"].append(int(amount[0]) / 10 ** 18)
+            user_data[user]["rewards"].append(int(amount[0]) /
+                                              DECIMAL_MAPPING[str(rewards_manager_split.chain)])
 
     logger.info(json.dumps(user_data, indent=2))
     assert user_data["0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd"]["rewards"] == [

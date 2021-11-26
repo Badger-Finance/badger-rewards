@@ -1,12 +1,12 @@
 import logging
 import time
 from decimal import Decimal
-from typing import Tuple
+from typing import Optional, Tuple
 
-from hexbytes import HexBytes
+from eth_typing import HexStr
 from web3 import Web3, exceptions
 
-from helpers.constants import EMISSIONS_CONTRACTS
+from helpers.constants import DECIMAL_MAPPING, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BotType, Network
 from helpers.http_session import http
@@ -18,23 +18,24 @@ logger = logging.getLogger("tx-utils")
 def get_gas_price_of_tx(
     web3: Web3,
     chain: str,
-    tx_hash: HexBytes,
+    tx_hash: HexStr,
     timeout: int = 60,
-) -> Decimal:
+    retries_on_failure: Optional[int] = 5,
+) -> Optional[Decimal]:
     """Gets the actual amount of gas used by the transaction and converts
     it from gwei to USD value for monitoring.
 
     Args:
         web3 (Web3): web3 node instance
-        gas_oracle (contract): web3 contract for chainlink gas unit / usd oracle
-        tx_hash (HexBytes): tx id of target transaction
+        tx_hash (HexStr): tx id of target transaction
         chain (str): chain of tx (valid: eth, poly)
-
+        timeout(int): time to wait on tx fetch failure
+        retries_on_failure(int): retry amount of times if tx fetching fails
     Returns:
         Decimal: USD value of gas used in tx
     """
     tx, tx_receipt = get_transaction(
-        web3, tx_hash, timeout, chain, bot_type=BotType.Cycle
+        web3, tx_hash, timeout, chain, bot_type=BotType.Cycle, tries=retries_on_failure
     )
     logger.info(f"tx: {tx_receipt}")
     total_gas_used = Decimal(tx_receipt.get("gasUsed", 0))
@@ -44,10 +45,11 @@ def get_gas_price_of_tx(
     )
 
     if chain == Network.Ethereum:
-        gas_price_base = Decimal(tx_receipt.get("effectiveGasPrice", 0) / 10 ** 18)
+        gas_price_base = Decimal(tx_receipt.get("effectiveGasPrice", 0) / DECIMAL_MAPPING[chain])
     elif chain in [Network.Polygon, Network.Arbitrum]:
-        gas_price_base = Decimal(tx.get("gasPrice", 0) / 10 ** 18)
-
+        gas_price_base = Decimal(tx.get("gasPrice", 0) / DECIMAL_MAPPING[chain])
+    else:
+        return
     gas_usd = Decimal(
         gas_oracle.latestAnswer().call() / 10 ** gas_oracle.decimals().call()
     )
@@ -115,7 +117,7 @@ def get_priority_fee(
 
 def get_transaction(
     web3: Web3,
-    tx_hash: HexBytes,
+    tx_hash: HexStr,
     timeout: int,
     chain: str,
     tries: int = 5,
@@ -149,16 +151,17 @@ def get_transaction(
 
 
 def confirm_transaction(
-    web3: Web3, tx_hash: HexBytes, chain: str, timeout: int = 60
+    web3: Web3, tx_hash: HexStr, chain: str, timeout: int = 60,
+    retries_on_failure: Optional[int] = 5,
 ) -> Tuple[bool, str]:
     """Waits for transaction to appear within a given timeframe or before a given block (if specified), and then times out.
 
     Args:
         web3 (Web3): Web3 instance
-        tx_hash (HexBytes): Transaction hash to identify transaction to wait on.
+        tx_hash (HexStr): Transaction hash to identify transaction to wait on.
+        chain (str): chain of tx (valid: eth, poly)
         timeout (int, optional): Timeout in seconds. Defaults to 60.
-        max_block (int, optional): Max block number to wait until. Defaults to None.
-
+        retries_on_failure(int): retry amount of times if tx fetching fails
     Returns:
         bool: True if transaction was confirmed, False otherwise.
         msg: Log message.
@@ -166,7 +169,7 @@ def confirm_transaction(
     logger.info(f"tx_hash before confirm: {tx_hash}")
 
     try:
-        get_transaction(web3, tx_hash, timeout, chain)
+        get_transaction(web3, tx_hash, timeout, chain, tries=retries_on_failure)
         msg = f"Transaction {tx_hash} succeeded!"
         logger.info(msg)
         return True, msg
