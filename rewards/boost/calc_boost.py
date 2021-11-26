@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Any, Dict
 
 from rich.console import Console
 from tabulate import tabulate
@@ -6,7 +6,6 @@ from tabulate import tabulate
 from helpers.constants import BOOST_BLOCK_DELAY, STAKE_RATIO_RANGES
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BotType
-from rewards.aws.boost import add_user_data
 from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses
 
 console = Console()
@@ -30,7 +29,7 @@ def calc_stake_ratio(
     return stake_ratio
 
 
-def badger_boost(current_block: int, chain: str):
+def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     """
     Calculate badger boost multipliers based on stake ratios
     :param current_block: block to calculate boost at
@@ -44,7 +43,7 @@ def badger_boost(current_block: int, chain: str):
 
     all_addresses = calc_union_addresses(native_setts, non_native_setts)
     console.log(f"{len(all_addresses)} addresses fetched")
-    badger_boost = {}
+    badger_boost_data = {}
     boost_info = {}
     boost_data = {}
 
@@ -72,7 +71,7 @@ def badger_boost(current_block: int, chain: str):
     stake_data = {}
     for addr, stake_ratio in stake_ratios.items():
         if stake_ratio == 0:
-            badger_boost[addr] = 1
+            badger_boost_data[addr] = 1
         else:
             user_boost = 1
             user_stake_range = 0
@@ -82,9 +81,9 @@ def badger_boost(current_block: int, chain: str):
                     user_stake_range = stake_range
 
             stake_data[user_stake_range] = stake_data.get(user_stake_range, 0) + 1
-            badger_boost[addr] = user_boost
+            badger_boost_data[addr] = user_boost
 
-    for addr, boost in badger_boost.items():
+    for addr, boost in badger_boost_data.items():
         boost_metadata = boost_info.get(addr, {})
         boost_data[addr] = {
             "boost": boost,
