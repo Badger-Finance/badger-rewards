@@ -1,6 +1,6 @@
 import pytest
 
-from rewards.boost.boost_utils import calc_boost_balances
+from rewards.boost.boost_utils import calc_boost_balances, filter_dust
 
 TOKEN_SNAPSHOT_DATA = (
     {
@@ -96,3 +96,12 @@ def test_calc_boost_balances__dust_filtered(chain, mocker):
     native_balance, non_native_balances = calc_boost_balances(123, "whatever")
     assert native_balance == {}
     assert non_native_balances == {}
+
+
+def test_filter_dust():
+    assert filter_dust(
+        {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.000001241234}, 2
+    ) == {}
+    assert filter_dust(
+        {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.1}, 0
+    ) != {}

@@ -23,7 +23,7 @@ def calc_union_addresses(
     return list(set(native_addresses + non_native_addresses))
 
 
-def filter_dust(balances: Dict[str, int], dust_amount: int) -> Dict[str, float]:
+def filter_dust(balances: Dict[str, float], dust_amount: int) -> Dict[str, float]:
     """
     Filter out dust values from user balances
     :param balances: balances to filter
