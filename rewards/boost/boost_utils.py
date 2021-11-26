@@ -11,7 +11,7 @@ console = Console()
 
 
 def calc_union_addresses(
-    native_setts: Dict[str, int], non_native_setts: Dict[str, int]
+    native_setts: Dict[str, float], non_native_setts: Dict[str, float]
 ) -> List[str]:
     """
     Combine addresses from native setts and non native setts

@@ -1,6 +1,10 @@
 import pytest
 
-from rewards.boost.boost_utils import calc_boost_balances, filter_dust
+from rewards.boost.boost_utils import (
+    calc_boost_balances,
+    calc_union_addresses,
+    filter_dust,
+)
 
 TOKEN_SNAPSHOT_DATA = (
     {
@@ -105,3 +109,18 @@ def test_filter_dust():
     assert filter_dust(
         {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.1}, 0
     ) != {}
+
+
+def test_calc_union_addresses():
+    result = calc_union_addresses(
+        {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 1},
+        {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 1}
+    )
+    assert result == ['0x0000000000007F150Bd6f54c40A34d7C3d5e9f56']
+    result = calc_union_addresses(
+        {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 1},
+        {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f561': 1}
+    )
+    assert result == [
+        '0x0000000000007F150Bd6f54c40A34d7C3d5e9f56', '0x0000000000007F150Bd6f54c40A34d7C3d5e9f561'
+    ]
