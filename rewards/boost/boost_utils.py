@@ -38,6 +38,7 @@ def calc_boost_balances(
     """
     Calculate boost data required for boost calculation
     :param block: block to collect the boost data from
+    :param chain: target chain
     """
 
     native = Counter()
@@ -50,14 +51,14 @@ def calc_boost_balances(
     console.log(f"\n === Taking chain snapshot on {chain} === \n")
 
     native_setts, non_native_setts = chain_snapshot_usd(chain, block)
-    non_native = non_native + Counter(non_native_setts)
-    native = native + Counter(native_setts)
+    non_native += Counter(non_native_setts)
+    native += Counter(native_setts)
 
     console.log(f"\n === Taking claims snapshot on {chain} === \n")
 
     native_claimable, non_native_claimable = claims_snapshot_usd(chain)
-    native = native + Counter(native_claimable)
-    non_native = non_native + Counter(non_native_claimable)
+    native += Counter(native_claimable)
+    non_native += Counter(non_native_claimable)
 
     native = filter_dust(dict(native), 1)
     non_native = filter_dust(dict(non_native), 1)

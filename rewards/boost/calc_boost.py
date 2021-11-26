@@ -34,6 +34,7 @@ def badger_boost(current_block: int, chain: str):
     """
     Calculate badger boost multipliers based on stake ratios
     :param current_block: block to calculate boost at
+    :param chain: target chain
     """
     discord_url = get_discord_url(chain, BotType.Boost)
     console.log(f"Calculating boost at block {current_block} ...")
