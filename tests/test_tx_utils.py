@@ -2,10 +2,12 @@ from decimal import Decimal
 from unittest.mock import MagicMock
 
 import pytest
+import responses
 
 from helpers.enums import Network
 from rewards.utils.tx_utils import (
     confirm_transaction,
+    get_effective_gas_price,
     get_gas_price_of_tx,
     get_latest_base_fee,
     get_priority_fee,
@@ -111,3 +113,49 @@ def test_get_latest_base_fee(fee):
     if type(fee) == str and fee.startswith("0x"):
         fee = int(fee, 0)
     assert get_latest_base_fee(web3) == int(fee)
+
+
+def test_get_effective_gas_price__eth():
+    reward = 11e9
+    base_fee = 1000000
+    web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(return_value={'baseFeePerGas': base_fee}),
+            fee_history=MagicMock(return_value={'reward': [[reward]]})
+        ),
+    )
+    gas = get_effective_gas_price(web3, Network.Ethereum)
+    assert gas == 2 * base_fee + reward
+
+
+@responses.activate
+def test_get_effective_gas_price__polygon_happy(mock_discord):
+    web3 = env_config.get_web3(Network.Polygon)
+    fast_gas = 125
+    responses.add(
+        responses.GET, "https://gasstation-mainnet.matic.network", json={
+            'fast': fast_gas
+        }, status=200
+    )
+    gas = get_effective_gas_price(web3, Network.Polygon)
+    assert gas == web3.toWei(int(fast_gas * 1.1), "gwei")
+
+
+@responses.activate
+def test_get_effective_gas_price__polygon_unhappy(mock_discord):
+    web3 = env_config.get_web3(Network.Polygon)
+    responses.add(
+        responses.GET, "https://gasstation-mainnet.matic.network", json={}, status=400
+    )
+    assert not get_effective_gas_price(web3, Network.Polygon)
+
+
+def test_get_effective_gas_price__arb():
+    gas_price = 125
+    web3 = MagicMock(
+        eth=MagicMock(
+            gas_price=gas_price,
+        ),
+    )
+    gas = get_effective_gas_price(web3, Network.Arbitrum)
+    assert gas == gas_price * 1.1
