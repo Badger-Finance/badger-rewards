@@ -10,7 +10,6 @@ from helpers.constants import DECIMAL_MAPPING, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BotType, Network
 from helpers.http_client import http_client
-from helpers.http_session import http
 from helpers.web3_utils import make_contract
 
 logger = logging.getLogger("tx-utils")
