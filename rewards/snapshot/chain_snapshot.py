@@ -100,8 +100,8 @@ def chain_snapshot_usd(chain: Network, block: int) -> Tuple[Counter, Counter]:
         usd_snapshot = snapshot.convert_to_usd(chain)
         balances = Counter(usd_snapshot.balances)
         if usd_snapshot.type == BalanceType.Native:
-            native = native + balances
+            native += balances
         elif usd_snapshot.type == BalanceType.NonNative:
-            non_native = non_native + balances
+            non_native += balances
 
     return native, non_native
