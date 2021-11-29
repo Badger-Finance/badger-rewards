@@ -118,7 +118,7 @@ jobs:
           git add ${{ github.event.repository.name }}-stg
           git commit -m "Deploying ${{ github.event.repository.name }}-stg:${{ github.event.pull_request.head.sha }}" || echo "¯\_(ツ)_/¯ Nothing changed, so nothing committed, and nothing new will be pushed to manifests."
           echo "Push New Manifest"
-          git push https://${{ github.actor }}:${{ secrets.GH_TOKEN }}@github.com/${{ env.MANIFEST_RESPOSITORY }}.git HEAD:${{ env.TARGET_ENVIRONMENT }}
+          git push https://${{ github.actor }}:${{ secrets.GH_TOKEN }}@github.com/${{ env.MANIFEST_RESPOSITORY }}.git HEAD:dev
 
 
   notify:
