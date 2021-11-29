@@ -10,6 +10,7 @@ from web3.contract import ContractFunctions
 from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS, NATIVE
 from helpers.enums import Abi, Network
 from helpers.web3_utils import make_contract
+from rewards.classes.NftWeightSchedule import NFTWeightSchedule
 from rewards.classes.Schedule import Schedule
 from subgraph.queries.setts import list_setts
 
@@ -37,11 +38,27 @@ def get_nft_control(chain: Network) -> ContractFunctions:
     return make_contract(
         EMISSIONS_CONTRACTS[chain]["NFTControl"], Abi.NFTControl, chain
     )
+    
 
-
-def get_nft_score(chain: str, nft_address: str, nft_id: int) -> Decimal:
-    return 1
-    return Decimal(get_nft_control(chain).nftWeight(nft_address, nft_id).call() / 1e18)
+@lru_cache 
+def get_nft_weights(chain: Network):
+    nft_control = get_nft_control(chain)
+    schedules = list(map(NFTWeightSchedule, nft_control.getNftWeightSchedules()))
+    weights = {}
+    for weight_schedule in schedules:
+        key = f"{weight_schedule.addr}-{weight_schedule.nft_id}"
+        if not weights[key]:
+            weights[key] = weight_schedule
+        else:
+            curr_schedule = weights[key]
+            if weight_schedule.timestamp > curr_schedule.timestamp:
+                weights[key] = weight_schedule
+    return weights
+    
+    
+def get_nft_weight(chain: str, nft_address: str, nft_id: int) -> Decimal:
+    weights = get_nft_weights(chain)
+    return weights[f"{nft_address}-{nft_id}"]
 
 
 def fetch_unboosted_vaults(chain) -> List[str]:

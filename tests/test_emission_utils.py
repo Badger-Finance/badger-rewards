@@ -10,6 +10,7 @@ from rewards.utils.emission_utils import (
     fetch_setts,
     fetch_unboosted_vaults,
     get_flat_emission_rate,
+    get_nft_weight,
     get_token_weight,
 )
 
@@ -42,6 +43,26 @@ def test_get_flat_emission_rate():
         assert get_flat_emission_rate(sett, chain) == rate
     with pytest.raises(Exception):
         get_flat_emission_rate(SETTS[Network.Ethereum]["sbtc_crv"].lower(), chain)
+
+
+def test_get_nft_weight():
+    chain = Network.Ethereum
+    happy_cases = [
+        ({"address":"0xe1e546e25A5eD890DFf8b8D005537c0d373497F8", "id": 1}, 200),
+        ({"address":"0xe4605d46Fd0B3f8329d936a8b258D69276cBa264", "id": 97})
+    ]
+    bad_cases = [
+         ({"address":"0xe1e546e25A5eD890DFf8b8D005537c0d373497F8", "id": 1}, 100),
+         ({"address":"0xe1e546e25A5eD890DFf8b8D005537c0d373497F2", "id": 5}, 200),
+    ]
+    for nft_data, weight in happy_cases:
+        assert get_nft_weight(chain, nft_data["address"], nft_data["id"]) == weight
+    with pytest.raises(Exception):
+        for nft_data, weight in bad_cases:
+            get_nft_weight(chain, nft_data["address"], nft_data["id"]) == weight
+
+            
+    
 
 
 def test_get_token_weight():
