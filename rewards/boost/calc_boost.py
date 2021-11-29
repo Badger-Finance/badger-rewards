@@ -71,7 +71,8 @@ def badger_boost(current_block: int, chain: str):
         boost_info[user]["stakeRatio"] = ratio
         
     for user, nft_balances in nfts.items():
-        boost_info[user]["nfts"] = nft_balances
+        if user in all_addresses:
+            boost_info[user]["nfts"] = nft_balances
 
     stake_data = {}
     for addr, stake_ratio in stake_ratios.items():

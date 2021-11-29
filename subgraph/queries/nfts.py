@@ -3,6 +3,7 @@ from typing import Dict
 
 from gql import gql
 from rich.console import Console
+from web3.main import Web3
 
 from helpers.discord import send_error_to_discord
 from helpers.enums import Network
@@ -37,6 +38,7 @@ def fetch_nfts(chain: str, block: int) -> Dict:
             nft_data = results["nftbalances"]
             for result in nft_data:
                 nft_addr, nft_id, user = result["id"].split("-")
+                user = Web3.toChecksumAddress(user)
                 if user not in nft_balances:
                     nft_balances[user] = []
                 nft_balances[user].append({
