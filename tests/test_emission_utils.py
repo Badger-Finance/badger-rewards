@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 
 from helpers.constants import SETTS
@@ -56,7 +58,7 @@ def test_get_nft_weight():
          ({"address":"0xe1e546e25A5eD890DFf8b8D005537c0d373497F2", "id": 5}, 200),
     ]
     for nft_data, weight in happy_cases:
-        assert get_nft_weight(chain, nft_data["address"], nft_data["id"]) == weight
+        assert get_nft_weight(chain, nft_data["address"], nft_data["id"]) == Decimal(weight)
     with pytest.raises(Exception):
         for bad_nft_data, bad_weight in bad_cases:
             get_nft_weight(chain, bad_nft_data["address"], bad_nft_data["id"])

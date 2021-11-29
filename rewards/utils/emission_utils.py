@@ -58,7 +58,7 @@ def get_nft_weights(chain: Network):
     
 def get_nft_weight(chain: str, nft_address: str, nft_id: int) -> Decimal:
     weights = get_nft_weights(chain)
-    return weights[f"{nft_address}-{nft_id}"]
+    return Decimal(weights[f"{nft_address}-{nft_id}"].weight / 1e18)
 
 
 def fetch_unboosted_vaults(chain) -> List[str]:
