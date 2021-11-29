@@ -15,7 +15,7 @@ def nft_snapshot(chain: Network, block: int) -> Snapshot:
         for nft_balance in nft_balances:
             nft_address = nft_balance["address"]
             nft_id = nft_balance["id"]
-            bals[user] = bals.get(user, 0) + get_nft_score(nft_address, nft_id)
+            bals[user] = bals.get(user, 0) + get_nft_score(chain, nft_address, nft_id)
     return Snapshot(BADGER, bals, ratio=1, type=BalanceType.Native)
 
 

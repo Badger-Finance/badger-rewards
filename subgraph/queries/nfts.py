@@ -1,11 +1,13 @@
 from typing import Dict
 
 from gql import gql
+from rich.console import Console
 
 from helpers.discord import send_error_to_discord
 from helpers.enums import Network
 from subgraph.subgraph_utils import make_gql_client
 
+console = Console()
 
 def fetch_nfts(chain: str, block: int) -> Dict:
     if chain != Network.Ethereum:
@@ -16,7 +18,7 @@ def fetch_nfts(chain: str, block: int) -> Dict:
     query = gql(
     """
     query nfts($block_number: Block_height, $nft_filter: NFTBalance_filter) {
-        nfts(block: $block_number, where: $nft_filter) {
+        nftbalances(first: 1000, block: $block_number, where: $nft_filter) {
             id
         }
     }
@@ -31,16 +33,19 @@ def fetch_nfts(chain: str, block: int) -> Dict:
         while True:
             variables["nft_filter"]["id_gt"] = last_nft_id
             results = nft_client.execute(query, variable_values=variables)
-            nft_data = results["nfts"]
+            nft_data = results["nftbalances"]
             for result in nft_data:
-                nft_addr,nft_id, user  = result.split("-")
-                nft_balances[user] = nft_balances.get(user, []).append({
+                nft_addr, nft_id, user = result["id"].split("-")
+                if user not in nft_balances:
+                    nft_balances[user] = []
+                nft_balances[user].append({
                     "address": nft_addr,
                     "id": nft_id
                 })
             if len(nft_data) == 0:
                 break
             else:
+                console.log(f"Fetching {len(nft_data)} nft balances")
                 last_nft_id = nft_data[-1]["id"]
         return nft_balances
     except Exception as e:
