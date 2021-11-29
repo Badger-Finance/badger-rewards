@@ -5,7 +5,7 @@ import responses
 
 from badger_api.requests import badger_api
 from helpers.enums import BalanceType, Network
-from rewards.snapshot.chain_snapshot import chain_snapshot
+from rewards.snapshot.chain_snapshot import chain_snapshot, parse_sett_balances
 
 BADGER_TOKEN_ADDR = "0x19D97D8fA813EE2f51aD4B4e04EA08bAf4DFfC28"
 YEARN_WBTC_ADDR = "0x4b92d19c11435614CD49Af1b589001b7c08cD4D5"
@@ -83,3 +83,42 @@ def test_chain_snapshot__raises(mocker, chain):
     )
     with pytest.raises(Exception):
         chain_snapshot(chain, 123123)
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Arbitrum]
+)
+def test_parse_sett_balances(chain):
+    snapshot = parse_sett_balances(
+        BADGER_TOKEN_ADDR,
+        balances={
+            '0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.04533617521779346,
+        },
+        chain=chain,
+    )
+    assert snapshot.type == BalanceType.Native
+    assert snapshot.ratio == 1
+    assert snapshot.token == BADGER_TOKEN_ADDR
+    assert list(snapshot.balances.values())[0] == round(Decimal(
+        list(BALANCES_DATA[BADGER_TOKEN_ADDR].values())[0]
+    ), 17)
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Arbitrum]
+)
+def test_parse_sett_balances__blacklisted(chain, mocker):
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.REWARDS_BLACKLIST",
+        {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": "some blacklisted stuff"}
+    )
+    snapshot = parse_sett_balances(
+        BADGER_TOKEN_ADDR,
+        balances={
+            '0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.04533617521779346,
+        },
+        chain=chain,
+    )
+    assert snapshot.balances == {}
