@@ -40,7 +40,6 @@ def get_nft_control(chain: Network) -> ContractFunctions:
 
 
 def get_nft_score(chain: str, nft_address: str, nft_id: int) -> Decimal:
-    return 1
     return Decimal(get_nft_control(chain).nftWeight(nft_address, nft_id).call() / 1e18)
 
 
