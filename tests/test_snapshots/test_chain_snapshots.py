@@ -1,7 +1,9 @@
 from decimal import Decimal
 
 import pytest
+import responses
 
+from badger_api.requests import badger_api
 from helpers.enums import BalanceType, Network
 from rewards.snapshot.chain_snapshot import chain_snapshot
 
@@ -32,7 +34,14 @@ def mock_fetch_ch_balances(mocker):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
+@responses.activate
 def test_chain_snapshot__happy(mock_fetch_ch_balances, chain):
+    responses.add(
+        responses.GET, f"{badger_api}/tokens?chain={chain}",
+        json={'name': 'bBadger'},
+        status=200
+    )
+    responses.add_passthru('https://')
     snapshot = chain_snapshot(chain, 123123)
     native = snapshot[BADGER_TOKEN_ADDR]
     assert native.type == BalanceType.Native
