@@ -23,8 +23,6 @@ console = Console()
 def chain_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     """
     Take a snapshot of a chains sett balances at a certain block
-
-    :param badger: badger system
     :param chain: chain to query
     :param block: block at which to query
 
@@ -64,8 +62,10 @@ def parse_sett_balances(
 ) -> Snapshot:
     """
     Blacklist balances and add metadata for boost
+    :param sett_address: target sett address
     :param balances: balances of users:
     :param chain: chain where balances come from
+    :param blacklist: blacklist certain addresses
     """
     if blacklist:
         addresses_to_blacklist = {**REWARDS_BLACKLIST, **EMISSIONS_BLACKLIST}
