@@ -58,8 +58,8 @@ def test_get_nft_weight():
     for nft_data, weight in happy_cases:
         assert get_nft_weight(chain, nft_data["address"], nft_data["id"]) == weight
     with pytest.raises(Exception):
-        for nft_data, weight in bad_cases:
-            get_nft_weight(chain, nft_data["address"], nft_data["id"]) == weight
+        for bad_nft_data, bad_weight in bad_cases:
+            get_nft_weight(chain, bad_nft_data["address"], bad_nft_data["id"])
 
             
     
