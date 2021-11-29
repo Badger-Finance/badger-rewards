@@ -1,3 +1,4 @@
+from functools import _lru_cache_wrapper, lru_cache
 from typing import Dict
 
 from gql import gql
@@ -8,7 +9,7 @@ from helpers.enums import Network
 from subgraph.subgraph_utils import make_gql_client
 
 console = Console()
-
+@lru_cache
 def fetch_nfts(chain: str, block: int) -> Dict:
     if chain != Network.Ethereum:
         return {}
