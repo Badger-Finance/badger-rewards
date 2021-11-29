@@ -61,3 +61,16 @@ def test_chain_snapshot__empty(mocker, chain):
     )
     snapshot = chain_snapshot(chain, 123123)
     assert snapshot == {}
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Arbitrum]
+)
+def test_chain_snapshot__raises(mocker, chain):
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_chain_balances",
+        side_effect=Exception,
+    )
+    with pytest.raises(Exception):
+        chain_snapshot(chain, 123123)
