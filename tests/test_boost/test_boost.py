@@ -1,16 +1,8 @@
-import json
 import logging
-import os
 
 import pytest
 from brownie import web3
-from eth_account import Account
 
-from config.singletons import env_config
-from helpers.enums import Network
-from rewards.aws.boost import add_user_data, download_boosts
-from rewards.boost.calc_boost import badger_boost
-from tests.cycle_utils import mock_upload_boosts
 from tests.utils import (
     mock_boosts,
     mock_send_message_to_discord_prod,

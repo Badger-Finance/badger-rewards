@@ -64,6 +64,7 @@ def mock_send_message_to_discord_prod(
     assert "s3://badger-staging-merkle-proofs/" not in description
     assert "s3://badger-merkle-proofs/" in description
 
+
 def mock_send_code_block_to_discord(
     msg: str, username: str, url: str = None
 ):
