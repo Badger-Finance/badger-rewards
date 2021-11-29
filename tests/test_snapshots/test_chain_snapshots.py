@@ -48,3 +48,16 @@ def test_chain_snapshot__happy(mock_fetch_ch_balances, chain):
     assert list(non_native.balances.values())[0] == round(Decimal(
         list(BALANCES_DATA[YEARN_WBTC_ADDR].values())[0]
     ), 16)
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Arbitrum]
+)
+def test_chain_snapshot__empty(mocker, chain):
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_chain_balances",
+        return_value={}
+    )
+    snapshot = chain_snapshot(chain, 123123)
+    assert snapshot == {}
