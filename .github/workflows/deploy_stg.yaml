@@ -115,7 +115,7 @@ jobs:
           cd manifests
           git config --local user.email "github@badger-finance.com"
           git config --local user.name "${{ github.actor }}"
-          git add ${{ github.event.repository.name }}-stg
+          git add ${{ github.event.repository.name }}-stg applications/
           git commit -m "Deploying ${{ github.event.repository.name }}-stg:${{ github.event.pull_request.head.sha }}" || echo "¯\_(ツ)_/¯ Nothing changed, so nothing committed, and nothing new will be pushed to manifests."
           echo "Push New Manifest"
           git push https://${{ github.actor }}:${{ secrets.GH_TOKEN }}@github.com/${{ env.MANIFEST_RESPOSITORY }}.git HEAD:dev
