@@ -34,7 +34,7 @@ def claims_snapshot(chain: str) -> Dict[str, Snapshot]:
                     10, token_decimals[token]
                 )
             else:
-                balance = balance / math.pow(10, token_decimals[token])
+                balance /= math.pow(10, token_decimals[token])
             if token not in claims_data:
                 claims_data[token] = {}
 
@@ -65,8 +65,8 @@ def claims_snapshot_usd(chain: str) -> Tuple[Counter, Counter]:
     for sett, claims in snapshot.items():
         usd_claims = claims.convert_to_usd(chain)
         if usd_claims.type == BalanceType.Native:
-            native = native + Counter(usd_claims.balances)
+            native += Counter(usd_claims.balances)
         elif usd_claims.type == BalanceType.NonNative:
-            non_native = non_native + Counter(usd_claims.balances)
+            non_native += Counter(usd_claims.balances)
 
     return native, non_native
