@@ -118,6 +118,7 @@ def add_user_data(user_data, chain):
             "stakeRatio": str(data["stakeRatio"]),
             "multipliers": multipliers,
         }
+      
     upload_boosts(boosts, chain)
 
 
