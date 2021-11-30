@@ -45,6 +45,7 @@ def calc_boost_balances(
     non_native = Counter()
 
     nft_balances = nft_snapshot_usd(chain, block)
+    console.log(nft_balances)
     console.log(f"\n === Taking token snapshot on {chain} === \n")
     badger_tokens, digg_tokens = token_snapshot_usd(chain, block)
 

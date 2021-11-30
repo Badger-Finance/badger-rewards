@@ -38,24 +38,30 @@ def get_nft_control(chain: Network) -> ContractFunctions:
     return make_contract(
         EMISSIONS_CONTRACTS[chain]["NFTControl"], Abi.NFTControl, chain
     )
-    
 
-@lru_cache 
+
+@lru_cache
 def get_nft_weights(chain: Network):
     nft_control = get_nft_control(chain)
-    schedules = list(map(NFTWeightSchedule, nft_control.getNftWeightSchedules()))
+    print(nft_control.getNftWeightSchedules().call())
+    schedules = list(
+        map(
+            lambda ws: NFTWeightSchedule(ws[0], ws[1], ws[2], ws[3]),
+            nft_control.getNftWeightSchedules().call(),
+        )
+    )
     weights = {}
     for weight_schedule in schedules:
         key = f"{weight_schedule.addr}-{weight_schedule.nft_id}"
-        if not weights[key]:
+        if key not in weights:
             weights[key] = weight_schedule
         else:
             curr_schedule = weights[key]
             if weight_schedule.timestamp > curr_schedule.timestamp:
                 weights[key] = weight_schedule
     return weights
-    
-    
+
+
 def get_nft_weight(chain: str, nft_address: str, nft_id: int) -> Decimal:
     weights = get_nft_weights(chain)
     return Decimal(weights[f"{nft_address}-{nft_id}"].weight / 1e18)

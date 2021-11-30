@@ -40,7 +40,9 @@ def get_gas_price_of_tx(
     total_gas_used = Decimal(tx_receipt.get("gasUsed", 0))
     logger.info(f"gas used: {total_gas_used}")
     gas_oracle = make_contract(
-        EMISSIONS_CONTRACTS[chain]["GasOracle"], abi_name=Abi.ChainlinkOracle, chain=chain
+        EMISSIONS_CONTRACTS[chain]["GasOracle"],
+        abi_name=Abi.ChainlinkOracle,
+        chain=chain,
     )
 
     if chain == Network.Ethereum:

@@ -42,7 +42,7 @@ def fetch_nfts(chain: str, block: int) -> Dict:
                 if user not in nft_balances:
                     nft_balances[user] = []
                 nft_balances[user].append({
-                    "address": nft_addr,
+                    "address": Web3.toChecksumAddress(nft_addr),
                     "id": nft_id
                 })
             if len(nft_data) == 0:

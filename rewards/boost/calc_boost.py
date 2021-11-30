@@ -97,6 +97,7 @@ def badger_boost(current_block: int, chain: str):
             "nonNativeBalance": boost_metadata.get("nonNativeBalance", 0),
             "stakeRatio": boost_metadata.get("stakeRatio", 0),
             "multipliers": {},
+            "nfts": boost_metadata.get("nfts", [])
         }
 
     stake_data = {k: stake_data[k] for k in sorted(stake_data, reverse=True)}
