@@ -50,16 +50,18 @@ def test_get_nft_weight():
     chain = Network.Ethereum
     happy_cases = [
         ({"address":"0xe1e546e25A5eD890DFf8b8D005537c0d373497F8", "id": 1}, 200),
-        ({"address":"0xe4605d46Fd0B3f8329d936a8b258D69276cBa264", "id": 97})
+        ({"address":"0xe4605d46Fd0B3f8329d936a8b258D69276cBa264", "id": 97}, 10)
     ]
     bad_cases = [
          ({"address":"0xe1e546e25A5eD890DFf8b8D005537c0d373497F8", "id": 1}, 100),
          ({"address":"0xe1e546e25A5eD890DFf8b8D005537c0d373497F2", "id": 5}, 200),
     ]
-    for nft_data, weight in happy_cases:
+    for happy_case in happy_cases:
+        nft_data, weight = happy_case
         assert get_nft_weight(chain, nft_data["address"], nft_data["id"]) == Decimal(weight)
     with pytest.raises(Exception):
-        for bad_nft_data, bad_weight in bad_cases:
+        for bad_case in bad_cases:
+            bad_nft_data, weight = bad_case
             get_nft_weight(chain, bad_nft_data["address"], bad_nft_data["id"])
 
             

@@ -43,7 +43,6 @@ def get_nft_control(chain: Network) -> ContractFunctions:
 @lru_cache
 def get_nft_weights(chain: Network):
     nft_control = get_nft_control(chain)
-    print(nft_control.getNftWeightSchedules().call())
     schedules = list(
         map(
             lambda ws: NFTWeightSchedule(ws[0], ws[1], ws[2], ws[3]),
