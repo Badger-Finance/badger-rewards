@@ -240,10 +240,7 @@ def test_chain_snapshot_usd__happy(chain, mock_fetch_ch_balances, mocker):
     [Network.Ethereum, Network.Arbitrum]
 )
 def test_chain_snapshot_usd__no_boost(chain, mock_fetch_ch_balances, mocker):
-    mocker.patch(
-        "rewards.snapshot.chain_snapshot.fetch_chain_balances",
-        return_value={}
-    )
+    # Make sure setts are excluded in case 'no_boost' variable contains them
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_unboosted_vaults",
         return_value=[BADGER_TOKEN_ADDR, YEARN_WBTC_ADDR]
