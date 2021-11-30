@@ -1,3 +1,4 @@
+from collections import Counter
 from decimal import Decimal
 
 import pytest
@@ -232,3 +233,48 @@ def test_chain_snapshot_usd__happy(chain, mock_fetch_ch_balances, mocker):
     assert non_native['0x05E41229Efca125057f4D96007Dc477312dB8feB'] == approx(
         expected_balance_in_usd_non_native
     )
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Arbitrum]
+)
+def test_chain_snapshot_usd__no_boost(chain, mock_fetch_ch_balances, mocker):
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_chain_balances",
+        return_value={}
+    )
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_unboosted_vaults",
+        return_value=[BADGER_TOKEN_ADDR, YEARN_WBTC_ADDR]
+    )
+    assert chain_snapshot_usd(chain, 13710328) == (Counter(), Counter())
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Arbitrum]
+)
+def test_chain_snapshot_usd__empty(chain, mock_fetch_ch_balances, mocker):
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_chain_balances",
+        return_value={}
+    )
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_unboosted_vaults",
+        return_value=[]
+    )
+    assert chain_snapshot_usd(chain, 13710328) == (Counter(), Counter())
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Arbitrum]
+)
+def test_chain_snapshot__raises(mocker, chain):
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_chain_balances",
+        side_effect=Exception,
+    )
+    with pytest.raises(Exception):
+        chain_snapshot_usd(chain, 13710328)
