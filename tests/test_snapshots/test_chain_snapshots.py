@@ -6,7 +6,7 @@ import responses
 from pytest import approx
 
 from badger_api.requests import badger_api
-from helpers.constants import BOOST_CHAINS
+from helpers.constants import BBADGER_ADDRESS, BOOST_CHAINS, YEARN_WBTC_ADDRESS
 from helpers.enums import BalanceType, Network
 from rewards.snapshot.chain_snapshot import (
     chain_snapshot,
@@ -15,16 +15,13 @@ from rewards.snapshot.chain_snapshot import (
     sett_snapshot,
 )
 
-BADGER_TOKEN_ADDR = "0x19D97D8fA813EE2f51aD4B4e04EA08bAf4DFfC28"
-YEARN_WBTC_ADDR = "0x4b92d19c11435614CD49Af1b589001b7c08cD4D5"
-
 BALANCES_DATA = {
     # Badger Token
-    BADGER_TOKEN_ADDR: {
+    BBADGER_ADDRESS: {
         '0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.04533617521779346,
     },
     # yearn_wbtc
-    YEARN_WBTC_ADDR: {
+    YEARN_WBTC_ADDRESS: {
         '0x05E41229Efca125057f4D96007Dc477312dB8feB': 1.04533617521779346,
     }
 }
@@ -64,19 +61,19 @@ def test_chain_snapshot__happy(mock_fetch_ch_balances, chain):
     )
     responses.add_passthru('https://')
     snapshot = chain_snapshot(chain, 123123)
-    native = snapshot[BADGER_TOKEN_ADDR]
+    native = snapshot[BBADGER_ADDRESS]
     assert native.type == BalanceType.Native
     assert native.ratio == 1
-    assert native.token == BADGER_TOKEN_ADDR
+    assert native.token == BBADGER_ADDRESS
     assert list(native.balances.values())[0] == approx(Decimal(
-        list(BALANCES_DATA[BADGER_TOKEN_ADDR].values())[0]
+        list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]
     ))
 
-    non_native = snapshot[YEARN_WBTC_ADDR]
+    non_native = snapshot[YEARN_WBTC_ADDRESS]
     assert non_native.ratio == 1
-    assert non_native.token == YEARN_WBTC_ADDR
+    assert non_native.token == YEARN_WBTC_ADDRESS
     assert list(non_native.balances.values())[0] == approx(Decimal(
-        list(BALANCES_DATA[YEARN_WBTC_ADDR].values())[0]
+        list(BALANCES_DATA[YEARN_WBTC_ADDRESS].values())[0]
     ))
 
 
@@ -112,7 +109,7 @@ def test_chain_snapshot__raises(mocker, chain):
 )
 def test_parse_sett_balances(chain):
     snapshot = parse_sett_balances(
-        BADGER_TOKEN_ADDR,
+        BBADGER_ADDRESS,
         balances={
             '0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.04533617521779346,
         },
@@ -120,9 +117,9 @@ def test_parse_sett_balances(chain):
     )
     assert snapshot.type == BalanceType.Native
     assert snapshot.ratio == 1
-    assert snapshot.token == BADGER_TOKEN_ADDR
+    assert snapshot.token == BBADGER_ADDRESS
     assert list(snapshot.balances.values())[0] == approx(Decimal(
-        list(BALANCES_DATA[BADGER_TOKEN_ADDR].values())[0]
+        list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]
     ))
 
 
@@ -136,7 +133,7 @@ def test_parse_sett_balances__blacklisted(chain, mocker):
         {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": "some blacklisted stuff"}
     )
     snapshot = parse_sett_balances(
-        BADGER_TOKEN_ADDR,
+        BBADGER_ADDRESS,
         balances={
             '0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.04533617521779346,
         },
@@ -157,12 +154,12 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances):
         status=200
     )
     responses.add_passthru('https://')
-    snapshot = sett_snapshot(chain, 13710328, BADGER_TOKEN_ADDR, blacklist=True)
+    snapshot = sett_snapshot(chain, 13710328, BBADGER_ADDRESS, blacklist=True)
     assert snapshot.type == BalanceType.Native
     assert snapshot.ratio == 1
-    assert snapshot.token == BADGER_TOKEN_ADDR
+    assert snapshot.token == BBADGER_ADDRESS
     assert list(snapshot.balances.values())[0] == approx(Decimal(
-        list(BALANCES_DATA[BADGER_TOKEN_ADDR].values())[0]
+        list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]
     ))
 
 
@@ -175,7 +172,7 @@ def test_sett_snapshot__empty(mocker, chain):
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         return_value={}
     )
-    snapshot = sett_snapshot(chain, 13710328, BADGER_TOKEN_ADDR, blacklist=True)
+    snapshot = sett_snapshot(chain, 13710328, BBADGER_ADDRESS, blacklist=True)
     assert snapshot.balances == {}
 
 
@@ -189,7 +186,7 @@ def test_sett_snapshot__raises(mocker, chain):
         side_effect=Exception,
     )
     with pytest.raises(Exception):
-        sett_snapshot(chain, 13710328, BADGER_TOKEN_ADDR, blacklist=True)
+        sett_snapshot(chain, 13710328, BBADGER_ADDRESS, blacklist=True)
 
 
 @pytest.mark.parametrize(
@@ -211,8 +208,8 @@ def test_chain_snapshot_usd__happy(chain, mock_fetch_ch_balances, mocker):
         responses.add(
             responses.GET, f"{badger_api}/prices?chain={boost_chain}",
             json={
-                BADGER_TOKEN_ADDR: BADGER_PRICE,
-                YEARN_WBTC_ADDR: YEARN_WBTC_PRICE,
+                BBADGER_ADDRESS: BADGER_PRICE,
+                YEARN_WBTC_ADDRESS: YEARN_WBTC_PRICE,
             },
             status=200
         )
@@ -221,11 +218,11 @@ def test_chain_snapshot_usd__happy(chain, mock_fetch_ch_balances, mocker):
     # Make sure USD balance is calculated properly
     expected_balance_in_usd_native = Decimal(
         BADGER_PRICE *
-        BALANCES_DATA[BADGER_TOKEN_ADDR]['0x0000000000007F150Bd6f54c40A34d7C3d5e9f56']
+        BALANCES_DATA[BBADGER_ADDRESS]['0x0000000000007F150Bd6f54c40A34d7C3d5e9f56']
     )
     expected_balance_in_usd_non_native = Decimal(
         YEARN_WBTC_PRICE *
-        BALANCES_DATA[YEARN_WBTC_ADDR]['0x05E41229Efca125057f4D96007Dc477312dB8feB']
+        BALANCES_DATA[YEARN_WBTC_ADDRESS]['0x05E41229Efca125057f4D96007Dc477312dB8feB']
     )
     assert native['0x0000000000007F150Bd6f54c40A34d7C3d5e9f56'] == approx(
         expected_balance_in_usd_native
@@ -243,7 +240,7 @@ def test_chain_snapshot_usd__no_boost(chain, mock_fetch_ch_balances, mocker):
     # Make sure setts are excluded in case 'no_boost' variable contains them
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_unboosted_vaults",
-        return_value=[BADGER_TOKEN_ADDR, YEARN_WBTC_ADDR]
+        return_value=[BBADGER_ADDRESS, YEARN_WBTC_ADDRESS]
     )
     assert chain_snapshot_usd(chain, 13710328) == (Counter(), Counter())
 
