@@ -16,7 +16,6 @@ console = Console()
 def fetch_nfts(chain: str, block: int) -> Dict:
     if chain != Network.Ethereum:
         return {}
-    
     last_nft_id = ""
     nft_client = make_gql_client("nfts")
     query = gql(
@@ -29,7 +28,7 @@ def fetch_nfts(chain: str, block: int) -> Dict:
     """
     )
     nft_balances = {}
-    variables =  {
+    variables = {
         "block_number": {"number": block},
         "nft_filter": {"id_gt": last_nft_id, "amount_gt": 0}
     }
