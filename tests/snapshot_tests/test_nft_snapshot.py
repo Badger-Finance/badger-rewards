@@ -13,7 +13,7 @@ from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 def mock_fns(monkeypatch):
     monkeypatch.setattr("rewards.snapshot.nft_snapshot.fetch_nfts", mock_fetch_nfts)
     monkeypatch.setattr(
-        "rewards.snapshot.nft_snapshot.get_nft_score", mock_get_nft_score
+        "rewards.snapshot.nft_snapshot.get_nft_weight", mock_get_nft_score
     )
 
     monkeypatch.setattr(
@@ -24,7 +24,7 @@ def mock_fns(monkeypatch):
     )
 
 
-def mock_get_nft_score(nft_address: str, nft_id: int):
+def mock_get_nft_score(chain: Network, nft_address: str, nft_id: int):
     nft_scores = {
         "0xe1e546e25A5eD890DFf8b8D005537c0d373497F8-1": 200,
         "0xe4605d46Fd0B3f8329d936a8b258D69276cBa264-97": 10,
