@@ -1,11 +1,12 @@
 import math
 from functools import lru_cache
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 from gql import Client, gql
 from rich.console import Console
 from web3 import Web3
 
+from helpers.constants import DECIMAL_MAPPING
 from helpers.digg_utils import digg_utils
 from helpers.discord import (
     get_discord_url,
@@ -60,7 +61,7 @@ def fetch_token_balances(client: Client, block_number: int, chain: str) -> Tuple
                     amount = float(entry["balance"])
                     if amount > 0:
                         if entry["token"]["symbol"] == "BADGER":
-                            badger_balances[address] = amount / 1e18
+                            badger_balances[address] = amount / DECIMAL_MAPPING[chain]
                         if entry["token"]["symbol"] == "DIGG":
                             # Speed this up
                             if entry["balance"] == 0:

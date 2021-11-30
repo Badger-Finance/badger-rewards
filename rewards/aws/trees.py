@@ -64,7 +64,6 @@ def download_past_trees(test: bool, number: int):
     versions = response["Versions"][:number]
     for version in versions:
         console.log(version["Key"], version["VersionId"])
-        # yield version
         s3_client_obj = s3.get_object(
             Bucket=bucket, Key=version["Key"], VersionId=version["VersionId"]
         )
@@ -87,11 +86,11 @@ def upload_tree(
     chain_id = CHAIN_IDS[chain]
 
     if chain == Network.Ethereum:
-        key = "badger-tree.json"
         rewards_bucket = "badger-json"
     else:
-        key = f"badger-tree-{chain_id}.json"
         rewards_bucket = f"badger-json-{chain}"
+    
+    key = f"badger-tree-{chain_id}.json"
 
     upload_targets = [
         {

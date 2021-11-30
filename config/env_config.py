@@ -41,7 +41,6 @@ class EnvConfig:
             ),
         }
         # TODO: set polygon back to paid node
-        # polygon = self.make_provider("quiknode/poly-node-url", "POLYGON_NODE_URL")
         polygon = Web3(Web3.HTTPProvider("https://polygon-rpc.com/"))
         polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
 

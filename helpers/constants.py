@@ -367,3 +367,10 @@ ABI_DIRS = {
 
 SANITY_TOKEN_AMOUNT = 4000 * 1e18
 BOOST_BLOCK_DELAY = 10
+
+
+DECIMAL_MAPPING = {
+    Network.Ethereum: 1e18,
+    Network.Polygon: 1e18,
+    Network.Arbitrum: 1e18,
+}

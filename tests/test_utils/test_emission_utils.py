@@ -9,7 +9,6 @@ from tests.utils import set_env_vars
 set_env_vars()
 
 from rewards.utils.emission_utils import (
-    fetch_setts,
     fetch_unboosted_vaults,
     get_flat_emission_rate,
     get_nft_weight,
@@ -36,13 +35,13 @@ def mock_fetch_setts(*args, **kwargs):
 def test_get_flat_emission_rate():
     chain = Network.Ethereum
     happy_cases = [
-        (SETTS[Network.Ethereum]["bvecvx"], 1),
-        (SETTS[Network.Ethereum]["sbtc_crv"], 0),
-        (SETTS[Network.Ethereum]["ibbtc_crv"], 0.49),
+        SETTS[Network.Ethereum]["bvecvx"],
+        SETTS[Network.Ethereum]["sbtc_crv"],
+        SETTS[Network.Ethereum]["ibbtc_crv"],
     ]
 
-    for sett, rate in happy_cases:
-        assert get_flat_emission_rate(sett, chain) == rate
+    for sett in happy_cases:
+        assert type(get_flat_emission_rate(sett, chain)) == Decimal
     with pytest.raises(Exception):
         get_flat_emission_rate(SETTS[Network.Ethereum]["sbtc_crv"].lower(), chain)
 

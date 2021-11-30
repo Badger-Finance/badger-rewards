@@ -5,9 +5,8 @@ from math import isclose
 from unittest import TestCase
 
 import pytest
-from brownie import web3
 
-from helpers.constants import BADGER, SETTS
+from helpers.constants import BADGER, DECIMAL_MAPPING, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
 from tests.utils import (
@@ -26,9 +25,8 @@ set_env_vars()
 
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Snapshot import Snapshot
-from rewards.classes.TreeManager import TreeManager
 from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewards
-from tests.cycle_utils import mock_badger_tree, mock_tree_manager
+from tests.test_utils.cycle_utils import mock_badger_tree, mock_tree_manager
 
 logger = logging.getLogger("test-rewards-manager")
 
@@ -233,7 +231,8 @@ def test_splits(
             user_data[user]["boost"] = boosts_split["userData"][user]["boost"]
             if "rewards" not in user_data[user]:
                 user_data[user]["rewards"] = []
-            user_data[user]["rewards"].append(int(amount[0]) / 10 ** 18)
+            user_data[user]["rewards"].append(int(amount[0]) /
+                                              DECIMAL_MAPPING[str(rewards_manager_split.chain)])
 
     logger.info(json.dumps(user_data, indent=2))
     assert user_data["0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd"]["rewards"] == [
