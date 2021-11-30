@@ -119,8 +119,6 @@ def add_user_data(user_data, chain):
             "multipliers": multipliers,
             "nfts": data.get("nfts",[])
         }
-    with open("badger-boosts.json", "w") as fp:
-        json.dump(boosts, fp)
     upload_boosts(boosts, chain)
 
 
