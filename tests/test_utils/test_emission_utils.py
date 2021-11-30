@@ -64,9 +64,6 @@ def test_get_nft_weight():
             bad_nft_data, weight = bad_case
             get_nft_weight(chain, bad_nft_data["address"], bad_nft_data["id"])
 
-            
-    
-
 
 def test_get_token_weight():
     all_cases = {
