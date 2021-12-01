@@ -9,6 +9,7 @@ from badger_api.requests import badger_api
 from helpers.constants import (
     ARB_BADGER,
     BADGER,
+    BOOST_CHAINS,
     CVX_CRV_ADDRESS,
     DIGG,
     NETWORK_TO_BADGER_TOKEN,
@@ -19,7 +20,12 @@ from helpers.constants import (
 )
 from helpers.digg_utils import digg_utils
 from helpers.enums import BalanceType, Network
-from rewards.snapshot.claims_snapshot import claims_snapshot
+from rewards.snapshot.claims_snapshot import claims_snapshot, claims_snapshot_usd
+
+BADGER_PRICE = 27.411460272851376
+XSUSHI_PRICE = 1.201460272851376
+CVX_CRV_PRICE = 12.411460272851376
+SWAPR_WETH_SWAPR_PRICE = 12312.201460272851376
 
 TEST_WALLET = '0xD27E9195aA35A7dE31513656AD5d4D29268f94eC'
 TEST_WALLET_ANOTHER = '0xF9e11762d522ea29Dd78178c9BAf83b7B093aacc'
@@ -188,3 +194,50 @@ def test_claims_snapshot__unhappy(mock_discord):
     responses.add_passthru('https://')
     with pytest.raises(ValueError):
         claims_snapshot(Network.Ethereum)
+
+
+@responses.activate
+def test_claims_snapshot_usd__happy():
+    # Make sure native and non-native balances are correcly calculated to usd
+    responses.add(
+        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
+        json=CLAIMABLE_BALANCES_DATA_ETH, status=200
+    )
+    for boost_chain in BOOST_CHAINS:
+        responses.add(
+            responses.GET, f"{badger_api}/prices?chain={boost_chain}",
+            json={
+                BADGER: BADGER_PRICE,
+                CVX_CRV_ADDRESS: CVX_CRV_PRICE,
+                XSUSHI: XSUSHI_PRICE,
+                SWAPR_WETH_SWAPR_ARB_ADDRESS: SWAPR_WETH_SWAPR_PRICE,
+            },
+            status=200
+        )
+    responses.add_passthru('https://')
+    native, non_native = claims_snapshot_usd(Network.Ethereum)
+    expected_native_balance = 0
+    # For this wallet native balance is only
+    for claim in CLAIMABLE_BALANCES_DATA_ETH['rewards'][TEST_WALLET]:
+        if claim['address'] == BADGER:
+            expected_native_balance = BADGER_PRICE * int(claim['balance']) / math.pow(10, 18)
+    assert native[TEST_WALLET] == approx(Decimal(expected_native_balance))
+
+    # For this wallet non-native balance is only cvxCRV token
+    expected_non_native_balance = 0
+    for claim in CLAIMABLE_BALANCES_DATA_ETH['rewards'][TEST_WALLET]:
+        if claim['address'] == CVX_CRV_ADDRESS:
+            expected_non_native_balance = CVX_CRV_PRICE * int(claim['balance']) / math.pow(10, 18)
+    assert non_native[TEST_WALLET] == approx(Decimal(expected_non_native_balance))
+
+
+@responses.activate
+def test_claims_snapshot_usd__unhappy(mock_discord):
+    # Raises exception in case non-200 response is returned
+    responses.add(
+        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
+        json={'maxPage': 1}, status=400
+    )
+    responses.add_passthru('https://')
+    with pytest.raises(ValueError):
+        claims_snapshot_usd(Network.Ethereum)
