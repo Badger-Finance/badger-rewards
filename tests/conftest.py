@@ -1,5 +1,7 @@
 import pytest
 
+from badger_api.requests import fetch_token_names, fetch_token_prices
+
 TOKEN_SNAPSHOT_DATA = (
     {
         '0x01fb5de8847e570899d3e00029Ae9cD9cB40E5d7': 44557.11578,
@@ -55,3 +57,9 @@ def mock_snapshots(mocker):
         "rewards.boost.boost_utils.claims_snapshot_usd",
         return_value=CHAIN_CLAIMS_SNAPSHOT_DATA
     )
+
+
+@pytest.fixture(autouse=True)
+def clear_cache():
+    fetch_token_names.cache_clear()
+    fetch_token_prices.cache_clear()
