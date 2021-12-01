@@ -36,7 +36,8 @@ CLAIMABLE_BALANCES_DATA_ETH = {
         TEST_WALLET: [
             {
                 'network': 'ethereum', 'address': BADGER,
-                'balance': '148480869281534217908'},
+                'balance': '148480869281534217908'
+            },
             {
                 'network': 'ethereum', 'address': CVX_CRV_ADDRESS,
                 'balance': '2421328289687344724270258601055314109178877723910682205504219578892288'
@@ -49,10 +50,12 @@ CLAIMABLE_BALANCES_DATA_ETH = {
         TEST_WALLET_ANOTHER: [
             {
                 'network': 'ethereum', 'address': BADGER,
-                'balance': '8202381382803713155'},
+                'balance': '8202381382803713155'
+            },
             {
                 'network': 'ethereum', 'address': CVX_CRV_ADDRESS,
-                'balance': '2656585570737360069'},
+                'balance': '2656585570737360069'
+            },
             {
                 'network': 'ethereum', 'address': XSUSHI,
                 'balance': '4169175341925473404499430551565743649791614840189435481041751238508157'
@@ -67,7 +70,8 @@ CLAIMABLE_BALANCES_DATA_POLY = {
         TEST_WALLET: [
             {
                 'network': 'ethereum', 'address': POLY_BADGER,
-                'balance': '148480869281534217908'},
+                'balance': '148480869281534217908'
+            },
             {
                 'network': 'ethereum', 'address': POLY_SUSHI,
                 'balance': '2421328289687344724270258601055314109178877723910682205504219578892288'
@@ -76,10 +80,12 @@ CLAIMABLE_BALANCES_DATA_POLY = {
         TEST_WALLET_ANOTHER: [
             {
                 'network': 'ethereum', 'address': POLY_BADGER,
-                'balance': '8202381382803713155'},
+                'balance': '8202381382803713155'
+            },
             {
                 'network': 'ethereum', 'address': POLY_SUSHI,
-                'balance': '2656585570737360069'},
+                'balance': '2656585570737360069'
+            },
         ],
     }
 }
@@ -90,7 +96,8 @@ CLAIMABLE_BALANCES_DATA_ARB = {
         TEST_WALLET: [
             {
                 'network': 'ethereum', 'address': ARB_BADGER,
-                'balance': '148480869281534217908'},
+                'balance': '148480869281534217908'
+            },
             {
                 'network': 'ethereum', 'address': SWAPR_WETH_SWAPR_ARB_ADDRESS,
                 'balance': '2421328289687344724270258601055314109178877723910682205504219578892288'
@@ -99,10 +106,12 @@ CLAIMABLE_BALANCES_DATA_ARB = {
         TEST_WALLET_ANOTHER: [
             {
                 'network': 'ethereum', 'address': ARB_BADGER,
-                'balance': '8202381382803713155'},
+                'balance': '8202381382803713155'
+            },
             {
                 'network': 'ethereum', 'address': SWAPR_WETH_SWAPR_ARB_ADDRESS,
-                'balance': '2656585570737360069'},
+                'balance': '2656585570737360069'
+            },
         ],
     }
 }

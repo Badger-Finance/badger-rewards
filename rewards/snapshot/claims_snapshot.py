@@ -15,7 +15,7 @@ from rewards.classes.Snapshot import Snapshot
 def claims_snapshot(chain: str) -> Dict[str, Snapshot]:
     all_claims = fetch_all_claimable_balances(chain)
     if not all_claims:
-        raise ValueError("Badger-api returns error")
+        raise ValueError("Error retrieving claimable balances from Badger API")
     chain_claimable_tokens = CLAIMABLE_TOKENS[chain]
     native_tokens = chain_claimable_tokens[BalanceType.Native]
     non_native_tokens = chain_claimable_tokens[BalanceType.NonNative]
