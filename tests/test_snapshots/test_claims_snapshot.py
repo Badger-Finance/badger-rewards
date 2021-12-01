@@ -10,12 +10,14 @@ from helpers.constants import (
     ARB_BADGER,
     BADGER,
     CVX_CRV_ADDRESS,
+    DIGG,
     NETWORK_TO_BADGER_TOKEN,
     POLY_BADGER,
     POLY_SUSHI,
     SWAPR_WETH_SWAPR_ARB_ADDRESS,
     XSUSHI,
 )
+from helpers.digg_utils import digg_utils
 from helpers.enums import BalanceType, Network
 from rewards.snapshot.claims_snapshot import claims_snapshot
 
@@ -146,3 +148,31 @@ def test_claims_snapshot__happy(chain, data):
             assert snapshot.balances[TEST_WALLET] == approx(
                 Decimal(expected_token_balance)
             )
+
+
+@responses.activate
+def test_claims_snapshot_digg():
+    # Digg has different calculation algorithm hence separate test
+    balance = '148480869281534217908'
+    responses.add(
+        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
+        json={
+            'maxPage': 1,
+            'rewards': {
+                TEST_WALLET: [
+                    {
+                        'network': 'ethereum', 'address': DIGG,
+                        'balance': balance
+                    },
+                ]
+            }
+        }, status=200
+    )
+    responses.add_passthru('https://')
+    snapshots = claims_snapshot(Network.Ethereum)
+    digg_snapshot = snapshots[DIGG]
+    assert digg_snapshot.type == BalanceType.Native
+    assert digg_snapshot.ratio == 1
+    assert digg_snapshot.token == DIGG
+    expected_digg_balance = digg_utils.shares_to_fragments(int(balance)) / math.pow(10, 18)
+    assert digg_snapshot.balances[TEST_WALLET] == approx(Decimal(expected_digg_balance))
