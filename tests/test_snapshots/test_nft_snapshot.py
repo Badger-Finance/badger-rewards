@@ -1,5 +1,4 @@
 from decimal import Decimal
-from typing import Dict
 from unittest import TestCase
 
 import pytest

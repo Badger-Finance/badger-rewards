@@ -43,12 +43,7 @@ def get_nft_control(chain: Network) -> ContractFunctions:
 @lru_cache
 def get_nft_weights(chain: Network):
     nft_control = get_nft_control(chain)
-    schedules = list(
-        map(
-            lambda ws: NFTWeightSchedule(ws[0], ws[1], ws[2], ws[3]),
-            nft_control.getNftWeightSchedules().call(),
-        )
-    )
+    schedules = parse_nft_weight_schedules(nft_control.getNftWeightSchedules.call())
     weights = {}
     for weight_schedule in schedules:
         key = f"{weight_schedule.addr}-{weight_schedule.nft_id}"
@@ -118,3 +113,16 @@ def parse_schedule(schedule) -> Schedule:
         schedule[4],
         schedule[5],
     )
+
+
+def parse_nft_weight_schedule(weight_schedule: List) -> NFTWeightSchedule:
+    return NFTWeightSchedule(
+        weight_schedule[0],
+        weight_schedule[1],
+        weight_schedule[2],
+        weight_schedule[3],
+    )
+
+
+def parse_nft_weight_schedules(weight_schedules: List) -> List[NFTWeightSchedule]:
+    return [parse_nft_weight_schedule(ws) for ws in weight_schedules]

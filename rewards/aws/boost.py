@@ -18,7 +18,7 @@ def upload_boosts(boost_data, chain: str):
         chain,
         "badger-boosts"
     )
-    
+
 
 def upload_proposed_boosts(boost_data, chain: str):
     upload_boosts_to_aws(
@@ -26,6 +26,7 @@ def upload_proposed_boosts(boost_data, chain: str):
         chain,
         "propose-boosts"
     )
+
 
 def upload_boosts_to_aws(boost_data, chain: str, file_name: str):
     """Upload boosts file to aws bucket
@@ -117,7 +118,7 @@ def add_user_data(user_data, chain):
             "nonNativeBalance": str(data["nonNativeBalance"]),
             "stakeRatio": str(data["stakeRatio"]),
             "multipliers": multipliers,
-            "nfts": data.get("nfts",[])
+            "nfts": data.get("nfts", [])
         }
     upload_boosts(boosts, chain)
 
