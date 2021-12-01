@@ -115,21 +115,21 @@ def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
 
 def parse_schedule(schedule) -> Schedule:
     return Schedule(
-        Web3.toChecksumAddress(schedule[0]),
-        Web3.toChecksumAddress(schedule[1]),
-        schedule[2],
-        schedule[3],
-        schedule[4],
-        schedule[5],
+        Web3.toChecksumAddress(schedule[0]),  # sett
+        Web3.toChecksumAddress(schedule[1]),  # token
+        schedule[2],  # tokensLocked
+        schedule[3],  # startTime
+        schedule[4],  # endTime
+        schedule[5],  # duration
     )
 
 
 def parse_nft_weight_schedule(weight_schedule: List) -> NFTWeightSchedule:
     return NFTWeightSchedule(
-        weight_schedule[0],
-        weight_schedule[1],
-        weight_schedule[2],
-        weight_schedule[3],
+        weight_schedule[0],  # nft addr
+        weight_schedule[1],  # nft id
+        weight_schedule[2],  # nft weight
+        weight_schedule[3],  # timestamp
     )
 
 
