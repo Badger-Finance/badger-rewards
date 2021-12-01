@@ -9,7 +9,7 @@ from helpers.enums import Network
 from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def mock_fns(monkeypatch):
     monkeypatch.setattr("rewards.snapshot.nft_snapshot.fetch_nfts", mock_fetch_nfts)
     monkeypatch.setattr(
