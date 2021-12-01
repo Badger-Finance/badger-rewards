@@ -1,3 +1,4 @@
+from helpers.enums import Network
 from rewards.boost.boost_utils import (
     calc_boost_balances,
     calc_union_addresses,
@@ -7,7 +8,7 @@ from tests.conftest import CHAIN_CLAIMS_SNAPSHOT_DATA, CHAIN_SETT_SNAPSHOT_DATA
 
 
 def test_calc_boost_balances(chain, mock_snapshots):
-    native_balance, non_native_balances = calc_boost_balances(123, "whatever")
+    native_balance, non_native_balances = calc_boost_balances(123, Network.Ethereum)
     # Make sure snapshot balances are sum up for both nati
     sum_expected_native_balances = {}
     for key in CHAIN_CLAIMS_SNAPSHOT_DATA[0].keys():
@@ -47,7 +48,7 @@ def test_calc_boost_balances__dust_filtered(chain, mocker):
             {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.000001241234},
         )
     )
-    native_balance, non_native_balances = calc_boost_balances(123, "whatever")
+    native_balance, non_native_balances = calc_boost_balances(123, Network.Ethereum)
     assert native_balance == {}
     assert non_native_balances == {}
 

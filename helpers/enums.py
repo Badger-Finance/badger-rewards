@@ -55,10 +55,10 @@ class Abi(str, Enum):
     ChainlinkOracle = "ChainlinkOracle"
     RewardsLogger = "RewardsLogger"
     EmissionControl = "EmissionControl"
+    NFTControl = "NFTControl"
     Strategy = "BaseStrategy"
     Controller = "Controller"
     CErc20Delegator = "CErc20Delegator"
-    
+
     def __str__(self) -> str:
         return self.value
-    

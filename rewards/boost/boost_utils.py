@@ -5,6 +5,7 @@ from rich.console import Console
 
 from rewards.snapshot.chain_snapshot import chain_snapshot_usd
 from rewards.snapshot.claims_snapshot import claims_snapshot_usd
+from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 
 console = Console()
@@ -44,12 +45,15 @@ def calc_boost_balances(
     native = Counter()
     non_native = Counter()
 
+    console.log(f"\n === Taking nft snapshot on {chain} === \n")
+    nft_balances = nft_snapshot_usd(chain, block)
+
     console.log(f"\n === Taking token snapshot on {chain} === \n")
     badger_tokens, digg_tokens = token_snapshot_usd(chain, block)
-    native = native + Counter(badger_tokens) + Counter(digg_tokens)
+
+    native = Counter(badger_tokens) + Counter(digg_tokens) + Counter(nft_balances)
 
     console.log(f"\n === Taking chain snapshot on {chain} === \n")
-
     native_setts, non_native_setts = chain_snapshot_usd(chain, block)
     non_native += Counter(non_native_setts)
     native += Counter(native_setts)

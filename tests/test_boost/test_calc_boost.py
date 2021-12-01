@@ -1,6 +1,7 @@
 import pytest
 
 from helpers.constants import STAKE_RATIO_RANGES
+from helpers.enums import Network
 from rewards.boost.calc_boost import badger_boost, calc_stake_ratio
 
 
@@ -35,7 +36,7 @@ def test_calc_stake_ratio__zero_non_native():
 
 
 def test_badger_boost__happy(mock_discord_send_code, mock_snapshots):
-    result = badger_boost(123, "whatever")
+    result = badger_boost(123, Network.Ethereum)
     assert mock_discord_send_code.called
     # Check boosts for different data points
     for addr, boost_data in result.items():
@@ -49,3 +50,4 @@ def test_badger_boost__happy(mock_discord_send_code, mock_snapshots):
         assert 'nonNativeBalance' in keys
         assert 'stakeRatio' in keys
         assert 'multipliers' in keys
+        assert 'nfts' in keys

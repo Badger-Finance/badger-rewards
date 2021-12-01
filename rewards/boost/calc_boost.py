@@ -7,6 +7,7 @@ from helpers.constants import BOOST_BLOCK_DELAY, STAKE_RATIO_RANGES
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BotType
 from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses
+from subgraph.queries.nfts import fetch_nfts
 
 console = Console()
 
@@ -51,12 +52,13 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
         calc_stake_ratio(addr, native_setts, non_native_setts) for addr in all_addresses
     ]
     stake_ratios = dict(zip(all_addresses, stake_ratios_list))
-
+    nfts = fetch_nfts(chain, current_block)
     for addr in all_addresses:
         boost_info[addr] = {
             "nativeBalance": 0,
             "nonNativeBalance": 0,
             "stakeRatio": 0,
+            "nfts":[]
         }
 
     for user, native_usd in native_setts.items():
@@ -67,6 +69,10 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
 
     for user, ratio in stake_ratios.items():
         boost_info[user]["stakeRatio"] = ratio
+
+    for user, nft_balances in nfts.items():
+        if user in all_addresses:
+            boost_info[user]["nfts"] = nft_balances
 
     stake_data = {}
     for addr, stake_ratio in stake_ratios.items():
@@ -91,6 +97,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
             "nonNativeBalance": boost_metadata.get("nonNativeBalance", 0),
             "stakeRatio": boost_metadata.get("stakeRatio", 0),
             "multipliers": {},
+            "nfts": boost_metadata.get("nfts", [])
         }
 
     stake_data = {k: stake_data[k] for k in sorted(stake_data, reverse=True)}
