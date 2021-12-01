@@ -1,6 +1,5 @@
 from helpers.enums import Network
 
-subgraph_ids = {}
 subgraph_urls = {
     # Chain graphs
     Network.BinanceSmartChain: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-bsc",
