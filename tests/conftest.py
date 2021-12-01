@@ -1,6 +1,7 @@
 import pytest
 
 from badger_api.requests import fetch_token_names, fetch_token_prices
+from rewards.snapshot.claims_snapshot import claims_snapshot
 
 TOKEN_SNAPSHOT_DATA = (
     {
@@ -63,3 +64,4 @@ def mock_snapshots(mocker):
 def clear_cache():
     fetch_token_names.cache_clear()
     fetch_token_prices.cache_clear()
+    claims_snapshot.cache_clear()
