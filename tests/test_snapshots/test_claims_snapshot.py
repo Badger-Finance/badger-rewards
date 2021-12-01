@@ -176,3 +176,15 @@ def test_claims_snapshot_digg():
     assert digg_snapshot.token == DIGG
     expected_digg_balance = digg_utils.shares_to_fragments(int(balance)) / math.pow(10, 18)
     assert digg_snapshot.balances[TEST_WALLET] == approx(Decimal(expected_digg_balance))
+
+
+@responses.activate
+def test_claims_snapshot__unhappy(mock_discord):
+    # Raises exception in case non-200 response is returned
+    responses.add(
+        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
+        json={'maxPage': 1}, status=400
+    )
+    responses.add_passthru('https://')
+    with pytest.raises(ValueError):
+        claims_snapshot(Network.Ethereum)
