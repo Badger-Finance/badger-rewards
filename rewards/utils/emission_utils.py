@@ -8,7 +8,8 @@ from web3 import Web3
 from web3.contract import ContractFunctions
 
 from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS, NATIVE
-from helpers.enums import Abi, Network
+from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.enums import Abi, BotType, Network
 from helpers.web3_utils import make_contract
 from rewards.classes.NftWeightSchedule import NFTWeightSchedule
 from rewards.classes.Schedule import Schedule
@@ -39,26 +40,34 @@ def get_nft_control(chain: Network) -> ContractFunctions:
         EMISSIONS_CONTRACTS[chain]["NFTControl"], Abi.NFTControl, chain
     )
 
-
 @lru_cache
 def get_nft_weights(chain: Network):
     nft_control = get_nft_control(chain)
-    schedules = parse_nft_weight_schedules(nft_control.getNftWeightSchedules.call())
+    schedules = parse_nft_weight_schedules(nft_control.getNftWeightSchedules().call())
     weights = {}
     for weight_schedule in schedules:
         key = f"{weight_schedule.addr}-{weight_schedule.nft_id}"
         if key not in weights:
             weights[key] = weight_schedule
         else:
-            curr_schedule = weights[key]
-            if weight_schedule.timestamp > curr_schedule.timestamp:
-                weights[key] = weight_schedule
+            weights[key] = weight_schedule if weight_schedule.timestamp > weights[key].timestamp else weights[key]
     return weights
 
 
 def get_nft_weight(chain: str, nft_address: str, nft_id: int) -> Decimal:
     weights = get_nft_weights(chain)
-    return Decimal(weights[f"{nft_address}-{nft_id}"].weight / 1e18)
+    key = f"{nft_address}-{nft_id}"
+    if key in weights:
+        return Decimal(weights[key].weight / 1e18)
+    else:
+        send_message_to_discord(
+            "**ERROR**"
+            f"Cannot find weights for {key}",
+            [],
+            "Boost Bot",
+            url=get_discord_url(chain, bot_type=BotType.Boost)
+        )
+        raise Exception
 
 
 def fetch_unboosted_vaults(chain) -> List[str]:

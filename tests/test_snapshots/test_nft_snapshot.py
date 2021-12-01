@@ -54,7 +54,7 @@ def mock_send_message_to_discord(
     return True
 
 
-def test_nft_snapshot_usd():
+def test_nft_snapshot_usd(mock_fns):
     chain = Network.Ethereum
     expected_snapshot_usd = {
         "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": Decimal(210 * 10),
