@@ -120,10 +120,29 @@ def test_claims_snapshot__happy(chain, data):
     assert badger_snapshot.type == BalanceType.Native
     assert badger_snapshot.ratio == 1
     assert badger_snapshot.token == NETWORK_TO_BADGER_TOKEN[chain]
-    expected_badger_balance_1 = 0
+    expected_badger_balance = 0
     for claim in data['rewards'][TEST_WALLET]:
         if claim['address'] == NETWORK_TO_BADGER_TOKEN[chain]:
-            expected_badger_balance_1 = int(claim['balance']) / math.pow(10, 18)
-    assert badger_snapshot.balances[TEST_WALLET] == approx(Decimal(expected_badger_balance_1))
+            expected_badger_balance = int(claim['balance']) / math.pow(10, 18)
+    assert badger_snapshot.balances[TEST_WALLET] == approx(Decimal(expected_badger_balance))
 
-    # TODO: More tests for non-native and excluded tokens
+    excluded_token = None
+    non_native_token = None
+    if chain == Network.Ethereum:
+        excluded_token = XSUSHI
+        non_native_token = CVX_CRV_ADDRESS
+    elif chain == Network.Polygon:
+        excluded_token = POLY_SUSHI
+    elif chain == Network.Arbitrum:
+        excluded_token = SWAPR_WETH_SWAPR_ARB_ADDRESS
+    for token in [excluded_token, non_native_token]:
+        if token:
+            snapshot = snapshots[excluded_token]
+            assert snapshot.ratio == 1
+            expected_token_balance = 0
+            for claim in data['rewards'][TEST_WALLET]:
+                if claim['address'] == excluded_token:
+                    expected_token_balance = int(claim['balance']) / math.pow(10, 18)
+            assert snapshot.balances[TEST_WALLET] == approx(
+                Decimal(expected_token_balance)
+            )
