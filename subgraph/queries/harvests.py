@@ -1,5 +1,6 @@
 from gql import gql
 from rich.console import Console
+from web3 import Web3
 
 from subgraph.subgraph_utils import make_gql_client
 
@@ -9,21 +10,24 @@ harvests_client = make_gql_client("harvests-ethereum")
 
 
 def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
-    tree_client = make_gql_client(f"harvests-{chain}")
+    tree_client = make_gql_client(chain)
     query = gql(
         """
         query tree_distributions(
-            $lastDistId: TreeDistribution_filter
+            $lastDistId: TokenDistribution_filter
             ) {
-            treeDistributions(where: $lastDistId) {
+            badgerTreeDistributions(where: $lastDistId) {
                 id
                 token {
-                    address
+                    id
                     symbol
                 }
                 amount
                 blockNumber
                 timestamp
+                sett {
+                    id
+                }
                 }
             }
         """
@@ -35,6 +39,10 @@ def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
         variables["lastDistId"] = {"id_gt": last_dist_id}
         results = tree_client.execute(query, variable_values=variables)
         dist_data = results["treeDistributions"]
+        for dist in dist_data:
+            dist["token"] = Web3.toChecksumAddress(dist["token"]["id"])
+            dist["sett"] = Web3.toChecksumAddress(dist["sett"]["id"])
+
         if len(dist_data) == 0:
             break
         else:

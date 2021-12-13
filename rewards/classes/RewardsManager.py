@@ -244,9 +244,8 @@ class RewardsManager:
         all_dist_rewards = []
         for dist in tree_distributions:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
-            token = dist["token"]["address"]
-            strategy = dist["id"].split("-")[0]
-            sett = self.get_sett_from_strategy(strategy)
+            token = dist["token"]
+            sett = dist["sett"]
             # Dont blacklist tree rewards for emissions contracts
             snapshot = self.fetch_sett_snapshot(block, sett, blacklist=False)
             amount = int(dist["amount"])
