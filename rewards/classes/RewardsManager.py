@@ -5,7 +5,7 @@ from rich.console import Console
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
-from helpers.constants import EMISSIONS_CONTRACTS, XSUSHI
+from helpers.constants import BVECVX_CVX_LP, EMISSIONS_CONTRACTS, XSUSHI
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BalanceType, Network
 from helpers.time_utils import to_hours, to_utc_date
@@ -14,7 +14,7 @@ from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
-from rewards.emission_handlers import eth_tree_handler
+from rewards.emission_handlers import bvecvx_lp_handler, eth_tree_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
@@ -242,6 +242,9 @@ class RewardsManager:
             f"Fetched {len(tree_distributions)} tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
+        custom_behaviour = {
+            BVECVX_CVX_LP: bvecvx_lp_handler
+        }
         for dist in tree_distributions:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]
@@ -255,7 +258,7 @@ class RewardsManager:
                 sett, self.web3.toChecksumAddress(token), amount
             )
             all_dist_rewards.append(
-                distribute_rewards_to_snapshot(amount, snapshot, token)
+                distribute_rewards_to_snapshot(amount, snapshot, token, custom_rewards=custom_behaviour, block=block)
             )
         return combine_rewards(all_dist_rewards, self.cycle)
 

@@ -207,7 +207,6 @@ REWARDS_BLACKLIST = {
     ETH_BADGER_TREE: "ETH Badger Tree",
     IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
     BADGER_PAYMENTS: "Badger Payments",
-    BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
 
 STAKE_RATIO_RANGES = list(
