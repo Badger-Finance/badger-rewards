@@ -56,7 +56,7 @@ def calc_boost_balances(
 
     console.log(f"\n === Taking claims snapshot on {chain} === \n")
 
-    native_claimable, non_native_claimable = claims_snapshot_usd(chain)
+    native_claimable, non_native_claimable = claims_snapshot_usd(chain, block)
     native += Counter(native_claimable)
     non_native += Counter(non_native_claimable)
 

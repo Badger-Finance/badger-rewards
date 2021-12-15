@@ -2,8 +2,10 @@ from typing import Dict, Tuple
 
 from rich.console import Console
 
-from config.singletons import env_config
-from helpers.enums import Network
+from badger_api.claimable import (
+    get_claimable_snapshot_block,
+    get_claimable_snapshot_metadata,
+)
 from rewards.classes.TreeManager import TreeManager
 from subgraph.queries.setts import last_synced_block
 
@@ -37,11 +39,11 @@ def calc_next_cycle_range(
 
     last_claim_end = tree_manager.last_publish_end_block()
     start_block = last_claim_end + 1
+    synced_block = last_synced_block(chain)
+    metadata = get_claimable_snapshot_metadata(chain, start_block, synced_block)
+    end_block = metadata["start_block"]
 
-    # Claim at last synced block
-    end_block = last_synced_block(chain)
-    if chain == Network.Arbitrum:
-        end_block = end_block - 100
+    assert end_block <= synced_block
 
     # Sanity check: Ensure start block is not too far in the past
     assert start_block < end_block

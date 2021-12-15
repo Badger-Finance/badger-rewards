@@ -10,12 +10,19 @@ logger = logging.getLogger("aws-helpers")
 
 if config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]:
     s3 = boto3.client("s3")
+    dynamodb = boto3.client("dynamodb")
 else:
     s3 = boto3.client(
         "s3",
         aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
         aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"),
     )
+    dynamodb = boto3.client(
+        "dynamodb",
+        aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"),
+    )
+
 
 
 def get_bucket(production: bool) -> str:
