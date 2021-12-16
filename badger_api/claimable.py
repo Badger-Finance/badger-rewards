@@ -26,17 +26,18 @@ def get_latest_claimable_metadata(
         )
         raise e
     else:
-        return output["Item"]
+        return output["Items"][0]
+
 
 def get_claimable_balances(chain: Network, chain_start_block: str) -> Dict[str, float]:
     table = dynamodb.Table(get_snapshot_table())
     try:
-        response = table.get_item(
-            Key={
-                'chain': chain,
-                'chainStartBlock': chain_start_block,
-            }
-        )
+        kce = Key('chainStartBlock').eq(chain_start_block)
+        response = table.query(KeyConditionExpression=kce)
+        data = response["Items"]
+        while 'LastEvaluatedKey' in response:
+            response = table.query(KeyConditionExpression=kce, ExclusiveStartKey=response['LastEvaluatedKey'])
+            data.extend(response["Items"])
     except ClientError as e:
         send_error_to_discord(
             e,
@@ -46,7 +47,7 @@ def get_claimable_balances(chain: Network, chain_start_block: str) -> Dict[str, 
         )
         raise e
     else:
-        return response["Item"]["claimableBalances"]
+        return data
 
 
 def get_latest_claimable_snapshot(
