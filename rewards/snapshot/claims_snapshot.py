@@ -3,7 +3,7 @@ from collections import Counter
 from functools import lru_cache
 from typing import Dict, Tuple
 
-from badger_api.claimable import get_claimable_balances, get_claimable_snapshot
+from badger_api.claimable import get_claimable_balances, get_latest_claimable_snapshot
 from badger_api.requests import fetch_all_claimable_balances
 from helpers.constants import CLAIMABLE_TOKENS, DIGG
 from helpers.digg_utils import digg_utils
@@ -14,7 +14,7 @@ from rewards.classes.Snapshot import Snapshot
 
 @lru_cache
 def claims_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
-    snapshot = get_claimable_snapshot(chain, 0, block)
+    snapshot = get_latest_claimable_snapshot(chain)
 
 def claims_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
     """Take a snapshot of native and non native claims in usd"""

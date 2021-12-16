@@ -1,4 +1,5 @@
 import math
+from functools import lru_cache
 from typing import Dict, List
 
 from gql import gql
@@ -14,7 +15,7 @@ from subgraph.subgraph_utils import make_gql_client
 console = Console()
 thegraph_client = make_gql_client("thegraph")
 
-
+@lru_cache
 def last_synced_block(chain):
     deployment_id = fetch_deployment_id(chain)
     query = gql(

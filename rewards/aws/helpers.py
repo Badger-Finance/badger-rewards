@@ -6,6 +6,8 @@ import boto3
 from botocore.exceptions import ClientError
 from decouple import config
 
+from config.singletons import env_config
+
 logger = logging.getLogger("aws-helpers")
 
 if config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]:
@@ -23,6 +25,13 @@ else:
         aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"),
     )
 
+
+def get_metadata_table():
+    return "metadata" if env_config.production else "metadata-staging"
+
+
+def get_snapshot_table():
+    return "unclaimed-snapshots" if env_config.production else "unclaimed-snapshots-staging"
 
 
 def get_bucket(production: bool) -> str:
