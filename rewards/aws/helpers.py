@@ -1,37 +1,37 @@
 import base64
 import json
 import logging
+from math import prod
 
 import boto3
 from botocore.exceptions import ClientError
 from decouple import config
 
-from config.singletons import env_config
-
 logger = logging.getLogger("aws-helpers")
 
 if config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]:
     s3 = boto3.client("s3")
-    dynamodb = boto3.client("dynamodb")
+    dynamodb = boto3.resource("dynamodb", region_name='us-west-1')
 else:
     s3 = boto3.client(
         "s3",
         aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
         aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"),
     )
-    dynamodb = boto3.client(
+    dynamodb = boto3.resource(
         "dynamodb",
+        region_name='us-west-1',
         aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
         aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"),
     )
 
 
-def get_metadata_table():
-    return "metadata" if env_config.production else "metadata-staging"
+def get_metadata_table(production: bool):
+    return "metadata" if production else "metadata-staging"
 
 
-def get_snapshot_table():
-    return "unclaimed-snapshots" if env_config.production else "unclaimed-snapshots-staging"
+def get_snapshot_table(production: bool):
+    return "unclaimed-snapshots" if production else "unclaimed-snapshots-staging"
 
 
 def get_bucket(production: bool) -> str:

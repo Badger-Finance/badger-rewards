@@ -30,7 +30,7 @@ def claims_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
                 token_contract = make_token(token, chain)
                 decimals = token_contract.decimals().call()
                 token_decimals[token] = decimals
-            balance = claimable_bal["balance"]
+            balance = int(claimable_bal["balance"])
             if token == DIGG:
                 balance = digg_utils.shares_to_fragments(balance) / math.pow(10, token_decimals[token])
             else:

@@ -44,22 +44,20 @@ def calc_boost_balances(
     native = Counter()
     non_native = Counter()
 
+    console.log(f"\n === Taking claims snapshot on {chain} === \n")
+    native_claimable, non_native_claimable = claims_snapshot_usd(chain, block)
+    native += Counter(native_claimable)
+    non_native += Counter(non_native_claimable)
+
     console.log(f"\n === Taking token snapshot on {chain} === \n")
     badger_tokens, digg_tokens = token_snapshot_usd(chain, block)
     native = native + Counter(badger_tokens) + Counter(digg_tokens)
 
     console.log(f"\n === Taking chain snapshot on {chain} === \n")
-
     native_setts, non_native_setts = chain_snapshot_usd(chain, block)
     non_native += Counter(non_native_setts)
     native += Counter(native_setts)
-
-    console.log(f"\n === Taking claims snapshot on {chain} === \n")
-
-    native_claimable, non_native_claimable = claims_snapshot_usd(chain, block)
-    native += Counter(native_claimable)
-    non_native += Counter(non_native_claimable)
-
+    
     native = filter_dust(dict(native), 1)
     non_native = filter_dust(dict(non_native), 1)
     return native, non_native
