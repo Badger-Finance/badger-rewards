@@ -13,18 +13,29 @@ from rewards.classes.Snapshot import Snapshot
 
 @lru_cache
 def claims_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
-    snapshot = get_latest_claimable_snapshot(chain)
+    all_claims = get_latest_claimable_snapshot(chain)
     chain_claimable_tokens = CLAIMABLE_TOKENS[chain]
     native_tokens = chain_claimable_tokens[BalanceType.Native]
     non_native_tokens = chain_claimable_tokens[BalanceType.NonNative]
     claims_by_token = {}
     snapshots = {}
-    for user_claim_snapshot in snapshot:
+    token_decimals = {}
+
+    for user_claim_snapshot in all_claims:
         address = user_claim_snapshot["address"]
         claimable_balances = user_claim_snapshot["claimableBalances"]
         for claimable_bal in claimable_balances:
             token = claimable_bal["address"]
+            if token not in token_decimals:
+                token_contract = make_token(token, chain)
+                decimals = token_contract.decimals().call()
+                token_decimals[token] = decimals
             balance = claimable_bal["balance"]
+            if token == DIGG:
+                balance = digg_utils.shares_to_fragments(balance) / math.pow(10, token_decimals[token])
+            else:
+                balance = balance / math.pow(10, token_decimals[token])
+
             if token not in claims_by_token:
                 claims_by_token[token] = {}
             claims_by_token[token][address] = balance
