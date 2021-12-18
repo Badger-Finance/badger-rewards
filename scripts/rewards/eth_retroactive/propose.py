@@ -5,10 +5,8 @@ from config.singletons import env_config
 from helpers.enums import Network
 from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_latest_tree
-from rewards.calc_rewards import approve_root, propose_root
 from rewards.classes.TreeManager import TreeManager
 from scripts.rewards.eth_retroactive.retro import retro_cycle
-from subgraph.queries.setts import last_synced_block
 
 if __name__ == "__main__":
     chain = Network.Ethereum
@@ -24,5 +22,5 @@ if __name__ == "__main__":
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
     rewards_data = retro_cycle(tree)
-    #tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
+    tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
 
