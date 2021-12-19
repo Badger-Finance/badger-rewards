@@ -21,6 +21,6 @@ if __name__ == "__main__":
 
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
-    rewards_data = retro_cycle(tree)
-    tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
+    rewards_data = retro_cycle(tree, propose_tree_manager)
+    #tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
 

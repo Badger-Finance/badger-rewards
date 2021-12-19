@@ -25,7 +25,7 @@ if __name__ == "__main__":
     cycle_key = Account.decrypt(key_file_json, key_decrypt_password)
     
     approve_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
-    rewards_data = retro_cycle(tree)
+    rewards_data = retro_cycle(tree, approve_tree_manager)
     tx_hash, succeded = approve_tree_manager.approve_root(
         rewards_data
     )
