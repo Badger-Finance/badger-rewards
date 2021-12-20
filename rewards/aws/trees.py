@@ -17,7 +17,7 @@ def download_latest_tree(chain: str):
     :param chain: the chain from which to fetch the latest tree from
     """
 
-    key = f"badger-tree-{CHAIN_IDS[chain]}-borked.json"
+    key = f"badger-tree-{CHAIN_IDS[chain]}.json"
 
     target = {
         "bucket": get_bucket(env_config.production),
