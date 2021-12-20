@@ -39,7 +39,7 @@ def retro_cycle(tree, tree_manager: TreeManager):
 
     return {
         "merkleTree": merkle_tree,
-        "roothash": root_hash.hex(),
+        "rootHash": root_hash.hex(),
         "fileName": file_name,
         "multiplierData": {},
         "userMultipliers": {}
