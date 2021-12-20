@@ -53,6 +53,7 @@ def move_ibbtc(tree, tree_manager: TreeManager):
         bcvxcrv_rewards,
         bcvx_rewards
     )
+    rewards_list.cycle +=1
     
             
     start_block = int(tree["endBlock"]) + 1
@@ -69,7 +70,7 @@ def move_ibbtc(tree, tree_manager: TreeManager):
 
     return {
         "merkleTree": merkle_tree,
-        "roothash": root_hash.hex(),
+        "rootHash": root_hash.hex(),
         "fileName": file_name,
         "multiplierData": {},
         "userMultipliers": {}
