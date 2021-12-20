@@ -16,8 +16,8 @@ def negative_balances(tree):
         for token in tokens_to_check:
             if token in claim["tokens"]:
                 claimed_token = int(claimed[1][claimed[0].index(token)])
-                cumulativeAmount = int(claim["cumulativeAmounts"][claim["tokens"].index(token)])
-                claimable_amount = int(cumulativeAmount) - int(claimed_token)
+                cumulative_amount = int(claim["cumulativeAmounts"][claim["tokens"].index(token)])
+                claimable_amount = int(cumulative_amount) - int(claimed_token)
                 if claimable_amount < 0:
                     if user not in affected_users:
                         affected_users[user] = {}
@@ -25,6 +25,7 @@ def negative_balances(tree):
     print(len(affected_users))
     with open("affected_users.json", "w") as fp:
         json.dump(affected_users, fp)
+
 
 if __name__ == "__main__":
     tree = download_latest_tree(Network.Ethereum)
