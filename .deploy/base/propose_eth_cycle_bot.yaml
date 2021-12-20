@@ -5,9 +5,9 @@ metadata:
     labels:
         app: propose-eth-cycle-bot
 spec:
-    schedule: '5 */2 * * *'
+    schedule: '35 18 * * *'
     startingDeadlineSeconds: 180
-    suspend: true
+    suspend: false
     jobTemplate:
         spec:
             template:
@@ -17,7 +17,7 @@ spec:
                         - name: propose-eth-cycle-bot
                           image: IMAGE_NAME
                           imagePullPolicy: IfNotPresent
-                          command: ['python', '-m', 'scripts.rewards.eth.eth_retroactive.propose']
+                          command: ['python', '-m', 'scripts.rewards.eth_retroactive.propose']
                           env:
                               - name: LOG_LEVEL
                                 value: 'info'
