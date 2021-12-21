@@ -1,5 +1,3 @@
-import json
-
 import requests
 from eth_utils.hexadecimal import encode_hex
 from web3 import Web3
@@ -19,7 +17,6 @@ def move_ibbtc(tree, tree_manager: TreeManager):
     rewards_list = merkle_tree_to_rewards_list(tree)
     BCVXCRV = "0x2B5455aac8d64C14786c3a29858E43b5945819C0"
     BCVX = "0x53C8E199eb2Cb7c01543C137078a038937a68E40"
-    IBBTC_PEAK
 
     peak_data = requests.get(f"https://api.badger.com/v2/reward/tree/{IBBTC_PEAK}").json()
     claimed_for = tree_manager.get_claimed_for(IBBTC_PEAK, [BCVX, BCVXCRV])
