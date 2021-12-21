@@ -1,4 +1,3 @@
-from decouple import config
 from eth_account import Account
 
 from config.singletons import env_config
@@ -19,8 +18,5 @@ if __name__ == "__main__":
     )
     propose_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
 
-    start_block = int(tree["endBlock"]) + 1
-    end_block = start_block
     rewards_data = move_ibbtc(tree, propose_tree_manager)
     tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
-
