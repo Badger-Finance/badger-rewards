@@ -197,6 +197,7 @@ EMISSIONS_BLACKLIST = {
     TECH_OPS: "Badger Tech Ops",
     TREASURY_OPS: "Badger Treasury Ops",
     TREASURY_VAULT: "Badger Treasury Vault",
+    BADGER_PAYMENTS: "Badger Payments Multisig",
 }
 
 REWARDS_BLACKLIST = {
