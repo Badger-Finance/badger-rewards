@@ -1,12 +1,10 @@
 import json
 import os
-import random
-from math import isclose
 
 import boto3
 from dotenv import load_dotenv
 
-from helpers.constants import BOOST_CHAINS, CHAIN_IDS, S3_BUCKETS
+from helpers.constants import CHAIN_IDS, S3_BUCKETS
 from helpers.enums import BucketType, Environment, Network
 
 load_dotenv()
