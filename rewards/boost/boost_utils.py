@@ -66,4 +66,4 @@ def calc_boost_balances(
 
     native = filter_dust(dict(native), 1)
     non_native = filter_dust(dict(non_native), 1)
-    return native, non_native
+    return native, non_native, nft_balances

@@ -38,7 +38,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     """
     discord_url = get_discord_url(chain, BotType.Boost)
     console.log(f"Calculating boost at block {current_block} ...")
-    native_setts, non_native_setts = calc_boost_balances(
+    native_setts, non_native_setts, nft_balances = calc_boost_balances(
         current_block - BOOST_BLOCK_DELAY, chain
     )
 
@@ -58,6 +58,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
             "nativeBalance": 0,
             "nonNativeBalance": 0,
             "stakeRatio": 0,
+            "nftBalance": 0,
             "nfts":[]
         }
 
@@ -66,6 +67,9 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
 
     for user, non_native_usd in non_native_setts.items():
         boost_info[user]["nonNativeBalance"] = non_native_usd
+
+    for user, nft_balance in nft_balances.items():
+        boost_info[user]["nftBalance"] = nft_balance
 
     for user, ratio in stake_ratios.items():
         boost_info[user]["stakeRatio"] = ratio
@@ -95,6 +99,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
             "boost": boost,
             "nativeBalance": boost_metadata.get("nativeBalance", 0),
             "nonNativeBalance": boost_metadata.get("nonNativeBalance", 0),
+            "nftBalance": boost_metadata.get("nftBalance", 0),
             "stakeRatio": boost_metadata.get("stakeRatio", 0),
             "multipliers": {},
             "nfts": boost_metadata.get("nfts", [])
