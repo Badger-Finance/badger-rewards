@@ -1,56 +1,46 @@
 import json
 import os
 
-import boto3
 from dotenv import load_dotenv
 
-from helpers.constants import CHAIN_IDS, S3_BUCKETS
-from helpers.enums import BucketType, Environment, Network
+from config.singletons import env_config
+from helpers.constants import BOOST_BLOCK_DELAY
+from helpers.enums import Network
+from rewards.boost.boost_utils import calc_boost_balances
 
 load_dotenv()
 
-
-def download_boosts(chain: str, bucket: str):
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-    )
-
-    print(f"DOWNLOADING BOOST FOR {chain.upper()} FROM {bucket}")
-    chain_id = CHAIN_IDS[chain]
-
-    boost_file_name = f"badger-boosts-{chain_id}.json"
-    s3ClientObj = s3.get_object(Bucket=bucket, Key=boost_file_name)
-    data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
-    return data
-
-
 chain = Network.Ethereum
 
-prod_boosts = download_boosts(
-    chain, S3_BUCKETS[BucketType.Merkle][Environment.Production]
-)
-stag_boosts = download_boosts(
-    chain, S3_BUCKETS[BucketType.Merkle][Environment.Staging]
-)
+current_block = env_config.get_web3(chain).eth.block_number
 
-PROD_USER_LIST = prod_boosts["userData"].keys()
+nft_native_setts, _ = calc_boost_balances(
+        current_block - BOOST_BLOCK_DELAY, chain
+    )
+no_nft_native_setts, _ = calc_boost_balances(current_block - BOOST_BLOCK_DELAY, chain, False)
+
+for addr in nft_native_setts.keys():
+    nft_native_setts[addr] = float(nft_native_setts[addr])
+
+for addr in no_nft_native_setts.keys():
+    no_nft_native_setts[addr] = float(no_nft_native_setts[addr])
+
 differences = {}
 
-for addr in PROD_USER_LIST:
-    
-    prod_native = float(prod_boosts["userData"][addr]["nativeBalance"])
-    stag_native = float(stag_boosts["userData"][addr]["nativeBalance"])
-
-
-
-    if prod_native + 150 <= stag_native:
+for addr in nft_native_setts.keys():
+    if addr not in no_nft_native_setts:
         differences[addr] = {
-            'prod': prod_native,
-            'stag': stag_native,
-            'diff': float(stag_native) - float(prod_native)
+            'nft': nft_native_setts[addr],
+            'no_nft': 0,
+            'diff': nft_native_setts[addr] - 0
         }
-        with open('boost-differences.json', "w") as fp:
-            json.dump(differences, fp, indent=4)
+    elif no_nft_native_setts[addr] + 150 <= nft_native_setts[addr]:
+        differences[addr] = {
+            'nft': nft_native_setts[addr],
+            'no_nft': no_nft_native_setts[addr],
+            'diff': nft_native_setts[addr] - no_nft_native_setts[addr]
+        }
+
+with open('boost-differences.json', "w") as fp:
+    json.dump(differences, fp, indent=4)
 

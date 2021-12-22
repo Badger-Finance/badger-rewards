@@ -34,7 +34,7 @@ def filter_dust(balances: Dict[str, float], dust_amount: int) -> Dict[str, float
 
 
 def calc_boost_balances(
-    block: int, chain: str
+    block: int, chain: str, nft_boost: bool = True
 ) -> Tuple[Dict[str, float], Dict[str, float]]:
     """
     Calculate boost data required for boost calculation
@@ -46,7 +46,7 @@ def calc_boost_balances(
     non_native = Counter()
 
     console.log(f"\n === Taking nft snapshot on {chain} === \n")
-    nft_balances = nft_snapshot_usd(chain, block)
+    nft_balances = nft_snapshot_usd(chain, block) if nft_boost else {}
 
     console.log(f"\n === Taking token snapshot on {chain} === \n")
     badger_tokens, digg_tokens = token_snapshot_usd(chain, block)
