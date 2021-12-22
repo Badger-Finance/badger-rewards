@@ -21,6 +21,7 @@ def retro_cycle(tree, tree_manager: TreeManager):
             )
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
+    rewards_list.cycle += 1
     merkle_tree = rewards_to_merkle_tree(rewards_list, start_block, end_block)
     for addr, data in affected_users.items():
         tokens_to_check = list(data.keys())
