@@ -48,6 +48,7 @@ def test_badger_boost__happy(mock_discord_send_code, mock_snapshots):
         assert 'boost' in keys
         assert 'nativeBalance' in keys
         assert 'nonNativeBalance' in keys
+        assert 'nftBalance' in keys
         assert 'stakeRatio' in keys
         assert 'multipliers' in keys
         assert 'nfts' in keys
