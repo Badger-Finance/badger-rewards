@@ -59,9 +59,10 @@ def test_calc_boost_balances__dust_filtered(chain, mocker):
             {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.000001241234},
         )
     )
-    native_balance, non_native_balances, _ = calc_boost_balances(123, Network.Ethereum)
+    native_balance, non_native_balances, nft_balances = calc_boost_balances(123, Network.Ethereum)
     assert native_balance == {}
     assert non_native_balances == {}
+    assert nft_balances == {}
 
 
 def test_filter_dust():
