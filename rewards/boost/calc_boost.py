@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 from rich.console import Console
 from tabulate import tabulate
@@ -30,6 +30,22 @@ def calc_stake_ratio(
     return stake_ratio
 
 
+def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
+    badger_boost_data = {}
+    stake_data_ranges = {}
+    for addr, stake_ratio in stake_ratios.items():
+        user_boost = 1
+        user_stake_range = 0
+        for stake_range, multiplier in STAKE_RATIO_RANGES:
+            if stake_ratio > stake_range:
+                user_boost = multiplier
+                user_stake_range = stake_range
+
+        stake_data_ranges[user_stake_range] = stake_data_ranges.get(user_stake_range, 0) + 1
+        badger_boost_data[addr] = user_boost if stake_ratio != 0 else 1
+    return badger_boost_data, stake_data_ranges
+
+
 def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     """
     Calculate badger boost multipliers based on stake ratios
@@ -44,7 +60,6 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
 
     all_addresses = calc_union_addresses(native_setts, non_native_setts)
     console.log(f"{len(all_addresses)} addresses fetched")
-    badger_boost_data = {}
     boost_info = {}
     boost_data = {}
 
@@ -52,14 +67,16 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
         calc_stake_ratio(addr, native_setts, non_native_setts) for addr in all_addresses
     ]
     stake_ratios = dict(zip(all_addresses, stake_ratios_list))
+    badger_boost_data, stake_data = get_badger_boost_data(stake_ratios)
     nfts = fetch_nfts(chain, current_block)
+    # TODO: into init function
     for addr in all_addresses:
         boost_info[addr] = {
             "nativeBalance": 0,
             "nonNativeBalance": 0,
             "stakeRatio": 0,
             "nftBalance": 0,
-            "nfts":[]
+            "nfts": [],
         }
 
     for user, native_usd in native_setts.items():
@@ -77,21 +94,6 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     for user, nft_balances in nfts.items():
         if user in all_addresses:
             boost_info[user]["nfts"] = nft_balances
-
-    stake_data = {}
-    for addr, stake_ratio in stake_ratios.items():
-        if stake_ratio == 0:
-            badger_boost_data[addr] = 1
-        else:
-            user_boost = 1
-            user_stake_range = 0
-            for stake_range, multiplier in STAKE_RATIO_RANGES:
-                if stake_ratio > stake_range:
-                    user_boost = multiplier
-                    user_stake_range = stake_range
-
-            stake_data[user_stake_range] = stake_data.get(user_stake_range, 0) + 1
-            badger_boost_data[addr] = user_boost
 
     for addr, boost in badger_boost_data.items():
         boost_metadata = boost_info.get(addr, {})
