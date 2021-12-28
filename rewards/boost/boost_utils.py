@@ -1,4 +1,5 @@
 from collections import Counter
+from decimal import Decimal
 from typing import Dict, List, Tuple
 
 from rich.console import Console
@@ -35,7 +36,7 @@ def filter_dust(balances: Dict[str, float], dust_amount: int) -> Dict[str, float
 
 def calc_boost_balances(
     block: int, chain: str
-) -> Tuple[Dict[str, float], Dict[str, float]]:
+) -> Tuple[Dict[str, float], Dict[str, float], Dict[str, Decimal]]:
     """
     Calculate boost data required for boost calculation
     :param block: block to collect the boost data from
