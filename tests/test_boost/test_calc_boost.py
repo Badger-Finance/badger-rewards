@@ -2,11 +2,19 @@ import pytest
 
 from helpers.constants import STAKE_RATIO_RANGES
 from helpers.enums import Network
+from rewards.boost.calc_boost import allocate_nft_balances_to_users
+from rewards.boost.calc_boost import allocate_nft_to_users
+from rewards.boost.calc_boost import assign_native_balances_to_users
+from rewards.boost.calc_boost import assign_non_native_balances_to_users
+from rewards.boost.calc_boost import assign_stake_ratio_to_users
 from rewards.boost.calc_boost import (
     badger_boost,
     calc_stake_ratio,
     get_badger_boost_data,
 )
+
+
+TEST_USER = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
 
 
 @pytest.fixture
@@ -18,14 +26,14 @@ def mock_discord_send_code(mocker):
 def test_calc_stake_ratio__happy():
     target = {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.1}
     assert calc_stake_ratio(
-        "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56", target, target
+        TEST_USER, target, target
     ) == list(target.values())[0] / list(target.values())[0]
 
 
 def test_calc_stake_ratio__zero_native():
-    target = {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.1}
+    target = {TEST_USER: 0.1}
     assert calc_stake_ratio(
-        "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56",
+        TEST_USER,
         {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0},
         target,
     ) == 0
@@ -34,7 +42,7 @@ def test_calc_stake_ratio__zero_native():
 def test_calc_stake_ratio__zero_non_native():
     target = {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.1}
     assert calc_stake_ratio(
-        "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56", target,
+        TEST_USER, target,
         {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0}
     ) == 0
 
@@ -73,3 +81,39 @@ def test_badger_boost__happy(mock_discord_send_code, mock_snapshots):
         assert 'stakeRatio' in keys
         assert 'multipliers' in keys
         assert 'nfts' in keys
+
+
+def test_allocate_nft_balances_to_users():
+    boost = {TEST_USER: {}}
+    allocate_nft_balances_to_users(boost, {TEST_USER: 123})
+    assert boost[TEST_USER]['nftBalance'] == 123
+
+
+def test_allocate_nft_to_users():
+    boost = {TEST_USER: {}}
+    allocate_nft_to_users(boost, [TEST_USER], {TEST_USER: 123})
+    assert boost[TEST_USER]['nfts'] == 123
+
+
+def test_allocate_nft_to_users__no_match():
+    boost = {TEST_USER: {}}
+    allocate_nft_to_users(boost, [], {TEST_USER: 123})
+    assert boost[TEST_USER].get('nft') is None
+
+
+def test_assign_stake_ratio_to_users():
+    boost = {TEST_USER: {}}
+    assign_stake_ratio_to_users(boost, {TEST_USER: 123})
+    assert boost[TEST_USER]['stakeRatio'] == 123
+
+
+def test_assign_native_balances_to_users():
+    boost = {TEST_USER: {}}
+    assign_native_balances_to_users(boost, {TEST_USER: 123})
+    assert boost[TEST_USER]['nativeBalance'] == 123
+
+
+def test_assign_nonnative_balances_to_users():
+    boost = {TEST_USER: {}}
+    assign_non_native_balances_to_users(boost, {TEST_USER: 123})
+    assert boost[TEST_USER]['nonNativeBalance'] == 123
