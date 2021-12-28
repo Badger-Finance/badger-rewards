@@ -1,4 +1,5 @@
 from typing import Any, Dict, Tuple
+from typing import List
 
 from rich.console import Console
 from tabulate import tabulate
@@ -46,6 +47,46 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
     return badger_boost_data, stake_data_ranges
 
 
+def init_boost_data(addresses: List[str]) -> Dict[str, Any]:
+    boost_info = {}
+    for addr in addresses:
+        boost_info[addr] = {
+            "nativeBalance": 0,
+            "nonNativeBalance": 0,
+            "stakeRatio": 0,
+            "nftBalance": 0,
+            "nfts": [],
+        }
+
+    return boost_info
+
+
+def allocate_nft_balances_to_users(boost_info: Dict, nft_balances: Dict) -> None:
+    for user, nft_balance in nft_balances.items():
+        boost_info[user]["nftBalance"] = nft_balance
+
+
+def allocate_nft_to_users(boost_info: Dict, addresses: List[str], nfts: Dict):
+    for user, nft_balances in nfts.items():
+        if user in addresses:
+            boost_info[user]["nfts"] = nft_balances
+
+
+def assign_stake_ratio_to_users(boost_info: Dict, stake_ratios: Dict) -> None:
+    for user, ratio in stake_ratios.items():
+        boost_info[user]["stakeRatio"] = ratio
+
+
+def assign_native_balances_to_users(boost_info: Dict, native_setts: Dict):
+    for user, native_usd in native_setts.items():
+        boost_info[user]["nativeBalance"] = native_usd
+
+
+def assign_non_native_balances_to_users(boost_info: Dict, non_native_setts: Dict):
+    for user, non_native_usd in non_native_setts.items():
+        boost_info[user]["nonNativeBalance"] = non_native_usd
+
+
 def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     """
     Calculate badger boost multipliers based on stake ratios
@@ -60,7 +101,6 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
 
     all_addresses = calc_union_addresses(native_setts, non_native_setts)
     console.log(f"{len(all_addresses)} addresses fetched")
-    boost_info = {}
     boost_data = {}
 
     stake_ratios_list = [
@@ -69,31 +109,13 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     stake_ratios = dict(zip(all_addresses, stake_ratios_list))
     badger_boost_data, stake_data = get_badger_boost_data(stake_ratios)
     nfts = fetch_nfts(chain, current_block)
-    # TODO: into init function
-    for addr in all_addresses:
-        boost_info[addr] = {
-            "nativeBalance": 0,
-            "nonNativeBalance": 0,
-            "stakeRatio": 0,
-            "nftBalance": 0,
-            "nfts": [],
-        }
 
-    for user, native_usd in native_setts.items():
-        boost_info[user]["nativeBalance"] = native_usd
-
-    for user, non_native_usd in non_native_setts.items():
-        boost_info[user]["nonNativeBalance"] = non_native_usd
-
-    for user, nft_balance in nft_balances.items():
-        boost_info[user]["nftBalance"] = nft_balance
-
-    for user, ratio in stake_ratios.items():
-        boost_info[user]["stakeRatio"] = ratio
-
-    for user, nft_balances in nfts.items():
-        if user in all_addresses:
-            boost_info[user]["nfts"] = nft_balances
+    boost_info = init_boost_data(all_addresses)
+    allocate_nft_balances_to_users(boost_info, nft_balances)
+    allocate_nft_to_users(boost_info, all_addresses, nfts)
+    assign_stake_ratio_to_users(boost_info, stake_ratios)
+    assign_native_balances_to_users(boost_info, native_setts)
+    assign_non_native_balances_to_users(boost_info, native_setts)
 
     for addr, boost in badger_boost_data.items():
         boost_metadata = boost_info.get(addr, {})
