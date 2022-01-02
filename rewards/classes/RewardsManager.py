@@ -2,19 +2,19 @@ from decimal import Decimal
 from typing import Dict, List, Tuple
 
 from rich.console import Console
+from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
-from helpers.constants import EMISSIONS_CONTRACTS, XSUSHI
-from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import Abi, BalanceType, Network
+from helpers.constants import XSUSHI
+from helpers.discord import get_discord_url, send_code_block_to_discord
+from helpers.enums import Abi, BalanceType
 from helpers.time_utils import to_hours, to_utc_date
 from helpers.web3_utils import make_contract
 from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
-from rewards.emission_handlers import eth_tree_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
@@ -114,6 +114,7 @@ class RewardsManager:
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
     ) -> RewardsList:
         all_rewards = []
+        table = []
         for sett in setts:
             sett_token = fetch_token(self.chain, sett)
             sett_name = sett_token.get("name", "")
@@ -121,17 +122,16 @@ class RewardsManager:
             rewards, flat, boosted = self.calculate_sett_rewards(
                 sett, all_schedules[sett]
             )
-            desc = f"**Boosted Rewards**\n\n{boosted.totals_info(self.chain)}\n\n**Flat Rewards**\n\n{flat.totals_info(self.chain)}"
-          
-            send_message_to_discord(
-                f"Rewards for {sett_name}",
-                description=desc,
-                fields=[],
-                username="Rewards Bot",
-                url=self.discord_url,
+            table.append(
+                [sett_name, boosted.totals_info(self.chain), flat.totals_info(self.chain)]
             )
             all_rewards.append(rewards)
 
+        send_code_block_to_discord(
+            msg=tabulate(table, headers=["vault", "boosted rewards", "flat rewards"]),
+            username="Rewards Bot",
+            url=self.discord_url,
+        )
         return combine_rewards(all_rewards, self.cycle)
 
     def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
