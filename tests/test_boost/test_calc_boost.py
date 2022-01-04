@@ -2,17 +2,16 @@ import pytest
 
 from helpers.constants import STAKE_RATIO_RANGES
 from helpers.enums import Network
-from rewards.boost.calc_boost import allocate_nft_balances_to_users
-from rewards.boost.calc_boost import allocate_nft_to_users
-from rewards.boost.calc_boost import assign_native_balances_to_users
-from rewards.boost.calc_boost import assign_non_native_balances_to_users
-from rewards.boost.calc_boost import assign_stake_ratio_to_users
 from rewards.boost.calc_boost import (
+    allocate_nft_balances_to_users,
+    allocate_nft_to_users,
+    assign_native_balances_to_users,
+    assign_non_native_balances_to_users,
+    assign_stake_ratio_to_users,
     badger_boost,
     calc_stake_ratio,
     get_badger_boost_data,
 )
-
 
 TEST_USER = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
 
