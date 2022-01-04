@@ -1,7 +1,9 @@
+import logging
 from typing import Optional
 
 from gql import Client
 from gql.transport.requests import RequestsHTTPTransport
+from gql.transport.requests import log as requests_logger
 
 from subgraph.config import subgraph_urls
 
@@ -14,6 +16,7 @@ def subgraph_url(name: str) -> str:
 
 
 def make_gql_client(name: str) -> Optional[Client]:
+    requests_logger.setLevel(logging.WARNING)
     url = subgraph_url(name)
     if not url:
         return
