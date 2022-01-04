@@ -12,7 +12,7 @@ from helpers.constants import (
     PRO_RATA_VAULTS,
     REWARDS_BLACKLIST,
 )
-from helpers.enums import BalanceType
+from helpers.enums import BalanceType, Network
 from rewards.classes.Snapshot import Snapshot
 from rewards.utils.emission_utils import fetch_unboosted_vaults, get_token_weight
 from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
@@ -20,11 +20,9 @@ from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
 console = Console()
 
 
-def chain_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
+def chain_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
     """
     Take a snapshot of a chains sett balances at a certain block
-
-    :param badger: badger system
     :param chain: chain to query
     :param block: block at which to query
 
@@ -43,12 +41,13 @@ def chain_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     return balances_by_sett
 
 
-def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> Snapshot:
+def sett_snapshot(chain: Network, block: int, sett: str, blacklist: bool) -> Snapshot:
     """
     Take a snapshot of a sett on a chain at a certain block
     :param chain:
     :param block:
     :param sett:
+    :param blacklist:
     """
     token = fetch_token(chain, sett)
     name = token.get("name", "")
@@ -60,12 +59,14 @@ def sett_snapshot(chain: str, block: int, sett: str, blacklist: bool) -> Snapsho
 
 
 def parse_sett_balances(
-    sett_address: str, balances: Dict[str, int], chain: str, blacklist: bool = True
+    sett_address: str, balances: Dict[str, float], chain: Network, blacklist: bool = True
 ) -> Snapshot:
     """
     Blacklist balances and add metadata for boost
+    :param sett_address: target sett address
     :param balances: balances of users:
     :param chain: chain where balances come from
+    :param blacklist: blacklist certain addresses
     """
     if blacklist:
         addresses_to_blacklist = {**REWARDS_BLACKLIST, **EMISSIONS_BLACKLIST}
@@ -86,7 +87,7 @@ def parse_sett_balances(
     return Snapshot(sett_address, balances, sett_ratio, sett_type)
 
 
-def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
+def chain_snapshot_usd(chain: Network, block: int) -> Tuple[Counter, Counter]:
     """Take a snapshot of a chains native/non native balances in usd"""
     total_snapshot = chain_snapshot(chain, block)
     native = Counter()
@@ -99,8 +100,8 @@ def chain_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
         usd_snapshot = snapshot.convert_to_usd(chain)
         balances = Counter(usd_snapshot.balances)
         if usd_snapshot.type == BalanceType.Native:
-            native = native + balances
+            native += balances
         elif usd_snapshot.type == BalanceType.NonNative:
-            non_native = non_native + balances
+            non_native += balances
 
     return native, non_native
