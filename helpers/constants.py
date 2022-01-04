@@ -203,15 +203,15 @@ EMISSIONS_BLACKLIST = {
     TECH_OPS: "Badger Tech Ops",
     TREASURY_OPS: "Badger Treasury Ops",
     TREASURY_VAULT: "Badger Treasury Vault",
+    IBBTC_PEAK: "IBBTC Peak",
+    IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
 }
 
 REWARDS_BLACKLIST = {
     CREAM_BBADGER: "Cream bBadger",
     SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     SETTS[Network.Ethereum]["badger"]: "Badger Vault",
-    IBBTC_PEAK: "IBBTC Peak",
     ETH_BADGER_TREE: "ETH Badger Tree",
-    IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
     BADGER_PAYMENTS: "Badger Payments",
     BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
