@@ -1,5 +1,4 @@
-from typing import Any, Dict, Tuple
-from typing import List
+from typing import Any, Dict, List, Tuple
 
 from rich.console import Console
 from tabulate import tabulate
@@ -115,7 +114,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     allocate_nft_to_users(boost_info, all_addresses, nfts)
     assign_stake_ratio_to_users(boost_info, stake_ratios)
     assign_native_balances_to_users(boost_info, native_setts)
-    assign_non_native_balances_to_users(boost_info, native_setts)
+    assign_non_native_balances_to_users(boost_info, non_native_setts)
 
     for addr, boost in badger_boost_data.items():
         boost_metadata = boost_info.get(addr, {})
