@@ -1,5 +1,4 @@
-from typing import Any, Dict, Tuple
-from typing import List
+from typing import Any, Dict, List, Tuple
 
 from rich.console import Console
 from tabulate import tabulate
