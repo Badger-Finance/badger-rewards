@@ -1,8 +1,5 @@
 from helpers.enums import Network
 
-subgraph_ids = {
-    "nfts": "0xba5edb751ccf93770796e273d8bce83e1e81e2d4-3",
-}
 subgraph_urls = {
     # Chain graphs
     Network.BinanceSmartChain: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-bsc",
@@ -21,4 +18,5 @@ subgraph_urls = {
     f"harvests-{Network.Arbitrum}": "https://api.thegraph.com/subgraphs/name/darruma/badger-tree-rewards-arbitrum",
     "fuse": "https://api.thegraph.com/subgraphs/name/darruma/fuse-subgraph-badger",
     "thegraph": "https://api.thegraph.com/index-node/graphql",
+    "nfts": "https://api.thegraph.com/subgraphs/name/darruma/badger-nfts"
 }

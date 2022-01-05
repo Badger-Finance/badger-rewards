@@ -90,6 +90,7 @@ BADGER_PAYMENTS = "0xD4868d98849a58F743787c77738D808376210292"
 ETH_REWARDS_LOGGER = "0x0A4F4e92C3334821EbB523324D09E321a6B0d8ec"
 ETH_GAS_ORACLE = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
 ETH_EMISSION_CONTROL = "0x31825c0A6278b89338970e3eB979b05B27FAa263"
+ETH_NFT_CONTROL = "0xe1AaC4bE0FCF218533c95808BB638f4D727E5714"
 
 POLY_BADGER_TREE = "0x2C798FaFd37C7DCdcAc2498e19432898Bc51376b"
 POLY_REWARDS_LOGGER = "0xd0EE2A5108b8800D688AbC834445fd03b3b2738e"
@@ -119,9 +120,14 @@ POLY_SUSHI = "0x0b3F868E0BE5597D5DB7fEB59E1CADBb0fdDa50a"
 
 BSC_TEST_VAULT = "0xB6bd5ae3d5F78A6Bb04bBb031E24fA9C2BbD090d"
 
+BBADGER_ADDRESS = "0x19D97D8fA813EE2f51aD4B4e04EA08bAf4DFfC28"
+YEARN_WBTC_ADDRESS = "0x4b92d19c11435614CD49Af1b589001b7c08cD4D5"
+CVX_CRV_ADDRESS = "0x2B5455aac8d64C14786c3a29858E43b5945819C0"
+SWAPR_WETH_SWAPR_ARB_ADDRESS = "0x0c2153e8aE4DB8233c61717cDC4c75630E952561"
+
 SETTS = {
     Network.Ethereum: {
-        "badger": "0x19D97D8fA813EE2f51aD4B4e04EA08bAf4DFfC28",
+        "badger": BBADGER_ADDRESS,
         "ren_crv": "0x6dEf55d2e18486B9dDfaA075bc4e4EE0B28c1545",
         "sbtc_crv": "0xd04c48A53c111300aD41190D63681ed3dAd998eC",
         "tbtc_crv": "0xb9D076fDe463dbc9f915E5392F807315Bf940334",
@@ -132,14 +138,14 @@ SETTS = {
         "digg": "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a",
         "uni_digg_wbtc": "0xC17078FDd324CC473F8175Dc5290fae5f2E84714",
         "sushi_digg_wbtc": "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6",
-        "yearn_wbtc": "0x4b92d19c11435614CD49Af1b589001b7c08cD4D5",
+        "yearn_wbtc": YEARN_WBTC_ADDRESS,
         "sushi_ibbtc_wbtc": "0x8a8FFec8f4A0C8c9585Da95D9D97e8Cd6de273DE",
         "experimental_digg": "0x608b6D82eb121F3e5C0baeeD32d81007B916E83C",
         "hbtc_crv": "0x8c76970747afd5398e958bDfadA4cf0B9FcA16c4",
         "pbtc_crv": "0x55912D0Cf83B75c492E761932ABc4DB4a5CB1b17",
         "obtc_crv": "0xf349c0faA80fC1870306Ac093f75934078e28991",
         "bbtc_crv": "0x5Dce29e92b1b939F8E8C60DcF15BDE82A85be4a9",
-        "cvx_crv": "0x2B5455aac8d64C14786c3a29858E43b5945819C0",
+        "cvx_crv": CVX_CRV_ADDRESS,
         "cvx": "0x53C8E199eb2Cb7c01543C137078a038937a68E40",
         "renbtc": "0x58CAc1409F1ffbdcBA6a58d54c94CAC3fb4C6F8B",
         "tricrypto_crv": "0xBE08Ef12e4a553666291E9fFC24fCCFd354F2Dd2",
@@ -255,6 +261,7 @@ EMISSIONS_CONTRACTS = {
             "BadgerTree": ETH_BADGER_TREE,
             "RewardsLogger": ETH_REWARDS_LOGGER,
             "GasOracle": ETH_GAS_ORACLE,
+            "NFTControl": ETH_NFT_CONTROL,
         }
     ),
     Network.Polygon: DotMap(
@@ -306,15 +313,15 @@ MONITORING_SECRET_NAMES = {
     Environment.Staging: {
         Network.Ethereum: {
             BotType.Cycle: "cycle-bot/test-discord-url",
-            BotType.Boost: "boost-bot/eth/prod-discord-url",
+            BotType.Boost: "boost-bot/eth/staging-discord-url",
         },
         Network.Polygon: {
             BotType.Cycle: "cycle-bot/test-discord-url",
-            BotType.Boost: "boost-bot/polygon/prod-discord-url",
+            BotType.Boost: "boost-bot/polygon/staging-discord-url",
         },
         Network.Arbitrum: {
             BotType.Cycle: "cycle-bot/test-discord-url",
-            BotType.Boost: "boost-bot/arbitrum/prod-discord-url",
+            BotType.Boost: "boost-bot/arbitrum/staging-discord-url",
         },
     },
     Environment.Test: {
@@ -339,6 +346,12 @@ CHAIN_IDS = {
     Network.Ethereum: 1,
     Network.Arbitrum: 42161,
     Network.Polygon: 137,
+}
+
+NETWORK_TO_BADGER_TOKEN = {
+    Network.Ethereum: BADGER,
+    Network.Polygon: POLY_BADGER,
+    Network.Arbitrum: ARB_BADGER,
 }
 
 S3_BUCKETS = {
