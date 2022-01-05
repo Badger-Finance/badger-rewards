@@ -34,13 +34,7 @@ def claims_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
             if token == DIGG:
                 balance = digg_utils.shares_to_fragments(balance) / math.pow(10, token_decimals[token])
             else:
-<<<<<<< HEAD
                 balance = balance / math.pow(10, token_decimals[token])
-=======
-                balance /= math.pow(10, token_decimals[token])
-            if token not in claims_data:
-                claims_data[token] = {}
->>>>>>> development
 
             if token not in claims_by_token:
                 claims_by_token[token] = {}
@@ -59,11 +53,7 @@ def claims_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     return snapshots
 
 
-<<<<<<< HEAD
 def claims_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
-=======
-def claims_snapshot_usd(chain: Network) -> Tuple[Counter, Counter]:
->>>>>>> development
     """Take a snapshot of native and non native claims in usd"""
     snapshot = claims_snapshot(chain, block)
     native = Counter()
