@@ -1,3 +1,5 @@
+import re
+
 from gql import gql
 from rich.console import Console
 from web3 import Web3
@@ -38,7 +40,12 @@ def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
         results = tree_client.execute(query, variable_values=variables)
         dist_data = results["badgerTreeDistributions"]
         for dist in dist_data:
-            dist["token"] = Web3.toChecksumAddress(dist["token"]["id"])
+            # Subgraph sometimes sends token ids as 0x0x123123123 values and
+            # that's why it is needed to rstrip 0x once to make token id valid hex string
+            if len(re.findall("0x", dist["token"]["id"])) >= 2:
+                dist["token"] = Web3.toChecksumAddress(dist["token"]["id"].replace("0x", "", 1))
+            else:
+                dist["token"] = Web3.toChecksumAddress(dist["token"]["id"])
             dist["sett"] = Web3.toChecksumAddress(dist["sett"]["id"])
 
         if len(dist_data) == 0:
