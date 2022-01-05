@@ -27,6 +27,12 @@ CHAIN_SETT_SNAPSHOT_DATA = (
     },
 )
 
+NFT_SNAPSHOT_DATA = {
+    '0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 3446.0,
+    '0x0000001d2B0A08A235276e8765aa1A659Aae58bb': 3536.0,
+}
+
+
 CHAIN_CLAIMS_SNAPSHOT_DATA = (
     {
         '0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 44557.11578,
@@ -58,6 +64,12 @@ def mock_snapshots(mocker):
         "rewards.boost.boost_utils.claims_snapshot_usd",
         return_value=CHAIN_CLAIMS_SNAPSHOT_DATA
     )
+
+    mocker.patch(
+        "rewards.boost.boost_utils.nft_snapshot_usd",
+        return_value=NFT_SNAPSHOT_DATA
+    )
+
 
 
 @pytest.fixture(autouse=True)

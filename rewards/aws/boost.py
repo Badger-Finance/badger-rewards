@@ -116,6 +116,7 @@ def add_user_data(user_data, chain):
             "boost": data["boost"],
             "nativeBalance": str(data["nativeBalance"]),
             "nonNativeBalance": str(data["nonNativeBalance"]),
+            "nftBalance": str(data["nftBalance"]),
             "stakeRatio": str(data["stakeRatio"]),
             "multipliers": multipliers,
             "nfts": data.get("nfts", [])

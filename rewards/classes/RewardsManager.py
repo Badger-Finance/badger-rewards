@@ -1,28 +1,27 @@
 from decimal import Decimal
-from typing import Dict, List, Tuple
+from typing import Dict
+from typing import List
 
 from rich.console import Console
+from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
-from helpers.constants import EMISSIONS_CONTRACTS, XSUSHI
-from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import Abi, BalanceType, Network
-from helpers.time_utils import to_hours, to_utc_date
-from helpers.web3_utils import make_contract
+from helpers.discord import get_discord_url
+from helpers.discord import send_code_block_to_discord
+from helpers.enums import BalanceType
+from helpers.time_utils import to_hours
+from helpers.time_utils import to_utc_date
 from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
-from rewards.emission_handlers import eth_tree_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
-from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
-from subgraph.queries.harvests import (
-    fetch_sushi_harvest_events,
-    fetch_tree_distributions,
-)
+from rewards.utils.rewards_utils import combine_rewards
+from rewards.utils.rewards_utils import distribute_rewards_to_snapshot
+from subgraph.queries.harvests import fetch_tree_distributions
 
 console = Console()
 
@@ -42,21 +41,6 @@ class RewardsManager:
         self, block: int, sett: str, blacklist: bool = True
     ) -> Snapshot:
         return sett_snapshot(self.chain, block, sett, blacklist)
-
-    def get_sett_from_strategy(self, strat: str) -> str:
-        """Go from strategy -> want -> controller -> want -> sett
-
-        :param strat: Strategy to find sett of
-        :type strat: str
-        :rtype: str
-        """
-        strategy = make_contract(strat, Abi.Strategy, self.chain)
-        controller = make_contract(
-            strategy.controller().call(), Abi.Controller, self.chain
-        )
-        want = strategy.want().call()
-        sett = controller.vaults(want).call()
-        return sett
 
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
@@ -114,6 +98,7 @@ class RewardsManager:
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
     ) -> RewardsList:
         all_rewards = []
+        table = []
         for sett in setts:
             sett_token = fetch_token(self.chain, sett)
             sett_name = sett_token.get("name", "")
@@ -121,17 +106,16 @@ class RewardsManager:
             rewards, flat, boosted = self.calculate_sett_rewards(
                 sett, all_schedules[sett]
             )
-            desc = f"**Boosted Rewards**\n\n{boosted.totals_info(self.chain)}\n\n**Flat Rewards**\n\n{flat.totals_info(self.chain)}"
-          
-            send_message_to_discord(
-                f"Rewards for {sett_name}",
-                description=desc,
-                fields=[],
-                username="Rewards Bot",
-                url=self.discord_url,
+            table.append(
+                [sett_name, boosted.totals_info(self.chain), flat.totals_info(self.chain)]
             )
             all_rewards.append(rewards)
 
+        send_code_block_to_discord(
+            msg=tabulate(table, headers=["vault", "boosted rewards", "flat rewards"]),
+            username="Rewards Bot",
+            url=self.discord_url,
+        )
         return combine_rewards(all_rewards, self.cycle)
 
     def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
@@ -244,9 +228,8 @@ class RewardsManager:
         all_dist_rewards = []
         for dist in tree_distributions:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
-            token = dist["token"]["address"]
-            strategy = dist["id"].split("-")[0]
-            sett = self.get_sett_from_strategy(strategy)
+            token = dist["token"]
+            sett = dist["sett"]
             # Dont blacklist tree rewards for emissions contracts
             snapshot = self.fetch_sett_snapshot(block, sett, blacklist=False)
             amount = int(dist["amount"])
@@ -259,48 +242,3 @@ class RewardsManager:
                 distribute_rewards_to_snapshot(amount, snapshot, token)
             )
         return combine_rewards(all_dist_rewards, self.cycle)
-
-    def calc_sushi_distributions(self) -> RewardsList:
-        sushi_events = fetch_sushi_harvest_events(self.start, self.end)
-        all_from_events = 0
-        all_sushi_rewards = []
-        all_from_rewards = 0
-        for strategy, events in sushi_events.items():
-            rewards, from_rewards = self.calc_sushi_distribution(strategy, events)
-            all_from_events += sum(map(lambda e: int(e["rewardAmount"]), events))
-            all_from_rewards += from_rewards
-            all_sushi_rewards.append(rewards)
-        assert abs(all_from_events - all_from_rewards) < 1e9
-        return combine_rewards(all_sushi_rewards, self.cycle)
-
-    def calc_sushi_distribution(
-        self, strategy: str, events: List[Dict]
-    ) -> Tuple[RewardsList, int]:
-        sett = self.get_sett_from_strategy(strategy)
-        total_from_rewards = 0
-        all_sushi_rewards = []
-        for event in events:
-            cycle_logger.add_tree_distribution(
-                sett,
-                {
-                    "id": event["id"],
-                    "blockNumber": event["blockNumber"],
-                    "timestamp": event["timestamp"],
-                    "token": {"address": XSUSHI, "symbol": "xSushi"},
-                    "amount": event["rewardAmount"],
-                },
-            )
-            block = int(event["blockNumber"])
-            reward_amount = int(event["rewardAmount"])
-            cycle_logger.add_sett_token_data(sett, XSUSHI, reward_amount)
-            total_from_rewards += reward_amount
-            cycle_logger.add_sett_token_data(
-                sett, self.web3.toChecksumAddress(XSUSHI), reward_amount
-            )
-
-            snapshot = self.fetch_sett_snapshot(block, sett)
-            all_sushi_rewards.append(
-                distribute_rewards_to_snapshot(reward_amount, snapshot, XSUSHI)
-            )
-
-        return combine_rewards(all_sushi_rewards, self.cycle), total_from_rewards
