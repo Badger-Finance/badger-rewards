@@ -36,7 +36,7 @@ def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
     while True:
         variables["lastDistId"] = {"id_gt": last_dist_id}
         results = tree_client.execute(query, variable_values=variables)
-        dist_data = results["treeDistributions"]
+        dist_data = results["badgerTreeDistributions"]
         for dist in dist_data:
             dist["token"] = Web3.toChecksumAddress(dist["token"]["id"])
             dist["sett"] = Web3.toChecksumAddress(dist["sett"]["id"])
