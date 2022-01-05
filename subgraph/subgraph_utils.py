@@ -1,4 +1,3 @@
-from re import sub
 from typing import Optional
 
 from gql import Client
