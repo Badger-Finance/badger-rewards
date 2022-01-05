@@ -17,6 +17,7 @@ def subgraph_url(name: str) -> str:
     else:
         return staging_urls.get(name, prod_urls.get(name, ""))
 
+
 def make_gql_client(name: str) -> Optional[Client]:
     url = subgraph_url(name)
     if not url:

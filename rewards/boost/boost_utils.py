@@ -1,10 +1,12 @@
 from collections import Counter
+from decimal import Decimal
 from typing import Dict, List, Tuple
 
 from rich.console import Console
 
 from rewards.snapshot.chain_snapshot import chain_snapshot_usd
 from rewards.snapshot.claims_snapshot import claims_snapshot_usd
+from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 
 console = Console()
@@ -34,7 +36,7 @@ def filter_dust(balances: Dict[str, float], dust_amount: int) -> Dict[str, float
 
 def calc_boost_balances(
     block: int, chain: str
-) -> Tuple[Dict[str, float], Dict[str, float]]:
+) -> Tuple[Dict[str, float], Dict[str, float], Dict[str, Decimal]]:
     """
     Calculate boost data required for boost calculation
     :param block: block to collect the boost data from
@@ -44,12 +46,15 @@ def calc_boost_balances(
     native = Counter()
     non_native = Counter()
 
+    console.log(f"\n === Taking nft snapshot on {chain} === \n")
+    nft_balances = nft_snapshot_usd(chain, block)
+
     console.log(f"\n === Taking token snapshot on {chain} === \n")
     badger_tokens, digg_tokens = token_snapshot_usd(chain, block)
-    native = native + Counter(badger_tokens) + Counter(digg_tokens)
+
+    native = Counter(badger_tokens) + Counter(digg_tokens) + Counter(nft_balances)
 
     console.log(f"\n === Taking chain snapshot on {chain} === \n")
-
     native_setts, non_native_setts = chain_snapshot_usd(chain, block)
     non_native += Counter(non_native_setts)
     native += Counter(native_setts)
@@ -62,4 +67,4 @@ def calc_boost_balances(
 
     native = filter_dust(dict(native), 1)
     non_native = filter_dust(dict(non_native), 1)
-    return native, non_native
+    return native, non_native, nft_balances

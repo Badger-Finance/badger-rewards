@@ -6,7 +6,7 @@ from typing import Dict, Tuple
 from badger_api.requests import fetch_all_claimable_balances
 from helpers.constants import CLAIMABLE_TOKENS, DIGG
 from helpers.digg_utils import digg_utils
-from helpers.enums import BalanceType
+from helpers.enums import BalanceType, Network
 from helpers.web3_utils import make_token
 from rewards.classes.Snapshot import Snapshot
 
@@ -14,6 +14,8 @@ from rewards.classes.Snapshot import Snapshot
 @lru_cache
 def claims_snapshot(chain: str) -> Dict[str, Snapshot]:
     all_claims = fetch_all_claimable_balances(chain)
+    if not all_claims:
+        raise ValueError("Error retrieving claimable balances from Badger API")
     chain_claimable_tokens = CLAIMABLE_TOKENS[chain]
     native_tokens = chain_claimable_tokens[BalanceType.Native]
     non_native_tokens = chain_claimable_tokens[BalanceType.NonNative]
@@ -34,7 +36,7 @@ def claims_snapshot(chain: str) -> Dict[str, Snapshot]:
                     10, token_decimals[token]
                 )
             else:
-                balance = balance / math.pow(10, token_decimals[token])
+                balance /= math.pow(10, token_decimals[token])
             if token not in claims_data:
                 claims_data[token] = {}
 
@@ -57,7 +59,7 @@ def claims_snapshot(chain: str) -> Dict[str, Snapshot]:
     return snapshots
 
 
-def claims_snapshot_usd(chain: str) -> Tuple[Counter, Counter]:
+def claims_snapshot_usd(chain: Network) -> Tuple[Counter, Counter]:
     """Take a snapshot of native and non native claims in usd"""
     snapshot = claims_snapshot(chain)
     native = Counter()
@@ -65,8 +67,8 @@ def claims_snapshot_usd(chain: str) -> Tuple[Counter, Counter]:
     for sett, claims in snapshot.items():
         usd_claims = claims.convert_to_usd(chain)
         if usd_claims.type == BalanceType.Native:
-            native = native + Counter(usd_claims.balances)
+            native += Counter(usd_claims.balances)
         elif usd_claims.type == BalanceType.NonNative:
-            non_native = non_native + Counter(usd_claims.balances)
+            non_native += Counter(usd_claims.balances)
 
     return native, non_native
