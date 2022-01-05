@@ -5,21 +5,20 @@ from unittest import TestCase
 
 import pytest
 
-from helpers.constants import BADGER
-from helpers.constants import DECIMAL_MAPPING
-from helpers.constants import SETTS
-from helpers.enums import BalanceType
-from helpers.enums import Network
+from helpers.constants import BADGER, DECIMAL_MAPPING, SETTS
+from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
-from tests.utils import mock_balances
-from tests.utils import mock_boosts
-from tests.utils import mock_boosts_split
-from tests.utils import mock_tree
-from tests.utils import set_env_vars
-from tests.utils import test_account
-from tests.utils import test_cycle
-from tests.utils import test_end
-from tests.utils import test_start
+from tests.utils import (
+    mock_balances,
+    mock_boosts,
+    mock_boosts_split,
+    mock_tree,
+    set_env_vars,
+    test_account,
+    test_cycle,
+    test_end,
+    test_start,
+)
 
 set_env_vars()
 
