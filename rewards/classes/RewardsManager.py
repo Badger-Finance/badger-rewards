@@ -5,7 +5,7 @@ from rich.console import Console
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
-from helpers.constants import EMISSIONS_CONTRACTS, XSUSHI
+from helpers.constants import EMISSIONS_CONTRACTS, ETH_BADGER_TREE, XSUSHI
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BalanceType, Network
 from helpers.time_utils import to_hours, to_utc_date
@@ -73,7 +73,10 @@ class RewardsManager:
         """
         flat_rewards_list = []
         boosted_rewards_list = []
-        custom_behaviour = {}
+        custom_behaviour = {
+            ETH_BADGER_TREE: eth_tree_handler
+        }
+
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
@@ -242,6 +245,9 @@ class RewardsManager:
             f"Fetched {len(tree_distributions)} tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
+        custom_behaviour = {
+            ETH_BADGER_TREE: eth_tree_handler
+        }
         for dist in tree_distributions:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]["address"]
@@ -256,7 +262,7 @@ class RewardsManager:
                 sett, self.web3.toChecksumAddress(token), amount
             )
             all_dist_rewards.append(
-                distribute_rewards_to_snapshot(amount, snapshot, token)
+                distribute_rewards_to_snapshot(amount, snapshot, token, custom_rewards=custom_behaviour)
             )
         return combine_rewards(all_dist_rewards, self.cycle)
 

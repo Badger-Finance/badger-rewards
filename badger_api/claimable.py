@@ -11,6 +11,7 @@ from rewards.aws.helpers import dynamodb, get_metadata_table, get_snapshot_table
 from subgraph.queries.setts import last_synced_block
 
 
+@lru_cache
 def get_claimable_metadata(chain: Network, block: int) -> Dict:
     kce = Key("chain").eq(chain) & Key("startBlock").between(
         0, block
@@ -32,8 +33,10 @@ def get_claimable_metadata(chain: Network, block: int) -> Dict:
     else:
         return output["Items"][0]
 
+
 def get_latest_claimable_metadata(chain: Network):
     return get_claimable_metadata(chain, block=last_synced_block(chain))
+
 
 def get_claimable_balances(chain: Network, chain_start_block: str) -> Dict[str, float]:
     table = dynamodb.Table(get_snapshot_table(env_config.production))
