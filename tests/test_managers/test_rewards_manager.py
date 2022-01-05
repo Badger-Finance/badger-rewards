@@ -1,4 +1,3 @@
-import json
 import logging
 from decimal import Decimal
 from math import isclose
@@ -6,20 +5,21 @@ from unittest import TestCase
 
 import pytest
 
-from helpers.constants import BADGER, DECIMAL_MAPPING, SETTS
-from helpers.enums import BalanceType, Network
+from helpers.constants import BADGER
+from helpers.constants import DECIMAL_MAPPING
+from helpers.constants import SETTS
+from helpers.enums import BalanceType
+from helpers.enums import Network
 from rewards.classes.Schedule import Schedule
-from tests.utils import (
-    mock_balances,
-    mock_boosts,
-    mock_boosts_split,
-    mock_tree,
-    set_env_vars,
-    test_account,
-    test_cycle,
-    test_end,
-    test_start,
-)
+from tests.utils import mock_balances
+from tests.utils import mock_boosts
+from tests.utils import mock_boosts_split
+from tests.utils import mock_tree
+from tests.utils import set_env_vars
+from tests.utils import test_account
+from tests.utils import test_cycle
+from tests.utils import test_end
+from tests.utils import test_start
 
 set_env_vars()
 
@@ -194,10 +194,12 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
     indirect=True,
 )
 def test_splits(
-    rewards_manager_split, schedule, tree_manager, boosts_split, monkeypatch
+    rewards_manager_split, schedule, tree_manager, boosts_split, monkeypatch,
+    mocker,
 ):
     rates = [Decimal(0), Decimal(0.5), Decimal(1)]
     user_data = {}
+    discord = mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     for rate in rates:
         monkeypatch.setattr(
             "rewards.classes.RewardsManager.get_flat_emission_rate",
@@ -233,8 +235,8 @@ def test_splits(
                 user_data[user]["rewards"] = []
             user_data[user]["rewards"].append(int(amount[0]) /
                                               DECIMAL_MAPPING[str(rewards_manager_split.chain)])
-
-    logger.info(json.dumps(user_data, indent=2))
+    assert discord.called
+    assert discord.call_count == len(rates)
     assert user_data["0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd"]["rewards"] == [
         0.03332222592469277,
         16.683327779629014,

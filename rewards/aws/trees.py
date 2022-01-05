@@ -16,10 +16,8 @@ def download_latest_tree(chain: str):
     Download the latest merkle tree that was uploaded for a chain
     :param chain: the chain from which to fetch the latest tree from
     """
-    if chain == Network.Ethereum:
-        key = "badger-tree.json"
-    else:
-        key = f"badger-tree-{CHAIN_IDS[chain]}.json"
+
+    key = f"badger-tree-{CHAIN_IDS[chain]}.json"
 
     target = {
         "bucket": get_bucket(env_config.production),
