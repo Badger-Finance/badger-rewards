@@ -12,7 +12,7 @@ def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
     query = gql(
         """
         query tree_distributions(
-            $lastDistId: TokenDistribution_filter
+            $lastDistId: BadgerTreeDistribution_filter
             ) {
             badgerTreeDistributions(where: $lastDistId) {
                 id
