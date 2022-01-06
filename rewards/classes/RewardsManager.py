@@ -1,17 +1,14 @@
 from decimal import Decimal
-from typing import Dict
-from typing import List
+from typing import Dict, List
 
 from rich.console import Console
 from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
-from helpers.discord import get_discord_url
-from helpers.discord import send_code_block_to_discord
+from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType
-from helpers.time_utils import to_hours
-from helpers.time_utils import to_utc_date
+from helpers.time_utils import to_hours, to_utc_date
 from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
@@ -19,8 +16,7 @@ from rewards.classes.Snapshot import Snapshot
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
-from rewards.utils.rewards_utils import combine_rewards
-from rewards.utils.rewards_utils import distribute_rewards_to_snapshot
+from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
 from subgraph.queries.harvests import fetch_tree_distributions
 
 console = Console()
