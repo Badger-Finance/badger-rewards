@@ -17,7 +17,6 @@ set_env_vars()
 
 from unittest import TestCase
 
-from badger_api.requests import fetch_all_claimable_balances
 from helpers.constants import BOOST_CHAINS
 from rewards.classes.TreeManager import TreeManager
 
@@ -70,12 +69,3 @@ def tree_manager(cycle_key) -> TreeManager:
     tree_manager.validate_tree = mock_validate_tree
     tree_manager.get_claimed_for = mock_get_claimed_for
     return tree_manager
-
-
-@pytest.mark.parametrize(
-    "chain",
-    BOOST_CHAINS,
-)
-def test_fetch_all_claimable_balances(chain):
-    result = fetch_all_claimable_balances(chain)
-    assert len(result) > 0

@@ -1,4 +1,3 @@
-import concurrent.futures
 from functools import lru_cache
 from typing import Dict, Optional, Tuple
 
@@ -35,42 +34,6 @@ def fetch_token_prices() -> Dict[str, float]:
         prices = {**prices, **chain_prices}
 
     return prices
-
-
-def fetch_claimable(page: int, chain: str) -> Optional[Dict]:
-    """
-    Fetch claimable data from account data
-    :param page: page to fetch data from
-    """
-    return http_client.get(f"{badger_api}/accounts/allClaimable?page={page}&chain={chain}")
-
-
-def fetch_total_claimable_pages(chain: str) -> Optional[int]:
-    response = fetch_claimable(1, chain)
-    if not response:
-        return
-    return response["maxPage"]
-
-
-def fetch_all_claimable_balances(chain: str) -> Optional[Dict]:
-    """
-    Fetch the claimable balances by fetching in parallel
-
-    """
-
-    results = {}
-    total_pages = fetch_total_claimable_pages(chain)
-    if not total_pages:
-        return
-    with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
-        futures = [
-            executor.submit(fetch_claimable, page=p, chain=chain)
-            for p in range(0, total_pages + 1)
-        ]
-        for future in concurrent.futures.as_completed(futures):
-            data = future.result()["rewards"]
-            results = {**results, **data}
-    return results
 
 
 @lru_cache
