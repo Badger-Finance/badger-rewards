@@ -5,7 +5,7 @@ from helpers.enums import Network
 from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_latest_tree
 from rewards.classes.TreeManager import TreeManager
-from scripts.rewards.ibbtc_rewards.move_ibbtc import move_ibbtc
+from scripts.rewards.rebate.rebate_calculation import rebate
 
 if __name__ == "__main__":
     chain = Network.Ethereum
@@ -18,5 +18,5 @@ if __name__ == "__main__":
     )
     propose_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
 
-    rewards_data = move_ibbtc(tree, propose_tree_manager)
+    rewards_data = rebate(tree, propose_tree_manager)
     tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)

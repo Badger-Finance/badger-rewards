@@ -18,6 +18,7 @@ from rewards.utils.rewards_utils import (
 def add_rewards(rewards_list: RewardsList, file_name):
     reader = csv.DictReader(open(file_name))
     for row in reader:
+        print(row)
         rewards_list.increase_user_rewards(
             row["reciever"], row["token_address"], row["amount"] * 1e18
         )
