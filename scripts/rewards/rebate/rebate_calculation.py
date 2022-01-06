@@ -32,7 +32,7 @@ def rebate(tree, tree_manager: TreeManager):
     add_rewards(rewards_list, "rebates/bip71_wd_fee.csv")
     add_rewards(rewards_list, "rebates/bip75_first_point.csv")
     add_rewards(rewards_list, "rebates/bip75_second_point.csv")
-    
+
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
     merkle_tree = rewards_to_merkle_tree(rewards_list, start_block, end_block)
