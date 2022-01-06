@@ -20,7 +20,7 @@ def add_rewards(rewards_list: RewardsList, file_name):
     for row in reader:
         print(row)
         rewards_list.increase_user_rewards(
-            row["reciever"], row["token_address"], row["amount"] * 1e18
+            row["receiver"], row["token_address"], row["amount"] * 1e18
         )
 
 def rebate(tree, tree_manager: TreeManager):
