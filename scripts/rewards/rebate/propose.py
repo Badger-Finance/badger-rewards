@@ -19,4 +19,4 @@ if __name__ == "__main__":
     propose_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
 
     rewards_data = rebate(tree, propose_tree_manager)
-    #tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
+    tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)

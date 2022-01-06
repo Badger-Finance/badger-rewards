@@ -1,26 +1,24 @@
 import csv
+from decimal import Decimal
 
 from eth_utils.hexadecimal import encode_hex
 from web3 import Web3
 
-from helpers.constants import CHAIN_IDS, IBBTC_PEAK, SETTS, TECH_OPS
+from helpers.constants import CHAIN_IDS
 from helpers.enums import Network
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.TreeManager import TreeManager
-from rewards.utils.rewards_utils import (
-    get_claimed_for_token,
-    get_cumulative_claimable_for_token,
-    merkle_tree_to_rewards_list,
-)
+from rewards.utils.rewards_utils import merkle_tree_to_rewards_list
 
 
 def add_rewards(rewards_list: RewardsList, file_name):
     reader = csv.DictReader(open(file_name))
     for row in reader:
         print(row)
+        amount = Decimal(float(row["amount"]) * 1e18)
         rewards_list.increase_user_rewards(
-            row["receiver"], row["token_address"], row["amount"] * 1e18
+            row["receiver"], row["token_address"], amount
         )
 
 def rebate(tree, tree_manager: TreeManager):
