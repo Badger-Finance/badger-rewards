@@ -41,6 +41,27 @@ def chain_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
     return balances_by_sett
 
 
+def weighted_sett_snapshot(
+        chain: Network, start_block: int, end_block: int,
+        sett: str, blacklist: bool, number_of_snapshots: int,
+) -> Snapshot:
+    """
+    Take a weighted snapshot of a sett between two blocks
+    """
+    snapshot = sett_snapshot(chain, start_block, sett, blacklist)
+    snapshot += sett_snapshot(chain, end_block, sett, blacklist)
+    rate = int((end_block - start_block) / number_of_snapshots)
+    current_block = start_block
+    for i in range(number_of_snapshots):
+        current_block += rate
+        snapshot += sett_snapshot(chain, current_block, sett, blacklist)
+    for addr, balance in snapshot:
+        total_number_of_snapshots = number_of_snapshots + 2  # +2 for beginning and end block
+        snapshot.balances[addr] = balance / total_number_of_snapshots
+
+    return snapshot
+
+
 def sett_snapshot(chain: Network, block: int, sett: str, blacklist: bool) -> Snapshot:
     """
     Take a snapshot of a sett on a chain at a certain block

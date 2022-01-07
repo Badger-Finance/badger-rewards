@@ -14,6 +14,7 @@ from rewards.snapshot.chain_snapshot import (
     parse_sett_balances,
     sett_snapshot,
 )
+from rewards.snapshot.chain_snapshot import weighted_sett_snapshot
 
 BALANCES_DATA = {
     # Badger Token
@@ -161,6 +162,34 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances):
     assert list(snapshot.balances.values())[0] == approx(Decimal(
         list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]
     ))
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Arbitrum]
+)
+@pytest.mark.parametrize(
+    "snapshots_number",
+    [3, 13, 1, 14]
+)
+@responses.activate
+def test_sett_weighted_snapshot__even_balance(
+        chain, snapshots_number: int, mock_fetch_sett_balances):
+    responses.add(
+        responses.GET, f"{badger_api}/tokens?chain={chain}",
+        json={'name': 'bBadger'},
+        status=200
+    )
+    responses.add_passthru('https://')
+    snapshot = weighted_sett_snapshot(
+        chain, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
+        number_of_snapshots=snapshots_number
+    )
+    assert snapshot.type == BalanceType.Native
+    assert snapshot.ratio == 1
+    assert snapshot.token == BBADGER_ADDRESS
+    expected_amount: Decimal = Decimal(list(BALANCES_DATA[BBADGER_ADDRESS].values())[0])
+    assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
 @pytest.mark.parametrize(
