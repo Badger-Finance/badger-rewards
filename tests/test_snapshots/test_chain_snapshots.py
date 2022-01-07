@@ -192,6 +192,14 @@ def test_sett_weighted_snapshot__even_balance(
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
+def test_sett_weighted_snapshot__invalid_blocks():
+    with pytest.raises(AssertionError):
+        weighted_sett_snapshot(
+            Network.Ethereum, 13710338, 13710328, BBADGER_ADDRESS, blacklist=True,
+            number_of_snapshots=1
+        )
+
+
 @pytest.mark.parametrize(
     "chain",
     [Network.Ethereum, Network.Arbitrum]

@@ -48,9 +48,18 @@ def weighted_sett_snapshot(
     """
     Take a weighted snapshot of a sett between two blocks
     """
+    assert end_block > start_block
     snapshot = sett_snapshot(chain, start_block, sett, blacklist)
     snapshot += sett_snapshot(chain, end_block, sett, blacklist)
     rate = int((end_block - start_block) / number_of_snapshots)
+    # If rate == 0 it means that number of snapshots is too big, and it cannot be calculated
+    # properly. So, just divide snapshots balance values by 2(start and endblock and return)
+    # For ex: start block 13710328, end block 13710338 and num of snaps == 14
+    if rate == 0:
+        snapshot.balances = {k: v / 2 for k, v in snapshot.balances.items()}
+        for addr, balance in snapshot:
+            snapshot.balances[addr] = balance / 2
+        return snapshot
     current_block = start_block
     for i in range(number_of_snapshots):
         current_block += rate
