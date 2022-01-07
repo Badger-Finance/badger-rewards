@@ -57,8 +57,6 @@ def weighted_sett_snapshot(
     # For ex: start block 13710328, end block 13710338 and num of snaps == 14
     if rate == 0:
         snapshot.balances = {k: v / 2 for k, v in snapshot.balances.items()}
-        for addr, balance in snapshot:
-            snapshot.balances[addr] = balance / 2
         return snapshot
     current_block = start_block
     for i in range(number_of_snapshots):
