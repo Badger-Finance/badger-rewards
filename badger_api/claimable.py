@@ -26,7 +26,7 @@ def get_claimable_metadata(chain: Network, block: int) -> Dict:
         send_error_to_discord(
             e,
             f"Database Error \n ```{e.response['Error']['Message']}```",
-            "Negative Rewards Error",
+            "Client Error",
             chain,
         )
         raise e
@@ -54,7 +54,7 @@ def get_claimable_balances(chain: Network, chain_start_block: str) -> Dict[str, 
         send_error_to_discord(
             e,
             f"Database Error \n ```{e.response['Error']['Message']}```",
-            "Negative Rewards Error",
+            "Client Error",
             chain,
         )
         raise e
@@ -66,4 +66,9 @@ def get_latest_claimable_snapshot(chain: Network):
     metadata = get_latest_claimable_metadata(
         chain
     )
+    return get_claimable_balances(chain, metadata["chainStartBlock"])
+
+
+def get_claimable_snapshot(chain: Network, block: int):
+    metadata = get_claimable_metadata(chain, block)
     return get_claimable_balances(chain, metadata["chainStartBlock"])

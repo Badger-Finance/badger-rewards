@@ -1,3 +1,4 @@
+from os import sync
 from typing import Dict, Tuple
 
 from rich.console import Console
@@ -37,7 +38,7 @@ def calc_next_cycle_range(
     last_claim_end = tree_manager.last_publish_end_block()
     start_block = last_claim_end + 1
     synced_block = last_synced_block(chain)
-    metadata = get_latest_claimable_metadata(chain)
+    metadata = get_claimable_metadata(chain, synced_block)
     end_block = metadata["endBlock"]
     assert end_block <= synced_block
 

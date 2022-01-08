@@ -3,7 +3,7 @@ from collections import Counter
 from functools import lru_cache
 from typing import Dict, Tuple
 
-from badger_api.claimable import get_latest_claimable_snapshot
+from badger_api.claimable import get_claimable_snapshot
 from helpers.constants import CLAIMABLE_TOKENS, DIGG
 from helpers.digg_utils import digg_utils
 from helpers.enums import BalanceType, Network
@@ -12,8 +12,8 @@ from rewards.classes.Snapshot import Snapshot
 
 
 @lru_cache
-def claims_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
-    all_claims = get_latest_claimable_snapshot(chain)
+def claims_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
+    all_claims = get_claimable_snapshot(chain, block)
     chain_claimable_tokens = CLAIMABLE_TOKENS[chain]
     native_tokens = chain_claimable_tokens[BalanceType.Native]
     non_native_tokens = chain_claimable_tokens[BalanceType.NonNative]
@@ -53,7 +53,7 @@ def claims_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
     return snapshots
 
 
-def claims_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
+def claims_snapshot_usd(chain: Network, block: int) -> Tuple[Counter, Counter]:
     """Take a snapshot of native and non native claims in usd"""
     snapshot = claims_snapshot(chain, block)
     native = Counter()
@@ -66,3 +66,5 @@ def claims_snapshot_usd(chain: str, block: int) -> Tuple[Counter, Counter]:
             non_native += Counter(usd_claims.balances)
 
     return native, non_native
+
+

@@ -117,6 +117,44 @@ CLAIMABLE_BALANCES_DATA_ARB = {
 }
 
 
+@pytest.fixture()
+def claimable_block():
+    return 13952759
+
+def mock_get_claimable_snapshot(chain, block):
+    return [
+        {
+            "address": TEST_WALLET,
+            "claimableBalances":[
+                {
+                "address": BADGER,
+                "balance": 148480869281534217908
+                },
+            {
+                "addresss": CVX_CRV_ADDRESS,
+                "balance": 2421328289687344724270258601055314109178877723910682205504219578892288
+            },
+            {
+                "address": XSUSHI,
+                "balance":242132828968734472427025860105531410917
+            }
+            ]
+            }
+    ]
+
+@pytest.fixture()
+def mock_fns(monkeypatch):
+    # TODO: Mock claimable functions
+    
+
+    monkeypatch.setattr(
+        "badger_api.claimable.get_claimable_snapshot",
+        mock_get_claimable_snapshot
+    )
+
+
+
+
 @pytest.mark.parametrize(
     "chain, data",
     [
@@ -126,13 +164,9 @@ CLAIMABLE_BALANCES_DATA_ARB = {
     ]
 )
 @responses.activate
-def test_claims_snapshot__happy(chain, data):
-    responses.add(
-        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={chain}",
-        json=data, status=200
-    )
-    responses.add_passthru('https://')
-    snapshots = claims_snapshot(chain)
+def test_claims_snapshot__happy(chain, data, claimable_block,  mock_fns):
+    snapshots = claims_snapshot(chain, claimable_block)
+
     badger_snapshot = snapshots[NETWORK_TO_BADGER_TOKEN[chain]]
     assert badger_snapshot.type == BalanceType.Native
     assert badger_snapshot.ratio == 1
@@ -166,25 +200,12 @@ def test_claims_snapshot__happy(chain, data):
 
 
 @responses.activate
-def test_claims_snapshot_digg():
+def test_claims_snapshot_digg(claimable_block):
     # Digg has different calculation algorithm hence separate test
     balance = '148480869281534217908'
-    responses.add(
-        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
-        json={
-            'maxPage': 1,
-            'rewards': {
-                TEST_WALLET: [
-                    {
-                        'network': 'ethereum', 'address': DIGG,
-                        'balance': balance
-                    },
-                ]
-            }
-        }, status=200
-    )
-    responses.add_passthru('https://')
-    snapshots = claims_snapshot(Network.Ethereum)
+    # TODO: Mock db call with claimable digg 
+       
+    snapshots = claims_snapshot(Network.Ethereum, claimable_block)
     digg_snapshot = snapshots[DIGG]
     assert digg_snapshot.type == BalanceType.Native
     assert digg_snapshot.ratio == 1
@@ -194,24 +215,18 @@ def test_claims_snapshot_digg():
 
 
 @responses.activate
-def test_claims_snapshot__unhappy(mock_discord):
+def test_claims_snapshot__unhappy(mock_discord, claimable_block, mock_nfs):
     # Raises exception in case non-200 response is returned
-    responses.add(
-        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
-        json={'maxPage': 1}, status=400
-    )
-    responses.add_passthru('https://')
+    #  TODO: Mock failed db call
     with pytest.raises(ValueError):
-        claims_snapshot(Network.Ethereum)
+        claims_snapshot(Network.Ethereum, claimable_block)
 
 
 @responses.activate
-def test_claims_snapshot_usd__happy():
+def test_claims_snapshot_usd__happy(claimable_block, mock_fnss):
     # Make sure native and non-native balances are correcly calculated to usd
-    responses.add(
-        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
-        json=CLAIMABLE_BALANCES_DATA_ETH, status=200
-    )
+    # TODO: Mock db call for snapshot data
+    
     for boost_chain in BOOST_CHAINS:
         responses.add(
             responses.GET, f"{badger_api}/prices?chain={boost_chain}",
@@ -224,7 +239,7 @@ def test_claims_snapshot_usd__happy():
             status=200
         )
     responses.add_passthru('https://')
-    native, non_native = claims_snapshot_usd(Network.Ethereum)
+    native, non_native = claims_snapshot_usd(Network.Ethereum, claimable_block)
     expected_native_balance = 0
     # For this wallet native balance is only
     for claim in CLAIMABLE_BALANCES_DATA_ETH['rewards'][TEST_WALLET]:
@@ -241,12 +256,9 @@ def test_claims_snapshot_usd__happy():
 
 
 @responses.activate
-def test_claims_snapshot_usd__unhappy(mock_discord):
+def test_claims_snapshot_usd__unhappy(mock_discord, claimable_block, mock_fns):
     # Raises exception in case non-200 response is returned
-    responses.add(
-        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
-        json={'maxPage': 1}, status=400
-    )
-    responses.add_passthru('https://')
+    
+    # TODO: Mock unhappy db call
     with pytest.raises(ValueError):
-        claims_snapshot_usd(Network.Ethereum)
+        claims_snapshot_usd(Network.Ethereum, claimable_block)
