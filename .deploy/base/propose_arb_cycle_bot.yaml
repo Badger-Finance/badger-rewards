@@ -1,28 +1,28 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: propose-arb-cycle-bot
-  labels:
-    app: propose-arb-cycle-bot
+    name: propose-arb-cycle-bot
+    labels:
+        app: propose-arb-cycle-bot
 spec:
-  schedule: "5 */2 * * *"
-  startingDeadlineSeconds: 180
-  suspend: false
-  jobTemplate:
-    spec:
-      template:
+    schedule: '5 */2 * * *'
+    startingDeadlineSeconds: 180
+    suspend: false
+    jobTemplate:
         spec:
-          serviceAccountName: propose-arb-cycle-bot
-          containers:
-          - name: propose-arb-cycle-bot
-            image: IMAGE_NAME
-            imagePullPolicy: IfNotPresent
-            command: ["python", "-m", "scripts.rewards.arbitrum.propose_arbitrum"]
-            env:
-              - name: LOG_LEVEL
-                value: 'info'
-              - name: ENV
-                value: 'PROD'
-              - name: KUBE
-                value: 'True'
-          restartPolicy: OnFailure
+            template:
+                spec:
+                    serviceAccountName: propose-arb-cycle-bot
+                    containers:
+                        - name: propose-arb-cycle-bot
+                          image: IMAGE_NAME
+                          imagePullPolicy: IfNotPresent
+                          command: ['python', '-m', 'scripts.rewards.arbitrum.propose_arbitrum']
+                          env:
+                              - name: LOG_LEVEL
+                                value: 'info'
+                              - name: ENV
+                                value: 'PROD'
+                              - name: KUBE
+                                value: 'True'
+                    restartPolicy: OnFailure
