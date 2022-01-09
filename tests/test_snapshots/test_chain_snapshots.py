@@ -169,7 +169,7 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_bal
 )
 @pytest.mark.parametrize(
     "snapshots_number",
-    [3, 13, 1, 14]
+    [3, 6, 1, 5]
 )
 def test_sett_weighted_snapshot__even_balance(
         chain, snapshots_number: int, mock_fetch_sett_balances, responses_mock_token_balance):
@@ -183,6 +183,26 @@ def test_sett_weighted_snapshot__even_balance(
     expected_amount: Decimal = Decimal(
         list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]
     ) * (snapshots_number + 2)
+    assert list(snapshot.balances.values())[0] == approx(expected_amount)
+
+
+@pytest.mark.parametrize(
+    "snapshots_number",
+    [14, 20, 100]
+)
+def test_total_harvest_sett_snapshot__invalid_rate(
+        snapshots_number: int, mock_fetch_sett_balances, responses_mock_token_balance):
+    snapshot = total_harvest_sett_snapshot(
+        Network.Ethereum, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
+        number_of_snapshots=snapshots_number
+    )
+    assert snapshot.type == BalanceType.Native
+    assert snapshot.ratio == 1
+    assert snapshot.token == BBADGER_ADDRESS
+    # In this case only first and last snaps should be taken into account
+    expected_amount: Decimal = Decimal(
+        list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]
+    ) * 2
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
