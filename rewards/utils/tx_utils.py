@@ -9,7 +9,7 @@ from web3 import Web3, exceptions
 from helpers.constants import DECIMAL_MAPPING, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BotType, Network
-from helpers.http_session import http
+from helpers.http_client import http_client
 from helpers.web3_utils import make_contract
 
 logger = logging.getLogger("tx-utils")
@@ -41,7 +41,9 @@ def get_gas_price_of_tx(
     total_gas_used = Decimal(tx_receipt.get("gasUsed", 0))
     logger.info(f"gas used: {total_gas_used}")
     gas_oracle = make_contract(
-        EMISSIONS_CONTRACTS[chain]["GasOracle"], abi_name=Abi.ChainlinkOracle, chain=chain
+        EMISSIONS_CONTRACTS[chain]["GasOracle"],
+        abi_name=Abi.ChainlinkOracle,
+        chain=chain,
     )
 
     if chain == Network.Ethereum:
@@ -71,7 +73,9 @@ def get_latest_base_fee(web3: Web3, default=int(100e9)):  # default to 100 gwei
 
 
 def get_effective_gas_price(web3: Web3, chain: str = Network.Ethereum) -> int:
-    # TODO: Currently using max fee (per gas) that can be used for this tx. Maybe use base + priority (for average).
+    # TODO: Currently using max fee (per gas) that can be used for this tx.
+    # TODO: Maybe use base + priority (for average).
+    gas_price = None
     if chain == Network.Ethereum:
         base_fee = get_latest_base_fee(web3)
         logger.info(f"latest base fee: {base_fee}")
@@ -81,9 +85,9 @@ def get_effective_gas_price(web3: Web3, chain: str = Network.Ethereum) -> int:
         # max fee aka gas price enough to get included in next 6 blocks
         gas_price = 2 * base_fee + priority_fee
     elif chain == Network.Polygon:
-        response = http.get("https://gasstation-mainnet.matic.network")
-        json = response.json()
-        gas_price = web3.toWei(int(json.get("fast") * 1.1), "gwei")
+        json = http_client.get("https://gasstation-mainnet.matic.network")
+        if json:
+            gas_price = web3.toWei(int(json.get("fast") * 1.1), "gwei")
     elif chain == Network.Arbitrum:
         gas_price = web3.eth.gas_price * 1.1
     return gas_price

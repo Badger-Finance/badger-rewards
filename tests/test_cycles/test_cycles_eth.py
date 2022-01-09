@@ -1,29 +1,19 @@
-import json
 import logging
 import os
-from decimal import Decimal
 
 import pytest
-from brownie import Contract, accounts, web3
-from brownie.network.gas.strategies import ExponentialScalingStrategy
+from brownie import accounts
 from eth_account import Account
-from hexbytes import HexBytes
-from web3 import contract
 
-from tests.utils import mock_boosts, mock_tree, set_env_vars, test_address, test_key
+from tests.utils import set_env_vars, test_address, test_key
 
 set_env_vars()
 os.environ["private"] = test_key
 
 from config.singletons import env_config
-from helpers.constants import ABI_DIRS, EMISSIONS_CONTRACTS, ETH_BADGER_TREE
 from helpers.enums import Network
 from rewards.aws.helpers import get_secret
-from rewards.classes.TreeManager import TreeManager
-from rewards.utils.tree_utils import calc_next_cycle_range, get_last_proposed_cycle
-from scripts.rewards.utils.approve_rewards import approve_root
-from scripts.rewards.utils.propose_rewards import propose_root
-from tests.cycle_utils import (
+from tests.test_utils.cycle_utils import (
     MockCycleLogger,
     mock_badger_tree,
     mock_cycle,
@@ -46,6 +36,7 @@ def mock_fns(monkeypatch):
     monkeypatch.setattr("rewards.calc_rewards.cycle_logger", MockCycleLogger())
 
 
+
 @pytest.fixture(autouse=True)
 def set_env_config(monkeypatch):
     env_config.test = False
@@ -55,7 +46,7 @@ def set_env_config(monkeypatch):
 
 @pytest.fixture
 def chain():
-    return Network.Arbitrum
+    return Network.Ethereum
 
 
 @pytest.fixture
@@ -86,6 +77,7 @@ def tree_manager(chain, cycle_account, badger_tree):
     return tree_manager
 
 
-@pytest.mark.require_network("hardhat-arbitrum-fork")
+@pytest.mark.require_network("hardhat-fork")
 def test_cycle(tree_manager, badger_tree, keeper_address):
+    accounts[0].transfer(keeper_address, "10 ether", priority_fee="2 gwei")
     mock_cycle(tree_manager, badger_tree, keeper_address)

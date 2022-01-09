@@ -1,11 +1,9 @@
-import json
 import logging
 from decimal import Decimal
 from math import isclose
 from unittest import TestCase
 
 import pytest
-from brownie import web3
 
 from helpers.constants import BADGER, DECIMAL_MAPPING, SETTS
 from helpers.enums import BalanceType, Network
@@ -26,9 +24,8 @@ set_env_vars()
 
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Snapshot import Snapshot
-from rewards.classes.TreeManager import TreeManager
 from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewards
-from tests.cycle_utils import mock_badger_tree, mock_tree_manager
+from tests.test_utils.cycle_utils import mock_badger_tree, mock_tree_manager
 
 logger = logging.getLogger("test-rewards-manager")
 
@@ -196,10 +193,12 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
     indirect=True,
 )
 def test_splits(
-    rewards_manager_split, schedule, tree_manager, boosts_split, monkeypatch
+    rewards_manager_split, schedule, tree_manager, boosts_split, monkeypatch,
+    mocker,
 ):
     rates = [Decimal(0), Decimal(0.5), Decimal(1)]
     user_data = {}
+    discord = mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     for rate in rates:
         monkeypatch.setattr(
             "rewards.classes.RewardsManager.get_flat_emission_rate",
@@ -235,8 +234,8 @@ def test_splits(
                 user_data[user]["rewards"] = []
             user_data[user]["rewards"].append(int(amount[0]) /
                                               DECIMAL_MAPPING[str(rewards_manager_split.chain)])
-
-    logger.info(json.dumps(user_data, indent=2))
+    assert discord.called
+    assert discord.call_count == len(rates)
     assert user_data["0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd"]["rewards"] == [
         0.03332222592469277,
         16.683327779629014,

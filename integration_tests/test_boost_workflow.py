@@ -2,9 +2,9 @@ import logging
 
 from config.singletons import env_config
 from helpers.enums import Network
-from rewards.aws.boost import add_user_data, download_boosts
+from rewards.aws.boost import add_user_data
 from rewards.boost.calc_boost import badger_boost
-from tests.cycle_utils import mock_upload_boosts
+from tests.test_utils.cycle_utils import mock_upload_boosts
 from tests.utils import (
     mock_boosts,
     mock_send_code_block_to_discord,
