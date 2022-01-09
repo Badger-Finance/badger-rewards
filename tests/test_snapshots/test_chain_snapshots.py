@@ -14,7 +14,7 @@ from rewards.snapshot.chain_snapshot import (
     parse_sett_balances,
     sett_snapshot,
 )
-from rewards.snapshot.chain_snapshot import weighted_sett_snapshot
+from rewards.snapshot.chain_snapshot import total_harvest_sett_snapshot
 
 BALANCES_DATA = {
     # Badger Token
@@ -173,18 +173,20 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_bal
 )
 def test_sett_weighted_snapshot__even_balance(
         chain, snapshots_number: int, mock_fetch_sett_balances, responses_mock_token_balance):
-    snapshot = weighted_sett_snapshot(
+    snapshot = total_harvest_sett_snapshot(
         chain, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
         number_of_snapshots=snapshots_number
     )
     assert snapshot.type == BalanceType.Native
     assert snapshot.ratio == 1
     assert snapshot.token == BBADGER_ADDRESS
-    expected_amount: Decimal = Decimal(list(BALANCES_DATA[BBADGER_ADDRESS].values())[0])
+    expected_amount: Decimal = Decimal(
+        list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]
+    ) * (snapshots_number + 2)
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
-def test_sett_weighted_snapshot__uneven_balance_decr(chain, mocker, responses_mock_token_balance):
+def test_sett_weighted_snapshot__uneven_balance(chain, mocker, responses_mock_token_balance):
     initial_balance = 0.045336
     with mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
@@ -194,47 +196,19 @@ def test_sett_weighted_snapshot__uneven_balance_decr(chain, mocker, responses_mo
             {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0},
         ]
     ):
-        snapshot = weighted_sett_snapshot(
+        snapshot = total_harvest_sett_snapshot(
             Network.Ethereum, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
             number_of_snapshots=1
         )
-    assert snapshot.type == BalanceType.Native
-    assert snapshot.ratio == 1
     assert snapshot.token == BBADGER_ADDRESS
-    # Expected amount is average of sums of all snapshots. In this case
-    # balance will be decreased because user didn't have balance at the end of cycle
-    expected_amount: Decimal = Decimal((initial_balance + 0.01 + 0) / 3)
-    assert expected_amount < initial_balance
-    assert list(snapshot.balances.values())[0] == approx(expected_amount)
-
-
-def test_sett_weighted_snapshot__uneven_balance_incr(chain, mocker, responses_mock_token_balance):
-    initial_balance = 0.045336
-    with mocker.patch(
-        "rewards.snapshot.chain_snapshot.fetch_sett_balances",
-        side_effect=[
-            {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': initial_balance},
-            {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 1.00},
-            {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.94},
-        ]
-    ):
-        snapshot = weighted_sett_snapshot(
-            Network.Ethereum, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
-            number_of_snapshots=1
-        )
-    assert snapshot.type == BalanceType.Native
-    assert snapshot.ratio == 1
-    assert snapshot.token == BBADGER_ADDRESS
-    # Expected amount is average of sums of all snapshots. In this case
-    # balance will be increased
-    expected_amount: Decimal = Decimal((initial_balance + 1.00 + 0.94) / 3)
+    expected_amount: Decimal = Decimal((initial_balance + 0.01 + 0))
     assert expected_amount > initial_balance
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
 def test_sett_weighted_snapshot__invalid_blocks():
     with pytest.raises(AssertionError):
-        weighted_sett_snapshot(
+        total_harvest_sett_snapshot(
             Network.Ethereum, 13710338, 13710328, BBADGER_ADDRESS, blacklist=True,
             number_of_snapshots=1
         )

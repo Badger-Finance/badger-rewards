@@ -41,30 +41,22 @@ def chain_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
     return balances_by_sett
 
 
-def weighted_sett_snapshot(
+def total_harvest_sett_snapshot(
         chain: Network, start_block: int, end_block: int,
         sett: str, blacklist: bool, number_of_snapshots: int,
 ) -> Snapshot:
     """
-    Take a weighted snapshot of a sett between two blocks
+    Get a snapshot for total harvest period. That should sum up all Snapshots balances for
+    the number_of_snapshots
     """
     assert end_block > start_block
     snapshot = sett_snapshot(chain, start_block, sett, blacklist)
     snapshot += sett_snapshot(chain, end_block, sett, blacklist)
     rate = int((end_block - start_block) / number_of_snapshots)
-    # If rate == 0 it means that number of snapshots is too big, and it cannot be calculated
-    # properly. So, just divide snapshots balance values by 2(start and endblock and return)
-    # For ex: start block 13710328, end block 13710338 and num of snaps == 14
-    if rate == 0:
-        snapshot.balances = {k: v / 2 for k, v in snapshot.balances.items()}
-        return snapshot
     current_block = start_block
     for i in range(number_of_snapshots):
         current_block += rate
         snapshot += sett_snapshot(chain, current_block, sett, blacklist)
-    for addr, balance in snapshot:
-        total_number_of_snapshots = number_of_snapshots + 2  # +2 for beginning and end block
-        snapshot.balances[addr] = balance / total_number_of_snapshots
 
     return snapshot
 

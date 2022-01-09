@@ -16,7 +16,7 @@ from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot
-from rewards.snapshot.chain_snapshot import weighted_sett_snapshot
+from rewards.snapshot.chain_snapshot import total_harvest_sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
 from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
 from subgraph.queries.harvests import fetch_tree_distributions
@@ -230,7 +230,7 @@ class RewardsManager:
             end_block = get_block_by_timestamp(self.chain, int(dist["last_timestamp"]))
             token = dist["token"]
             sett = dist["sett"]
-            snapshot = weighted_sett_snapshot(
+            snapshot = total_harvest_sett_snapshot(
                 self.chain,
                 start_block,
                 end_block,
