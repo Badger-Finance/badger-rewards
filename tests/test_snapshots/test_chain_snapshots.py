@@ -171,7 +171,7 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_bal
     "snapshots_number",
     [3, 6, 1, 5]
 )
-def test_sett_weighted_snapshot__even_balance(
+def test_total_harvest_sett_snapshot__even_balance(
         chain, snapshots_number: int, mock_fetch_sett_balances, responses_mock_token_balance):
     snapshot = total_harvest_sett_snapshot(
         chain, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
@@ -206,7 +206,7 @@ def test_total_harvest_sett_snapshot__invalid_rate(
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
-def test_sett_weighted_snapshot__uneven_balance(chain, mocker, responses_mock_token_balance):
+def test_total_harvest_sett_snapshot__uneven_balance(chain, mocker, responses_mock_token_balance):
     initial_balance = 0.045336
     with mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
@@ -226,7 +226,7 @@ def test_sett_weighted_snapshot__uneven_balance(chain, mocker, responses_mock_to
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
-def test_sett_weighted_snapshot__invalid_blocks():
+def test_total_harvest_sett_snapshot__invalid_blocks():
     with pytest.raises(AssertionError):
         total_harvest_sett_snapshot(
             Network.Ethereum, 13710338, 13710328, BBADGER_ADDRESS, blacklist=True,
