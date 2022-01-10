@@ -4,10 +4,11 @@ from math import isclose
 from unittest import TestCase
 
 import pytest
-
+from web3 import Web3
 from helpers.constants import BADGER, DECIMAL_MAPPING, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
+from tests.test_subgraph.test_data import BADGER_DISTRIBUTIONS_TEST_DATA
 from tests.utils import (
     mock_balances,
     mock_boosts,
@@ -251,3 +252,34 @@ def test_splits(
         49.988892591358436,
         33.333333333333336,
     ]
+
+
+def test_calculate_tree_distributions__totals(mocker, boosts_split):
+    data = {
+        'badgerTreeDistributions': BADGER_DISTRIBUTIONS_TEST_DATA['badgerTreeDistributions'][:2]
+    }
+    first_user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    # second_user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f57"
+    mocker.patch(
+        "subgraph.subgraph_utils.Client.execute",
+        side_effect=[
+            data,
+            {'badgerTreeDistributions': []}
+        ],
+    )
+    rewards_manager = RewardsManager(
+        Network.Ethereum, 123, 12997653, 13331083, boosts_split["userData"]
+    )
+    with mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_sett_balances",
+        return_value={
+            '0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 1000000000000,
+            '0x0000000000007F150Bd6f54c40A34d7C3d5e9f57': 4000000000000,
+        }
+    ):
+        tree_rewards = rewards_manager.calculate_tree_distributions()
+    assert (
+        tree_rewards.claims[first_user]
+        [Web3.toChecksumAddress('0x2B5455aac8d64C14786c3a29858E43b5945819C0')]
+        == pytest.approx(Decimal(1198684123822457380799 * 0.2))
+    )

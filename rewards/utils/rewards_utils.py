@@ -78,6 +78,18 @@ def distribute_rewards_to_snapshot(
     return combine_rewards([rewards] + custom_rewards_list, 0)
 
 
+def distribute_rewards_from_total_snapshot(amount: int, snapshot: Snapshot, token: str):
+    rewards = RewardsList()
+    custom_rewards_list = []
+    total = snapshot.total_balance()
+    for addr, balance in snapshot:
+        rewards_percentage = Decimal(balance) / total
+        reward_amount = Decimal(amount) * rewards_percentage
+        assert reward_amount >= 0
+        rewards.increase_user_rewards(addr, token, reward_amount)
+    return combine_rewards([rewards] + custom_rewards_list, 0)
+
+
 def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
     """Combine past rewards with new rewards
 
