@@ -256,17 +256,24 @@ def test_splits(
 
 
 def test_calculate_tree_distributions__totals(mocker, boosts_split):
-    data = {
-        'badgerTreeDistributions': deepcopy(
-            BADGER_DISTRIBUTIONS_TEST_DATA['badgerTreeDistributions'][:2]
-        )
-    }
-    first_user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
-    # second_user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f57"
+    first_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f56")
+    second_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f57")
+    token = Web3.toChecksumAddress('0x2B5455aac8d64C14786c3a29858E43b5945819C0')
+    another_token = Web3.toChecksumAddress('0x53c8e199eb2cb7c01543c137078a038937a68e40')
+    first_amount_distributed = (
+        int(BADGER_DISTRIBUTIONS_TEST_DATA['badgerTreeDistributions'][:2][0]['amount'])
+    )
+    second_amount_distributed = (
+        int(BADGER_DISTRIBUTIONS_TEST_DATA['badgerTreeDistributions'][:2][1]['amount'])
+    )
     mocker.patch(
         "subgraph.subgraph_utils.Client.execute",
         side_effect=[
-            data,
+            {
+                'badgerTreeDistributions': deepcopy(
+                    BADGER_DISTRIBUTIONS_TEST_DATA['badgerTreeDistributions'][:2]
+                )
+            },
             {'badgerTreeDistributions': []}
         ],
     )
@@ -276,13 +283,26 @@ def test_calculate_tree_distributions__totals(mocker, boosts_split):
     with mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         return_value={
-            '0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 1000000000000,
-            '0x0000000000007F150Bd6f54c40A34d7C3d5e9f57': 4000000000000,
+            first_user: 1000000000000,
+            second_user: 4000000000000,
         }
     ):
         tree_rewards = rewards_manager.calculate_tree_distributions()
+    # First user gets 20% of total rewards, second one gets 80%
     assert (
-        tree_rewards.claims[first_user]
-        [Web3.toChecksumAddress('0x2B5455aac8d64C14786c3a29858E43b5945819C0')]
-        == pytest.approx(Decimal(1198684123822457380799 * 0.2))
+        tree_rewards.claims[first_user][token] ==
+        pytest.approx(Decimal(first_amount_distributed * 0.2))
+    )
+    assert (
+        tree_rewards.claims[second_user][token] ==
+        pytest.approx(Decimal(first_amount_distributed * 0.8))
+    )
+
+    assert (
+        tree_rewards.claims[first_user][another_token] ==
+        pytest.approx(Decimal(second_amount_distributed * 0.2))
+    )
+    assert (
+        tree_rewards.claims[second_user][another_token] ==
+        pytest.approx(Decimal(second_amount_distributed * 0.8))
     )
