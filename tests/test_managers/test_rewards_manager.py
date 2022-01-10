@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 from decimal import Decimal
 from math import isclose
 from unittest import TestCase
@@ -256,7 +257,9 @@ def test_splits(
 
 def test_calculate_tree_distributions__totals(mocker, boosts_split):
     data = {
-        'badgerTreeDistributions': BADGER_DISTRIBUTIONS_TEST_DATA['badgerTreeDistributions'][:2]
+        'badgerTreeDistributions': deepcopy(
+            BADGER_DISTRIBUTIONS_TEST_DATA['badgerTreeDistributions'][:2]
+        )
     }
     first_user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
     # second_user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f57"

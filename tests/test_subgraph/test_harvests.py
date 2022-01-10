@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from web3 import Web3
 
 from helpers.enums import Network
@@ -9,7 +11,7 @@ def test_fetch_tree_distributions_have_end_timestamp(mocker):
     mocker.patch(
         "subgraph.subgraph_utils.Client.execute",
         side_effect=[
-            BADGER_DISTRIBUTIONS_TEST_DATA,
+            deepcopy(BADGER_DISTRIBUTIONS_TEST_DATA),
             {'badgerTreeDistributions': []}
         ],
     )
