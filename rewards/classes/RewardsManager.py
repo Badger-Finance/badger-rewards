@@ -6,6 +6,7 @@ from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
+from helpers.constants import IBBTC_PEAK
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType
 from helpers.time_utils import to_hours, to_utc_date
@@ -13,6 +14,7 @@ from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
+from rewards.emission_handlers import ibbtc_peak_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
@@ -103,7 +105,11 @@ class RewardsManager:
                 sett, all_schedules[sett]
             )
             table.append(
-                [sett_name, boosted.totals_info(self.chain), flat.totals_info(self.chain)]
+                [
+                    sett_name,
+                    boosted.totals_info(self.chain),
+                    flat.totals_info(self.chain),
+                ]
             )
             all_rewards.append(rewards)
 
@@ -221,6 +227,7 @@ class RewardsManager:
         console.log(
             f"Fetched {len(tree_distributions)} tree distributions between {self.start} and {self.end}"
         )
+        custom_behaviour = {IBBTC_PEAK: ibbtc_peak_handler}
         all_dist_rewards = []
         for dist in tree_distributions:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
@@ -235,6 +242,8 @@ class RewardsManager:
                 sett, self.web3.toChecksumAddress(token), amount
             )
             all_dist_rewards.append(
-                distribute_rewards_to_snapshot(amount, snapshot, token)
+                distribute_rewards_to_snapshot(
+                    amount, snapshot, token, custom_behaviour
+                )
             )
         return combine_rewards(all_dist_rewards, self.cycle)
