@@ -14,9 +14,11 @@ from rewards.explorer import fetch_block_by_timestamp
 @responses.activate
 def test_fetch_block_by_timestamp_handled(mock_discord):
     responses.add(
-        responses.GET, "https://api.etherscan.io/api?module=block&action="
-                       "getblocknobytime&timestamp=123&closest=before&apikey=",
-        json={}, status=404
+        responses.GET,
+        "https://api.etherscan.io/api?module=block&action="
+        "getblocknobytime&timestamp=123&closest=before&apikey=",
+        json={},
+        status=404,
     )
     fetch_block_by_timestamp("ethereum", 123)
 
@@ -41,8 +43,7 @@ def test_fetch_ppfs_handled(mock_discord):
 def test_fetch_token_prices_handled(mock_discord):
     for chain in BOOST_CHAINS:
         responses.add(
-            responses.GET, f"{badger_api}/prices?chain={chain}",
-            json={}, status=404
+            responses.GET, f"{badger_api}/prices?chain={chain}", json={}, status=404
         )
     fetch_token_prices()
 
@@ -55,8 +56,7 @@ def test_fetch_token_prices_handled(mock_discord):
 @responses.activate
 def test_fetch_token_names_handled(mock_discord):
     responses.add(
-        responses.GET, f"{badger_api}/tokens?chain=ethereum",
-        json={}, status=404
+        responses.GET, f"{badger_api}/tokens?chain=ethereum", json={}, status=404
     )
     fetch_token_names("ethereum")
     assert mock_discord.call_count == 1

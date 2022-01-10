@@ -20,7 +20,7 @@ def approve_rewards(chain, kube):
         "DECRYPT_PASSWORD_ARN",
         "DECRYPT_PASSWORD_KEY",
         region_name="us-west-2",
-        kube=kube
+        kube=kube,
     )
 
     with open(config("KEYFILE")) as key_file:

@@ -19,7 +19,7 @@ def fetch_nfts(chain: str, block: int) -> Dict:
     last_nft_id = ""
     nft_client = make_gql_client("nfts")
     query = gql(
-    """
+        """
     query nfts($block_number: Block_height, $nft_filter: NFTBalance_filter) {
         nftbalances(first: 1000, block: $block_number, where: $nft_filter) {
             id
@@ -30,7 +30,7 @@ def fetch_nfts(chain: str, block: int) -> Dict:
     nft_balances = {}
     variables = {
         "block_number": {"number": block},
-        "nft_filter": {"id_gt": last_nft_id, "amount_gt": 0}
+        "nft_filter": {"id_gt": last_nft_id, "amount_gt": 0},
     }
     try:
         while True:
@@ -42,10 +42,9 @@ def fetch_nfts(chain: str, block: int) -> Dict:
                 user = Web3.toChecksumAddress(user)
                 if user not in nft_balances:
                     nft_balances[user] = []
-                nft_balances[user].append({
-                    "address": Web3.toChecksumAddress(nft_addr),
-                    "id": nft_id
-                })
+                nft_balances[user].append(
+                    {"address": Web3.toChecksumAddress(nft_addr), "id": nft_id}
+                )
             if len(nft_data) == 0:
                 break
             else:
@@ -53,7 +52,5 @@ def fetch_nfts(chain: str, block: int) -> Dict:
                 last_nft_id = nft_data[-1]["id"]
         return nft_balances
     except Exception as e:
-        send_error_to_discord(
-            e, "Error in Fetching Nfts", "Subgraph Error", chain
-        )
+        send_error_to_discord(e, "Error in Fetching Nfts", "Subgraph Error", chain)
         raise e

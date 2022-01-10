@@ -3,6 +3,7 @@ from typing import Dict, Optional, Tuple
 
 from badger_api.config import get_api_base_path
 from helpers.constants import BOOST_CHAINS
+from helpers.enums import Network
 from helpers.http_client import http_client
 
 badger_api = get_api_base_path()
@@ -37,10 +38,15 @@ def fetch_token_prices() -> Dict[str, float]:
 
 
 @lru_cache
-def fetch_token_names(chain: str) -> Optional[Dict]:
+def fetch_token_names(chain: Network) -> Optional[Dict]:
     return http_client.get(f"{badger_api}/tokens?chain={chain}")
 
 
-def fetch_token(chain: str, token: str) -> Optional[Dict]:
+def fetch_token(chain: Network, token: str) -> Optional[Dict]:
     token_names = fetch_token_names(chain)
     return token_names.get(token, {}) if token_names else None
+
+
+def fetch_token_decimals(chain: Network, token: str) -> int:
+    token = fetch_token(chain, token)
+    return token.get("decimals", 0)

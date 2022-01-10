@@ -54,10 +54,7 @@ class RewardsManager:
         """
         flat_rewards_list = []
         boosted_rewards_list = []
-        custom_behaviour = {
-            ETH_BADGER_TREE: eth_tree_handler
-        }
-
+        custom_behaviour = {ETH_BADGER_TREE: eth_tree_handler}
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
@@ -107,7 +104,11 @@ class RewardsManager:
                 sett, all_schedules[sett]
             )
             table.append(
-                [sett_name, boosted.totals_info(self.chain), flat.totals_info(self.chain)]
+                [
+                    sett_name,
+                    boosted.totals_info(self.chain),
+                    flat.totals_info(self.chain),
+                ]
             )
             all_rewards.append(rewards)
 
@@ -226,9 +227,7 @@ class RewardsManager:
             f"Fetched {len(tree_distributions)} tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
-        custom_behaviour = {
-            ETH_BADGER_TREE: eth_tree_handler
-        }
+        custom_behaviour = {ETH_BADGER_TREE: eth_tree_handler}
         for dist in tree_distributions:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]
@@ -242,6 +241,8 @@ class RewardsManager:
                 sett, self.web3.toChecksumAddress(token), amount
             )
             all_dist_rewards.append(
-                distribute_rewards_to_snapshot(amount, snapshot, token, custom_rewards=custom_behaviour)
+                distribute_rewards_to_snapshot(
+                    amount, snapshot, token, custom_rewards=custom_behaviour
+                )
             )
         return combine_rewards(all_dist_rewards, self.cycle)

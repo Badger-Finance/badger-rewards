@@ -41,7 +41,9 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
                 user_boost = multiplier
                 user_stake_range = stake_range
 
-        stake_data_ranges[user_stake_range] = stake_data_ranges.get(user_stake_range, 0) + 1
+        stake_data_ranges[user_stake_range] = (
+            stake_data_ranges.get(user_stake_range, 0) + 1
+        )
         badger_boost_data[addr] = user_boost if stake_ratio != 0 else 1
     return badger_boost_data, stake_data_ranges
 
@@ -125,7 +127,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
             "nftBalance": boost_metadata.get("nftBalance", 0),
             "stakeRatio": boost_metadata.get("stakeRatio", 0),
             "multipliers": {},
-            "nfts": boost_metadata.get("nfts", [])
+            "nfts": boost_metadata.get("nfts", []),
         }
 
     stake_data = {k: stake_data[k] for k in sorted(stake_data, reverse=True)}

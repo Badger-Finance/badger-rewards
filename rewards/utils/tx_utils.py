@@ -47,7 +47,9 @@ def get_gas_price_of_tx(
     )
 
     if chain == Network.Ethereum:
-        gas_price_base = Decimal(tx_receipt.get("effectiveGasPrice", 0) / DECIMAL_MAPPING[chain])
+        gas_price_base = Decimal(
+            tx_receipt.get("effectiveGasPrice", 0) / DECIMAL_MAPPING[chain]
+        )
     elif chain in [Network.Polygon, Network.Arbitrum]:
         gas_price_base = Decimal(tx.get("gasPrice", 0) / DECIMAL_MAPPING[chain])
     else:
@@ -155,7 +157,10 @@ def get_transaction(
 
 
 def confirm_transaction(
-    web3: Web3, tx_hash: HexStr, chain: str, timeout: int = 60,
+    web3: Web3,
+    tx_hash: HexStr,
+    chain: str,
+    timeout: int = 60,
     retries_on_failure: Optional[int] = 5,
 ) -> Tuple[bool, str]:
     """Waits for transaction to appear within a given timeframe or before a given block (if specified), and then times out.

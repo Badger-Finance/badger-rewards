@@ -87,7 +87,7 @@ def upload_tree(
         rewards_bucket = "badger-json"
     else:
         rewards_bucket = f"badger-json-{chain}"
-    
+
     key = f"badger-tree-{chain_id}.json"
 
     upload_targets = [

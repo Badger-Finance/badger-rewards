@@ -15,9 +15,9 @@ subgraph_urls = {
         f"tokens-{Network.Arbitrum}": "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-arbitrum",
         "fuse": "https://api.thegraph.com/subgraphs/name/darruma/fuse-subgraph-badger",
         "thegraph": "https://api.thegraph.com/index-node/graphql",
-        "nfts": "https://api.thegraph.com/subgraphs/name/darruma/badger-nfts"
+        "nfts": "https://api.thegraph.com/subgraphs/name/darruma/badger-nfts",
     },
     Environment.Staging: {
         Network.Ethereum: "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts",
-    }
+    },
 }

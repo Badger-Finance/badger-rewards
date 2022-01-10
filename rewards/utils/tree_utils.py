@@ -43,7 +43,7 @@ def calc_next_cycle_range(
     assert end_block <= synced_block
 
     # Sanity check: Ensure start block is not too far in the past
-    #assert start_block < end_block
+    # assert start_block < end_block
 
     # Sanity check: Ensure start block is not too close to end block
     return current_rewards, start_block, end_block

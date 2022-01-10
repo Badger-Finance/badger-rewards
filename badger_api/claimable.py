@@ -13,14 +13,14 @@ from subgraph.queries.setts import last_synced_block
 
 @lru_cache
 def get_claimable_metadata(chain: Network, block: int) -> Dict:
-    kce = Key("chain").eq(chain) & Key("startBlock").between(
-        0, block
-    )
+    kce = Key("chain").eq(chain) & Key("startBlock").between(0, block)
     table = dynamodb.Table(get_metadata_table(env_config.production))
     try:
         output = table.query(
-            IndexName="IndexMetadataChainAndStartBlock", KeyConditionExpression=kce,
-            ScanIndexForward=False, Limit=1
+            IndexName="IndexMetadataChainAndStartBlock",
+            KeyConditionExpression=kce,
+            ScanIndexForward=False,
+            Limit=1,
         )
     except ClientError as e:
         send_error_to_discord(
@@ -63,12 +63,10 @@ def get_claimable_balances(chain: Network, chain_start_block: str) -> Dict[str, 
 
 
 def get_latest_claimable_snapshot(chain: Network):
-    metadata = get_latest_claimable_metadata(
-        chain
-    )
+    metadata = get_latest_claimable_metadata(chain)
     return get_claimable_balances(chain, metadata["chainStartBlock"])
 
 
-def get_claimable_snapshot(chain: Network, block: int):
+def get_claimable_data(chain: Network, block: int):
     metadata = get_claimable_metadata(chain, block)
     return get_claimable_balances(chain, metadata["chainStartBlock"])

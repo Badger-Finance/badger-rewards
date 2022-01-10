@@ -18,6 +18,7 @@ class HTTPClient:
 
     Implement more HTTP methods as needed
     """
+
     def __init__(self, http_session: requests.Session):
         self.http = http_session
         assert type(self.http) == requests.Session
@@ -28,9 +29,7 @@ class HTTPClient:
             return response_obj.json()
 
     def get(self, url, **kwargs) -> Optional[Union[Dict, List]]:
-        return self._unwrap_response(
-            self.http.get(url, **kwargs)
-        )
+        return self._unwrap_response(self.http.get(url, **kwargs))
 
     def post(self, url, data=None, json=None, **kwargs) -> Optional[Union[Dict, List]]:
         return self._unwrap_response(

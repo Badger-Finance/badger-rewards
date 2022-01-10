@@ -51,15 +51,16 @@ def sett_snapshot(chain: Network, block: int, sett: str, blacklist: bool) -> Sna
     """
     token = fetch_token(chain, sett)
     name = token.get("name", "")
-    console.log(
-        f"Taking snapshot on {chain} of {name} ({sett}) at {block}\n"
-    )
+    console.log(f"Taking snapshot on {chain} of {name} ({sett}) at {block}\n")
     sett_balances = fetch_sett_balances(chain, block, sett)
     return parse_sett_balances(sett, sett_balances, chain, blacklist)
 
 
 def parse_sett_balances(
-    sett_address: str, balances: Dict[str, float], chain: Network, blacklist: bool = True
+    sett_address: str,
+    balances: Dict[str, float],
+    chain: Network,
+    blacklist: bool = True,
 ) -> Snapshot:
     """
     Blacklist balances and add metadata for boost

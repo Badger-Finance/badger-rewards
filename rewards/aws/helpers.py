@@ -11,7 +11,7 @@ logger = logging.getLogger("aws-helpers")
 
 if config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]:
     s3 = boto3.client("s3")
-    dynamodb = boto3.resource("dynamodb", region_name='us-west-1')
+    dynamodb = boto3.resource("dynamodb", region_name="us-west-1")
 else:
     s3 = boto3.client(
         "s3",
@@ -20,7 +20,7 @@ else:
     )
     dynamodb = boto3.resource(
         "dynamodb",
-        region_name='us-west-1',
+        region_name="us-west-1",
         aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
         aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"),
     )
