@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from gql import gql
 from rich.console import Console
 from web3 import Web3
@@ -19,6 +21,9 @@ def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
                 token {
                     id
                     symbol
+                }
+                strategy {
+                    id
                 }
                 amount
                 blockNumber
@@ -45,6 +50,7 @@ def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
             else:
                 dist["token"] = Web3.toChecksumAddress(dist["token"]["id"])
             dist["sett"] = Web3.toChecksumAddress(dist["sett"]["id"])
+            dist["strategy"] = Web3.toChecksumAddress(dist["strategy"]["id"])
 
         if len(dist_data) == 0:
             break
@@ -52,8 +58,30 @@ def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
             tree_distributions = [*tree_distributions, *dist_data]
         if len(dist_data) > 0:
             last_dist_id = dist_data[-1]["id"]
+    grouped_distributions_by_strategy = defaultdict(list)
+    for distribution in tree_distributions:
+        grouped_distributions_by_strategy[distribution['strategy']].append(distribution)
+    for strategy, dists in grouped_distributions_by_strategy.items():
+        grouped_distributions_by_strategy[strategy] = sorted(dists, key=lambda d: d["timestamp"])
+    # For each distribution populate end of the distribution behind it by adding
+    # end_of_previous_dist data point. If this is a first distribution returned from subgraph,
+    # end_of_previous_dist should be same as start of current distribution
+    for __, distributions in grouped_distributions_by_strategy.items():
+        for dist in distributions:
+            if distributions.index(dist) == 0:
+                dist['end_of_previous_dist_timestamp'] = dist['timestamp']
+                continue
+            dist['end_of_previous_dist_timestamp'] = int(
+                distributions[distributions.index(dist) - 1]["timestamp"]
+            )
+    final_filtered_distributions = []
+    for all_distributions in grouped_distributions_by_strategy.values():
+        for dist in all_distributions:
+            if start_timestamp < int(dist["timestamp"]) <= end_timestamp:
+                final_filtered_distributions.append(dist)
+
     return [
-        td
-        for td in tree_distributions
-        if start_timestamp < int(td["timestamp"]) <= end_timestamp
+        distr
+        for grouped_distrs in grouped_distributions_by_strategy.values() for distr in grouped_distrs
+        if start_timestamp < int(distr["timestamp"]) <= end_timestamp
     ]

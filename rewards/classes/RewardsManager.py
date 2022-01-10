@@ -226,8 +226,10 @@ class RewardsManager:
         )
         all_dist_rewards = []
         for dist in tree_distributions:
-            start_block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
-            end_block = get_block_by_timestamp(self.chain, int(dist["last_timestamp"]))
+            start_block = get_block_by_timestamp(
+                self.chain, int(dist["end_of_previous_dist_timestamp"])
+            )
+            end_block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]
             sett = dist["sett"]
             snapshot = total_harvest_sett_snapshot(
