@@ -1,4 +1,6 @@
 from collections import defaultdict
+from typing import Dict
+from typing import List
 
 from gql import gql
 from rich.console import Console
@@ -9,7 +11,31 @@ from subgraph.subgraph_utils import make_gql_client
 console = Console()
 
 
-def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
+def _populate_end_of_previous_harvest(tree_distributions: List[Dict]):
+    """
+    This function groups distributions by strategy and adds
+    param end_of_previous_dist_timestamp to each distribution item
+    """
+    grouped_distributions_by_strategy = defaultdict(list)
+    for distribution in tree_distributions:
+        grouped_distributions_by_strategy[distribution['strategy']].append(distribution)
+    for strategy, dists in grouped_distributions_by_strategy.items():
+        grouped_distributions_by_strategy[strategy] = sorted(dists, key=lambda d: d["timestamp"])
+    # For each distribution populate end of the distribution behind it by adding
+    # end_of_previous_dist data point. If this is a first distribution returned from subgraph,
+    # end_of_previous_dist should be same as start of current distribution
+    for __, distributions in grouped_distributions_by_strategy.items():
+        for dist in distributions:
+            if distributions.index(dist) == 0:
+                dist['end_of_previous_dist_timestamp'] = dist['timestamp']
+                continue
+            dist['end_of_previous_dist_timestamp'] = int(
+                distributions[distributions.index(dist) - 1]["timestamp"]
+            )
+    return grouped_distributions_by_strategy
+
+
+def fetch_tree_distributions(start_timestamp, end_timestamp, chain) -> List[Dict]:
     tree_client = make_gql_client(chain)
     query = gql(
         """
@@ -58,30 +84,10 @@ def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
             tree_distributions = [*tree_distributions, *dist_data]
         if len(dist_data) > 0:
             last_dist_id = dist_data[-1]["id"]
-    grouped_distributions_by_strategy = defaultdict(list)
-    for distribution in tree_distributions:
-        grouped_distributions_by_strategy[distribution['strategy']].append(distribution)
-    for strategy, dists in grouped_distributions_by_strategy.items():
-        grouped_distributions_by_strategy[strategy] = sorted(dists, key=lambda d: d["timestamp"])
-    # For each distribution populate end of the distribution behind it by adding
-    # end_of_previous_dist data point. If this is a first distribution returned from subgraph,
-    # end_of_previous_dist should be same as start of current distribution
-    for __, distributions in grouped_distributions_by_strategy.items():
-        for dist in distributions:
-            if distributions.index(dist) == 0:
-                dist['end_of_previous_dist_timestamp'] = dist['timestamp']
-                continue
-            dist['end_of_previous_dist_timestamp'] = int(
-                distributions[distributions.index(dist) - 1]["timestamp"]
-            )
-    final_filtered_distributions = []
-    for all_distributions in grouped_distributions_by_strategy.values():
-        for dist in all_distributions:
-            if start_timestamp < int(dist["timestamp"]) <= end_timestamp:
-                final_filtered_distributions.append(dist)
+    modified_tree_distributions = _populate_end_of_previous_harvest(tree_distributions)
 
     return [
         distr
-        for grouped_distrs in grouped_distributions_by_strategy.values() for distr in grouped_distrs
+        for grouped_distrs in modified_tree_distributions.values() for distr in grouped_distrs
         if start_timestamp < int(distr["timestamp"]) <= end_timestamp
     ]
