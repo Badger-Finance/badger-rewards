@@ -94,7 +94,7 @@ def setup_dynamodb(aws_credentials):
             aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
         )
         dynamodb_client.create_table(
-            TableName="metadata",
+            TableName="metadata-staging",
             AttributeDefinitions=[
                 {"AttributeName": "chainStartBlock", "AttributeType": "S"},
                 {"AttributeName": "chain", "AttributeType": "S"},
@@ -114,7 +114,7 @@ def setup_dynamodb(aws_credentials):
         )
 
         dynamodb_client.create_table(
-            TableName="unclaimed-snapshots",
+            TableName="unclaimed-snapshots-staging",
             AttributeDefinitions=[
                 {"AttributeName": "chainStartBlock", "AttributeType": "S"},
                 {"AttributeName": "address", "AttributeType": "S"},
