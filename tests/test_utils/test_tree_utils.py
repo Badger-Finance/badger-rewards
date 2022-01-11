@@ -1,10 +1,8 @@
 import json
 import os
 
-import boto3
 import pytest
 from eth_account import Account
-from moto import mock_dynamodb2
 
 from tests.utils import chains, mock_tree, set_env_vars, test_address, test_key
 
@@ -72,10 +70,6 @@ def aws_credentials():
     chains,
     indirect=True,
 )
-def test_calc_next_cycle_range(tree_manager):
-    from moto.core import patch_resource
-
-    from rewards.aws.helpers import dynamodb
-    patch_resource(dynamodb)
+def test_calc_next_cycle_range(tree_manager, setup_dynamodb):
     result = calc_next_cycle_range(tree_manager.chain, tree_manager)
     assert result[0] == mock_tree

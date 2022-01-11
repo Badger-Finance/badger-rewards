@@ -1,4 +1,6 @@
+import boto3
 import pytest
+from moto import mock_dynamodb2
 
 from badger_api.requests import fetch_token_names, fetch_token_prices
 from rewards.snapshot.claims_snapshot import claims_snapshot
@@ -67,6 +69,108 @@ def mock_snapshots(mocker):
     mocker.patch(
         "rewards.boost.boost_utils.nft_snapshot_usd", return_value=NFT_SNAPSHOT_DATA
     )
+
+
+@pytest.fixture
+def setup_dynamodb():
+    with mock_dynamodb2():
+        dynamodb_client = boto3.client("dynamodb")
+        dynamodb_client.create_table(
+            TableName="metadata",
+            AttributeDefinitions=[
+                {"AttributeName": "chainStartBlock", "AttributeType": "S"},
+                {"AttributeName": "chain", "AttributeType": "S"},
+                {"AttributeName": "startBlock", "AttrributeType": "N"},
+            ],
+            KeySchema=[{"AttributeName": "chainStartBlock", "KeyType": "HASH"}],
+            GlobalSecondaryIndexes=[
+                {
+                    "IndexName": "IndexMetadataChainAndStartBlock",
+                    "KeySchema": [
+                        {"AttributeName": "chain", "KeyType": "HASH"},
+                        {"AttributeName": "startBlock", "KeyType": "RANGE"},
+                    ],
+                    "Projection": {"ProjectionType": "ALL"},
+                }
+            ],
+        )
+
+        dynamodb_client.create_table(
+            TableName="unclaimed-snapshots",
+            AttributeDefinitions=[
+                {"AttributeName": "chainStartBlock", "AttributeType": "S"},
+                {"AttributeName": "address", "AttributeType": "S"},
+            ],
+            KeySchema=[{"AttributeName": "chainStartBlock", "KeyType": "HASH"}, {'AttributeName': "address", "KeyType": "RANGE"}],
+        )
+
+        dynamodb_resource = boto3.resource("dynamodb")
+
+        metadata_table = dynamodb_resource.Table("metadata")
+        metadata_table.update_item(
+            Key={"chainStartBlock": "ethereum_13957559"},
+            ExpressionAttributeNames={
+                "#CH": "chain",
+                "#EB": "endBlock",
+                "#SB": "startBlock",
+            },
+            ExpressionAttributeValues={
+                ":ch": "ethereum",
+                ":eb": "13958081",
+                ":sb": "13957559",
+            },
+            UpdateExpression="SET #CH=:ch, #EB=:rt, #SB=:ft",
+        )
+        metadata_table.update_item(
+            Key={"chainStartBlock": "polygon_22597558"},
+            ExpressionAttributeNames={
+                "#CH": "chain",
+                "#EB": "endBlock",
+                "#SB": "startBlock",
+            },
+            ExpressionAttributeValues={
+                ":ch": "polygon",
+                ":eb": "23599058",
+                ":sb": "22597558",
+            },
+            UpdateExpression="SET #CH=:ch, #EB=:rt, #SB=:ft",
+        )
+        metadata_table.update_item(
+            Key={"chainStartBlock": "arbitrum_3902125"},
+            ExpressionAttributeNames={
+                "#CH": "chain",
+                "#EB": "endBlock",
+                "#SB": "startBlock",
+            },
+            ExpressionAttributeValues={
+                ":ch": "arbitrum",
+                ":eb": "3903105",
+                ":sb": "3902125",
+            },
+            UpdateExpression="SET #CH=:ch, #EB=:rt, #SB=:ft",
+        )
+
+        unclaimed_snapshots_table = dynamodb_resource.Table("unclaimed-snapshots")
+        unclaimed_snapshots_table.update_item(
+            Key={"chainStartBlock": "ethereum_13957559"},
+            ExpressionAttributeNames={"#A": "address", "#C": "chain", "#CB": "claimableBalances"},
+            ExpressionAttributeValues={":a": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84", ":c": "ethereum", ":cb": "[]"},
+            UpdateExpression="SET #A=:a, #C=:c, #cb=:CB",
+        )
+        unclaimed_snapshots_table.update_item(
+            Key={"chainStartBlock": "polygon_22597558"},
+            ExpressionAttributeNames={"#A": "address", "#C": "chain", "#CB": "claimableBalances"},
+            ExpressionAttributeValues={":a": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84", ":c": "polygon", ":cb": "[]"},
+            UpdateExpression="SET #A=:a, #C=:c, #cb=:CB",
+        )
+        unclaimed_snapshots_table.update_item(
+            Key={"chainStartBlock": "arbitrum_3902125"},
+            ExpressionAttributeNames={"#A": "address", "#C": "chain", "#CB": "claimableBalances"},
+            ExpressionAttributeValues={":a": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84", ":c": "arbitrum", ":cb": "[]"},
+            UpdateExpression="SET #A=:a, #C=:c, #cb=:CB",
+        )
+
+        yield dynamodb_client, dynamodb_resource
 
 
 @pytest.fixture(autouse=True)
