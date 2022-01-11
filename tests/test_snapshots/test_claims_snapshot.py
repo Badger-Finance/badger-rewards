@@ -192,7 +192,6 @@ def test_claims_snapshot_digg(claimable_block, monkeypatch):
     )
     snapshots = claims_snapshot(Network.Ethereum, claimable_block)
     digg_snapshot = snapshots[DIGG]
-    print()
     assert digg_snapshot.type == BalanceType.Native
     assert digg_snapshot.ratio == 1
     assert digg_snapshot.token == DIGG

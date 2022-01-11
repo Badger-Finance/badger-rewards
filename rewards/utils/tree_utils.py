@@ -33,13 +33,10 @@ def calc_next_cycle_range(
 ) -> Tuple[Dict, int, int]:
     # Fetch the appropriate file
     current_rewards = tree_manager.fetch_current_tree()
-
     last_claim_end = tree_manager.last_publish_end_block()
     start_block = last_claim_end + 1
     synced_block = last_synced_block(chain)
     metadata = get_claimable_metadata(chain, synced_block)
-    print(metadata)
-    print(start_block)
     end_block = metadata["endBlock"]
     assert end_block <= synced_block
 
