@@ -3,7 +3,9 @@ import os
 
 import pytest
 from eth_account import Account
+from moto.core import patch_resource
 
+from rewards.aws.helpers import dynamodb
 from tests.utils import chains, mock_tree, set_env_vars, test_address, test_key
 
 set_env_vars()
@@ -62,5 +64,7 @@ def test_get_last_proposed_cycle(tree_manager):
     indirect=True,
 )
 def test_calc_next_cycle_range(tree_manager, setup_dynamodb):
+    patch_resource(dynamodb)
+
     result = calc_next_cycle_range(tree_manager.chain, tree_manager)
     assert result[0] == mock_tree
