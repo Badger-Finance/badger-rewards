@@ -7,7 +7,6 @@ from rich.console import Console
 from web3 import Web3
 from web3.contract import ContractFunctions
 
-from badger_api.requests import fetch_token, fetch_token_names
 from helpers.constants import DISABLED_VAULTS, EMISSIONS_CONTRACTS, NATIVE
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BotType, Network
