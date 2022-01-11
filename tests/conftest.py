@@ -125,7 +125,12 @@ def setup_dynamodb(aws_credentials):
             ],
         )
 
-        dynamodb_resource = boto3.resource("dynamodb", region_name="us-west-1")
+        dynamodb_resource = boto3.resource(
+            "dynamodb",
+            region_name="us-west-1",
+            aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+            aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+        )
 
         metadata_table = dynamodb_resource.Table("metadata")
         metadata_table.update_item(
@@ -173,7 +178,10 @@ def setup_dynamodb(aws_credentials):
 
         unclaimed_snapshots_table = dynamodb_resource.Table("unclaimed-snapshots")
         unclaimed_snapshots_table.update_item(
-            Key={"chainStartBlock": "ethereum_13957559", "address": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84"},
+            Key={
+                "chainStartBlock": "ethereum_13957559",
+                "address": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84",
+            },
             ExpressionAttributeNames={
                 "#A": "address",
                 "#C": "chain",
@@ -185,7 +193,10 @@ def setup_dynamodb(aws_credentials):
             UpdateExpression="SET #A=:a, #C=:c",
         )
         unclaimed_snapshots_table.update_item(
-            Key={"chainStartBlock": "polygon_22597558", "address": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84"},
+            Key={
+                "chainStartBlock": "polygon_22597558",
+                "address": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84",
+            },
             ExpressionAttributeNames={
                 "#A": "address",
                 "#C": "chain",
@@ -197,7 +208,10 @@ def setup_dynamodb(aws_credentials):
             UpdateExpression="SET #A=:a, #C=:c",
         )
         unclaimed_snapshots_table.update_item(
-            Key={"chainStartBlock": "arbitrum_3902125", "address": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84"},
+            Key={
+                "chainStartBlock": "arbitrum_3902125",
+                "address": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84",
+            },
             ExpressionAttributeNames={
                 "#A": "address",
                 "#C": "chain",
