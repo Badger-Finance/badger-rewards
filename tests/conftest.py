@@ -132,7 +132,7 @@ def setup_dynamodb(aws_credentials):
             aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
         )
 
-        metadata_table = dynamodb_resource.Table("metadata")
+        metadata_table = dynamodb_resource.Table("metadata-staging")
         metadata_table.update_item(
             Key={"chainStartBlock": "ethereum_13957559"},
             ExpressionAttributeNames={
@@ -176,7 +176,7 @@ def setup_dynamodb(aws_credentials):
             UpdateExpression="SET #CH=:ch, #EB=:eb, #SB=:sb",
         )
 
-        unclaimed_snapshots_table = dynamodb_resource.Table("unclaimed-snapshots")
+        unclaimed_snapshots_table = dynamodb_resource.Table("unclaimed-snapshots-staging")
         unclaimed_snapshots_table.update_item(
             Key={
                 "chainStartBlock": "ethereum_13957559",
