@@ -7,6 +7,7 @@ from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
+from helpers.constants import NUMBER_OF_SNAPSHOTS_FOR_SETT
 from helpers.discord import get_discord_url
 from helpers.discord import send_code_block_to_discord
 from helpers.enums import BalanceType
@@ -242,7 +243,7 @@ class RewardsManager:
                 end_block,
                 sett,
                 blacklist=False,
-                number_of_snapshots=3,
+                number_of_snapshots=NUMBER_OF_SNAPSHOTS_FOR_SETT
             )
             amount = int(dist["amount"])
             all_dist_rewards.append(

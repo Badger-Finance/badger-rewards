@@ -56,8 +56,9 @@ def total_harvest_sett_snapshot(
     snapshot += sett_snapshot(chain, end_block, sett, blacklist)
     rate = int((end_block - start_block) / number_of_snapshots)
     # If rate == 0 it means that number of snapshots is too big, and it cannot be calculated
-    # properly
-    # For ex: start block 13710328, end block 13710338 and num of snaps == 14
+    # properly.
+    # For ex: start block = 100, end block = 110 and num of snaps = 14,
+    # requesting more snapshots than blocks in the timeframe
     if rate == 0:
         return snapshot
     current_block = start_block
