@@ -34,6 +34,7 @@ def cycle_key() -> str:
 def tree_manager(cycle_key, request) -> TreeManager:
     tree_manager = TreeManager(request.param, Account.from_key(cycle_key))
     tree_manager.validate_tree = mock_validate_tree
+    tree_manager.last_publish_end_block = lambda: 0
     return tree_manager
 
 
