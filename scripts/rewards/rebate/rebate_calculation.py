@@ -27,9 +27,7 @@ def rebate(tree, tree_manager: TreeManager):
     
     rewards_list.cycle += 1
 
-    add_rewards(rewards_list, "rebates/bip71_gas_rebate.csv")
-    add_rewards(rewards_list, "rebates/bip71_wd_fee.csv")
-    add_rewards(rewards_list, "rebates/bip75_first_point.csv")
+    add_rewards(rewards_list, "rebates/missing_bip75_first_point.csv")
     add_rewards(rewards_list, "rebates/bip75_second_point.csv")
 
     start_block = int(tree["endBlock"]) + 1
