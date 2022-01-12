@@ -77,4 +77,4 @@ def tree_manager(cycle_key) -> TreeManager:
 @pytest.mark.parametrize("chain", chains)
 def test_get_latest_claimable_snapshot(chain, setup_dynamodb):
     patch_resource(dynamodb)
-    get_latest_claimable_snapshot(chain)
+    assert len(get_latest_claimable_snapshot(chain)) > 0
