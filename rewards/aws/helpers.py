@@ -9,22 +9,7 @@ from decouple import config
 
 logger = logging.getLogger("aws-helpers")
 
-if config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]:
-    s3 = boto3.client("s3")
-    dynamodb = boto3.resource("dynamodb", region_name="us-west-1")
-else:
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
-        aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"),
-    )
-    dynamodb = boto3.resource(
-        "dynamodb",
-        region_name="us-west-1",
-        aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
-        aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"),
-    )
-
+DYNAMO_ASSUME_ROLE = "arn:aws:iam::784874126256:role/k8s-bots"
 
 def get_metadata_table(production: bool):
     return "metadata" if production else "metadata-staging"
@@ -118,13 +103,13 @@ def get_secret(
     return None
 
 
-def get_assume_role_credentials(assume_role_arn: str):
+def get_assume_role_credentials(assume_role_arn: str, session_name: str = "AssumeRoleSession1"):
     sts_client = boto3.client("sts")
 
     # Call the assume_role method of the STSConnection object and pass the role
     # ARN and a role session name.
     assumed_role_object = sts_client.assume_role(
-        RoleArn=assume_role_arn, RoleSessionName="AssumeRoleSession1"
+        RoleArn=assume_role_arn, RoleSessionName=session_name
     )
 
     # From the response that contains the assumed role, get the temporary
@@ -132,3 +117,26 @@ def get_assume_role_credentials(assume_role_arn: str):
     credentials = assumed_role_object["Credentials"]
 
     return credentials
+
+
+if config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]:
+    credentials = get_assume_role_credentials(DYNAMO_ASSUME_ROLE, session_name="AssumeDynamoRole")
+    session = boto3.session.Session(
+        aws_access_key_id=credentials["AccessKeyId"],
+        aws_secret_access_key=credentials["SecretAccessKey"],
+        aws_session_token=credentials["SessionToken"],
+    )
+    s3 = boto3.client("s3")
+    dynamodb = session.resource("dynamodb", region_name="us-west-1")
+else:
+    s3 = boto3.client(
+        "s3",
+        aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"),
+    )
+    dynamodb = boto3.resource(
+        "dynamodb",
+        region_name="us-west-1",
+        aws_access_key_id=config("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=config("AWS_SECRET_ACCESS_KEY"),
+    )
