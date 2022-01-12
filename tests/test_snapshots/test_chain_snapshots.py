@@ -169,7 +169,7 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_bal
 )
 @pytest.mark.parametrize(
     "snapshots_number",
-    [3, 6, 1, 5]
+    [3, 6, 5]
 )
 def test_total_harvest_sett_snapshot__even_balance(
         chain, snapshots_number: int, mock_fetch_sett_balances, responses_mock_token_balance):
@@ -183,6 +183,20 @@ def test_total_harvest_sett_snapshot__even_balance(
     expected_amount: Decimal = Decimal(
         list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]
     ) * (snapshots_number + 2)
+    assert list(snapshot.balances.values())[0] == approx(expected_amount)
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Arbitrum]
+)
+def test_total_harvest_sett_snapshot__even_balance_single_snap(
+        chain, mock_fetch_sett_balances, responses_mock_token_balance):
+    snapshot = total_harvest_sett_snapshot(
+        chain, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
+        number_of_snapshots=1
+    )
+    expected_amount: Decimal = Decimal(list(BALANCES_DATA[BBADGER_ADDRESS].values())[0])
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
@@ -214,11 +228,12 @@ def test_total_harvest_sett_snapshot__uneven_balance(chain, mocker, responses_mo
             {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': initial_balance},
             {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.01},
             {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0},
+            {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0},
         ]
     ):
         snapshot = total_harvest_sett_snapshot(
             Network.Ethereum, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
-            number_of_snapshots=1
+            number_of_snapshots=2
         )
     assert snapshot.token == BBADGER_ADDRESS
     expected_amount: Decimal = Decimal((initial_balance + 0.01 + 0))
