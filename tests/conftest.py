@@ -86,7 +86,6 @@ def aws_credentials():
 @pytest.fixture
 def setup_dynamodb():
     with mock_dynamodb2():
-        print(os.environ)
         dynamodb_client = boto3.client(
             "dynamodb",
             region_name="us-west-1",
@@ -176,7 +175,9 @@ def setup_dynamodb():
             UpdateExpression="SET #CH=:ch, #EB=:eb, #SB=:sb",
         )
 
-        unclaimed_snapshots_table = dynamodb_resource.Table("unclaimed-snapshots-staging")
+        unclaimed_snapshots_table = dynamodb_resource.Table(
+            "unclaimed-snapshots-staging"
+        )
         unclaimed_snapshots_table.update_item(
             Key={
                 "chainStartBlock": "ethereum_13957559",
@@ -185,10 +186,12 @@ def setup_dynamodb():
             ExpressionAttributeNames={
                 "#A": "address",
                 "#C": "chain",
+                "#CB": "claimableBalances",
             },
             ExpressionAttributeValues={
                 ":a": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84",
                 ":c": "ethereum",
+                ":cb": [],
             },
             UpdateExpression="SET #A=:a, #C=:c",
         )
@@ -200,10 +203,12 @@ def setup_dynamodb():
             ExpressionAttributeNames={
                 "#A": "address",
                 "#C": "chain",
+                "#CB": "claimableBalances",
             },
             ExpressionAttributeValues={
                 ":a": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84",
                 ":c": "polygon",
+                ":cb": [],
             },
             UpdateExpression="SET #A=:a, #C=:c",
         )
@@ -215,10 +220,12 @@ def setup_dynamodb():
             ExpressionAttributeNames={
                 "#A": "address",
                 "#C": "chain",
+                "#CB": "claimableBalances",
             },
             ExpressionAttributeValues={
                 ":a": "0x00C67d9D6D3D13b42a87424E145826c467CcCd84",
                 ":c": "arbitrum",
+                ":cb": [],
             },
             UpdateExpression="SET #A=:a, #C=:c",
         )

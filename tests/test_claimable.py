@@ -3,8 +3,12 @@ import os
 
 import pytest
 from eth_account import Account
+from moto.core import patch_resource
 
+from badger_api.claimable import get_latest_claimable_snapshot
+from rewards.aws.helpers import dynamodb
 from tests.utils import (
+    chains,
     mock_claimable_bals,
     mock_claimed_for,
     mock_tree,
@@ -69,3 +73,9 @@ def tree_manager(cycle_key) -> TreeManager:
     tree_manager.validate_tree = mock_validate_tree
     tree_manager.get_claimed_for = mock_get_claimed_for
     return tree_manager
+
+
+@pytest.mark.parametrize("chain", chains)
+def test_get_latest_claimable_snapshot(chain, setup_dynamodb):
+    patch_resource(dynamodb)
+    get_latest_claimable_snapshot(chain)
