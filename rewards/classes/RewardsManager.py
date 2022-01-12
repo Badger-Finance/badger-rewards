@@ -14,7 +14,7 @@ from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
-from rewards.emission_handlers import eth_tree_handler
+from rewards.emission_handlers import unclaimed_rewards_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
@@ -55,7 +55,7 @@ class RewardsManager:
         """
         flat_rewards_list = []
         boosted_rewards_list = []
-        custom_behaviour = {ETH_BADGER_TREE: eth_tree_handler}
+        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler}
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
@@ -228,7 +228,7 @@ class RewardsManager:
             f"Fetched {len(tree_distributions)} tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
-        custom_behaviour = {ETH_BADGER_TREE: eth_tree_handler}
+        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler}
         for dist in tree_distributions:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]

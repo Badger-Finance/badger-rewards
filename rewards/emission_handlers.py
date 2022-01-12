@@ -4,7 +4,7 @@ from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.utils.rewards_utils import distribute_rewards_to_snapshot
 
 
-def eth_tree_handler(amount: float, token: str, sett: str, block: int):
+def unclaimed_rewards_handler(amount: float, token: str, sett: str, block: int):
     claiamble = claims_snapshot(Network.Ethereum, block)
     BCVXCRV = SETTS[Network.Ethereum]["cvx_crv"]
     BVECVX = SETTS[Network.Ethereum]["bvecvx"]
