@@ -5,8 +5,8 @@ from rewards.utils.rewards_utils import distribute_rewards_to_snapshot
 
 
 def unclaimed_rewards_handler(amount: float, token: str, sett: str, block: int):
-    claiamble = claims_snapshot(Network.Ethereum, block)
+    claimable = claims_snapshot(Network.Ethereum, block)
     BCVXCRV = SETTS[Network.Ethereum]["cvx_crv"]
     BVECVX = SETTS[Network.Ethereum]["bvecvx"]
     if sett in [BCVXCRV, BVECVX]:
-        return distribute_rewards_to_snapshot(amount, claiamble[sett], token)
+        return distribute_rewards_to_snapshot(amount, claimable[sett], token)
