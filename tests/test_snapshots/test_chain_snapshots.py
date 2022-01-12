@@ -13,8 +13,8 @@ from rewards.snapshot.chain_snapshot import (
     chain_snapshot_usd,
     parse_sett_balances,
     sett_snapshot,
+    total_harvest_sett_snapshot,
 )
-from rewards.snapshot.chain_snapshot import total_harvest_sett_snapshot
 
 BALANCES_DATA = {
     # Badger Token

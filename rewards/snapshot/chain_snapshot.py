@@ -50,10 +50,10 @@ def total_harvest_sett_snapshot(
     the number_of_snapshots
     """
     assert end_block >= start_block
-    snapshot = sett_snapshot(chain, start_block, sett, blacklist)
-    if end_block == start_block:
+    snapshot = sett_snapshot(chain, end_block, sett, blacklist)
+    if end_block == start_block or number_of_snapshots == 1:
         return snapshot
-    snapshot += sett_snapshot(chain, end_block, sett, blacklist)
+    snapshot += sett_snapshot(chain, start_block, sett, blacklist)
     rate = int((end_block - start_block) / number_of_snapshots)
     # If rate == 0 it means that number of snapshots is too big, and it cannot be calculated
     # properly.
