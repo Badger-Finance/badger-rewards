@@ -19,4 +19,5 @@ subgraph_urls = {
     },
     Environment.Staging: {
     },
+    }
 }
