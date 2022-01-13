@@ -193,7 +193,7 @@ def setup_dynamodb():
                 ":c": "ethereum",
                 ":cb": [],
             },
-            UpdateExpression="SET #A=:a, #C=:c",
+            UpdateExpression="SET #A=:a, #C=:c, #CB=:cb",
         )
         unclaimed_snapshots_table.update_item(
             Key={
@@ -210,7 +210,7 @@ def setup_dynamodb():
                 ":c": "polygon",
                 ":cb": [],
             },
-            UpdateExpression="SET #A=:a, #C=:c",
+            UpdateExpression="SET #A=:a, #C=:c, #CB=:cb",
         )
         unclaimed_snapshots_table.update_item(
             Key={
@@ -227,7 +227,7 @@ def setup_dynamodb():
                 ":c": "arbitrum",
                 ":cb": [],
             },
-            UpdateExpression="SET #A=:a, #C=:c",
+            UpdateExpression="SET #A=:a, #C=:c, #CB=:cb",
         )
 
         yield dynamodb_client, dynamodb_resource
