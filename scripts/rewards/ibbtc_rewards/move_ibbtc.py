@@ -36,8 +36,8 @@ def move_ibbtc(tree, tree_manager: TreeManager):
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
     merkle_tree = rewards_to_merkle_tree(rewards_list, start_block, end_block)
-    pre_ibbtc_msig_bcvxcrv = get_cumulative_claimable_for_token(tree["claims"][TECH_OPS], BCVXCRV)
-    post_ibbtc_msig_bcvxcrv = get_cumulative_claimable_for_token(merkle_tree["claims"][TECH_OPS], BCVXCRV)
+    pre_ibbtc_msig_bcvxcrv = get_cumulative_claimable_for_token(tree["claims"][IBBTC_MULTISIG], BCVXCRV)
+    post_ibbtc_msig_bcvxcrv = get_cumulative_claimable_for_token(merkle_tree["claims"][IBBTC_MULTISIG], BCVXCRV)
     # Make sure total rewards don't change
     assert merkle_tree["tokenTotals"][BCVXCRV] == tree["tokenTotals"][BCVXCRV]
     assert bcvx_crv_rewards == post_ibbtc_msig_bcvxcrv - pre_ibbtc_msig_bcvxcrv
