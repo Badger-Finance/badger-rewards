@@ -16,7 +16,9 @@ def negative_balances(tree):
         for token in tokens_to_check:
             if token in claim["tokens"]:
                 claimed_token = int(claimed[1][claimed[0].index(token)])
-                cumulative_amount = int(claim["cumulativeAmounts"][claim["tokens"].index(token)])
+                cumulative_amount = int(
+                    claim["cumulativeAmounts"][claim["tokens"].index(token)]
+                )
                 claimable_amount = int(cumulative_amount) - int(claimed_token)
                 if claimable_amount < 0:
                     if user not in affected_users:

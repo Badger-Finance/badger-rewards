@@ -6,7 +6,7 @@ from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
-from helpers.constants import BOOSTED_EMISSION_TOKENS
+from helpers.constants import BOOSTED_EMISSION_TOKENS, ETH_BADGER_TREE
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType
 from helpers.time_utils import to_hours, to_utc_date
@@ -14,6 +14,7 @@ from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
+from rewards.emission_handlers import unclaimed_rewards_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
@@ -54,7 +55,7 @@ class RewardsManager:
         """
         flat_rewards_list = []
         boosted_rewards_list = []
-        custom_behaviour = {}
+        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler}
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
@@ -107,7 +108,11 @@ class RewardsManager:
                 sett, all_schedules[sett]
             )
             table.append(
-                [sett_name, boosted.totals_info(self.chain), flat.totals_info(self.chain)]
+                [
+                    sett_name,
+                    boosted.totals_info(self.chain),
+                    flat.totals_info(self.chain),
+                ]
             )
             all_rewards.append(rewards)
 
@@ -226,6 +231,7 @@ class RewardsManager:
             f"Fetched {len(tree_distributions)} tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
+        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler}
         for dist in tree_distributions:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]
@@ -239,6 +245,8 @@ class RewardsManager:
                 sett, self.web3.toChecksumAddress(token), amount
             )
             all_dist_rewards.append(
-                distribute_rewards_to_snapshot(amount, snapshot, token)
+                distribute_rewards_to_snapshot(
+                    amount, snapshot, token, custom_rewards=custom_behaviour
+                )
             )
         return combine_rewards(all_dist_rewards, self.cycle)
