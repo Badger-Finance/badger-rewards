@@ -370,6 +370,11 @@ CLAIMABLE_TOKENS = {
     Network.Polygon: {BalanceType.Native: [POLY_BADGER], BalanceType.NonNative: []},
 }
 
+BOOSTED_EMISSION_TOKENS = [
+    BADGER,
+    DIGG
+]
+
 ABI_DIRS = {
     Network.Ethereum: "eth",
     Network.Polygon: "polygon",

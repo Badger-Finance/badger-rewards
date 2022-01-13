@@ -6,6 +6,7 @@ from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
+from helpers.constants import BOOSTED_EMISSION_TOKENS
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType
 from helpers.time_utils import to_hours, to_utc_date
@@ -60,6 +61,8 @@ class RewardsManager:
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
             token_distribution = end_dist - start_dist
             emissions_rate = get_flat_emission_rate(sett, self.chain)
+            if token not in BOOSTED_EMISSION_TOKENS:
+                emissions_rate = 1
             flat_emissions = token_distribution * emissions_rate
             boosted_emissions = token_distribution * (1 - emissions_rate)
             if flat_emissions > 0:
