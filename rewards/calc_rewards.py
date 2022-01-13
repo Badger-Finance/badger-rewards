@@ -206,9 +206,6 @@ def generate_rewards_in_range(
     console.log("Calculating Sett Rewards...")
     sett_rewards = rewards_manager.calculate_all_sett_rewards(setts, all_schedules)
     rewards_list.append(sett_rewards)
-    if chain == Network.Ethereum:
-        sushi_rewards = rewards_manager.calc_sushi_distributions()
-        rewards_list.append(sushi_rewards)
 
     new_rewards = combine_rewards(rewards_list, rewards_manager.cycle)
 
