@@ -88,18 +88,17 @@ def test_get_latest_claimable_snapshot(chain, setup_dynamodb):
         assert 'chain' in cb_data
         assert 'claimableBalances' in cb_data
 
+
 def raise_client_error(chain, block):
-    raise ClientError({},"")
+    raise ClientError({}, "")
 
 
 def test_latest_claimable_snapshot_unhappy(setup_dynamodb, mock_discord, mocker):
     patch_resource(dynamodb)
-    mocker.patch("badger_api.claimable.get_claimable_balances" ,side_effect=raise_client_error)
+    mocker.patch("badger_api.claimable.get_claimable_balances", side_effect=raise_client_error)
     with pytest.raises(ClientError):
         cb_snapshot = get_latest_claimable_snapshot(Network.Ethereum)
         # Make sure discord message was sent
         assert mock_discord.called
         # Make sure only one message was sent to discord
         assert mock_discord.call_count == 1
-
-    
