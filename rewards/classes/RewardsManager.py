@@ -60,9 +60,10 @@ class RewardsManager:
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
             token_distribution = end_dist - start_dist
-            emissions_rate = get_flat_emission_rate(sett, self.chain)
             if token not in BOOSTED_EMISSION_TOKENS:
                 emissions_rate = 1
+            else:
+                emissions_rate = get_flat_emission_rate(sett, self.chain)
             flat_emissions = token_distribution * emissions_rate
             boosted_emissions = token_distribution * (1 - emissions_rate)
             if flat_emissions > 0:
