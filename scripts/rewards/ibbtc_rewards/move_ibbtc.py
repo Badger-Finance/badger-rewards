@@ -15,7 +15,7 @@ from rewards.utils.rewards_utils import (
 def move_ibbtc(tree, tree_manager: TreeManager):
     chain = Network.Ethereum
     rewards_list = merkle_tree_to_rewards_list(tree)
-    BCVXCRV = SETTS[Network.Ethereum]["cvxcrv"]
+    BCVXCRV = SETTS[Network.Ethereum]["cvx_crv"]
     peak_data = tree["claims"][IBBTC_PEAK]
     claimed_for = tree_manager.get_claimed_for(IBBTC_PEAK, [BCVXCRV])
     bcvx_crv_claimed_for = get_claimed_for_token(claimed_for, BCVXCRV)
