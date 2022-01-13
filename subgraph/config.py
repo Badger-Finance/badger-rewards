@@ -18,6 +18,5 @@ subgraph_urls = {
         "nfts": "https://api.thegraph.com/subgraphs/name/darruma/badger-nfts",
     },
     Environment.Staging: {
-    },
     }
 }
