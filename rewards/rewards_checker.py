@@ -91,7 +91,7 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
             name, total_before_token, total_after_token, decimals
         )
         table.append(table_item)
-        send_code_block_to_discord(
-            msg=tabulate(table, headers=["token", "before", "after", "diff"]),
-            username="Rewards Bot", url=get_discord_url(chain, BotType.Cycle)
-        )
+    send_code_block_to_discord(
+        msg=tabulate(table, headers=["token", "before", "after", "diff"]),
+        username="Rewards Bot", url=get_discord_url(chain, BotType.Cycle)
+    )
