@@ -88,8 +88,13 @@ def propose_root(
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
     boosts = download_boosts(chain)
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager,
-        boosts=boosts
+        chain,
+        start,
+        end,
+        save=save,
+        past_tree=past_rewards,
+        tree_manager=tree_manager,
+        boosts=boosts,
     )
     console.log("Generated rewards")
 
@@ -99,7 +104,7 @@ def propose_root(
     if env_config.production:
         tx_hash, success = tree_manager.propose_root(rewards_data)
         if success:
-            upload_proposed_boosts(boosts,chain)
+            upload_proposed_boosts(boosts, chain)
     return rewards_data
 
 
@@ -124,7 +129,7 @@ def approve_root(
         save=False,
         past_tree=current_rewards,
         tree_manager=tree_manager,
-        boosts=boosts
+        boosts=boosts,
     )
     if env_config.test or env_config.staging:
         console.log(
@@ -179,7 +184,7 @@ def generate_rewards_in_range(
     save: bool,
     past_tree: Dict,
     tree_manager: TreeManager,
-    boosts: Dict
+    boosts: Dict,
 ):
     """Generate chain rewards for a chain within two blocks
 

@@ -40,11 +40,12 @@ if __name__ == "__main__":
         "Rewards Bot",
         url=discord_url,
     )
-    rewards_data = propose_root(chain, start_block, end_block, past_rewards, tree_manager, save=False)
+    rewards_data = propose_root(
+        chain, start_block, end_block, past_rewards, tree_manager, save=False
+    )
     upload_tree(
-                rewards_data["fileName"],
-                rewards_data["merkleTree"],
-                chain,
-                staging=env_config.test or env_config.staging,
-            )
-
+        rewards_data["fileName"],
+        rewards_data["merkleTree"],
+        chain,
+        staging=env_config.test or env_config.staging,
+    )
