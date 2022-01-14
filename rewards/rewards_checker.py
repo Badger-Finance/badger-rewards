@@ -43,7 +43,7 @@ def val(amount, decimals=18):
     return f"{amount / 10 ** decimals:,.18f}"
 
 
-def token_diff_table(
+def token_diff_table_item(
     name: str, before: float, after: float, decimals: Optional[int] = 18
 ) -> Tuple[float, List]:
     diff = after - before
@@ -87,7 +87,7 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
             total_before_token = digg_utils.shares_to_fragments(total_before_token)
             total_after_token = digg_utils.shares_to_fragments(total_after_token)
             decimals = 9
-        diff, table_item = token_diff_table(name, total_before_token, total_after_token, decimals)
+        diff, table_item = token_diff_table_item(name, total_before_token, total_after_token, decimals)
         table.append(table_item)
         send_code_block_to_discord(
             msg=tabulate(table, headers=["token", "before", "after", "diff"]),

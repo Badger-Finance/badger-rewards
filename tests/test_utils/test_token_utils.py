@@ -1,8 +1,8 @@
-from rewards.rewards_checker import token_diff_table
+from rewards.rewards_checker import token_diff_table_item
 
 
 def test_token_diff_table():
-    table_item = token_diff_table(
+    table_item = token_diff_table_item(
         name="bBADGER",
         before=100,
         after=200,
