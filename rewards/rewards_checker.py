@@ -1,9 +1,10 @@
 import json
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 from rich.console import Console
 from tabulate import tabulate
 
+from badger_api.requests import fetch_token
 from helpers.constants import TOKENS_TO_CHECK
 from helpers.digg_utils import digg_utils
 from helpers.discord import (
@@ -11,8 +12,7 @@ from helpers.discord import (
     send_code_block_to_discord,
     send_error_to_discord,
 )
-from helpers.enums import BotType
-from rewards.classes.TreeManager import TreeManager
+from helpers.enums import BotType, Network
 from rewards.snapshot.claims_snapshot import claims_snapshot
 
 console = Console()
@@ -43,21 +43,23 @@ def val(amount, decimals=18):
     return f"{amount / 10 ** decimals:,.18f}"
 
 
-def token_diff_table(
+def token_diff_table_item(
     name: str, before: float, after: float, decimals: Optional[int] = 18
-) -> Tuple[float, str]:
+) -> Tuple[float, List]:
     diff = after - before
     console.print(f"Diff for {name} \n")
-    table = []
-    table.append([f"{name} before", val(before, decimals=decimals)])
-    table.append([f"{name} after", val(after, decimals=decimals)])
-    table.append([f"{name} diff", val(diff, decimals=decimals)])
-    return diff, tabulate(table, headers=["token", "amount"])
+    table_item = [
+        name,
+        val(before, decimals=decimals),
+        val(after, decimals=decimals),
+        val(diff, decimals=decimals),
+    ]
+    return diff, table_item
 
 
-def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
+def verify_rewards(past_tree, new_tree, chain: Network):
     console.log("Verifying Rewards ... \n")
-    claim_snapshot = claims_snapshot(chain)
+    claim_snapshot = claims_snapshot(chain, block=int(new_tree["endBlock"]))
     negative_claimable = []
     for token, snapshot in claim_snapshot.items():
         for addr, amount in snapshot:
@@ -72,27 +74,24 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
             e,
             f"Negative Claimable \n ```{json.dumps(negative_claimable,indent=4)}```",
             "Negative Rewards Error",
-            chain
+            chain,
         )
         raise e
-
+    table = []
     for name, token in TOKENS_TO_CHECK[chain].items():
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
+        token_info = fetch_token(chain, token)
+        decimals = token_info.get("decimals", 18)
         console.log(name, total_before_token, total_after_token)
         if name == "Digg":
-            diff, table = token_diff_table(
-                name,
-                digg_utils.shares_to_fragments(total_before_token),
-                digg_utils.shares_to_fragments(total_after_token),
-                decimals=9,
-            )
-            print(
-                digg_utils.shares_to_fragments(total_before_token),
-                digg_utils.shares_to_fragments(total_after_token),
-            )
-        else:
-            diff, table = token_diff_table(name, total_before_token, total_after_token)
-        send_code_block_to_discord(
-            msg=table, username="Rewards Bot", url=get_discord_url(chain, BotType.Cycle)
+            total_before_token = digg_utils.shares_to_fragments(total_before_token)
+            total_after_token = digg_utils.shares_to_fragments(total_after_token)
+        diff, table_item = token_diff_table_item(
+            name, total_before_token, total_after_token, decimals
         )
+        table.append(table_item)
+    send_code_block_to_discord(
+        msg=tabulate(table, headers=["token", "before", "after", "diff"]),
+        username="Rewards Bot", url=get_discord_url(chain, BotType.Cycle)
+    )

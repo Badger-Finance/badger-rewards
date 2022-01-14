@@ -5,15 +5,16 @@ from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.utils.rewards_utils import distribute_rewards_to_snapshot
 
 
-def eth_tree_handler(amount: float, token: str, sett: str) -> RewardsList:
-    claims = claims_snapshot(Network.Ethereum)
+def unclaimed_rewards_handler(amount: float, token: str, sett: str, block: int):
+    claimable = claims_snapshot(Network.Ethereum, block)
     BCVXCRV = SETTS[Network.Ethereum]["cvx_crv"]
     BVECVX = SETTS[Network.Ethereum]["bvecvx"]
     if sett in [BCVXCRV, BVECVX]:
-        return distribute_rewards_to_snapshot(amount, claims[sett], token)
+        return distribute_rewards_to_snapshot(amount, claimable[sett], token)
 
 
 def ibbtc_peak_handler(amount: float, token: str, sett: str) -> RewardsList:
     rewards = RewardsList()
     rewards.increase_user_rewards(IBBTC_MULTISIG, token, amount)
     return rewards
+

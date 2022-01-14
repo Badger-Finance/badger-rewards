@@ -1,4 +1,5 @@
 import logging
+from collections import Counter
 
 from config.singletons import env_config
 from helpers.enums import Network
@@ -16,13 +17,28 @@ logger = logging.getLogger("test-boost")
 
 set_env_vars()
 
+def mock_claims_snapshot_usd(*args, **kwargs):
+    native = Counter()
+    non_native = Counter()
+
+    return native, non_native
+
 def test_boost_workflow(monkeypatch):
     monkeypatch.setattr(
         "rewards.aws.boost.send_message_to_discord", mock_send_message_to_discord_prod
     )
-    monkeypatch.setattr("rewards.boost.calc_boost.send_code_block_to_discord", mock_send_code_block_to_discord)
-    monkeypatch.setattr("rewards.aws.boost.download_boosts", lambda *args, **kwargs: mock_boosts)
+    monkeypatch.setattr(
+        "rewards.boost.calc_boost.send_code_block_to_discord",
+        mock_send_code_block_to_discord,
+    )
+    monkeypatch.setattr(
+        "rewards.aws.boost.download_boosts", lambda *args, **kwargs: mock_boosts
+    )
+    monkeypatch.setattr(
+        "rewards.boost.boost_utils.claims_snapshot_usd", mock_claims_snapshot_usd
+    )
     monkeypatch.setattr("rewards.aws.boost.upload_boosts", mock_upload_boosts)
+    
     current_block = env_config.get_web3().eth.block_number
     user_data = badger_boost(current_block, Network.Ethereum)
     # mock upload boosts has asserts baked in to check nothing Decimal, and saves file to test serialization

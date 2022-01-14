@@ -41,7 +41,9 @@ def fetch_tree_distributions(start_timestamp, end_timestamp, chain):
             # Subgraph sometimes sends token ids as 0x0x123123123 values and
             # that's why it is needed to rstrip 0x once to make token id valid hex string
             if dist["token"]["id"].startswith("0x0x"):
-                dist["token"] = Web3.toChecksumAddress(dist["token"]["id"].replace("0x", "", 1))
+                dist["token"] = Web3.toChecksumAddress(
+                    dist["token"]["id"].replace("0x", "", 1)
+                )
             else:
                 dist["token"] = Web3.toChecksumAddress(dist["token"]["id"])
             dist["sett"] = Web3.toChecksumAddress(dist["sett"]["id"])

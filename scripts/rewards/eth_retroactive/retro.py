@@ -16,9 +16,7 @@ def retro_cycle(tree, tree_manager: TreeManager):
     rewards_list = merkle_tree_to_rewards_list(tree)
     for addr, data in affected_users.items():
         for token, balance in data.items():
-            rewards_list.increase_user_rewards(
-                addr, token, abs(balance)
-            )
+            rewards_list.increase_user_rewards(addr, token, abs(balance))
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
     rewards_list.cycle += 1
@@ -30,7 +28,9 @@ def retro_cycle(tree, tree_manager: TreeManager):
             claimed_token = int(claimed[1][claimed[0].index(token)])
             claim = merkle_tree["claims"][addr]
             if token in claim["tokens"]:
-                total_token = int(claim["cumulativeAmounts"][claim["tokens"].index(token)])
+                total_token = int(
+                    claim["cumulativeAmounts"][claim["tokens"].index(token)]
+                )
                 amount = int(total_token) - int(claimed_token)
                 assert amount >= 0
     root_hash = Web3.keccak(text=merkle_tree["merkleRoot"])
@@ -43,5 +43,5 @@ def retro_cycle(tree, tree_manager: TreeManager):
         "rootHash": root_hash.hex(),
         "fileName": file_name,
         "multiplierData": {},
-        "userMultipliers": {}
+        "userMultipliers": {},
     }

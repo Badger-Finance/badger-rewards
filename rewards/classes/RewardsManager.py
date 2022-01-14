@@ -6,7 +6,7 @@ from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
-from helpers.constants import IBBTC_PEAK
+from helpers.constants import BOOSTED_EMISSION_TOKENS, ETH_BADGER_TREE, IBBTC_PEAK
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType
 from helpers.time_utils import to_hours, to_utc_date
@@ -14,7 +14,7 @@ from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
-from rewards.emission_handlers import ibbtc_peak_handler
+from rewards.emission_handlers import ibbtc_peak_handler, unclaimed_rewards_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
@@ -55,13 +55,16 @@ class RewardsManager:
         """
         flat_rewards_list = []
         boosted_rewards_list = []
-        custom_behaviour = {}
+        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler}
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
             token_distribution = end_dist - start_dist
-            emissions_rate = get_flat_emission_rate(sett, self.chain)
+            if token in BOOSTED_EMISSION_TOKENS:
+                emissions_rate = get_flat_emission_rate(sett, self.chain)
+            else:
+                emissions_rate = 1
             flat_emissions = token_distribution * emissions_rate
             boosted_emissions = token_distribution * (1 - emissions_rate)
             if flat_emissions > 0:
@@ -229,6 +232,7 @@ class RewardsManager:
         )
         custom_behaviour = {IBBTC_PEAK: ibbtc_peak_handler}
         all_dist_rewards = []
+        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler}
         for dist in tree_distributions:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]
