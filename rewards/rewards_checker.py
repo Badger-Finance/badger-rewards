@@ -11,8 +11,7 @@ from helpers.discord import (
     send_code_block_to_discord,
     send_error_to_discord,
 )
-from helpers.enums import BotType
-from rewards.classes.TreeManager import TreeManager
+from helpers.enums import BotType, Network
 from rewards.snapshot.claims_snapshot import claims_snapshot
 
 console = Console()
@@ -57,9 +56,10 @@ def token_diff_table_item(
     return diff, table_item
 
 
-def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
+def verify_rewards(past_tree, new_tree, chain: Network):
     console.log("Verifying Rewards ... \n")
-    claim_snapshot = claims_snapshot(chain)
+    # FIXME: What block we have to pass here?
+    claim_snapshot = claims_snapshot(chain, block=123)
     negative_claimable = []
     for token, snapshot in claim_snapshot.items():
         for addr, amount in snapshot:
