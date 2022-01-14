@@ -1,5 +1,5 @@
 import json
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 from rich.console import Console
 from tabulate import tabulate
@@ -45,14 +45,16 @@ def val(amount, decimals=18):
 
 def token_diff_table(
     name: str, before: float, after: float, decimals: Optional[int] = 18
-) -> Tuple[float, str]:
+) -> Tuple[float, List]:
     diff = after - before
     console.print(f"Diff for {name} \n")
-    table = []
-    table.append([f"{name} before", val(before, decimals=decimals)])
-    table.append([f"{name} after", val(after, decimals=decimals)])
-    table.append([f"{name} diff", val(diff, decimals=decimals)])
-    return diff, tabulate(table, headers=["token", "amount"])
+    table_item = [
+        name,
+        val(before, decimals=decimals),
+        val(after, decimals=decimals),
+        val(diff, decimals=decimals),
+    ]
+    return diff, table_item
 
 
 def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
@@ -75,24 +77,19 @@ def verify_rewards(past_tree, new_tree, tree_manager: TreeManager, chain: str):
             chain,
         )
         raise e
-
+    table = []
     for name, token in TOKENS_TO_CHECK[chain].items():
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
+        decimals = 18
         console.log(name, total_before_token, total_after_token)
         if name == "Digg":
-            diff, table = token_diff_table(
-                name,
-                digg_utils.shares_to_fragments(total_before_token),
-                digg_utils.shares_to_fragments(total_after_token),
-                decimals=9,
-            )
-            print(
-                digg_utils.shares_to_fragments(total_before_token),
-                digg_utils.shares_to_fragments(total_after_token),
-            )
-        else:
-            diff, table = token_diff_table(name, total_before_token, total_after_token)
+            total_before_token = digg_utils.shares_to_fragments(total_before_token)
+            total_after_token = digg_utils.shares_to_fragments(total_after_token)
+            decimals = 9
+        diff, table_item = token_diff_table(name, total_before_token, total_after_token, decimals)
+        table.append(table_item)
         send_code_block_to_discord(
-            msg=table, username="Rewards Bot", url=get_discord_url(chain, BotType.Cycle)
+            msg=tabulate(table, headers=["token", "before", "after", "diff"]),
+            username="Rewards Bot", url=get_discord_url(chain, BotType.Cycle)
         )
