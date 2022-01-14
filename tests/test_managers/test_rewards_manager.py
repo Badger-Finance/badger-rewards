@@ -185,7 +185,9 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
     for user, data in user_multipliers.items():
         for sett, mult in data.items():
             if sett in boosts["userData"][user]["multipliers"]:
-                assert isclose(mult, boosts["userData"][user]["multipliers"][sett], abs_tol=1e-6)
+                assert isclose(
+                    mult, boosts["userData"][user]["multipliers"][sett], abs_tol=1e-6
+                )
 
 
 @pytest.mark.parametrize(
@@ -196,7 +198,11 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
     indirect=True,
 )
 def test_splits(
-    rewards_manager_split, schedule, tree_manager, boosts_split, monkeypatch,
+    rewards_manager_split,
+    schedule,
+    tree_manager,
+    boosts_split,
+    monkeypatch,
     mocker,
 ):
     rates = [Decimal(0), Decimal(0.5), Decimal(1)]
@@ -235,8 +241,9 @@ def test_splits(
             user_data[user]["boost"] = boosts_split["userData"][user]["boost"]
             if "rewards" not in user_data[user]:
                 user_data[user]["rewards"] = []
-            user_data[user]["rewards"].append(int(amount[0]) /
-                                              DECIMAL_MAPPING[str(rewards_manager_split.chain)])
+            user_data[user]["rewards"].append(
+                int(amount[0]) / DECIMAL_MAPPING[str(rewards_manager_split.chain)]
+            )
     assert discord.called
     assert discord.call_count == len(rates)
     assert user_data["0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd"]["rewards"] == [

@@ -1,8 +1,11 @@
 import json
+import os
 
 import pytest
 from eth_account import Account
+from moto.core import patch_resource
 
+from rewards.aws.helpers import dynamodb
 from tests.utils import chains, mock_tree, set_env_vars, test_address, test_key
 
 set_env_vars()
@@ -33,6 +36,7 @@ def cycle_key() -> str:
 def tree_manager(cycle_key, request) -> TreeManager:
     tree_manager = TreeManager(request.param, Account.from_key(cycle_key))
     tree_manager.validate_tree = mock_validate_tree
+    tree_manager.last_publish_end_block = lambda: 0
     return tree_manager
 
 
@@ -53,13 +57,14 @@ def test_get_last_proposed_cycle(tree_manager):
         )
     else:
         assert get_last_proposed_cycle(tree_manager.chain, tree_manager) == ({}, 0, 0)
-
-
+        
 @pytest.mark.parametrize(
     "tree_manager",
     chains,
     indirect=True,
 )
-def test_calc_next_cycle_range(tree_manager):
+def test_calc_next_cycle_range(tree_manager, setup_dynamodb):
+    patch_resource(dynamodb)
+
     result = calc_next_cycle_range(tree_manager.chain, tree_manager)
     assert result[0] == mock_tree

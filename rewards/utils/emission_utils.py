@@ -40,6 +40,7 @@ def get_nft_control(chain: Network) -> ContractFunctions:
         EMISSIONS_CONTRACTS[chain]["NFTControl"], Abi.NFTControl, chain
     )
 
+
 @lru_cache
 def get_nft_weights(chain: Network):
     nft_control = get_nft_control(chain)
@@ -50,7 +51,11 @@ def get_nft_weights(chain: Network):
         if key not in weights:
             weights[key] = weight_schedule
         else:
-            weights[key] = weight_schedule if weight_schedule.timestamp > weights[key].timestamp else weights[key]
+            weights[key] = (
+                weight_schedule
+                if weight_schedule.timestamp > weights[key].timestamp
+                else weights[key]
+            )
     return weights
 
 
@@ -61,11 +66,10 @@ def get_nft_weight(chain: str, nft_address: str, nft_id: int) -> Decimal:
         return Decimal(weights[key].weight / 1e18)
     else:
         send_message_to_discord(
-            "**ERROR**"
-            f"Cannot find weights for {key}",
+            "**ERROR**" f"Cannot find weights for {key}",
             [],
             "Boost Bot",
-            url=get_discord_url(chain, bot_type=BotType.Boost)
+            url=get_discord_url(chain, bot_type=BotType.Boost),
         )
         raise Exception
 
