@@ -217,6 +217,8 @@ REWARDS_BLACKLIST = {
     BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
 
+NATIVE_EMISSIONS = [BADGER, DIGG]
+
 STAKE_RATIO_RANGES = list(
     [
         (0, 1),
@@ -371,10 +373,7 @@ CLAIMABLE_TOKENS = {
     Network.Polygon: {BalanceType.Native: [POLY_BADGER], BalanceType.NonNative: []},
 }
 
-BOOSTED_EMISSION_TOKENS = [
-    BADGER,
-    DIGG
-]
+BOOSTED_EMISSION_TOKENS = [BADGER, DIGG]
 
 ABI_DIRS = {
     Network.Ethereum: "eth",

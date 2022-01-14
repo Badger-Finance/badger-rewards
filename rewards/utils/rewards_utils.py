@@ -6,7 +6,7 @@ from web3 import Web3
 
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
-from helpers.constants import EMISSIONS_BLACKLIST, REWARDS_BLACKLIST
+from helpers.constants import EMISSIONS_BLACKLIST, REWARDS_BLACKLIST, NATIVE_EMISSIONS
 
 
 console = Console()
