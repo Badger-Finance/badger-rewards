@@ -6,8 +6,11 @@ from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
-from helpers.constants import BOOSTED_EMISSION_TOKENS, NUMBER_OF_SNAPSHOTS_FOR_SETT
-from helpers.constants import ETH_BADGER_TREE
+from helpers.constants import (
+    BOOSTED_EMISSION_TOKENS,
+    ETH_BADGER_TREE,
+    NUMBER_OF_SNAPSHOTS_FOR_SETT,
+)
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType, Network
 from helpers.time_utils import to_hours, to_utc_date
@@ -254,6 +257,8 @@ class RewardsManager:
             )
             amount = int(dist["amount"])
             all_dist_rewards.append(
-                distribute_rewards_from_total_snapshot(amount, snapshot, token)
+                distribute_rewards_from_total_snapshot(
+                    amount, snapshot, token, custom_rewards=custom_behaviour,
+                )
             )
         return combine_rewards(all_dist_rewards, self.cycle)

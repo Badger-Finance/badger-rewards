@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
 from rich.console import Console
 from web3 import Web3
@@ -79,15 +79,30 @@ def distribute_rewards_to_snapshot(
     return combine_rewards([rewards] + custom_rewards_list, 0)
 
 
-def distribute_rewards_from_total_snapshot(amount: int, snapshot: Snapshot, token: str):
+def distribute_rewards_from_total_snapshot(
+        amount: int, snapshot: Snapshot, token: str,
+        custom_rewards: Optional[Dict[str, Callable]] = None,
+):
+    if not custom_rewards:
+        custom_rewards = {}
     rewards = RewardsList()
+    custom_rewards_list = []
     total = snapshot.total_balance()
+    # TODO: Think about refactoring this and splitting it into two separate funcs:
+    # TODO: one for normal rewards another for custom rewards
     for addr, balance in snapshot:
-        rewards_percentage = Decimal(balance) / total if not total == 0 else 0
-        reward_amount = Decimal(amount) * rewards_percentage
-        assert reward_amount >= 0
-        rewards.increase_user_rewards(addr, token, reward_amount)
-    return combine_rewards([rewards], ZERO_CYCLE)
+        if addr in custom_rewards:
+            custom_rewards_calc = custom_rewards[addr]
+            console.log(token, amount, snapshot.token)
+            custom_rewards_list.append(
+                custom_rewards_calc(amount, token, snapshot.token)
+            )
+        else:
+            rewards_percentage = Decimal(balance) / total if not total == 0 else 0
+            reward_amount = Decimal(amount) * rewards_percentage
+            assert reward_amount >= 0
+            rewards.increase_user_rewards(addr, token, reward_amount)
+    return combine_rewards([rewards] + custom_rewards_list, ZERO_CYCLE)
 
 
 def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
