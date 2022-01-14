@@ -4,6 +4,7 @@ from typing import List, Optional, Tuple
 from rich.console import Console
 from tabulate import tabulate
 
+from badger_api.requests import fetch_token
 from helpers.constants import TOKENS_TO_CHECK
 from helpers.digg_utils import digg_utils
 from helpers.discord import (
@@ -80,12 +81,12 @@ def verify_rewards(past_tree, new_tree, chain: Network):
     for name, token in TOKENS_TO_CHECK[chain].items():
         total_before_token = int(past_tree["tokenTotals"].get(token, 0))
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
-        decimals = 18
+        token_info = fetch_token(chain, token)
+        decimals = token_info.get("decimals", 18)
         console.log(name, total_before_token, total_after_token)
         if name == "Digg":
             total_before_token = digg_utils.shares_to_fragments(total_before_token)
             total_after_token = digg_utils.shares_to_fragments(total_after_token)
-            decimals = 9
         diff, table_item = token_diff_table_item(
             name, total_before_token, total_after_token, decimals
         )
