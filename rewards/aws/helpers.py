@@ -12,11 +12,11 @@ logger = logging.getLogger("aws-helpers")
 DYNAMO_ASSUME_ROLE = "arn:aws:iam::784874126256:role/k8s-bots"
 
 def get_metadata_table(production: bool):
-    return "metadata" if production else "metadata-staging"
+    return "metadata-prod" if production else "metadata-staging"
 
 
 def get_snapshot_table(production: bool):
-    return "unclaimed-snapshots" if production else "unclaimed-snapshots-staging"
+    return "unclaimed-snapshots-prod" if production else "unclaimed-snapshots-staging"
 
 
 def get_bucket(production: bool) -> str:
