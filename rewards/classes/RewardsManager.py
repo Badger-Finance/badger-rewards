@@ -55,13 +55,13 @@ class RewardsManager:
         """
         flat_rewards_list = []
         boosted_rewards_list = []
-        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler}
+        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler, IBBTC_PEAK: ibbtc_peak_handler}
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
             token_distribution = end_dist - start_dist
-            if token in BOOSTED_EMISSION_TOKENS:
+            if token in BOOSTED_EMISSION_TOKENS.get(self.chain, []):
                 emissions_rate = get_flat_emission_rate(sett, self.chain)
             else:
                 emissions_rate = 1
@@ -230,9 +230,8 @@ class RewardsManager:
         console.log(
             f"Fetched {len(tree_distributions)} tree distributions between {self.start} and {self.end}"
         )
-        custom_behaviour = {IBBTC_PEAK: ibbtc_peak_handler}
         all_dist_rewards = []
-        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler}
+        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler, IBBTC_PEAK: ibbtc_peak_handler}
         for dist in tree_distributions:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]

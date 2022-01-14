@@ -206,6 +206,7 @@ EMISSIONS_BLACKLIST = {
     TREASURY_OPS: "Badger Treasury Ops",
     TREASURY_VAULT: "Badger Treasury Vault",
     IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
+    IBBTC_PEAK: "IBBTC Peak"
 }
 
 REWARDS_BLACKLIST = {
@@ -371,10 +372,10 @@ CLAIMABLE_TOKENS = {
     Network.Polygon: {BalanceType.Native: [POLY_BADGER], BalanceType.NonNative: []},
 }
 
-BOOSTED_EMISSION_TOKENS = [
-    BADGER,
-    DIGG
-]
+BOOSTED_EMISSION_TOKENS = {
+    Network.Ethereum: [BADGER, DIGG],
+    Network.Arbitrum: [ARB_BADGER],
+}
 
 ABI_DIRS = {
     Network.Ethereum: "eth",
