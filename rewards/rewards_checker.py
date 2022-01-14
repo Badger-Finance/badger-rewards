@@ -58,8 +58,7 @@ def token_diff_table_item(
 
 def verify_rewards(past_tree, new_tree, chain: Network):
     console.log("Verifying Rewards ... \n")
-    # FIXME: What block we have to pass here?
-    claim_snapshot = claims_snapshot(chain, block=123)
+    claim_snapshot = claims_snapshot(chain, block=int(new_tree["endBlock"]))
     negative_claimable = []
     for token, snapshot in claim_snapshot.items():
         for addr, amount in snapshot:

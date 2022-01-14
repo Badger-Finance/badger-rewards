@@ -26,11 +26,13 @@ def test_verify_rewards__discord_get_called(mocker):
     )
     verify_rewards(
         past_tree={
+            "endBlock": 123,
             'tokenTotals': {
                 BADGER: 123,
             },
         },
         new_tree={
+            "endBlock": 123,
             'tokenTotals': {
                 BADGER: 123,
             },
