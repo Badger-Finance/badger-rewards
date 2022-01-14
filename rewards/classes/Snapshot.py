@@ -34,6 +34,10 @@ class Snapshot:
     def total_balance(self) -> Decimal:
         return Decimal(sum(list(self.balances.values())))
 
+    def zero_balance(self, addr: str):
+        if addr in self.balances:
+            self.balances[addr] = 0
+
     def boost_balance(self, user, multiple):
         self.balances[user] = self.balances[user] * multiple
 

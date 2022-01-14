@@ -41,45 +41,31 @@ def chain_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
     return balances_by_sett
 
 
-def sett_snapshot(chain: Network, block: int, sett: str, blacklist: bool) -> Snapshot:
+def sett_snapshot(chain: Network, block: int, sett: str) -> Snapshot:
     """
     Take a snapshot of a sett on a chain at a certain block
     :param chain:
     :param block:
     :param sett:
-    :param blacklist:
     """
     token = fetch_token(chain, sett)
     name = token.get("name", "")
     console.log(f"Taking snapshot on {chain} of {name} ({sett}) at {block}\n")
     sett_balances = fetch_sett_balances(chain, block, sett)
-    return parse_sett_balances(sett, sett_balances, chain, blacklist)
+    return parse_sett_balances(sett, sett_balances, chain)
 
 
 def parse_sett_balances(
     sett_address: str,
     balances: Dict[str, float],
     chain: Network,
-    blacklist: bool = True,
 ) -> Snapshot:
     """
     Blacklist balances and add metadata for boost
     :param sett_address: target sett address
     :param balances: balances of users:
     :param chain: chain where balances come from
-    :param blacklist: blacklist certain addresses
     """
-    if blacklist:
-        addresses_to_blacklist = {**REWARDS_BLACKLIST, **EMISSIONS_BLACKLIST}
-    else:
-        addresses_to_blacklist = REWARDS_BLACKLIST
-
-    balances = {
-        addr: bal
-        for addr, bal in balances.items()
-        if addr not in addresses_to_blacklist
-    }
-
     sett_type = BalanceType.Native if sett_address in NATIVE else BalanceType.NonNative
     sett_ratio = get_token_weight(sett_address, chain)
 

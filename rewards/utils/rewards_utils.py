@@ -6,6 +6,8 @@ from web3 import Web3
 
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
+from helpers.constants import EMISSIONS_BLACKLIST, REWARDS_BLACKLIST
+
 
 console = Console()
 
@@ -56,7 +58,17 @@ def distribute_rewards_to_snapshot(
 ):
     """
     Distribute a certain amount of rewards to a snapshot of users
+    and blacklist certain token rewards
     """
+    NATIVE_BLACKLIST = {**EMISSION_BLACKLIST, **REWARDS_BLACKLIST}
+    ## Blacklist badger + digg rewards but not vault reward tokens
+    if token in NATIVE_EMISSIONS:
+        for addr in NATIVE_BLACKLIST.keys():
+            snapshot.zero_balance(addr)
+    else:
+        for addr in REWARDS_BLACKLIST.keys():
+            snapshot.zero_balance(addr)
+
     rewards = RewardsList()
     custom_rewards_list = []
     total = snapshot.total_balance()

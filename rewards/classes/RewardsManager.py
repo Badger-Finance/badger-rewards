@@ -35,10 +35,8 @@ class RewardsManager:
         self.boosts = boosts
         self.apy_boosts = {}
 
-    def fetch_sett_snapshot(
-        self, block: int, sett: str, blacklist: bool = True
-    ) -> Snapshot:
-        return sett_snapshot(self.chain, block, sett, blacklist)
+    def fetch_sett_snapshot(self, block: int, sett: str) -> Snapshot:
+        return sett_snapshot(self.chain, block, sett)
 
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
@@ -236,8 +234,7 @@ class RewardsManager:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]
             sett = dist["sett"]
-            # Dont blacklist tree rewards for emissions contracts
-            snapshot = self.fetch_sett_snapshot(block, sett, blacklist=False)
+            snapshot = self.fetch_sett_snapshot(block, sett)
             amount = int(dist["amount"])
 
             cycle_logger.add_tree_distribution(sett, dist)
