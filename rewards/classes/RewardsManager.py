@@ -9,6 +9,7 @@ from config.singletons import env_config
 from helpers.constants import (
     BOOSTED_EMISSION_TOKENS,
     ETH_BADGER_TREE,
+    IBBTC_PEAK,
     NUMBER_OF_SNAPSHOTS_FOR_SETT,
 )
 from helpers.discord import get_discord_url, send_code_block_to_discord
@@ -17,7 +18,7 @@ from helpers.time_utils import to_hours, to_utc_date
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
-from rewards.emission_handlers import unclaimed_rewards_handler
+from rewards.emission_handlers import ibbtc_peak_handler, unclaimed_rewards_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot, total_harvest_sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
@@ -62,13 +63,13 @@ class RewardsManager:
         """
         flat_rewards_list = []
         boosted_rewards_list = []
-        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler}
+        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler, IBBTC_PEAK: ibbtc_peak_handler}
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
             token_distribution = end_dist - start_dist
-            if token in BOOSTED_EMISSION_TOKENS:
+            if token in BOOSTED_EMISSION_TOKENS.get(self.chain, []):
                 emissions_rate = get_flat_emission_rate(sett, self.chain)
             else:
                 emissions_rate = 1
@@ -239,7 +240,7 @@ class RewardsManager:
             f"tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
-        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler}
+        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler, IBBTC_PEAK: ibbtc_peak_handler}
         for dist in tree_distributions:
             start_block = get_block_by_timestamp(
                 self.chain, int(dist["end_of_previous_dist_timestamp"])
@@ -257,8 +258,8 @@ class RewardsManager:
             )
             amount = int(dist["amount"])
             all_dist_rewards.append(
-                distribute_rewards_from_total_snapshot(
-                    amount, snapshot, token, custom_rewards=custom_behaviour,
+                distribute_rewards_to_snapshot(
+                    amount, snapshot, token, custom_behaviour
                 )
             )
         return combine_rewards(all_dist_rewards, self.cycle)
