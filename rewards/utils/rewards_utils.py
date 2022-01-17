@@ -55,7 +55,7 @@ def distribute_rewards_to_snapshot(
     snapshot: Snapshot,
     token: str,
     custom_rewards: Dict[str, Callable] = {},
-):
+) -> RewardsList:
     """
     Distribute a certain amount of rewards to a snapshot of users
     and blacklist certain token rewards
