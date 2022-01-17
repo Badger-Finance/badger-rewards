@@ -60,12 +60,14 @@ def distribute_rewards_to_snapshot(
     Distribute a certain amount of rewards to a snapshot of users
     and blacklist certain token rewards
     """
-    NATIVE_BLACKLIST = {**EMISSION_BLACKLIST, **REWARDS_BLACKLIST}
-    ## Blacklist badger + digg rewards but not vault reward tokens
+    NATIVE_BLACKLIST = {**EMISSIONS_BLACKLIST, **REWARDS_BLACKLIST}
+
+    ## Blacklist badger and digg for all addresses
     if token in NATIVE_EMISSIONS:
         for addr in NATIVE_BLACKLIST.keys():
             snapshot.zero_balance(addr)
     else:
+        ## Blacklist other reward tokens for rewards blacklist
         for addr in REWARDS_BLACKLIST.keys():
             snapshot.zero_balance(addr)
 
