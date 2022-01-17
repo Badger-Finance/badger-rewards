@@ -205,7 +205,6 @@ EMISSIONS_BLACKLIST = {
     TREASURY_OPS: "Badger Treasury Ops",
     TREASURY_VAULT: "Badger Treasury Vault",
     IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
-    IBBTC_PEAK: "IBBTC Peak",
 }
 
 REWARDS_BLACKLIST = {
