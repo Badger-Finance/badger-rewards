@@ -112,22 +112,6 @@ def test_parse_sett_balances(chain):
 
 
 @pytest.mark.parametrize("chain", [Network.Ethereum, Network.Arbitrum])
-def test_parse_sett_balances__blacklisted(chain, mocker):
-    mocker.patch(
-        "rewards.snapshot.chain_snapshot.REWARDS_BLACKLIST",
-        {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": "some blacklisted stuff"},
-    )
-    snapshot = parse_sett_balances(
-        BBADGER_ADDRESS,
-        balances={
-            "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.04533617521779346,
-        },
-        chain=chain,
-    )
-    assert snapshot.balances == {}
-
-
-@pytest.mark.parametrize("chain", [Network.Ethereum, Network.Arbitrum])
 @responses.activate
 def test_sett_snapshot(chain, mock_fetch_sett_balances):
     responses.add(
@@ -137,7 +121,7 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances):
         status=200,
     )
     responses.add_passthru("https://")
-    snapshot = sett_snapshot(chain, 13710328, BBADGER_ADDRESS, blacklist=True)
+    snapshot = sett_snapshot(chain, 13710328, BBADGER_ADDRESS)
     assert snapshot.type == BalanceType.Native
     assert snapshot.ratio == 1
     assert snapshot.token == BBADGER_ADDRESS
@@ -149,7 +133,7 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances):
 @pytest.mark.parametrize("chain", [Network.Ethereum, Network.Arbitrum])
 def test_sett_snapshot__empty(mocker, chain):
     mocker.patch("rewards.snapshot.chain_snapshot.fetch_sett_balances", return_value={})
-    snapshot = sett_snapshot(chain, 13710328, BBADGER_ADDRESS, blacklist=True)
+    snapshot = sett_snapshot(chain, 13710328, BBADGER_ADDRESS)
     assert snapshot.balances == {}
 
 
@@ -160,7 +144,7 @@ def test_sett_snapshot__raises(mocker, chain):
         side_effect=Exception,
     )
     with pytest.raises(Exception):
-        sett_snapshot(chain, 13710328, BBADGER_ADDRESS, blacklist=True)
+        sett_snapshot(chain, 13710328, BBADGER_ADDRESS)
 
 
 @pytest.mark.parametrize("chain", [Network.Ethereum, Network.Arbitrum])
