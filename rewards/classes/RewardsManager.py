@@ -53,7 +53,10 @@ class RewardsManager:
         """
         flat_rewards_list = []
         boosted_rewards_list = []
-        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler, IBBTC_PEAK: ibbtc_peak_handler}
+        custom_behaviour = {
+            ETH_BADGER_TREE: unclaimed_rewards_handler,
+            IBBTC_PEAK: ibbtc_peak_handler,
+        }
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
@@ -71,6 +74,7 @@ class RewardsManager:
                         amount=flat_emissions,
                         snapshot=sett_snapshot,
                         token=token,
+                        block=self.end,
                         custom_rewards=custom_behaviour,
                     )
                 )
@@ -80,6 +84,7 @@ class RewardsManager:
                         boosted_emissions,
                         snapshot=self.boost_sett(sett, sett_snapshot),
                         token=token,
+                        block=self.end,
                         custom_rewards=custom_behaviour,
                     )
                 )
@@ -229,7 +234,10 @@ class RewardsManager:
             f"Fetched {len(tree_distributions)} tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
-        custom_behaviour = {ETH_BADGER_TREE: unclaimed_rewards_handler, IBBTC_PEAK: ibbtc_peak_handler}
+        custom_behaviour = {
+            ETH_BADGER_TREE: unclaimed_rewards_handler,
+            IBBTC_PEAK: ibbtc_peak_handler,
+        }
         for dist in tree_distributions:
             block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]
@@ -243,7 +251,7 @@ class RewardsManager:
             )
             all_dist_rewards.append(
                 distribute_rewards_to_snapshot(
-                    amount, snapshot, token, custom_behaviour
+                    amount, snapshot, token, self.end, custom_behaviour
                 )
             )
         return combine_rewards(all_dist_rewards, self.cycle)
