@@ -1,9 +1,10 @@
 from decimal import Decimal
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
 from rich.console import Console
 from web3 import Web3
 
+from helpers.constants import ZERO_CYCLE
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
 from helpers.constants import EMISSIONS_BLACKLIST, REWARDS_BLACKLIST, NATIVE_EMISSIONS
@@ -50,17 +51,12 @@ def combine_rewards(rewards_list: List[RewardsList], cycle) -> RewardsList:
     return combined_rewards
 
 
-def distribute_rewards_to_snapshot(
-    amount: float,
+def distribute_rewards_from_total_snapshot(
+    amount: int,
     snapshot: Snapshot,
     token: str,
-    block: int,
-    custom_rewards: Dict[str, Callable] = {},
-) -> RewardsList:
-    """
-    Distribute a certain amount of rewards to a snapshot of users
-    and blacklist certain token rewards
-    """
+    custom_rewards: Optional[Dict[str, Callable]] = {},
+):
     NATIVE_BLACKLIST = {**EMISSIONS_BLACKLIST, **REWARDS_BLACKLIST}
 
     ## Blacklist badger and digg for all addresses
@@ -75,21 +71,21 @@ def distribute_rewards_to_snapshot(
     rewards = RewardsList()
     custom_rewards_list = []
     total = snapshot.total_balance()
-    if total == 0:
-        unit = 0
-    else:
-        unit = amount / total
+    # TODO: Think about refactoring this and splitting it into two separate funcs:
+    # TODO: one for normal rewards another for custom rewards
     for addr, balance in snapshot:
-        reward_amount = Decimal(balance) * unit
-        assert reward_amount >= 0
         if addr in custom_rewards:
             custom_rewards_calc = custom_rewards[addr]
+            console.log(token, amount, snapshot.token)
             custom_rewards_list.append(
-                custom_rewards_calc(amount, token, snapshot.token, block)
+                custom_rewards_calc(amount, token, snapshot.token)
             )
         else:
+            rewards_percentage = Decimal(balance) / total if not total == 0 else 0
+            reward_amount = Decimal(amount) * rewards_percentage
+            assert reward_amount >= 0
             rewards.increase_user_rewards(addr, token, reward_amount)
-    return combine_rewards([rewards] + custom_rewards_list, 0)
+    return combine_rewards([rewards] + custom_rewards_list, ZERO_CYCLE)
 
 
 def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:

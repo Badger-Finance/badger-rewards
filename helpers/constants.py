@@ -391,3 +391,6 @@ DECIMAL_MAPPING = {
     Network.Polygon: 1e18,
     Network.Arbitrum: 1e18,
 }
+
+NUMBER_OF_SNAPSHOTS_FOR_SETT = 3
+ZERO_CYCLE = 0
