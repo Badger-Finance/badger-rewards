@@ -199,15 +199,21 @@ TOKENS_TO_CHECK = {
     },
 }
 
-EMISSIONS_BLACKLIST = {
+# Addresses blacklisted from native tokens
+NATIVE_TOKENS_BLACKLIST = {
     DEV_MULTISIG: "Badger Dev Multisig",
     TECH_OPS: "Badger Tech Ops",
     TREASURY_OPS: "Badger Treasury Ops",
     TREASURY_VAULT: "Badger Treasury Vault",
     IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
+    CREAM_BBADGER: "Cream bBadger",
+    SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
+    SETTS[Network.Ethereum]["badger"]: "Badger Vault",
+    BADGER_PAYMENTS: "Badger Payments",
+    BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
-
-REWARDS_BLACKLIST = {
+# Addresses blacklisted from rewards tokens
+REWARDS_TOKENS_BLACKLIST = {
     CREAM_BBADGER: "Cream bBadger",
     SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     SETTS[Network.Ethereum]["badger"]: "Badger Vault",

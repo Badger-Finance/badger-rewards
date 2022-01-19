@@ -22,7 +22,6 @@ from rewards.snapshot.chain_snapshot import sett_snapshot, total_harvest_sett_sn
 from rewards.utils.emission_utils import get_flat_emission_rate
 from rewards.utils.rewards_utils import (
     combine_rewards,
-    distribute_rewards_from_total_snapshot,
     distribute_rewards_to_snapshot,
 )
 from subgraph.queries.harvests import fetch_tree_distributions

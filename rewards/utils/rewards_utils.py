@@ -7,7 +7,7 @@ from web3 import Web3
 from helpers.constants import ZERO_CYCLE
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
-from helpers.constants import EMISSIONS_BLACKLIST, REWARDS_BLACKLIST, NATIVE_EMISSIONS
+from helpers.constants import NATIVE_TOKENS_BLACKLIST, REWARDS_TOKENS_BLACKLIST,NATIVE_EMISSIONS
 
 
 console = Console()
@@ -57,15 +57,14 @@ def distribute_rewards_from_total_snapshot(
     token: str,
     custom_rewards: Optional[Dict[str, Callable]] = {},
 ):
-    NATIVE_BLACKLIST = {**EMISSIONS_BLACKLIST, **REWARDS_BLACKLIST}
 
     ## Blacklist badger and digg for all addresses
     if token in NATIVE_EMISSIONS:
-        for addr in NATIVE_BLACKLIST.keys():
+        for addr in NATIVE_TOKENS_BLACKLIST.keys():
             snapshot.zero_balance(addr)
     else:
         ## Blacklist other reward tokens for rewards blacklist
-        for addr in REWARDS_BLACKLIST.keys():
+        for addr in REWARDS_TOKENS_BLACKLIST.keys():
             snapshot.zero_balance(addr)
 
     rewards = RewardsList()
@@ -74,15 +73,14 @@ def distribute_rewards_from_total_snapshot(
     # TODO: Think about refactoring this and splitting it into two separate funcs:
     # TODO: one for normal rewards another for custom rewards
     for addr, balance in snapshot:
+        rewards_percentage = Decimal(balance) / total if not total == 0 else 0
+        reward_amount = Decimal(amount) * rewards_percentage
         if addr in custom_rewards:
             custom_rewards_calc = custom_rewards[addr]
-            console.log(token, amount, snapshot.token)
             custom_rewards_list.append(
-                custom_rewards_calc(amount, token, snapshot.token)
+                custom_rewards_calc(reward_amount, token, snapshot.token, block)
             )
         else:
-            rewards_percentage = Decimal(balance) / total if not total == 0 else 0
-            reward_amount = Decimal(amount) * rewards_percentage
             assert reward_amount >= 0
             rewards.increase_user_rewards(addr, token, reward_amount)
     return combine_rewards([rewards] + custom_rewards_list, ZERO_CYCLE)
