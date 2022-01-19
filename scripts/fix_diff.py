@@ -12,25 +12,26 @@ if __name__ == "__main__":
     for user, token_data in diff_data["userTokenDiffs"].items():
         for token, amount in token_data.items():
             if amount > 0 and user in claimable[token].balances:
+                claimable_bal = float(claimable[token].balances[user]) * 1e18
+
                 if user not in user_reduction_data:
                     user_reduction_data[user] = {}
-                reduced = amount - claimable[token][user]
                 # if the users debt is less than what is claimable pay back the debt
-                if amount <= claimable[token][user]:
+                if amount <= claimable_bal:
                     user_reduction_data[user][token] = amount
                 else:
                     # Otherwise, just pay back what is claimable
                     if user not in rewards_left:
                         rewards_left[user] = {}
-                    rewards_left[user] = amount - claimable[user][token]
-                    user_reduction_data[data][token] = claimable[user][token]
+                    rewards_left[user][token] = amount - claimable_bal
+                    user_reduction_data[user][token] = claimable_bal
     with open("balance_changes.json", "w") as fp:
         json.dump(user_reduction_data, fp)
     with open("debt_left.json", "w") as fp2:
         json.dump(rewards_left, fp2)
 
     sum_token_debt = {}
-    for user, data in reward_left.items():
+    for user, data in rewards_left.items():
         for token, amount in data.items():
             if token not in sum_token_debt:
                 sum_token_debt[token] = 0
