@@ -21,5 +21,5 @@ def get_badger_tree(chain: str) -> ContractFunctions:
     )
 
 
-def make_token(token_addr: str, chain: str):
+def make_token(token_addr: str, chain: str) -> ContractFunctions:
     return make_contract(token_addr, abi_name=Abi.ERC20, chain=chain)
