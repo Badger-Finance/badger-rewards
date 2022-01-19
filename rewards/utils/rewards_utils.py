@@ -70,9 +70,8 @@ def distribute_rewards_to_snapshot(
         assert reward_amount >= 0
         if addr in custom_rewards:
             custom_rewards_calc = custom_rewards[addr]
-            console.log(token, amount, snapshot.token)
             custom_rewards_list.append(
-                custom_rewards_calc(amount, token, snapshot.token, block)
+                custom_rewards_calc(reward_amount, token, snapshot.token, block)
             )
         else:
             rewards.increase_user_rewards(addr, token, reward_amount)
