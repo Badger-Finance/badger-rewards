@@ -1,4 +1,4 @@
-from helpers.constants import BADGER, SETTS, DEV_MULTISIG, ETH_BADGER_TREE
+from helpers.constants import BADGER, SETTS, DEV_MULTISIG, CREAM_BBADGER
 import pytest
 from helpers.enums import Network
 from rewards.rewards_checker import token_diff_table_item, verify_rewards
@@ -52,7 +52,7 @@ def test_distribute_rewards_to_snapshot_blacklist(token):
     user = "0xb794F5eA0ba39494cE839613fffBA74279579268"
     balances = {
         DEV_MULTISIG: 500,
-        ETH_BADGER_TREE: 250,
+        CREAM_BBADGER: 250,
         user: 500,
     }
     snapshot = Snapshot(token, balances)
