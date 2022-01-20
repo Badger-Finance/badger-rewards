@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 
 from eth_utils.hexadecimal import encode_hex
 from web3 import Web3
@@ -15,7 +16,7 @@ def fix(tree, tree_manager):
     endBlock = startBlock
     for user, token_data in balance_changes.items():
         for token, amount in token_data.items():
-            r_list.decrease_user_rewards(user, token, amount)
+            r_list.decrease_user_rewards(user, token, Decimal(amount))
 
     new_tree = rewards_to_merkle_tree(r_list, startBlock, endBlock)
     root_hash = Web3.keccak(text=new_tree["merkleRoot"])
