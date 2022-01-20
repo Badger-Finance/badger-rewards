@@ -14,6 +14,7 @@ def fix(tree, tree_manager):
     r_list = merkle_tree_to_rewards_list(tree)
     startBlock = int(tree["endBlock"]) + 1
     endBlock = startBlock
+    r_list.cycle += 1
     for user, token_data in balance_changes.items():
         for token, amount in token_data.items():
             r_list.decrease_user_rewards(user, token, Decimal(amount))
