@@ -1,11 +1,10 @@
 import json
-from rewards.calc_rewards import generate_rewards_in_range
+
 from helpers.enums import Network
-
-from scripts.rewards.utils.managers import get_tree_manager
 from rewards.aws.boost import download_boosts
+from rewards.calc_rewards import generate_rewards_in_range
 from rewards.utils.rewards_utils import get_cumulative_claimable_for_token
-
+from scripts.rewards.utils.managers import get_tree_manager
 
 if __name__ == "__main__":
     chain = Network.Ethereum

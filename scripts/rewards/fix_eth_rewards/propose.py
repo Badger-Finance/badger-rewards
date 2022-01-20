@@ -5,7 +5,7 @@ from helpers.enums import Network
 from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_latest_tree
 from rewards.classes.TreeManager import TreeManager
-from scripts.rewards.eth_retroactive.fix import fix
+from scripts.rewards.fix_eth_rewards.fix import fix
 
 if __name__ == "__main__":
     chain = Network.Ethereum

@@ -1,8 +1,11 @@
 import json
-from rewards.utils.rewards_utils import merkle_tree_to_rewards_list
-from rewards.classes.MerkleTree import rewards_to_merkle_tree
-from helpers.constants import CHAIN_IDS
+
 from web3 import Web3
+
+from helpers.constants import CHAIN_IDS
+from rewards.classes.MerkleTree import rewards_to_merkle_tree
+from rewards.utils.rewards_utils import merkle_tree_to_rewards_list
+
 
 def fix(tree, tree_manager):
     balance_changes = json.load(open("balance_changes.json"))
