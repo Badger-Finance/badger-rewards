@@ -210,7 +210,6 @@ NATIVE_TOKENS_BLACKLIST = {
     SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     SETTS[Network.Ethereum]["badger"]: "Badger Vault",
     BADGER_PAYMENTS: "Badger Payments",
-    BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
 # Addresses blacklisted from rewards tokens
 REWARDS_TOKENS_BLACKLIST = {

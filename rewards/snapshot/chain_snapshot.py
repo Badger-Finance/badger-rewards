@@ -7,10 +7,8 @@ from web3 import Web3
 from badger_api.requests import fetch_token
 from helpers.constants import (
     DISABLED_VAULTS,
-    EMISSIONS_BLACKLIST,
     NATIVE,
     PRO_RATA_VAULTS,
-    REWARDS_BLACKLIST,
 )
 from helpers.enums import BalanceType, Network
 from rewards.classes.Snapshot import Snapshot

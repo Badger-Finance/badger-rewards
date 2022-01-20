@@ -7,7 +7,11 @@ from web3 import Web3
 from helpers.constants import ZERO_CYCLE
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
-from helpers.constants import NATIVE_TOKENS_BLACKLIST, REWARDS_TOKENS_BLACKLIST,NATIVE_EMISSIONS
+from helpers.constants import (
+    NATIVE_TOKENS_BLACKLIST,
+    REWARDS_TOKENS_BLACKLIST,
+    NATIVE_EMISSIONS,
+)
 
 
 console = Console()
@@ -51,7 +55,7 @@ def combine_rewards(rewards_list: List[RewardsList], cycle) -> RewardsList:
     return combined_rewards
 
 
-def distribute_rewards_from_total_snapshot(
+def distribute_rewards_to_snapshot(
     amount: int,
     snapshot: Snapshot,
     token: str,
