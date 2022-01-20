@@ -16,7 +16,7 @@ if __name__ == "__main__":
         for token, amount in token_data.items():
             if user in claimable[token].balances:
                 if token == DIGG:
-                    claimable_bal = digg_utils.fragments_to_shares(claimable[token].balances[user] * 1e9)
+                    claimable_bal = digg_utils.fragments_to_shares(float(claimable[token].balances[user]) * 1e9)
                 else:
                     claimable_bal = float(claimable[token].balances[user]) * 1e18
             else:
@@ -41,6 +41,8 @@ if __name__ == "__main__":
     sum_token_debt = {}
     for user, data in rewards_left.items():
         for token, amount in data.items():
+            if token == DIGG:
+                amount = digg_utils.shares_to_fragments(amount)
             if token not in sum_token_debt:
                 sum_token_debt[token] = 0
             sum_token_debt[token] += amount
