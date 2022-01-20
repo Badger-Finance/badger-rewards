@@ -2,6 +2,8 @@ import json
 from helpers.enums import Network
 from subgraph.queries.setts import last_synced_block
 from rewards.snapshot.claims_snapshot import claims_snapshot
+from helpers.constants import DIGG
+    from helpers.digg_utils import digg_utils
 
 if __name__ == "__main__":
     chain = Network.Ethereum
@@ -11,20 +13,22 @@ if __name__ == "__main__":
     rewards_left = {}
     for user, token_data in diff_data["userTokenDiffs"].items():
         for token, amount in token_data.items():
-            if amount > 0 and user in claimable[token].balances:
+            if user in claimable[token].balances:
                 claimable_bal = float(claimable[token].balances[user]) * 1e18
+            else:
+                claimable_bal = 0
 
-                if user not in user_reduction_data:
-                    user_reduction_data[user] = {}
-                # if the users debt is less than what is claimable pay back the debt
-                if amount <= claimable_bal:
-                    user_reduction_data[user][token] = amount
-                else:
-                    # Otherwise, just pay back what is claimable
-                    if user not in rewards_left:
-                        rewards_left[user] = {}
-                    rewards_left[user][token] = amount - claimable_bal
-                    user_reduction_data[user][token] = claimable_bal
+            if user not in user_reduction_data:
+                user_reduction_data[user] = {}
+            # if the users debt is less than what is claimable pay back the debt
+            if amount <= claimable_bal:
+                user_reduction_data[user][token] = amount
+            else:
+                # Otherwise, just pay back what is claimable
+                if user not in rewards_left:
+                    rewards_left[user] = {}
+                rewards_left[user][token] = amount - claimable_bal
+                user_reduction_data[user][token] = claimable_bal
     with open("balance_changes.json", "w") as fp:
         json.dump(user_reduction_data, fp)
     with open("debt_left.json", "w") as fp2:

@@ -15,7 +15,7 @@ if __name__ == "__main__":
     broken_tree = json.load(open("current_tree.json"))
 
     start_block = int(old_tree["endBlock"])
-    end_block = 14037274
+    end_block = int(broken_tree["endBlock"])
     rewards_data = generate_rewards_in_range(
         chain,
         start_block,
