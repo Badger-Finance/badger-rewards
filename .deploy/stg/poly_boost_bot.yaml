@@ -23,9 +23,9 @@ spec:
                 value: 'info'
               - name: ENV
                 value: 'STG'
-          - name: KUBE
-            value: 'True'
-            - name: fluent-bit
+              - name: KUBE
+                value: 'True'
+          - name: fluent-bit
             image: public.ecr.aws/aws-observability/aws-for-fluent-bit:stable
             imagePullPolicy: Always
             volumeMounts:
