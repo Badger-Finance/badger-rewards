@@ -81,7 +81,7 @@ def distribute_rewards_to_snapshot(
 
 def distribute_rewards_from_total_snapshot(
         amount: int, snapshot: Snapshot, token: str,
-        custom_rewards: Optional[Dict[str, Callable]] = None,
+        block: int, custom_rewards: Optional[Dict[str, Callable]] = None,
 ):
     if not custom_rewards:
         custom_rewards = {}
@@ -95,7 +95,7 @@ def distribute_rewards_from_total_snapshot(
             custom_rewards_calc = custom_rewards[addr]
             console.log(token, amount, snapshot.token)
             custom_rewards_list.append(
-                custom_rewards_calc(amount, token, snapshot.token)
+                custom_rewards_calc(amount, token, snapshot.token, block)
             )
         else:
             rewards_percentage = Decimal(balance) / total if not total == 0 else 0

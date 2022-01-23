@@ -265,7 +265,8 @@ class RewardsManager:
             amount = int(dist["amount"])
             all_dist_rewards.append(
                 distribute_rewards_from_total_snapshot(
-                    amount, snapshot, token, custom_rewards=custom_behaviour,
+                    amount, snapshot, token,
+                    block=self.end, custom_rewards=custom_behaviour,
                 )
             )
         return combine_rewards(all_dist_rewards, self.cycle)
