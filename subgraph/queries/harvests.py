@@ -10,7 +10,7 @@ from subgraph.subgraph_utils import make_gql_client
 console = Console()
 
 
-def _populate_end_of_previous_harvest(tree_distributions: List[Dict]):
+def _populate_end_of_previous_harvest(tree_distributions: List[Dict]) -> Dict[str, List]:
     """
     This function groups distributions by sett and adds
     param end_of_previous_dist_timestamp to each distribution item
