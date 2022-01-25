@@ -168,21 +168,21 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_bal
     [Network.Ethereum, Network.Arbitrum]
 )
 @pytest.mark.parametrize(
-    "snapshots_number",
+    "num_historical_snapshots",
     [3, 6, 5]
 )
 def test_total_harvest_sett_snapshot__even_balance(
-        chain, snapshots_number: int, mock_fetch_sett_balances, responses_mock_token_balance):
+        chain, num_historical_snapshots: int, mock_fetch_sett_balances, responses_mock_token_balance):
     snapshot = total_harvest_sett_snapshot(
         chain, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
-        number_of_snapshots=snapshots_number
+        num_historical_snapshots=num_historical_snapshots
     )
     assert snapshot.type == BalanceType.Native
     assert snapshot.ratio == 1
     assert snapshot.token == BBADGER_ADDRESS
     expected_amount: Decimal = Decimal(
         list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]
-    ) * (snapshots_number + 2)
+    ) * (num_historical_snapshots + 1)
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
@@ -192,23 +192,43 @@ def test_total_harvest_sett_snapshot__even_balance(
 )
 def test_total_harvest_sett_snapshot__even_balance_single_snap(
         chain, mock_fetch_sett_balances, responses_mock_token_balance):
+    """
+    If num_historical_snapshots is 1, we should only take 2 snapshots for first and last blocks
+    """
     snapshot = total_harvest_sett_snapshot(
         chain, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
-        number_of_snapshots=1
+        num_historical_snapshots=1
+    )
+    expected_amount: Decimal = Decimal(list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]) * 2
+    assert list(snapshot.balances.values())[0] == approx(expected_amount)
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Arbitrum]
+)
+def test_total_harvest_sett_snapshot__even_balance_no_snapshots(
+        chain, mock_fetch_sett_balances, responses_mock_token_balance):
+    """
+    If num_historical_snapshots is 0, we should only take end block snapshot
+    """
+    snapshot = total_harvest_sett_snapshot(
+        chain, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
+        num_historical_snapshots=0
     )
     expected_amount: Decimal = Decimal(list(BALANCES_DATA[BBADGER_ADDRESS].values())[0])
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
 @pytest.mark.parametrize(
-    "snapshots_number",
+    "num_historical_snapshots",
     [14, 20, 100]
 )
 def test_total_harvest_sett_snapshot__invalid_rate(
-        snapshots_number: int, mock_fetch_sett_balances, responses_mock_token_balance):
+        num_historical_snapshots: int, mock_fetch_sett_balances, responses_mock_token_balance):
     snapshot = total_harvest_sett_snapshot(
         Network.Ethereum, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
-        number_of_snapshots=snapshots_number
+        num_historical_snapshots=num_historical_snapshots
     )
     assert snapshot.type == BalanceType.Native
     assert snapshot.ratio == 1
@@ -233,7 +253,7 @@ def test_total_harvest_sett_snapshot__uneven_balance(chain, mocker, responses_mo
     ):
         snapshot = total_harvest_sett_snapshot(
             Network.Ethereum, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
-            number_of_snapshots=2
+            num_historical_snapshots=2
         )
     assert snapshot.token == BBADGER_ADDRESS
     expected_amount: Decimal = Decimal((initial_balance + 0.01 + 0))
@@ -245,7 +265,7 @@ def test_total_harvest_sett_snapshot__invalid_blocks():
     with pytest.raises(AssertionError):
         total_harvest_sett_snapshot(
             Network.Ethereum, 13710338, 13710328, BBADGER_ADDRESS, blacklist=True,
-            number_of_snapshots=1
+            num_historical_snapshots=1
         )
 
 
