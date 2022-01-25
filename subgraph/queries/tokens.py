@@ -19,12 +19,8 @@ from helpers.web3_utils import make_contract
 console = Console()
 
 
-@lru_cache(maxsize=None)
-def fetch_token_balances(
-    client: Client, block_number: int, chain: str
-) -> Tuple[Dict[str, int], Dict[str, int]]:
-    increment = 1000
-    query = gql(
+def token_query():
+    return gql(
         """
         query fetchWalletBalance($firstAmount: Int, $lastID: ID,$blockNumber:Block_height) {
             tokenBalances(first: $firstAmount, where: { id_gt: $lastID  },block: $blockNumber) {
@@ -37,6 +33,52 @@ def fetch_token_balances(
         }
     """
     )
+
+
+def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
+    increment = 1000
+    query = token_query()
+
+    continue_fetching = True
+    last_id = "0x0000000000000000000000000000000000000000"
+    across_balances = {}
+    client = make_gql_client("across")
+    try:
+        while continue_fetching:
+            variables = {
+                "firstAmount": increment,
+                "lastID": last_id,
+                "blockNumber": {"number": block_number},
+            }
+            next_page = client.execute(query, variable_values=variables)
+            if len(next_page["tokenBalances"]) == 0:
+                continue_fetching = False
+            else:
+                last_id = next_page["tokenBalances"][-1]["id"]
+                console.log(
+                    f"Fetching {len(next_page['tokenBalances'])} token balances"
+                )
+                for entry in next_page["tokenBalances"]:
+                    address = entry["id"].split("-")[0]
+                    amount = float(entry["balance"])
+                    if amount > 0:
+                        across_balances[address] = amount / DECIMAL_MAPPING[chain]
+
+    except Exception as e:
+        send_error_to_discord(
+            e, "Error in Fetching Token Balance", "Subgraph Error", chain
+        )
+        raise e
+
+    return across_balances
+
+
+@lru_cache(maxsize=None)
+def fetch_token_balances(
+    client: Client, block_number: int, chain: str
+) -> Tuple[Dict[str, int], Dict[str, int]]:
+    increment = 1000
+    query = token_query()
 
     continue_fetching = True
     last_id = "0x0000000000000000000000000000000000000000"
