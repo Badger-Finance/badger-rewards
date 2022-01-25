@@ -5,3 +5,4 @@ resources:
   - eth_boost_bot.yaml
   - poly_boost_bot.yaml
   - service_account.yaml
+  - fluent_bit_configmap.yaml

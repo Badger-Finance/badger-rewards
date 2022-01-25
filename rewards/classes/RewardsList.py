@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 from typing import Any, Dict, List, Tuple
 
 from dotmap import DotMap
@@ -39,10 +40,10 @@ class RewardsList:
         }
         return json.dumps(log_obj, indent=4)
 
-    def increase_user_rewards_source(self, source, user, token, toAdd):
+    def increase_user_rewards_source(self, source, user, token, to_add):
         if not self.sources[source][user][token]:
             self.sources[source][user][token] = 0
-        self.sources[source][user][token] += toAdd
+        self.sources[source][user][token] += to_add
 
     def totals_info(self, chain: str) -> str:
         info = []
@@ -75,7 +76,7 @@ class RewardsList:
             ), f"Token {token} is not checksummed"
             tokens[token.lower()] = True
 
-    def decrease_user_rewards(self, user, token, to_decrease):
+    def decrease_user_rewards(self, user, token, to_decrease: Decimal):
         if user in self.claims and token in self.claims[user]:
             self.claims[user][token] -= to_decrease
 
@@ -84,10 +85,10 @@ class RewardsList:
             if self.totals[token] == 0 and self.totals[to_checksum_address(token)] > 0:
                 del self.totals[token]
 
-    def increase_user_rewards(self, user, token, toAdd):
-        if toAdd < 0:
+    def increase_user_rewards(self, user, token, to_add: Decimal):
+        if to_add < 0:
             print("NEGATIVE to ADD")
-            toAdd = 0
+            to_add = 0
 
         """
         If user has rewards, increase. If not, set their rewards to this initial value
@@ -96,14 +97,14 @@ class RewardsList:
         user = to_checksum_address(user)
         token = to_checksum_address(token)
         if user in self.claims and token in self.claims[user]:
-            self.claims[user][token] += toAdd
+            self.claims[user][token] += to_add
         else:
-            self.claims[user][token] = toAdd
+            self.claims[user][token] = to_add
 
         if token in self.totals:
-            self.totals[token] += toAdd
+            self.totals[token] += to_add
         else:
-            self.totals[token] = toAdd
+            self.totals[token] = to_add
 
         self.user_rewards_sanity_check()
 
