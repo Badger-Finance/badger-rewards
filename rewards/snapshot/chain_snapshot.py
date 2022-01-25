@@ -62,7 +62,7 @@ def total_harvest_sett_snapshot(
     if rate == 0:
         return snapshot
     current_block = start_block
-    for i in range(number_of_snapshots):
+    for i in range(number_of_snapshots - 1):
         current_block += rate
         snapshot += sett_snapshot(chain, current_block, sett, blacklist)
 

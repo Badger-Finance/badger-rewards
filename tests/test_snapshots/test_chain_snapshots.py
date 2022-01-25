@@ -182,7 +182,7 @@ def test_total_harvest_sett_snapshot__even_balance(
     assert snapshot.token == BBADGER_ADDRESS
     expected_amount: Decimal = Decimal(
         list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]
-    ) * (snapshots_number + 2)
+    ) * (snapshots_number + 1)
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
