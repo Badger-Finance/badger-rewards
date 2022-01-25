@@ -10,7 +10,7 @@ from helpers.constants import (
     BOOSTED_EMISSION_TOKENS,
     ETH_BADGER_TREE,
     IBBTC_PEAK,
-    NUMBER_OF_SNAPSHOTS_FOR_SETT,
+    NUMBER_OF_HISTORICAL_SNAPSHOTS,
 )
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType, Network
@@ -262,7 +262,7 @@ class RewardsManager:
                 end_block,
                 sett,
                 blacklist=False,
-                number_of_snapshots=NUMBER_OF_SNAPSHOTS_FOR_SETT
+                num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS
             )
             amount = int(dist["amount"])
             all_dist_rewards.append(
