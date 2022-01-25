@@ -46,12 +46,13 @@ def total_harvest_sett_snapshot(
         sett: str, blacklist: bool, num_historical_snapshots: int,
 ) -> Snapshot:
     """
-    Get a snapshot for total harvest period. That should sum up all Snapshots balances for
-    the num_historical_snapshots
+    Get a snapshot for total harvest period.
+    That should sum up all Snapshots balances
+        for the num_historical_snapshots + snapshot at end_block
     """
     assert end_block >= start_block
     snapshot = sett_snapshot(chain, end_block, sett, blacklist)
-    if end_block == start_block or num_historical_snapshots == 1:
+    if end_block == start_block or num_historical_snapshots == 0:
         return snapshot
     snapshot += sett_snapshot(chain, start_block, sett, blacklist)
     rate = int((end_block - start_block) / num_historical_snapshots)

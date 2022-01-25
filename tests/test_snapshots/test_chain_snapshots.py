@@ -192,9 +192,29 @@ def test_total_harvest_sett_snapshot__even_balance(
 )
 def test_total_harvest_sett_snapshot__even_balance_single_snap(
         chain, mock_fetch_sett_balances, responses_mock_token_balance):
+    """
+    If num_historical_snapshots is 1, we should only take 2 snapshots for first and last blocks
+    """
     snapshot = total_harvest_sett_snapshot(
         chain, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
         num_historical_snapshots=1
+    )
+    expected_amount: Decimal = Decimal(list(BALANCES_DATA[BBADGER_ADDRESS].values())[0]) * 2
+    assert list(snapshot.balances.values())[0] == approx(expected_amount)
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Arbitrum]
+)
+def test_total_harvest_sett_snapshot__even_balance_no_snapshots(
+        chain, mock_fetch_sett_balances, responses_mock_token_balance):
+    """
+    If num_historical_snapshots is 0, we should only take end block snapshot
+    """
+    snapshot = total_harvest_sett_snapshot(
+        chain, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
+        num_historical_snapshots=0
     )
     expected_amount: Decimal = Decimal(list(BALANCES_DATA[BBADGER_ADDRESS].values())[0])
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
