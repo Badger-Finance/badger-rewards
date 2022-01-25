@@ -16,8 +16,9 @@ console = Console()
 
 
 class Snapshot:
-    def __init__(self, token, balances, ratio=1, type="none"):
+    def __init__(self, token, balances, ratio=1, type="none", chain="eth"):
         self.type = type
+        self.chain = chain
         self.ratio = Decimal(ratio)
         self.token = Web3.toChecksumAddress(token)
         self.balances = self.parse_balances(balances)
@@ -33,6 +34,10 @@ class Snapshot:
 
     def total_balance(self) -> Decimal:
         return Decimal(sum(list(self.balances.values())))
+
+    def zero_balance(self, addr):
+        if addr in self.balances:
+            self.balances[addr] = 0
 
     def boost_balance(self, user, multiple):
         self.balances[user] = self.balances[user] * multiple
@@ -53,7 +58,7 @@ class Snapshot:
         for addr, bal in other:
             new_bals[addr] = new_bals.get(addr, 0) + bal
 
-        return Snapshot(self.token, new_bals, self.ratio, self.type)
+        return Snapshot(self.token, new_bals, self.ratio, self.type, self.chain)
 
     def convert_to_usd(
         self, chain: Network, bot_type: BotType = BotType.Boost
@@ -76,4 +81,4 @@ class Snapshot:
         new_bals = {}
         for addr, bal in self.balances.items():
             new_bals[addr] = bal * price
-        return Snapshot(self.token, new_bals, self.ratio, self.type)
+        return Snapshot(self.token, new_bals, self.ratio, self.type, self.chain)

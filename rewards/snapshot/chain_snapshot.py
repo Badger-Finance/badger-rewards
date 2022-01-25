@@ -7,10 +7,8 @@ from web3 import Web3
 from badger_api.requests import fetch_token
 from helpers.constants import (
     DISABLED_VAULTS,
-    EMISSIONS_BLACKLIST,
     NATIVE,
     PRO_RATA_VAULTS,
-    REWARDS_BLACKLIST,
 )
 from helpers.enums import BalanceType, Network
 from rewards.classes.Snapshot import Snapshot
@@ -42,18 +40,21 @@ def chain_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
 
 
 def total_harvest_sett_snapshot(
-        chain: Network, start_block: int, end_block: int,
-        sett: str, blacklist: bool, number_of_snapshots: int,
+    chain: Network,
+    start_block: int,
+    end_block: int,
+    sett: str,
+    number_of_snapshots: int,
 ) -> Snapshot:
     """
     Get a snapshot for total harvest period. That should sum up all Snapshots balances for
     the number_of_snapshots
     """
     assert end_block >= start_block
-    snapshot = sett_snapshot(chain, end_block, sett, blacklist)
+    snapshot = sett_snapshot(chain, end_block, sett)
     if end_block == start_block or number_of_snapshots == 1:
         return snapshot
-    snapshot += sett_snapshot(chain, start_block, sett, blacklist)
+    snapshot += sett_snapshot(chain, start_block, sett)
     rate = int((end_block - start_block) / number_of_snapshots)
     # If rate == 0 it means that number of snapshots is too big, and it cannot be calculated
     # properly.
@@ -64,56 +65,43 @@ def total_harvest_sett_snapshot(
     current_block = start_block
     for i in range(number_of_snapshots):
         current_block += rate
-        snapshot += sett_snapshot(chain, current_block, sett, blacklist)
+        snapshot += sett_snapshot(chain, current_block, sett)
 
     return snapshot
 
 
-def sett_snapshot(chain: Network, block: int, sett: str, blacklist: bool) -> Snapshot:
+def sett_snapshot(chain: Network, block: int, sett: str) -> Snapshot
     """
     Take a snapshot of a sett on a chain at a certain block
     :param chain:
     :param block:
     :param sett:
-    :param blacklist:
     """
     token = fetch_token(chain, sett)
     name = token.get("name", "")
     console.log(f"Taking snapshot on {chain} of {name} ({sett}) at {block}\n")
     sett_balances = fetch_sett_balances(chain, block, sett)
-    return parse_sett_balances(sett, sett_balances, chain, blacklist)
+    return parse_sett_balances(sett, sett_balances, chain)
 
 
 def parse_sett_balances(
     sett_address: str,
     balances: Dict[str, float],
     chain: Network,
-    blacklist: bool = True,
 ) -> Snapshot:
     """
     Blacklist balances and add metadata for boost
     :param sett_address: target sett address
     :param balances: balances of users:
     :param chain: chain where balances come from
-    :param blacklist: blacklist certain addresses
     """
-    if blacklist:
-        addresses_to_blacklist = {**REWARDS_BLACKLIST, **EMISSIONS_BLACKLIST}
-    else:
-        addresses_to_blacklist = REWARDS_BLACKLIST
-
-    balances = {
-        addr: bal
-        for addr, bal in balances.items()
-        if addr not in addresses_to_blacklist
-    }
 
     sett_type = BalanceType.Native if sett_address in NATIVE else BalanceType.NonNative
     sett_ratio = get_token_weight(sett_address, chain)
 
     console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
 
-    return Snapshot(sett_address, balances, sett_ratio, sett_type)
+    return Snapshot(sett_address, balances, sett_ratio, sett_type, chain)
 
 
 def chain_snapshot_usd(chain: Network, block: int) -> Tuple[Counter, Counter]:

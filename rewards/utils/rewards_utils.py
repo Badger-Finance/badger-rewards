@@ -4,7 +4,14 @@ from typing import Callable, Dict, List, Optional
 from rich.console import Console
 from web3 import Web3
 
-from helpers.constants import ZERO_CYCLE
+from helpers.constants import (
+    ZERO_CYCLE,
+    NATIVE_EMISSIONS,
+    TREE_DISTRIBUTION_BLACKLIST,
+    TOTAL_BLACKLIST,
+    NATIVE_EMISSIONS_BLACKLIST,
+    NATIVE_EMISSIONS,
+)
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
 
@@ -14,8 +21,6 @@ console = Console()
 def get_cumulative_claimable_for_token(claim, token: str):
     tokens = claim["tokens"]
     amounts = claim["cumulativeAmounts"]
-
-    console.log(tokens, amounts)
 
     for i in range(len(tokens)):
         address = tokens[i]
@@ -80,16 +85,23 @@ def distribute_rewards_to_snapshot(
 
 
 def distribute_rewards_from_total_snapshot(
-        amount: int, snapshot: Snapshot, token: str,
-        block: int, custom_rewards: Optional[Dict[str, Callable]] = None,
+    amount: int,
+    snapshot: Snapshot,
+    token: str,
+    block: int,
+    custom_rewards: Optional[Dict[str, Callable]] = {},
 ):
-    if not custom_rewards:
-        custom_rewards = {}
     rewards = RewardsList()
     custom_rewards_list = []
     total = snapshot.total_balance()
-    # TODO: Think about refactoring this and splitting it into two separate funcs:
-    # TODO: one for normal rewards another for custom rewards
+    native_emissions = NATIVE_EMISSIONS[snapshot.chain]
+    if token in native_emissions:
+        for addr in TOTAL_BLACKLIST:
+            snapshot.zero_balance(addr)
+    else:
+        for addr in TREE_DISTRIBUTION_BLACKLIST:
+            snapshot.zero_balance(addr)
+
     for addr, balance in snapshot:
         rewards_percentage = Decimal(balance) / total if not total == 0 else 0
         reward_amount = Decimal(amount) * rewards_percentage

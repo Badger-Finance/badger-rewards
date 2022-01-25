@@ -7,8 +7,10 @@ from tabulate import tabulate
 from badger_api.requests import fetch_token
 from config.singletons import env_config
 from helpers.constants import (
-    BOOSTED_EMISSION_TOKENS, ETH_BADGER_TREE,
-    IBBTC_PEAK, NUMBER_OF_SNAPSHOTS_FOR_SETT,
+    BOOSTED_EMISSION_TOKENS,
+    ETH_BADGER_TREE,
+    IBBTC_PEAK,
+    NUMBER_OF_SNAPSHOTS_FOR_SETT,
 )
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType, Network
@@ -41,10 +43,8 @@ class RewardsManager:
         self.boosts = boosts
         self.apy_boosts = {}
 
-    def fetch_sett_snapshot(
-        self, block: int, sett: str, blacklist: bool = True
-    ) -> Snapshot:
-        return sett_snapshot(self.chain, block, sett, blacklist)
+    def fetch_sett_snapshot(self, block: int, sett: str) -> Snapshot:
+        return sett_snapshot(self.chain, block, sett)
 
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
@@ -259,14 +259,16 @@ class RewardsManager:
                 start_block,
                 end_block,
                 sett,
-                blacklist=False,
-                number_of_snapshots=NUMBER_OF_SNAPSHOTS_FOR_SETT
+                number_of_snapshots=NUMBER_OF_SNAPSHOTS_FOR_SETT,
             )
             amount = int(dist["amount"])
             all_dist_rewards.append(
                 distribute_rewards_from_total_snapshot(
-                    amount, snapshot, token,
-                    block=self.end, custom_rewards=custom_behaviour,
+                    amount,
+                    snapshot,
+                    token,
+                    block=self.end,
+                    custom_rewards=custom_behaviour,
                 )
             )
         return combine_rewards(all_dist_rewards, self.cycle)
