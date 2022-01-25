@@ -251,7 +251,7 @@ NATIVE = [
     SETTS[Network.Ethereum]["digg"],
     SETTS[Network.Ethereum]["uni_digg_wbtc"],
     SETTS[Network.Ethereum]["sushi_digg_wbtc"],
-    SETTS[Network.Ethereum]["rem_badger"]
+    SETTS[Network.Ethereum]["rem_badger"],
     SETTS[Network.Arbitrum]["swapr_weth_badger"],
 ]
 
