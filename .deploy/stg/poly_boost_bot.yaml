@@ -25,25 +25,4 @@ spec:
                 value: 'STG'
               - name: KUBE
                 value: 'True'
-          - name: fluent-bit
-            image: public.ecr.aws/aws-observability/aws-for-fluent-bit:stable
-            imagePullPolicy: Always
-            volumeMounts:
-            - name: fluentbitconfigvol
-              mountPath: /etc/fluent-bit/conf/
-            - name: varlog
-              mountPath: /var/log
-            - name: varlibdockercontainers
-              mountPath: /var/lib/docker/containers
-              readOnly: true
-            command: ["/fluent-bit/bin/fluent-bit"]
-            args: ["-c", "/etc/fluent-bit/conf/fluent-bit.conf"]
-          volumes:
-          - name: fluentbitconfigvol
-            configMap:
-              name: fluent-bit-config
-          - name: varlog
-            emptyDir: {}
-          - name: varlibdockercontainers
-            emptyDir: {}
           restartPolicy: OnFailure
