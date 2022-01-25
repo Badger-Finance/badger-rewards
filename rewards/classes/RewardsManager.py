@@ -7,8 +7,10 @@ from tabulate import tabulate
 from badger_api.requests import fetch_token
 from config.singletons import env_config
 from helpers.constants import (
-    BOOSTED_EMISSION_TOKENS, ETH_BADGER_TREE,
-    IBBTC_PEAK, NUMBER_OF_SNAPSHOTS_FOR_SETT,
+    BOOSTED_EMISSION_TOKENS,
+    ETH_BADGER_TREE,
+    IBBTC_PEAK,
+    NUMBER_OF_SNAPSHOTS_FOR_SETT,
 )
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType, Network
