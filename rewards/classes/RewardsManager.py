@@ -6,26 +6,34 @@ from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
-from helpers.constants import BOOSTED_EMISSION_TOKENS, ETH_BADGER_TREE, IBBTC_PEAK
+from helpers.constants import (
+    BOOSTED_EMISSION_TOKENS,
+    ETH_BADGER_TREE,
+    IBBTC_PEAK,
+    NUMBER_OF_HISTORICAL_SNAPSHOTS,
+)
 from helpers.discord import get_discord_url, send_code_block_to_discord
-from helpers.enums import BalanceType
+from helpers.enums import BalanceType, Network
 from helpers.time_utils import to_hours, to_utc_date
-from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
 from rewards.emission_handlers import ibbtc_peak_handler, unclaimed_rewards_handler
 from rewards.explorer import get_block_by_timestamp
-from rewards.snapshot.chain_snapshot import sett_snapshot
+from rewards.snapshot.chain_snapshot import sett_snapshot, total_harvest_sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
-from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
+from rewards.utils.rewards_utils import (
+    combine_rewards,
+    distribute_rewards_from_total_snapshot,
+    distribute_rewards_to_snapshot,
+)
 from subgraph.queries.harvests import fetch_tree_distributions
 
 console = Console()
 
 
 class RewardsManager:
-    def __init__(self, chain: str, cycle: int, start: int, end: int, boosts):
+    def __init__(self, chain: Network, cycle: int, start: int, end: int, boosts):
         self.chain = chain
         self.web3 = env_config.get_web3(chain)
         self.discord_url = get_discord_url(chain)
@@ -233,7 +241,8 @@ class RewardsManager:
             self.chain,
         )
         console.log(
-            f"Fetched {len(tree_distributions)} tree distributions between {self.start} and {self.end}"
+            f"Fetched {len(tree_distributions)} "
+            f"tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
         custom_behaviour = {
@@ -241,20 +250,25 @@ class RewardsManager:
             IBBTC_PEAK: ibbtc_peak_handler,
         }
         for dist in tree_distributions:
-            block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
+            start_block = get_block_by_timestamp(
+                self.chain, int(dist["end_of_previous_dist_timestamp"])
+            )
+            end_block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]
             sett = dist["sett"]
-            # Dont blacklist tree rewards for emissions contracts
-            snapshot = self.fetch_sett_snapshot(block, sett, blacklist=False)
-            amount = int(dist["amount"])
-
-            cycle_logger.add_tree_distribution(sett, dist)
-            cycle_logger.add_sett_token_data(
-                sett, self.web3.toChecksumAddress(token), amount
+            snapshot = total_harvest_sett_snapshot(
+                self.chain,
+                start_block,
+                end_block,
+                sett,
+                blacklist=False,
+                num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS
             )
+            amount = int(dist["amount"])
             all_dist_rewards.append(
-                distribute_rewards_to_snapshot(
-                    amount, snapshot, token, self.end, custom_behaviour
+                distribute_rewards_from_total_snapshot(
+                    amount, snapshot, token,
+                    block=self.end, custom_rewards=custom_behaviour,
                 )
             )
         return combine_rewards(all_dist_rewards, self.cycle)

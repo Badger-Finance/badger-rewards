@@ -130,6 +130,7 @@ SETTS = {
     Network.Ethereum: {
         "badger": BBADGER_ADDRESS,
         "ren_crv": "0x6dEf55d2e18486B9dDfaA075bc4e4EE0B28c1545",
+        "rem_badger": "0x6aF7377b5009d7d154F36FE9e235aE1DA27Aea22",
         "sbtc_crv": "0xd04c48A53c111300aD41190D63681ed3dAd998eC",
         "tbtc_crv": "0xb9D076fDe463dbc9f915E5392F807315Bf940334",
         "uni_badger_wbtc": "0x235c9e24D3FB2FAFd58a2E49D454Fdcd2DBf7FF1",
@@ -250,6 +251,7 @@ NATIVE = [
     SETTS[Network.Ethereum]["digg"],
     SETTS[Network.Ethereum]["uni_digg_wbtc"],
     SETTS[Network.Ethereum]["sushi_digg_wbtc"],
+    SETTS[Network.Ethereum]["rem_badger"],
     SETTS[Network.Arbitrum]["swapr_weth_badger"],
 ]
 
@@ -389,3 +391,6 @@ DECIMAL_MAPPING = {
     Network.Polygon: 1e18,
     Network.Arbitrum: 1e18,
 }
+
+NUMBER_OF_HISTORICAL_SNAPSHOTS = 3
+ZERO_CYCLE = 0
