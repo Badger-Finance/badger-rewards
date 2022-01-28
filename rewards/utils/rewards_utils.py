@@ -182,7 +182,7 @@ def get_actual_expected_totals(sett_totals: Dict[str, Dict[str, Decimal]]) -> Tu
     
     return actual_totals, expected_totals
 
-def check_token_totals_in_range(rewards_per_sett: Dict[str, Dict[str, Dict[str, Decimal]]]) -> List[Optional[List[str, str, str, str]]]:
+def check_token_totals_in_range(rewards_per_sett: Dict[str, Dict[str, Dict[str, Decimal]]]) -> List[Optional[List[str]]]:
     """Check that the total amount of tokens to be distributed falls within the expected range
     based on the rewards schedules.
 
@@ -191,7 +191,7 @@ def check_token_totals_in_range(rewards_per_sett: Dict[str, Dict[str, Dict[str, 
             amounts for each token to be distributed to each sett
 
     Returns:
-        List[Optional[List[str, str, str, str]]]: list of tokens with invalid distribution amounts
+        List[Optional[List[str]]]: list of tokens with invalid distribution amounts
     """
     actual_totals, expected_totals = get_actual_expected_totals(rewards_per_sett)
     invalid_totals = []

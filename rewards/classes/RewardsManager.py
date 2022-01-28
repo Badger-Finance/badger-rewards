@@ -149,7 +149,7 @@ class RewardsManager:
             
         return combine_rewards(all_rewards, self.cycle)
     
-    def report_invalid_totals(self, invalid_totals: List[List[str, str, str, str]]) -> None:
+    def report_invalid_totals(self, invalid_totals: List[List[str]]) -> None:
         send_code_block_to_discord(
             msg="INCORRECT REWARDS DISTRIBTION",
             username="Rewards Bot",
