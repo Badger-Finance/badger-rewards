@@ -13,6 +13,8 @@ from helpers.discord import (
     send_error_to_discord,
     send_message_to_discord,
 )
+from subgraph.subgraph_utils import make_gql_client
+from rewards.utils.emission_utils import across_lp_multiplier
 from helpers.enums import Abi, BotType, Network
 from helpers.web3_utils import make_contract
 
@@ -38,9 +40,9 @@ def token_query():
 def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
     increment = 1000
     query = token_query()
-
     continue_fetching = True
     last_id = "0x0000000000000000000000000000000000000000"
+    multiplier = across_lp_multiplier()
     across_balances = {}
     client = make_gql_client("across")
     try:
@@ -62,7 +64,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
                     address = entry["id"].split("-")[0]
                     amount = float(entry["balance"])
                     if amount > 0:
-                        across_balances[address] = amount / DECIMAL_MAPPING[chain]
+                        across_balances[address] = multiplier * amount / DECIMAL_MAPPING[chain]
 
     except Exception as e:
         send_error_to_discord(

@@ -59,6 +59,7 @@ class Abi(str, Enum):
     Strategy = "BaseStrategy"
     Controller = "Controller"
     CErc20Delegator = "CErc20Delegator"
+    BridgePoolProd = "BridgePoolProd"
 
     def __str__(self) -> str:
         return self.value
