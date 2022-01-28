@@ -1,12 +1,15 @@
+from collections import defaultdict
 from decimal import Decimal
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 
 from rich.console import Console
 from web3 import Web3
 
-from helpers.constants import ZERO_CYCLE
+from helpers.constants import REWARD_ERROR_TOLERANCE, ZERO_CYCLE
+from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
+from rewards.utils.reporting_utils import totals_info
 
 console = Console()
 
@@ -129,3 +132,75 @@ def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
 
 def merkle_tree_to_rewards_list(tree):
     return process_cumulative_rewards(tree, RewardsList(int(tree["cycle"])))
+
+def get_actual_expected_totals(sett_totals: Dict[str, Dict[str, Decimal]]) -> Tuple[Dict[str, Decimal], Dict[str, Decimal]]:
+    """Takes dictionary of tokens to be distributed to each sett and returns two dictionaries
+    containing the total amount of each token that has been calculated to be distributed (actual_totals)
+    and is expected to be distributed based on the rewards schedules (expected_totals).
+
+    Args:
+        sett_totals (Dict[str, Dict[str, Decimal]]) 
+            { 
+                "sett1": {
+                    "actual": {
+                        "token1": actual_amount, 
+                        "token2": actual_amount, 
+                        ...
+                    },
+                    "expected": {
+                        "token1": expected_amount, 
+                        "token2": expected_amount, 
+                        ...,
+                    },  
+                ...,
+            }
+
+    Returns:
+        Tuple[Dict[str, Decimal], Dict[str, Decimal]]
+        (
+            {
+                "token1": act_total_amount_to_be_dist_t1,
+                "token2": act_total_amount_to_be_dist_t2,
+            },
+            {
+                "token1": exp_total_amount_to_be_dist_t1,
+                "token2": exp_total_amount_to_be_dist_t2,
+            }
+        )
+
+    """
+    actual_totals = defaultdict(Decimal)
+    expected_totals = defaultdict(Decimal)
+
+    for _, dists in sett_totals.items():
+        for dist_type, rewards in dists.items():
+            for token, amount in rewards.items():
+                if dist_type == "actual":
+                    actual_totals[token] += amount
+                elif dist_type == "expected":
+                    expected_totals[token] += amount
+    
+    return actual_totals, expected_totals
+
+def check_token_totals_in_range(rewards_per_sett: Dict[str, Dict[str, Dict[str, Decimal]]]) -> List[Optional[List[str, str, str, str]]]:
+    """Check that the total amount of tokens to be distributed falls within the expected range
+    based on the rewards schedules.
+
+    Args:
+        rewards_per_sett (Dict[str, Dict[str, Dict[str, Decimal]]]): actual and expected reward
+            amounts for each token to be distributed to each sett
+
+    Returns:
+        List[Optional[List[str, str, str, str]]]: list of tokens with invalid distribution amounts
+    """
+    actual_totals, expected_totals = get_actual_expected_totals(rewards_per_sett)
+    invalid_totals = []
+
+    for token in expected_totals.keys():
+        min_expected = expected_totals[token] * Decimal(1 - REWARD_ERROR_TOLERANCE)
+        max_expected = expected_totals[token] * Decimal(1 + REWARD_ERROR_TOLERANCE)
+        actual = actual_totals[token]
+        if actual < min_expected or actual > max_expected:
+            invalid_totals.append([token, min_expected, max_expected, actual])
+    
+    return invalid_totals

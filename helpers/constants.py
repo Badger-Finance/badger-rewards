@@ -394,3 +394,6 @@ DECIMAL_MAPPING = {
 
 NUMBER_OF_HISTORICAL_SNAPSHOTS = 3
 ZERO_CYCLE = 0
+
+# OK with token distributions being within 1% of expected values
+REWARD_ERROR_TOLERANCE = .01

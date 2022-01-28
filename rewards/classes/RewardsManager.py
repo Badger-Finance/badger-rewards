@@ -1,5 +1,6 @@
+from collections import defaultdict
 from decimal import Decimal
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from rich.console import Console
 from tabulate import tabulate
@@ -23,6 +24,7 @@ from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import sett_snapshot, total_harvest_sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
 from rewards.utils.rewards_utils import (
+    check_token_totals_in_range,
     combine_rewards,
     distribute_rewards_from_total_snapshot,
     distribute_rewards_to_snapshot,
@@ -50,7 +52,7 @@ class RewardsManager:
 
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
-    ) -> RewardsList:
+    ) -> Tuple[RewardsList, RewardsList, RewardsList, Dict[str, Decimal]]:
         start_time = self.web3.eth.get_block(self.start)["timestamp"]
         end_time = self.web3.eth.get_block(self.end)["timestamp"]
         sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
@@ -63,6 +65,7 @@ class RewardsManager:
         """
         flat_rewards_list = []
         boosted_rewards_list = []
+        expected_distribution_amounts = {}
         custom_behaviour = {
             ETH_BADGER_TREE: unclaimed_rewards_handler,
             IBBTC_PEAK: ibbtc_peak_handler,
@@ -72,6 +75,7 @@ class RewardsManager:
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
             token_distribution = end_dist - start_dist
+            expected_distribution_amounts[token] = token_distribution
             if token in BOOSTED_EMISSION_TOKENS.get(self.chain, []):
                 emissions_rate = get_flat_emission_rate(sett, self.chain)
             else:
@@ -106,6 +110,7 @@ class RewardsManager:
             combine_rewards([flat_rewards, boosted_rewards], self.cycle),
             flat_rewards,
             boosted_rewards,
+            expected_distribution_amounts,
         )
 
     def calculate_all_sett_rewards(
@@ -113,11 +118,12 @@ class RewardsManager:
     ) -> RewardsList:
         all_rewards = []
         table = []
+        rewards_per_sett = defaultdict(dict)
         for sett in setts:
             sett_token = fetch_token(self.chain, sett)
             sett_name = sett_token.get("name", "")
             console.log(f"Calculating rewards for {sett_name}")
-            rewards, flat, boosted = self.calculate_sett_rewards(
+            rewards, flat, boosted, expected = self.calculate_sett_rewards(
                 sett, all_schedules[sett]
             )
             table.append(
@@ -128,13 +134,33 @@ class RewardsManager:
                 ]
             )
             all_rewards.append(rewards)
-
+            rewards_per_sett[sett]["actual"] = rewards.totals.toDict()
+            rewards_per_sett[sett]["expected"] = expected
+        
         send_code_block_to_discord(
             msg=tabulate(table, headers=["vault", "boosted rewards", "flat rewards"]),
             username="Rewards Bot",
             url=self.discord_url,
         )
+
+        invalid_totals = check_token_totals_in_range(rewards_per_sett)
+        if len(invalid_totals):
+            self.report_invalid_totals(invalid_totals)
+            
         return combine_rewards(all_rewards, self.cycle)
+    
+    def report_invalid_totals(self, invalid_totals: List[List[str, str, str, str]]) -> None:
+        send_code_block_to_discord(
+            msg="INCORRECT REWARDS DISTRIBTION",
+            username="Rewards Bot",
+            url=self.discord_url,
+        )
+        send_code_block_to_discord(
+            msg=tabulate(invalid_totals, headers=["token", "min expected", "max expected", "actual"]),
+            username="Rewards Bot",
+            url=self.discord_url,
+        )
+        raise Exception(f"trying to distribute invalid reward amounts: {invalid_totals}")
 
     def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
         sett_multipliers = {}
