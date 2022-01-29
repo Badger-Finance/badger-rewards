@@ -1,9 +1,6 @@
-import imp
-
 from rich.console import Console
 
 from helpers.constants import IBBTC_MULTISIG, UNCLAIMED_REWARDS_TOKENS
-from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from rewards.classes.RewardsList import RewardsList
 from rewards.snapshot.claims_snapshot import claims_snapshot
@@ -17,7 +14,7 @@ def unclaimed_rewards_handler(amount: float, token: str, sett: str, block: int):
     claimable = claims_snapshot(Network.Ethereum, block)
     if sett not in claimable:
         return RewardsList()
-    if sett in UNCLAIMED_REWARDS_TOKENS:
+    if sett in UNCLAIMED_REWARDS_TOKENS[Network.Ethereum]:
         return distribute_rewards_to_snapshot(amount, claimable[sett], token, block)
 
 
