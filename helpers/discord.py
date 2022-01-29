@@ -1,10 +1,13 @@
 from discord import Embed, RequestsWebhookAdapter, Webhook
+from rich import console
 
 from config.singletons import env_config
 from helpers.constants import MONITORING_SECRET_NAMES
 from helpers.enums import BotType
 from rewards.aws.helpers import get_secret
+from rich.console import Console
 
+console = Console()
 
 def send_error_to_discord(e: Exception, error_msg: str, error_type: str, chain: str):
     send_message_to_discord(
@@ -67,3 +70,8 @@ def get_discord_url(chain: str, bot_type: str = BotType.Cycle) -> str:
         "DISCORD_WEBHOOK_URL",
         kube=env_config.kube,
     )
+
+def console_and_discord(msg: str, chain: str, bot_type: BotType = BotType.Cycle):
+    url = get_discord_url(chain, bot_type)
+    console.log(msg)
+    send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
