@@ -1,4 +1,5 @@
 from rich.console import Console
+
 from helpers.constants import IBBTC_MULTISIG, UNCLAIMED_REWARDS_TOKENS
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
