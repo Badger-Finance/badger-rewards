@@ -372,7 +372,7 @@ CLAIMABLE_TOKENS = {
 }
 
 UNCLAIMED_REWARDS_TOKENS = {
-    Network.Ethereum: [SETTS[Network.Ethereum["cvx_crv"]], SETTS[Network.Ethereum]["bvecvx"]]
+    Network.Ethereum: [SETTS[Network.Ethereum]["cvx_crv"], SETTS[Network.Ethereum]["bvecvx"]]
 }
 BOOSTED_EMISSION_TOKENS = {
     Network.Ethereum: [BADGER, DIGG],
