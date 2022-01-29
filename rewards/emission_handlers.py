@@ -1,6 +1,6 @@
 from rich.console import Console
 from helpers.constants import IBBTC_MULTISIG, UNCLAIMED_REWARDS_TOKENS
-from helpers.enums import BotType, Network
+from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.utils.rewards_utils import distribute_rewards_to_snapshot
