@@ -1,11 +1,11 @@
 from discord import Embed, RequestsWebhookAdapter, Webhook
 from rich import console
+from rich.console import Console
 
 from config.singletons import env_config
 from helpers.constants import MONITORING_SECRET_NAMES
 from helpers.enums import BotType
 from rewards.aws.helpers import get_secret
-from rich.console import Console
 
 console = Console()
 
