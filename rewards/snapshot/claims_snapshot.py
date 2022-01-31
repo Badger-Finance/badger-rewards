@@ -49,7 +49,7 @@ def claims_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
             token_type = BalanceType.Excluded
         snapshots[token] = Snapshot(token, claims, ratio=1, type=token_type)
     if len(snapshots) == 0:
-          console_and_discord(f'<@&804147406043086850> - Error: No claimable', chain)
+          console_and_discord(f'Error: No claimable', chain, mentions='<@&804147406043086850>')
     return snapshots
 
 
