@@ -128,7 +128,7 @@ def upload_tree(
                 "✅ Uploaded file to s3://" + target["bucket"] + "/" + target["key"]
             )
         except Exception as e:
-            console_and_discord(f'<@&804147406043086850> - Error uploading approval file to bucket {target["bucket"]}, temp file saved: {e}', chain)
+            console_and_discord(f'Error uploading approval file to bucket {target["bucket"]}, temp file saved: {e}', chain, mentions='<@&804147406043086850>')
             with open('./temp_data/temp_tree.json', 'w') as outfile:
                     outfile.write(str(json.dumps(data)))
             raise e

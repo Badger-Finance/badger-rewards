@@ -52,6 +52,18 @@ def send_message_to_discord(
     webhook.send(embed=embed, username=username)
 
 
+def send_plain_text_to_discord(
+    message: str,
+    username: str,
+    url: str = env_config.get_webhook_url(),
+):
+    webhook = Webhook.from_url(
+        url,
+        adapter=RequestsWebhookAdapter()
+    )
+    webhook.send(message, username=username)
+
+
 def send_code_block_to_discord(
     msg: str, username: str, url: str = env_config.get_webhook_url()
 ):
@@ -71,7 +83,9 @@ def get_discord_url(chain: str, bot_type: str = BotType.Cycle) -> str:
         kube=env_config.kube,
     )
 
-def console_and_discord(msg: str, chain: str, bot_type: BotType = BotType.Cycle):
+def console_and_discord(msg: str, chain: str, bot_type: BotType = BotType.Cycle, mentions: str = ""):
     url = get_discord_url(chain, bot_type)
     console.log(msg)
+    if len(mentions) > 0:
+        send_plain_text_to_discord(mentions, "Rewards Bot", url=url)
     send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
