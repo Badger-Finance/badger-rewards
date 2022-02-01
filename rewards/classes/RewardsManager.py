@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import Dict, List
-
+from copy import deepcopy
 from rich.console import Console
 from tabulate import tabulate
 
@@ -215,6 +215,7 @@ class RewardsManager:
         return total_to_distribute
 
     def boost_sett(self, sett: str, snapshot: Snapshot) -> Snapshot:
+        snapshot = deepcopy(snapshot)
         if snapshot.type == BalanceType.NonNative:
             pre_boost = {}
             for user, balance in snapshot:
