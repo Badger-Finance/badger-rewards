@@ -71,7 +71,7 @@ def mock_get_sett_multipliers_split():
     return mock_boosts_split["multiplierData"]
 
 
-def mock_fetch_snapshot(block, sett):
+def mock_fetch_snapshot(start_block, end_block, sett):
     return Snapshot(
         sett,
         mock_balances,
@@ -108,8 +108,8 @@ def rewards_manager_split(cycle, start, end, boosts_split, request) -> RewardsMa
     rewards_manager_split = RewardsManager(
         request.param, cycle, start, end, boosts_split["userData"]
     )
-    rewards_manager_split.get_sett_multipliers = mock_get_sett_multipliers_split
     rewards_manager_split.fetch_sett_snapshot = mock_fetch_snapshot
+    rewards_manager_split.get_sett_multipliers = mock_get_sett_multipliers_split
     rewards_manager_split.start = 13609200
     rewards_manager_split.end = 13609300
 
@@ -261,6 +261,10 @@ def test_splits(
         49.988892591358436,
         33.333333333333336,
     ]
+
+
+def test_calculate_sett_rewards(mocker, boosts_split):
+    pass
 
 
 def test_calculate_tree_distributions__totals(mocker, boosts_split):

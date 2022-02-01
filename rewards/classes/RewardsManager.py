@@ -20,7 +20,7 @@ from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
 from rewards.emission_handlers import ibbtc_peak_handler, unclaimed_rewards_handler
 from rewards.explorer import get_block_by_timestamp
-from rewards.snapshot.chain_snapshot import sett_snapshot, total_harvest_sett_snapshot
+from rewards.snapshot.chain_snapshot import total_twap_sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
 from rewards.utils.rewards_utils import (
     combine_rewards,
@@ -44,17 +44,23 @@ class RewardsManager:
         self.apy_boosts = {}
 
     def fetch_sett_snapshot(
-        self, block: int, sett: str, blacklist: bool = True
+        self, start_block: int, end_block: int, sett: str, blacklist: bool = True
     ) -> Snapshot:
-        return sett_snapshot(self.chain, block, sett, blacklist)
+        return total_twap_sett_snapshot(
+            self.chain,
+            start_block,
+            end_block,
+            sett,
+            blacklist=blacklist,
+            num_historical_snapshots=0
+        )
 
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
     ) -> RewardsList:
         start_time = self.web3.eth.get_block(self.start)["timestamp"]
         end_time = self.web3.eth.get_block(self.end)["timestamp"]
-        sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
-
+        snapshot = self.fetch_sett_snapshot(self.start, self.end, sett)
         """
         Vaults can have a split of boosted and non boosted emissions
         which are calculated using the boosted balances and the normal
@@ -82,7 +88,7 @@ class RewardsManager:
                 flat_rewards_list.append(
                     distribute_rewards_to_snapshot(
                         amount=flat_emissions,
-                        snapshot=sett_snapshot,
+                        snapshot=snapshot,
                         token=token,
                         block=self.end,
                         custom_rewards=custom_behaviour,
@@ -92,7 +98,8 @@ class RewardsManager:
                 boosted_rewards_list.append(
                     distribute_rewards_to_snapshot(
                         boosted_emissions,
-                        snapshot=self.boost_sett(sett, sett_snapshot),
+                        # TODO: How to boost snapshot that has lots of balances aggregated?
+                        snapshot=self.boost_sett(sett, snapshot),
                         token=token,
                         block=self.end,
                         custom_rewards=custom_behaviour,
@@ -256,7 +263,7 @@ class RewardsManager:
             end_block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]
             sett = dist["sett"]
-            snapshot = total_harvest_sett_snapshot(
+            snapshot = total_twap_sett_snapshot(
                 self.chain,
                 start_block,
                 end_block,
