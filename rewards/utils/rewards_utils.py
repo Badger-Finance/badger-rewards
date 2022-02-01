@@ -55,12 +55,7 @@ def distribute_rewards_to_snapshot(
     token: str,
     block: int,
     custom_rewards: Dict[str, Callable] = {},
-<<<<<<< HEAD
-    block: int = 0,
-):
-=======
 ) -> RewardsList:
->>>>>>> development
     """
     Distribute a certain amount of rewards to a snapshot of users
     """
@@ -77,11 +72,7 @@ def distribute_rewards_to_snapshot(
         if addr in custom_rewards:
             custom_rewards_calc = custom_rewards[addr]
             custom_rewards_list.append(
-<<<<<<< HEAD
-                custom_rewards_calc(amount, token, snapshot.token, block)
-=======
                 custom_rewards_calc(reward_amount, token, snapshot.token, block)
->>>>>>> development
             )
         else:
             rewards.increase_user_rewards(addr, token, reward_amount)
