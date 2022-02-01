@@ -1,6 +1,6 @@
 from rich.console import Console
 
-from helpers.constants import IBBTC_MULTISIG, UNCLAIMED_REWARDS_TOKENS, SETTS
+from helpers.constants import BADGER, IBBTC_MULTISIG, UNCLAIMED_REWARDS_TOKENS, SETTS
 from helpers.enums import Network
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.classes.RewardsList import RewardsList
@@ -23,11 +23,15 @@ def unclaimed_rewards_handler(amount: float, token: str, sett: str, block: int):
 def bvecvx_lp_handler(amount, token: str, sett: str, block: int):
     bbvecvx_cvx_lp = SETTS[Network.Ethereum]["bvecvx_cvx"]
     snapshot = sett_snapshot(Network.Ethereum, block, bbvecvx_cvx_lp)
-    return distribute_rewards_to_snapshot(
-        amount,
-        snapshot,
-        token
-    )
+    if token == BADGER:
+        return RewardsList()
+    else:
+        return distribute_rewards_to_snapshot(
+            amount,
+            snapshot,
+            token,
+            block
+        )
 def ibbtc_peak_handler(amount: float, token: str, sett: str, block: int) -> RewardsList:
     console.log("Distributing {} of {} to ibbtc multisig".format(amount, token))
     rewards = RewardsList()
