@@ -13,8 +13,12 @@ from helpers.constants import (
     IBBTC_PEAK,
     NUMBER_OF_HISTORICAL_SNAPSHOTS,
 )
-from helpers.discord import get_discord_url, send_code_block_to_discord
-from helpers.enums import BalanceType, Network
+from helpers.discord import (
+    get_discord_url,
+    send_code_block_to_discord,
+    send_plain_text_to_discord,
+)
+from helpers.enums import BalanceType, DiscordRoles, Network
 from helpers.time_utils import to_hours, to_utc_date
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
@@ -150,8 +154,8 @@ class RewardsManager:
         return combine_rewards(all_rewards, self.cycle)
     
     def report_invalid_totals(self, invalid_totals: List[List[str]]) -> None:
-        send_code_block_to_discord(
-            msg="INCORRECT REWARDS DISTRIBTION",
+        send_plain_text_to_discord(
+            msg=f"INCORRECT REWARDS DISTRIBTION {DiscordRoles.RewardsPod}",
             username="Rewards Bot",
             url=self.discord_url,
         )
