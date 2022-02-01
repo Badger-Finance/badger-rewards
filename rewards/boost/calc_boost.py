@@ -41,9 +41,7 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
                 user_boost = multiplier
                 user_stake_range = stake_range
 
-        stake_data_ranges[user_stake_range] = (
-            stake_data_ranges.get(user_stake_range, 0) + 1
-        )
+        stake_data_ranges[user_stake_range] = stake_data_ranges.get(user_stake_range, 0) + 1
         badger_boost_data[addr] = user_boost if stake_ratio != 0 else 1
     return badger_boost_data, stake_data_ranges
 
