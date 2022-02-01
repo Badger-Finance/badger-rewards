@@ -9,7 +9,7 @@ from helpers.constants import REWARD_ERROR_TOLERANCE, ZERO_CYCLE
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
-from rewards.utils.reporting_utils import totals_info
+from rewards.utils.token_utils import token_amount_base_10
 
 console = Console()
 
@@ -182,7 +182,7 @@ def get_actual_expected_totals(sett_totals: Dict[str, Dict[str, Decimal]]) -> Tu
     
     return actual_totals, expected_totals
 
-def check_token_totals_in_range(rewards_per_sett: Dict[str, Dict[str, Dict[str, Decimal]]]) -> List[Optional[List[str]]]:
+def check_token_totals_in_range(chain: Network, rewards_per_sett: Dict[str, Dict[str, Dict[str, Decimal]]]) -> List[Optional[List[str]]]:
     """Check that the total amount of tokens to be distributed falls within the expected range
     based on the rewards schedules.
 
@@ -201,6 +201,9 @@ def check_token_totals_in_range(rewards_per_sett: Dict[str, Dict[str, Dict[str, 
         max_expected = expected_totals[token] * Decimal(1 + REWARD_ERROR_TOLERANCE)
         actual = actual_totals[token]
         if actual < min_expected or actual > max_expected:
+            min_expected = token_amount_base_10(chain, token, min_expected)
+            max_expected = token_amount_base_10(chain, token, max_expected)
+            actual = token_amount_base_10(chain, token, actual)
             invalid_totals.append([token, min_expected, max_expected, actual])
     
     return invalid_totals

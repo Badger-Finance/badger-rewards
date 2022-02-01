@@ -147,7 +147,7 @@ class RewardsManager:
             url=self.discord_url,
         )
 
-        invalid_totals = check_token_totals_in_range(rewards_per_sett)
+        invalid_totals = check_token_totals_in_range(self.chain, rewards_per_sett)
         if len(invalid_totals):
             self.report_invalid_totals(invalid_totals)
             

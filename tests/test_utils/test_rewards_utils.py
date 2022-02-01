@@ -113,7 +113,7 @@ def test_check_token_totals_in_range(mocker):
         ),
     )
 
-    invalid_totals = check_token_totals_in_range({})
+    invalid_totals = check_token_totals_in_range(Network.Ethereum, {})
     assert invalid_totals == []
 
     mocker.patch(
@@ -129,10 +129,9 @@ def test_check_token_totals_in_range(mocker):
             }
         ),
     )
-    invalid_totals = check_token_totals_in_range({})
-    actual = Decimal(2e18)
-    expected = Decimal(3e18)
+    invalid_totals = check_token_totals_in_range(Network.Ethereum, {})
+    actual = str(round(Decimal(2e18)/10**18, 5))
     token = BVECVX
-    min_accepted = expected * Decimal(1 - REWARD_ERROR_TOLERANCE)
-    max_accepted = expected * Decimal(1 + REWARD_ERROR_TOLERANCE)
+    min_accepted = str(round(Decimal(3e18*(1-REWARD_ERROR_TOLERANCE))/10**18, 5))
+    max_accepted = str(round(Decimal(3e18*(1+REWARD_ERROR_TOLERANCE))/10**18, 5))
     assert invalid_totals == [[token, min_accepted, max_accepted, actual]]
