@@ -84,6 +84,7 @@ SUSHI_BBADGER_WETH = "0x0a54d4b378C8dBfC7bC93BE50C85DebAFdb87439"
 ETH_BADGER_TREE = "0x660802Fc641b154aBA66a62137e71f331B6d787A"
 IBBTC_PEAK = "0x41671BA1abcbA387b9b2B752c205e22e916BE6e3"
 IBBTC_Y_PEAK = "0x825218beD8BE0B30be39475755AceE0250C50627"
+IBBTC_MULTISIG = "0xB76782B51BFf9C27bA69C77027e20Abd92Bcf3a8"
 BADGER_PAYMENTS = "0xD4868d98849a58F743787c77738D808376210292"
 
 
@@ -129,6 +130,7 @@ SETTS = {
     Network.Ethereum: {
         "badger": BBADGER_ADDRESS,
         "ren_crv": "0x6dEf55d2e18486B9dDfaA075bc4e4EE0B28c1545",
+        "rem_badger": "0x6aF7377b5009d7d154F36FE9e235aE1DA27Aea22",
         "sbtc_crv": "0xd04c48A53c111300aD41190D63681ed3dAd998eC",
         "tbtc_crv": "0xb9D076fDe463dbc9f915E5392F807315Bf940334",
         "uni_badger_wbtc": "0x235c9e24D3FB2FAFd58a2E49D454Fdcd2DBf7FF1",
@@ -203,7 +205,6 @@ EMISSIONS_BLACKLIST = {
     TECH_OPS: "Badger Tech Ops",
     TREASURY_OPS: "Badger Treasury Ops",
     TREASURY_VAULT: "Badger Treasury Vault",
-    IBBTC_PEAK: "IBBTC Peak",
     IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
 }
 
@@ -211,7 +212,6 @@ REWARDS_BLACKLIST = {
     CREAM_BBADGER: "Cream bBadger",
     SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     SETTS[Network.Ethereum]["badger"]: "Badger Vault",
-    ETH_BADGER_TREE: "ETH Badger Tree",
     BADGER_PAYMENTS: "Badger Payments",
 }
 
@@ -250,6 +250,7 @@ NATIVE = [
     SETTS[Network.Ethereum]["digg"],
     SETTS[Network.Ethereum]["uni_digg_wbtc"],
     SETTS[Network.Ethereum]["sushi_digg_wbtc"],
+    SETTS[Network.Ethereum]["rem_badger"],
     SETTS[Network.Arbitrum]["swapr_weth_badger"],
 ]
 
@@ -369,6 +370,14 @@ CLAIMABLE_TOKENS = {
     Network.Polygon: {BalanceType.Native: [POLY_BADGER], BalanceType.NonNative: []},
 }
 
+UNCLAIMED_REWARDS_TOKENS = {
+    Network.Ethereum: [SETTS[Network.Ethereum]["cvx_crv"], SETTS[Network.Ethereum]["bvecvx"]]
+}
+BOOSTED_EMISSION_TOKENS = {
+    Network.Ethereum: [BADGER, DIGG],
+    Network.Arbitrum: [ARB_BADGER],
+}
+
 ABI_DIRS = {
     Network.Ethereum: "eth",
     Network.Polygon: "polygon",
@@ -384,3 +393,6 @@ DECIMAL_MAPPING = {
     Network.Polygon: 1e18,
     Network.Arbitrum: 1e18,
 }
+
+NUMBER_OF_HISTORICAL_SNAPSHOTS = 3
+ZERO_CYCLE = 0

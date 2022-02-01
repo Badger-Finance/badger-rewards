@@ -1,4 +1,5 @@
 import math
+from functools import lru_cache
 from typing import Dict, List
 
 from gql import gql
@@ -15,6 +16,7 @@ console = Console()
 thegraph_client = make_gql_client("thegraph")
 
 
+@lru_cache
 def last_synced_block(chain):
     deployment_id = fetch_deployment_id(chain)
     query = gql(
@@ -85,7 +87,7 @@ def list_setts(chain: str) -> List[str]:
     """
     client = make_gql_client(chain)
     query = gql(
-    """
+        """
     {
 	    setts(first:100) {
             id

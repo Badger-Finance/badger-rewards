@@ -20,7 +20,9 @@ console = Console()
 
 
 @lru_cache(maxsize=None)
-def fetch_token_balances(client: Client, block_number: int, chain: str) -> Tuple[Dict[str, int], Dict[str, int]]:
+def fetch_token_balances(
+    client: Client, block_number: int, chain: str
+) -> Tuple[Dict[str, int], Dict[str, int]]:
     increment = 1000
     query = gql(
         """

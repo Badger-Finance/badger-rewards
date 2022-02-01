@@ -13,19 +13,11 @@ console = Console()
 
 
 def upload_boosts(boost_data, chain: str):
-    upload_boosts_to_aws(
-        boost_data,
-        chain,
-        "badger-boosts"
-    )
+    upload_boosts_to_aws(boost_data, chain, "badger-boosts")
 
 
 def upload_proposed_boosts(boost_data, chain: str):
-    upload_boosts_to_aws(
-        boost_data,
-        chain,
-        "propose-boosts"
-    )
+    upload_boosts_to_aws(boost_data, chain, "propose-boosts")
 
 
 def upload_boosts_to_aws(boost_data, chain: str, file_name: str):
@@ -119,7 +111,7 @@ def add_user_data(user_data, chain):
             "nftBalance": str(data["nftBalance"]),
             "stakeRatio": str(data["stakeRatio"]),
             "multipliers": multipliers,
-            "nfts": data.get("nfts", [])
+            "nfts": data.get("nfts", []),
         }
     upload_boosts(boosts, chain)
 

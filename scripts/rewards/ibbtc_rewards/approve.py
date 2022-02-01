@@ -18,24 +18,19 @@ if __name__ == "__main__":
         "DECRYPT_PASSWORD_ARN",
         "DECRYPT_PASSWORD_KEY",
         region_name="us-west-2",
-        kube=False
+        kube=False,
     )
     with open(config("KEYFILE")) as key_file:
         key_file_json = json.load(key_file)
     cycle_key = Account.decrypt(key_file_json, key_decrypt_password)
-    
+
     approve_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
     rewards_data = move_ibbtc(tree, approve_tree_manager)
-    tx_hash, succeded = approve_tree_manager.approve_root(
-        rewards_data
-    )
+    tx_hash, succeded = approve_tree_manager.approve_root(rewards_data)
     if succeded:
         upload_tree(
-                rewards_data["fileName"],
-                rewards_data["merkleTree"],
-                chain,
-                staging=env_config.test or env_config.staging,
-            )
-
-
-
+            rewards_data["fileName"],
+            rewards_data["merkleTree"],
+            chain,
+            staging=env_config.test or env_config.staging,
+        )

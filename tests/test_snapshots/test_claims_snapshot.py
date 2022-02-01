@@ -3,6 +3,7 @@ from decimal import Decimal
 
 import pytest
 import responses
+from botocore.exceptions import ClientError
 from pytest import approx
 
 from badger_api.requests import badger_api
@@ -26,95 +27,113 @@ BADGER_PRICE = 27.411460272851376
 XSUSHI_PRICE = 1.201460272851376
 CVX_CRV_PRICE = 12.411460272851376
 SWAPR_WETH_SWAPR_PRICE = 12312.201460272851376
+DIGG_PRICE = 50000
 
-TEST_WALLET = '0xD27E9195aA35A7dE31513656AD5d4D29268f94eC'
-TEST_WALLET_ANOTHER = '0xF9e11762d522ea29Dd78178c9BAf83b7B093aacc'
+TEST_WALLET = "0xD27E9195aA35A7dE31513656AD5d4D29268f94eC"
+TEST_WALLET_ANOTHER = "0xF9e11762d522ea29Dd78178c9BAf83b7B093aacc"
 
 CLAIMABLE_BALANCES_DATA_ETH = {
-    'maxPage': 1,
-    'rewards': {
+    "rewards": {
         TEST_WALLET: [
             {
-                'network': 'ethereum', 'address': BADGER,
-                'balance': '148480869281534217908'
+                "address": BADGER,
+                "balance": "148480869281534217908",
             },
             {
-                'network': 'ethereum', 'address': CVX_CRV_ADDRESS,
-                'balance': '2421328289687344724270258601055314109178877723910682205504219578892288'
+                "address": CVX_CRV_ADDRESS,
+                "balance": "2421328289687344724270258601055314109178877723910682205504219578892288",
             },
             {
-                'network': 'ethereum', 'address': XSUSHI,
-                'balance': '242132828968734472427025860105531410917'
+                "address": XSUSHI,
+                "balance": "242132828968734472427025860105531410917",
             },
         ],
         TEST_WALLET_ANOTHER: [
             {
-                'network': 'ethereum', 'address': BADGER,
-                'balance': '8202381382803713155'
+                "address": BADGER,
+                "balance": "8202381382803713155",
+            },
+            {"address": DIGG, "balance": "148480869281534217908"},
+            {
+                "address": CVX_CRV_ADDRESS,
+                "balance": "2656585570737360069",
             },
             {
-                'network': 'ethereum', 'address': CVX_CRV_ADDRESS,
-                'balance': '2656585570737360069'
-            },
-            {
-                'network': 'ethereum', 'address': XSUSHI,
-                'balance': '4169175341925473404499430551565743649791614840189435481041751238508157'
+                "address": XSUSHI,
+                "balance": "4169175341925473404499430551565743649791614840189435481041751238508157",
             },
         ],
-    }
+    },
 }
 
 CLAIMABLE_BALANCES_DATA_POLY = {
-    'maxPage': 1,
-    'rewards': {
+    "rewards": {
         TEST_WALLET: [
             {
-                'network': 'ethereum', 'address': POLY_BADGER,
-                'balance': '148480869281534217908'
+                "address": POLY_BADGER,
+                "balance": "148480869281534217908",
             },
             {
-                'network': 'ethereum', 'address': POLY_SUSHI,
-                'balance': '2421328289687344724270258601055314109178877723910682205504219578892288'
+                "address": POLY_SUSHI,
+                "balance": "2421328289687344724270258601055314109178877723910682205504219578892288",
             },
         ],
         TEST_WALLET_ANOTHER: [
             {
-                'network': 'ethereum', 'address': POLY_BADGER,
-                'balance': '8202381382803713155'
+                "address": POLY_BADGER,
+                "balance": "8202381382803713155",
             },
             {
-                'network': 'ethereum', 'address': POLY_SUSHI,
-                'balance': '2656585570737360069'
+                "address": POLY_SUSHI,
+                "balance": "2656585570737360069",
             },
         ],
-    }
+    },
 }
 
 CLAIMABLE_BALANCES_DATA_ARB = {
-    'maxPage': 1,
-    'rewards': {
+    "rewards": {
         TEST_WALLET: [
             {
-                'network': 'ethereum', 'address': ARB_BADGER,
-                'balance': '148480869281534217908'
+                "address": ARB_BADGER,
+                "balance": "148480869281534217908",
             },
             {
-                'network': 'ethereum', 'address': SWAPR_WETH_SWAPR_ARB_ADDRESS,
-                'balance': '2421328289687344724270258601055314109178877723910682205504219578892288'
+                "address": SWAPR_WETH_SWAPR_ARB_ADDRESS,
+                "balance": "2421328289687344724270258601055314109178877723910682205504219578892288",
             },
         ],
         TEST_WALLET_ANOTHER: [
             {
-                'network': 'ethereum', 'address': ARB_BADGER,
-                'balance': '8202381382803713155'
+                "address": ARB_BADGER,
+                "balance": "8202381382803713155",
             },
             {
-                'network': 'ethereum', 'address': SWAPR_WETH_SWAPR_ARB_ADDRESS,
-                'balance': '2656585570737360069'
+                "address": SWAPR_WETH_SWAPR_ARB_ADDRESS,
+                "balance": "2656585570737360069",
             },
         ],
-    }
+    },
 }
+
+
+@pytest.fixture()
+def claimable_block():
+    return 13952759
+
+
+def balances_to_data(bals):
+    return [{"address": k, "claimableBalances": v} for k, v in bals["rewards"].items()]
+
+
+def mock_get_claimable_data(chain, block):
+    print(block, chain)
+    if chain == Network.Ethereum:
+        return balances_to_data(CLAIMABLE_BALANCES_DATA_ETH)
+    elif chain == Network.Arbitrum:
+        return balances_to_data(CLAIMABLE_BALANCES_DATA_ARB)
+    elif chain == Network.Polygon:
+        return balances_to_data(CLAIMABLE_BALANCES_DATA_POLY)
 
 
 @pytest.mark.parametrize(
@@ -123,25 +142,25 @@ CLAIMABLE_BALANCES_DATA_ARB = {
         (Network.Ethereum, CLAIMABLE_BALANCES_DATA_ETH),
         (Network.Polygon, CLAIMABLE_BALANCES_DATA_POLY),
         (Network.Arbitrum, CLAIMABLE_BALANCES_DATA_ARB),
-    ]
+    ],
 )
-@responses.activate
-def test_claims_snapshot__happy(chain, data):
-    responses.add(
-        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={chain}",
-        json=data, status=200
+def test_claims_snapshot__happy(chain, data, claimable_block, monkeypatch):
+    monkeypatch.setattr(
+        "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
-    responses.add_passthru('https://')
-    snapshots = claims_snapshot(chain)
+    snapshots = claims_snapshot(chain, claimable_block)
+
     badger_snapshot = snapshots[NETWORK_TO_BADGER_TOKEN[chain]]
     assert badger_snapshot.type == BalanceType.Native
     assert badger_snapshot.ratio == 1
     assert badger_snapshot.token == NETWORK_TO_BADGER_TOKEN[chain]
     expected_badger_balance = 0
-    for claim in data['rewards'][TEST_WALLET]:
-        if claim['address'] == NETWORK_TO_BADGER_TOKEN[chain]:
-            expected_badger_balance = int(claim['balance']) / math.pow(10, 18)
-    assert badger_snapshot.balances[TEST_WALLET] == approx(Decimal(expected_badger_balance))
+    for claim in data["rewards"][TEST_WALLET]:
+        if claim["address"] == NETWORK_TO_BADGER_TOKEN[chain]:
+            expected_badger_balance = int(claim["balance"]) / math.pow(10, 18)
+    assert badger_snapshot.balances[TEST_WALLET] == approx(
+        Decimal(expected_badger_balance)
+    )
 
     excluded_token = None
     non_native_token = None
@@ -157,96 +176,68 @@ def test_claims_snapshot__happy(chain, data):
             snapshot = snapshots[excluded_token]
             assert snapshot.ratio == 1
             expected_token_balance = 0
-            for claim in data['rewards'][TEST_WALLET]:
-                if claim['address'] == excluded_token:
-                    expected_token_balance = int(claim['balance']) / math.pow(10, 18)
+            for claim in data["rewards"][TEST_WALLET]:
+                if claim["address"] == excluded_token:
+                    expected_token_balance = int(claim["balance"]) / math.pow(10, 18)
             assert snapshot.balances[TEST_WALLET] == approx(
                 Decimal(expected_token_balance)
             )
 
 
-@responses.activate
-def test_claims_snapshot_digg():
+def test_claims_snapshot_digg(claimable_block, monkeypatch):
     # Digg has different calculation algorithm hence separate test
-    balance = '148480869281534217908'
-    responses.add(
-        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
-        json={
-            'maxPage': 1,
-            'rewards': {
-                TEST_WALLET: [
-                    {
-                        'network': 'ethereum', 'address': DIGG,
-                        'balance': balance
-                    },
-                ]
-            }
-        }, status=200
+    balance = "148480869281534217908"
+    monkeypatch.setattr(
+        "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
-    responses.add_passthru('https://')
-    snapshots = claims_snapshot(Network.Ethereum)
+    snapshots = claims_snapshot(Network.Ethereum, claimable_block)
     digg_snapshot = snapshots[DIGG]
     assert digg_snapshot.type == BalanceType.Native
     assert digg_snapshot.ratio == 1
     assert digg_snapshot.token == DIGG
-    expected_digg_balance = digg_utils.shares_to_fragments(int(balance)) / math.pow(10, 18)
-    assert digg_snapshot.balances[TEST_WALLET] == approx(Decimal(expected_digg_balance))
-
-
-@responses.activate
-def test_claims_snapshot__unhappy(mock_discord):
-    # Raises exception in case non-200 response is returned
-    responses.add(
-        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
-        json={'maxPage': 1}, status=400
+    expected_digg_balance = digg_utils.shares_to_fragments(int(balance)) / math.pow(
+        10, 18
     )
-    responses.add_passthru('https://')
-    with pytest.raises(ValueError):
-        claims_snapshot(Network.Ethereum)
+    assert digg_snapshot.balances[TEST_WALLET_ANOTHER] == approx(
+        Decimal(expected_digg_balance)
+    )
 
 
 @responses.activate
-def test_claims_snapshot_usd__happy():
+def test_claims_snapshot_usd__happy(claimable_block, monkeypatch):
+    monkeypatch.setattr(
+        "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
+    )
     # Make sure native and non-native balances are correcly calculated to usd
-    responses.add(
-        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
-        json=CLAIMABLE_BALANCES_DATA_ETH, status=200
-    )
     for boost_chain in BOOST_CHAINS:
         responses.add(
-            responses.GET, f"{badger_api}/prices?chain={boost_chain}",
+            responses.GET,
+            f"{badger_api}/prices?chain={boost_chain}",
             json={
                 BADGER: BADGER_PRICE,
                 CVX_CRV_ADDRESS: CVX_CRV_PRICE,
                 XSUSHI: XSUSHI_PRICE,
+                DIGG: DIGG_PRICE,
                 SWAPR_WETH_SWAPR_ARB_ADDRESS: SWAPR_WETH_SWAPR_PRICE,
             },
-            status=200
+            status=200,
         )
-    responses.add_passthru('https://')
-    native, non_native = claims_snapshot_usd(Network.Ethereum)
+    responses.add_passthru("https://")
+    native, non_native = claims_snapshot_usd(Network.Ethereum, claimable_block)
     expected_native_balance = 0
     # For this wallet native balance is only
-    for claim in CLAIMABLE_BALANCES_DATA_ETH['rewards'][TEST_WALLET]:
-        if claim['address'] == BADGER:
-            expected_native_balance = BADGER_PRICE * int(claim['balance']) / math.pow(10, 18)
+    for claim in CLAIMABLE_BALANCES_DATA_ETH["rewards"][TEST_WALLET]:
+        if claim["address"] == BADGER:
+            expected_native_balance = (
+                BADGER_PRICE * int(claim["balance"]) / math.pow(10, 18)
+            )
     assert native[TEST_WALLET] == approx(Decimal(expected_native_balance))
 
     # For this wallet non-native balance is only cvxCRV token
     expected_non_native_balance = 0
-    for claim in CLAIMABLE_BALANCES_DATA_ETH['rewards'][TEST_WALLET]:
-        if claim['address'] == CVX_CRV_ADDRESS:
-            expected_non_native_balance = CVX_CRV_PRICE * int(claim['balance']) / math.pow(10, 18)
+    for claim in CLAIMABLE_BALANCES_DATA_ETH["rewards"][TEST_WALLET]:
+        if claim["address"] == CVX_CRV_ADDRESS:
+            expected_non_native_balance = (
+                CVX_CRV_PRICE * int(claim["balance"]) / math.pow(10, 18)
+            )
     assert non_native[TEST_WALLET] == approx(Decimal(expected_non_native_balance))
-
-
-@responses.activate
-def test_claims_snapshot_usd__unhappy(mock_discord):
-    # Raises exception in case non-200 response is returned
-    responses.add(
-        responses.GET, f"{badger_api}/accounts/allClaimable?page=1&chain={Network.Ethereum}",
-        json={'maxPage': 1}, status=400
-    )
-    responses.add_passthru('https://')
-    with pytest.raises(ValueError):
-        claims_snapshot_usd(Network.Ethereum)

@@ -49,8 +49,8 @@ def mock_upload_boosts(boosts, chain: str):
     keys = list(boosts["userData"].keys())
     for user in keys:
         for _, v in boosts["userData"][user].items():
-           assert type(v) != Decimal
-           assert json.dumps(v)
+            assert type(v) != Decimal
+            assert json.dumps(v)
     with open(f"{chain}-boosts.json", "w") as f:
         json.dump(boosts, f)
 

@@ -26,5 +26,5 @@ def make_gql_client(name: str) -> Optional[Client]:
         return
     transport = RequestsHTTPTransport(url=url, retries=3)
     return Client(
-        transport=transport, fetch_schema_from_transport=True, execute_timeout=30
+        transport=transport, fetch_schema_from_transport=True, execute_timeout=60
     )

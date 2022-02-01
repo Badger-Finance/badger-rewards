@@ -20,4 +20,3 @@ if __name__ == "__main__":
 
     rewards_data = retro_cycle(tree, propose_tree_manager)
     tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
-

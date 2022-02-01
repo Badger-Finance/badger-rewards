@@ -8,7 +8,7 @@ from rich.console import Console
 from config.rewards_config import rewards_config
 from config.singletons import env_config
 from helpers.constants import CHAIN_IDS, EMISSIONS_CONTRACTS
-from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.discord import console_and_discord
 from helpers.enums import Abi, BotType, Network
 from helpers.web3_utils import make_contract
 from rewards.aws.boost import (
@@ -29,12 +29,6 @@ from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewa
 from subgraph.queries.setts import list_setts
 
 console = Console()
-
-
-def console_and_discord(msg: str, chain: str, bot_type: BotType = BotType.Cycle):
-    url = get_discord_url(chain, bot_type)
-    console.log(msg)
-    send_message_to_discord("Rewards Cycle", msg, [], "Rewards Bot", url=url)
 
 
 def fetch_all_schedules(
@@ -88,8 +82,13 @@ def propose_root(
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
     boosts = download_boosts(chain)
     rewards_data = generate_rewards_in_range(
-        chain, start, end, save=save, past_tree=past_rewards, tree_manager=tree_manager,
-        boosts=boosts
+        chain,
+        start,
+        end,
+        save=save,
+        past_tree=past_rewards,
+        tree_manager=tree_manager,
+        boosts=boosts,
     )
     console.log("Generated rewards")
 
@@ -99,7 +98,7 @@ def propose_root(
     if env_config.production:
         tx_hash, success = tree_manager.propose_root(rewards_data)
         if success:
-            upload_proposed_boosts(boosts,chain)
+            upload_proposed_boosts(boosts, chain)
     return rewards_data
 
 
@@ -124,7 +123,7 @@ def approve_root(
         save=False,
         past_tree=current_rewards,
         tree_manager=tree_manager,
-        boosts=boosts
+        boosts=boosts,
     )
     if env_config.test or env_config.staging:
         console.log(
@@ -179,7 +178,7 @@ def generate_rewards_in_range(
     save: bool,
     past_tree: Dict,
     tree_manager: TreeManager,
-    boosts: Dict
+    boosts: Dict,
 ):
     """Generate chain rewards for a chain within two blocks
 
@@ -219,7 +218,7 @@ def generate_rewards_in_range(
 
     file_name = f"rewards-{chain_id}-{encode_hex(root_hash)}.json"
 
-    verify_rewards(past_tree, merkle_tree, tree_manager, chain)
+    verify_rewards(past_tree, merkle_tree, chain)
     if save:
         with open(file_name, "w") as fp:
             json.dump(merkle_tree, fp, indent=4)
