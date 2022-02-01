@@ -10,7 +10,8 @@ from helpers.constants import (
     BOOSTED_EMISSION_TOKENS,
     ETH_BADGER_TREE,
     IBBTC_PEAK,
-    NUMBER_OF_HISTORICAL_SNAPSHOTS,
+    NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS,
+    NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS,
 )
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType, Network
@@ -25,7 +26,6 @@ from rewards.utils.emission_utils import get_flat_emission_rate
 from rewards.utils.rewards_utils import (
     combine_rewards,
     distribute_rewards_from_total_snapshot,
-    distribute_rewards_to_snapshot,
 )
 from subgraph.queries.harvests import fetch_tree_distributions
 
@@ -52,7 +52,7 @@ class RewardsManager:
             end_block,
             sett,
             blacklist=blacklist,
-            num_historical_snapshots=0
+            num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS
         )
 
     def calculate_sett_rewards(
@@ -86,7 +86,7 @@ class RewardsManager:
             boosted_emissions = token_distribution * (1 - emissions_rate)
             if flat_emissions > 0:
                 flat_rewards_list.append(
-                    distribute_rewards_to_snapshot(
+                    distribute_rewards_from_total_snapshot(
                         amount=flat_emissions,
                         snapshot=snapshot,
                         token=token,
@@ -96,9 +96,8 @@ class RewardsManager:
                 )
             if boosted_emissions > 0:
                 boosted_rewards_list.append(
-                    distribute_rewards_to_snapshot(
+                    distribute_rewards_from_total_snapshot(
                         boosted_emissions,
-                        # TODO: How to boost snapshot that has lots of balances aggregated?
                         snapshot=self.boost_sett(sett, snapshot),
                         token=token,
                         block=self.end,
@@ -269,7 +268,7 @@ class RewardsManager:
                 end_block,
                 sett,
                 blacklist=False,
-                num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS
+                num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS
             )
             amount = int(dist["amount"])
             all_dist_rewards.append(

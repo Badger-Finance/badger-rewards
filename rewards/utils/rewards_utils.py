@@ -1,5 +1,6 @@
 from decimal import Decimal
 from typing import Callable, Dict, List, Optional
+from typing import Union
 
 from rich.console import Console
 from web3 import Web3
@@ -80,7 +81,7 @@ def distribute_rewards_to_snapshot(
 
 
 def distribute_rewards_from_total_snapshot(
-        amount: int, snapshot: Snapshot, token: str,
+        amount: Union[int, Decimal], snapshot: Snapshot, token: str,
         block: int, custom_rewards: Optional[Dict[str, Callable]] = None,
 ):
     if not custom_rewards:

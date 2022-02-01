@@ -143,7 +143,7 @@ def end_time() -> int:
 
 
 @pytest.fixture
-def schedule(start_time, end_time) -> int:
+def schedule(start_time, end_time) -> callable:
     def _method(sett, total_amount):
         return Schedule(
             sett,
@@ -263,8 +263,32 @@ def test_splits(
     ]
 
 
-def test_calculate_sett_rewards(mocker, boosts_split):
-    pass
+def test_calculate_sett_rewards(schedule, mocker, boosts_split):
+    mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
+    first_user = "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd"
+    second_user = "0xbC641f6C6957096857358Cc70df3623715A2ae45"
+    third_user = "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0"
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_sett_balances",
+        return_value={
+            first_user: 1000,
+            second_user: 1000,
+            third_user: 1000,
+        }
+    )
+    sett = SETTS[Network.Ethereum]["ibbtc_crv"]
+    total_badger = 100
+    mock_schedule = {BADGER: [schedule(sett, total_badger)]}
+    all_schedules = {sett: mock_schedule}
+
+    rewards_manager = RewardsManager(
+        Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
+    )
+
+    rewards = rewards_manager.calculate_all_sett_rewards(
+        [sett], all_schedules,
+    )
+    assert rewards.claims[first_user][BADGER]
 
 
 def test_calculate_tree_distributions__totals(mocker, boosts_split):
