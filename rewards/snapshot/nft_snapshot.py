@@ -16,7 +16,7 @@ def nft_snapshot(chain: Network, block: int) -> Snapshot:
             nft_address = nft_balance["address"]
             nft_id = nft_balance["id"]
             bals[user] = bals.get(user, 0) + get_nft_weight(chain, nft_address, nft_id)
-    return Snapshot(BADGER, bals, ratio=1, type=BalanceType.Native, chain=chain)
+    return Snapshot(BADGER, bals, ratio=1, type=BalanceType.Native)
 
 
 def nft_snapshot_usd(chain: Network, block: int) -> Dict[str, Decimal]:

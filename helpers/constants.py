@@ -201,7 +201,7 @@ TOKENS_TO_CHECK = {
     },
 }
 
-NATIVE_EMISSIONS_BLACKLIST = {
+EMISSIONS_BLACKLIST = {
     DEV_MULTISIG: "Badger Dev Multisig",
     TECH_OPS: "Badger Tech Ops",
     TREASURY_OPS: "Badger Treasury Ops",
@@ -209,17 +209,13 @@ NATIVE_EMISSIONS_BLACKLIST = {
     IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
 }
 
-TREE_DISTRIBUTION_BLACKLIST = {
+REWARDS_BLACKLIST = {
     CREAM_BBADGER: "Cream bBadger",
     SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     SETTS[Network.Ethereum]["badger"]: "Badger Vault",
     BADGER_PAYMENTS: "Badger Payments",
     BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
-
-TOTAL_BLACKLIST = {**NATIVE_EMISSIONS_BLACKLIST, **TREE_DISTRIBUTION_BLACKLIST}
-
-NATIVE_EMISSIONS = {Network.Ethereum: [BADGER, DIGG], Network.Arbitrum: [ARB_BADGER]}
 
 STAKE_RATIO_RANGES = list(
     [
@@ -248,7 +244,6 @@ STAKE_RATIO_RANGES = list(
 
 LP_SETT_INFO = {"type": "native", "ratio": 0.5}
 TOKEN_SETT_INFO = {"type": "native", "ratio": 1}
-
 
 NATIVE = [
     SETTS[Network.Ethereum]["badger"],
