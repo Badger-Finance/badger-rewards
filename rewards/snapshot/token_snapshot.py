@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Counter, Dict, Tuple
 
 from helpers.constants import BADGER, DIGG
 from rewards.classes.Snapshot import Snapshot
@@ -14,8 +14,8 @@ def token_snapshot(chain: str, block: int) -> Tuple[Snapshot, Snapshot]:
     token_client = make_gql_client(f"tokens-{chain}")
     badger_bals, digg_bals = fetch_token_balances(token_client, block, chain)
     across_bals = fetch_across_balances(block, chain)
-
-    return Snapshot(BADGER, badger_bals + across_bals), Snapshot(DIGG, digg_bals)
+    badger_bals = Counter(badger_bals) + Counter(across_bals)
+    return Snapshot(BADGER, badger_bals), Snapshot(DIGG, digg_bals)
 
 
 def fuse_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:

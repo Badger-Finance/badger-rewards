@@ -45,6 +45,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
     continue_fetching = True
     last_id = "0x0000000000000000000000000000000000000000"
     multiplier = across_lp_multiplier()
+    console.log(f"Across lp multiplier {multiplier}")
     across_balances = {}
     client = make_gql_client("across")
     try:
@@ -60,7 +61,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
             else:
                 last_id = next_page["tokenBalances"][-1]["id"]
                 console.log(
-                    f"Fetching {len(next_page['tokenBalances'])} token balances"
+                    f"Fetching {len(next_page['tokenBalances'])} across balances"
                 )
                 for entry in next_page["tokenBalances"]:
                     address = entry["id"].split("-")[0]
@@ -70,7 +71,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
 
     except Exception as e:
         send_error_to_discord(
-            e, "Error in Fetching Token Balance", "Subgraph Error", chain
+            e, "Error in Fetching Across Balance", "Subgraph Error", chain
         )
         raise e
 

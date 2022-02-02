@@ -64,7 +64,7 @@ def total_harvest_sett_snapshot(
     return snapshot
 
 
-def sett_snapshot(chain: Network, block: int, sett: str) -> Snapshot
+def sett_snapshot(chain: Network, block: int, sett: str) -> Snapshot:
     """
     Take a snapshot of a sett on a chain at a certain block
     :param chain:
