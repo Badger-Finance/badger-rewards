@@ -1,6 +1,5 @@
 import math
 from functools import lru_cache
-from re import A
 from typing import Dict, Optional, Tuple
 
 from gql import Client, gql
@@ -17,7 +16,7 @@ console = Console()
 
 @lru_cache(maxsize=None)
 def fetch_token_balances(
-    block_number: int, chain: str
+    block_number: int, chain: Network
 ) -> Tuple[Dict[str, int], Dict[str, int]]:
     client = SubgraphClient(f"tokens-{chain}", chain)
     increment = 1000
@@ -72,7 +71,7 @@ def fetch_token_balances(
     return badger_balances, digg_balances
 
 
-def fetch_fuse_pool_balances(client, chain, block):
+def fetch_fuse_pool_balances(chain: Network, block: int):
     if chain != Network.Ethereum:
         console.log("Fuse pools are only active on ETH")
         return {}

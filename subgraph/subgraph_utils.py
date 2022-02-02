@@ -36,10 +36,10 @@ class SubgraphClient:
         self.client = make_gql_client(name)
         self.chain = chain
 
-    def execute(self, **kwargs):
+    def execute(self, *args, **kwargs):
         transport_url = self.client.transport.url
         try:
-            return self.client.execute(**kwargs)
+            return self.client.execute(*args, **kwargs)
         except Exception as e:
             send_error_to_discord(
                 e,
