@@ -5,12 +5,11 @@ from rich.console import Console
 from web3 import Web3
 
 from helpers.constants import (
-    ZERO_CYCLE,
     NATIVE_EMISSIONS,
-    TREE_DISTRIBUTION_BLACKLIST,
-    TOTAL_BLACKLIST,
     NATIVE_EMISSIONS_BLACKLIST,
-    NATIVE_EMISSIONS,
+    TOTAL_BLACKLIST,
+    TREE_DISTRIBUTION_BLACKLIST,
+    ZERO_CYCLE,
 )
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot

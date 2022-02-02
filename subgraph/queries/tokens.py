@@ -13,10 +13,10 @@ from helpers.discord import (
     send_error_to_discord,
     send_message_to_discord,
 )
-from subgraph.subgraph_utils import make_gql_client
-from rewards.utils.emission_utils import across_lp_multiplier
 from helpers.enums import Abi, BotType, Network
 from helpers.web3_utils import make_contract
+from rewards.utils.emission_utils import across_lp_multiplier
+from subgraph.subgraph_utils import make_gql_client
 
 console = Console()
 
@@ -38,6 +38,8 @@ def token_query():
 
 
 def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
+    if chain != Network.Ethereum:
+        return {}
     increment = 1000
     query = token_query()
     continue_fetching = True

@@ -5,11 +5,7 @@ from rich.console import Console
 from web3 import Web3
 
 from badger_api.requests import fetch_token
-from helpers.constants import (
-    DISABLED_VAULTS,
-    NATIVE,
-    PRO_RATA_VAULTS,
-)
+from helpers.constants import DISABLED_VAULTS, NATIVE, PRO_RATA_VAULTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.Snapshot import Snapshot
 from rewards.utils.emission_utils import fetch_unboosted_vaults, get_token_weight
@@ -40,16 +36,8 @@ def chain_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
 
 
 def total_harvest_sett_snapshot(
-<<<<<<< HEAD
-    chain: Network,
-    start_block: int,
-    end_block: int,
-    sett: str,
-    number_of_snapshots: int,
-=======
         chain: Network, start_block: int, end_block: int,
         sett: str, blacklist: bool, num_historical_snapshots: int,
->>>>>>> development
 ) -> Snapshot:
     """
     Get a snapshot for total harvest period.
@@ -57,19 +45,11 @@ def total_harvest_sett_snapshot(
         for the num_historical_snapshots + snapshot at end_block
     """
     assert end_block >= start_block
-<<<<<<< HEAD
-    snapshot = sett_snapshot(chain, end_block, sett)
-    if end_block == start_block or number_of_snapshots == 1:
-        return snapshot
-    snapshot += sett_snapshot(chain, start_block, sett)
-    rate = int((end_block - start_block) / number_of_snapshots)
-=======
     snapshot = sett_snapshot(chain, end_block, sett, blacklist)
     if end_block == start_block or num_historical_snapshots == 0:
         return snapshot
     snapshot += sett_snapshot(chain, start_block, sett, blacklist)
     rate = int((end_block - start_block) / num_historical_snapshots)
->>>>>>> development
     # If rate == 0 it means that number of snapshots is too big, and it cannot be calculated
     # properly.
     # For ex: start block = 100, end block = 110 and num of snaps = 14,
