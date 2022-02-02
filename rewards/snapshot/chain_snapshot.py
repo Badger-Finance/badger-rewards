@@ -45,7 +45,7 @@ def total_harvest_sett_snapshot(
         for the num_historical_snapshots + snapshot at end_block
     """
     assert end_block >= start_block
-    snapshot = sett_snapshot(chain, end_block, sett, blacklist)
+    snapshot = sett_snapshot(chain, end_block, sett)
     if end_block == start_block or num_historical_snapshots == 0:
         return snapshot
     snapshot += sett_snapshot(chain, start_block, sett, blacklist)
