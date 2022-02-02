@@ -157,6 +157,11 @@ def schedule(start_time, end_time) -> callable:
     return _method
 
 
+FIRST_USER = "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd"
+SECOND_USER = "0xbC641f6C6957096857358Cc70df3623715A2ae45"
+THIRD_USER = "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0"
+
+
 @pytest.mark.parametrize(
     "rewards_manager",
     [Network.Ethereum],
@@ -267,21 +272,17 @@ def test_calculate_sett_rewards__equal_balances_for_period(
         schedule, mocker, boosts_split, mock_discord
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
-    first_user = "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd"
-    second_user = "0xbC641f6C6957096857358Cc70df3623715A2ae45"
-    third_user = "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0"
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         return_value={
-            first_user: 1000,
-            second_user: 1000,
-            third_user: 1000,
+            FIRST_USER: 1000,
+            SECOND_USER: 1000,
+            THIRD_USER: 1000,
         }
     )
     sett = SETTS[Network.Ethereum]["ibbtc_crv"]
     total_badger = 100
-    mock_schedule = {BADGER: [schedule(sett, total_badger)]}
-    all_schedules = {sett: mock_schedule}
+    all_schedules = {sett: {BADGER: [schedule(sett, total_badger)]}}
 
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
@@ -291,22 +292,76 @@ def test_calculate_sett_rewards__equal_balances_for_period(
         [sett], all_schedules,
     )
     # First user has boost = 1, so they get smallest amount of rewards because of unboosted balance
-    assert rewards.claims[first_user][BADGER] / Decimal(1e18) == pytest.approx(
+    assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(0.033322225924691)
     )
     # Second user has boost = 1000, so they get bigger portion of rewards
-    assert rewards.claims[second_user][BADGER] / Decimal(1e18) == pytest.approx(
+    assert rewards.claims[SECOND_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(33.32222592469176)
     )
     # Third user has boost = 2000
-    assert rewards.claims[third_user][BADGER] / Decimal(1e18) == pytest.approx(
+    assert rewards.claims[THIRD_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(66.64445184938353)
     )
     # Make sure all distributed rewards equal to total value distributed in schedule
     assert (
-        rewards.claims[first_user][BADGER]
-        + rewards.claims[second_user][BADGER]
-        + rewards.claims[third_user][BADGER]
+        rewards.claims[FIRST_USER][BADGER]
+        + rewards.claims[SECOND_USER][BADGER]
+        + rewards.claims[THIRD_USER][BADGER]
+    ) / Decimal(1e18) == total_badger
+
+
+def test_calculate_sett_rewards__balances_vary_for_period(
+        schedule, mocker, boosts_split, mock_discord
+):
+    mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
+
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_sett_balances",
+        side_effect=[
+            {
+                FIRST_USER: 1000,
+                SECOND_USER: 1000,
+                THIRD_USER: 1000,
+            },
+            {
+                FIRST_USER: 1000,
+                SECOND_USER: 10000,
+                THIRD_USER: 100,
+            },
+            {
+                FIRST_USER: 1000,
+                SECOND_USER: 100000,
+                THIRD_USER: 10,
+            },
+        ]
+    )
+    sett = SETTS[Network.Ethereum]["ibbtc_crv"]
+    total_badger = 100
+    all_schedules = {sett: {BADGER: [schedule(sett, total_badger)]}}
+
+    rewards_manager = RewardsManager(
+        Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
+    )
+
+    rewards = rewards_manager.calculate_all_sett_rewards(
+        [sett], all_schedules,
+    )
+    assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
+        Decimal(0.00264963832)
+    )
+    # As second user increased his balance he got more rewards than others
+    assert rewards.claims[SECOND_USER][BADGER] / Decimal(1e18) == pytest.approx(
+        Decimal(98.036618001642)
+    )
+    # Third user withdrew funds resulting in much smaller reward
+    assert rewards.claims[THIRD_USER][BADGER] / Decimal(1e18) == pytest.approx(
+        Decimal(1.960732360032)
+    )
+    assert (
+        rewards.claims[FIRST_USER][BADGER]
+        + rewards.claims[SECOND_USER][BADGER]
+        + rewards.claims[THIRD_USER][BADGER]
     ) / Decimal(1e18) == total_badger
 
 
