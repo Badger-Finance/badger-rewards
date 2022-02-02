@@ -130,6 +130,7 @@ SETTS = {
     Network.Ethereum: {
         "badger": BBADGER_ADDRESS,
         "ren_crv": "0x6dEf55d2e18486B9dDfaA075bc4e4EE0B28c1545",
+        "rem_digg": "0x99F39D495C6A5237f43602f3Ab5F49786E46c9B0",
         "rem_badger": "0x6aF7377b5009d7d154F36FE9e235aE1DA27Aea22",
         "sbtc_crv": "0xd04c48A53c111300aD41190D63681ed3dAd998eC",
         "tbtc_crv": "0xb9D076fDe463dbc9f915E5392F807315Bf940334",
@@ -252,6 +253,7 @@ NATIVE = [
     SETTS[Network.Ethereum]["uni_digg_wbtc"],
     SETTS[Network.Ethereum]["sushi_digg_wbtc"],
     SETTS[Network.Ethereum]["rem_badger"],
+    SETTS[Network.Ethereum]["rem_digg"],
     SETTS[Network.Arbitrum]["swapr_weth_badger"],
 ]
 
