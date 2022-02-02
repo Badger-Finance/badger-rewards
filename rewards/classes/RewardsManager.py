@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import Dict, List
-
+from copy import deepcopy
 from rich.console import Console
 from tabulate import tabulate
 
@@ -10,7 +10,11 @@ from helpers.constants import (
     BOOSTED_EMISSION_TOKENS,
     ETH_BADGER_TREE,
     IBBTC_PEAK,
+<<<<<<< HEAD
     NUMBER_OF_SNAPSHOTS_FOR_SETT,
+=======
+    NUMBER_OF_HISTORICAL_SNAPSHOTS,
+>>>>>>> development
 )
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType, Network
@@ -213,6 +217,7 @@ class RewardsManager:
         return total_to_distribute
 
     def boost_sett(self, sett: str, snapshot: Snapshot) -> Snapshot:
+        snapshot = deepcopy(snapshot)
         if snapshot.type == BalanceType.NonNative:
             pre_boost = {}
             for user, balance in snapshot:
@@ -259,7 +264,12 @@ class RewardsManager:
                 start_block,
                 end_block,
                 sett,
+<<<<<<< HEAD
                 number_of_snapshots=NUMBER_OF_SNAPSHOTS_FOR_SETT,
+=======
+                blacklist=False,
+                num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS
+>>>>>>> development
             )
             amount = int(dist["amount"])
             all_dist_rewards.append(
