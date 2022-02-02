@@ -1,6 +1,8 @@
 from decimal import Decimal
 from typing import Dict, List
 from copy import deepcopy
+from typing import Tuple
+
 from rich.console import Console
 from tabulate import tabulate
 
@@ -33,6 +35,11 @@ console = Console()
 
 
 class RewardsManager:
+    CUSTOM_BEHAVIOUR = {
+        ETH_BADGER_TREE: unclaimed_rewards_handler,
+        IBBTC_PEAK: ibbtc_peak_handler,
+    }
+
     def __init__(self, chain: Network, cycle: int, start: int, end: int, boosts):
         self.chain = chain
         self.web3 = env_config.get_web3(chain)
@@ -57,22 +64,17 @@ class RewardsManager:
 
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
-    ) -> RewardsList:
-        start_time = self.web3.eth.get_block(self.start)["timestamp"]
-        end_time = self.web3.eth.get_block(self.end)["timestamp"]
-        snapshot = self.fetch_sett_snapshot(self.start, self.end, sett)
+    ) -> Tuple[RewardsList, RewardsList, RewardsList]:
         """
         Vaults can have a split of boosted and non boosted emissions
         which are calculated using the boosted balances and the normal
         balances respectively
-        
         """
+        start_time = self.web3.eth.get_block(self.start)["timestamp"]
+        end_time = self.web3.eth.get_block(self.end)["timestamp"]
+        snapshot = self.fetch_sett_snapshot(self.start, self.end, sett)
         flat_rewards_list = []
         boosted_rewards_list = []
-        custom_behaviour = {
-            ETH_BADGER_TREE: unclaimed_rewards_handler,
-            IBBTC_PEAK: ibbtc_peak_handler,
-        }
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
@@ -91,7 +93,7 @@ class RewardsManager:
                         snapshot=snapshot,
                         token=token,
                         block=self.end,
-                        custom_rewards=custom_behaviour,
+                        custom_rewards=self.CUSTOM_BEHAVIOUR,
                     )
                 )
             if boosted_emissions > 0:
@@ -101,7 +103,7 @@ class RewardsManager:
                         snapshot=self.boost_sett(sett, snapshot),
                         token=token,
                         block=self.end,
-                        custom_rewards=custom_behaviour,
+                        custom_rewards=self.CUSTOM_BEHAVIOUR,
                     )
                 )
 
@@ -252,10 +254,7 @@ class RewardsManager:
             f"tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
-        custom_behaviour = {
-            ETH_BADGER_TREE: unclaimed_rewards_handler,
-            IBBTC_PEAK: ibbtc_peak_handler,
-        }
+
         for dist in tree_distributions:
             start_block = get_block_by_timestamp(
                 self.chain, int(dist["end_of_previous_dist_timestamp"])
@@ -275,7 +274,7 @@ class RewardsManager:
             all_dist_rewards.append(
                 distribute_rewards_from_total_snapshot(
                     amount, snapshot, token,
-                    block=self.end, custom_rewards=custom_behaviour,
+                    block=self.end, custom_rewards=self.CUSTOM_BEHAVIOUR,
                 )
             )
         return combine_rewards(all_dist_rewards, self.cycle)

@@ -263,7 +263,9 @@ def test_splits(
     ]
 
 
-def test_calculate_sett_rewards(schedule, mocker, boosts_split):
+def test_calculate_sett_rewards__equal_balances_for_period(
+        schedule, mocker, boosts_split, mock_discord
+):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     first_user = "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd"
     second_user = "0xbC641f6C6957096857358Cc70df3623715A2ae45"
@@ -288,7 +290,24 @@ def test_calculate_sett_rewards(schedule, mocker, boosts_split):
     rewards = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
-    assert rewards.claims[first_user][BADGER]
+    # First user has boost = 1, so they get smallest amount of rewards because of unboosted balance
+    assert rewards.claims[first_user][BADGER] / Decimal(1e18) == pytest.approx(
+        Decimal(0.033322225924691)
+    )
+    # Second user has boost = 1000, so they get bigger portion of rewards
+    assert rewards.claims[second_user][BADGER] / Decimal(1e18) == pytest.approx(
+        Decimal(33.32222592469176)
+    )
+    # Third user has boost = 2000
+    assert rewards.claims[third_user][BADGER] / Decimal(1e18) == pytest.approx(
+        Decimal(66.64445184938353)
+    )
+    # Make sure all distributed rewards equal to total value distributed in schedule
+    assert (
+        rewards.claims[first_user][BADGER]
+        + rewards.claims[second_user][BADGER]
+        + rewards.claims[third_user][BADGER]
+    ) / Decimal(1e18) == total_badger
 
 
 def test_calculate_tree_distributions__totals(mocker, boosts_split):
