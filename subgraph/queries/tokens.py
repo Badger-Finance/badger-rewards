@@ -1,5 +1,6 @@
 import math
 from functools import lru_cache
+from re import A
 from typing import Dict, Optional, Tuple
 
 from gql import Client, gql
@@ -8,21 +9,17 @@ from web3 import Web3
 
 from helpers.constants import DECIMAL_MAPPING
 from helpers.digg_utils import digg_utils
-from helpers.discord import (
-    get_discord_url,
-    send_error_to_discord,
-    send_message_to_discord,
-)
 from helpers.enums import Abi, BotType, Network
 from helpers.web3_utils import make_contract
-
+from subgraph.subgraph_utils import SubgraphClient
 console = Console()
 
 
 @lru_cache(maxsize=None)
 def fetch_token_balances(
-    client: Client, block_number: int, chain: str
+    block_number: int, chain: str
 ) -> Tuple[Dict[str, int], Dict[str, int]]:
+    client = SubgraphClient(f"tokens-{chain}", chain)
     increment = 1000
     query = gql(
         """
@@ -43,42 +40,35 @@ def fetch_token_balances(
 
     badger_balances = {}
     digg_balances = {}
-    try:
-        while continue_fetching:
-            variables = {
-                "firstAmount": increment,
-                "lastID": last_id,
-                "blockNumber": {"number": block_number},
-            }
-            next_page = client.execute(query, variable_values=variables)
-            if len(next_page["tokenBalances"]) == 0:
-                continue_fetching = False
-            else:
-                last_id = next_page["tokenBalances"][-1]["id"]
-                console.log(
-                    f"Fetching {len(next_page['tokenBalances'])} token balances"
-                )
-                for entry in next_page["tokenBalances"]:
-                    address = entry["id"].split("-")[0]
-                    amount = float(entry["balance"])
-                    if amount > 0:
-                        if entry["token"]["symbol"] == "BADGER":
-                            badger_balances[address] = amount / DECIMAL_MAPPING[chain]
-                        if entry["token"]["symbol"] == "DIGG":
-                            # Speed this up
-                            if entry["balance"] == 0:
-                                fragment_balance = 0
-                            else:
-                                fragment_balance = digg_utils.shares_to_fragments(
-                                    int(amount)
-                                )
-                            digg_balances[address] = float(fragment_balance) / 1e9
-    except Exception as e:
-        send_error_to_discord(
-            e, "Error in Fetching Token Balance", "Subgraph Error", chain
-        )
-        raise e
-
+    while continue_fetching:
+        variables = {
+            "firstAmount": increment,
+            "lastID": last_id,
+            "blockNumber": {"number": block_number},
+        }
+        next_page = client.execute(query, variable_values=variables)
+        if len(next_page["tokenBalances"]) == 0:
+            continue_fetching = False
+        else:
+            last_id = next_page["tokenBalances"][-1]["id"]
+            console.log(
+                f"Fetching {len(next_page['tokenBalances'])} token balances"
+            )
+            for entry in next_page["tokenBalances"]:
+                address = entry["id"].split("-")[0]
+                amount = float(entry["balance"])
+                if amount > 0:
+                    if entry["token"]["symbol"] == "BADGER":
+                        badger_balances[address] = amount / DECIMAL_MAPPING[chain]
+                    if entry["token"]["symbol"] == "DIGG":
+                        # Speed this up
+                        if entry["balance"] == 0:
+                            fragment_balance = 0
+                        else:
+                            fragment_balance = digg_utils.shares_to_fragments(
+                                int(amount)
+                            )
+                        digg_balances[address] = float(fragment_balance) / 1e9
     return badger_balances, digg_balances
 
 
@@ -87,6 +77,7 @@ def fetch_fuse_pool_balances(client, chain, block):
         console.log("Fuse pools are only active on ETH")
         return {}
 
+    client = SubgraphClient("fuse", chain)
     ctoken_data = {
         "fBADGER-22": {
             "underlying_contract": "0x3472A5A71965499acd81997a54BBA8D852C6E53d",
@@ -142,58 +133,37 @@ def fetch_fuse_pool_balances(client, chain, block):
         "block_number": {"number": block},
         "token_filter": {"id_gt": last_token_id, "symbol_in": list(ctoken_data.keys())},
     }
-    try:
-        while True:
-            variables["token_filter"]["id_gt"] = last_token_id
-            results = client.execute(query, variable_values=variables)
+    while True:
+        variables["token_filter"]["id_gt"] = last_token_id
+        results = client.execute(query, variable_values=variables)
 
-            for result in results["accountCTokens"]:
+        for result in results["accountCTokens"]:
 
-                last_token_id = result["id"]
-                symbol = result["symbol"]
-                ctoken_balance = float(result["cTokenBalance"])
-                balance = ctoken_balance * ctoken_data[symbol]["exchange_rate"]
-                account = Web3.toChecksumAddress(result["account"]["id"])
+            last_token_id = result["id"]
+            symbol = result["symbol"]
+            ctoken_balance = float(result["cTokenBalance"])
+            balance = ctoken_balance * ctoken_data[symbol]["exchange_rate"]
+            account = Web3.toChecksumAddress(result["account"]["id"])
 
-                if balance <= 0:
-                    continue
+            if balance <= 0:
+                continue
 
-                sett = Web3.toChecksumAddress(
-                    ctoken_data[symbol]["underlying_contract"]
-                )
+            sett = Web3.toChecksumAddress(
+                ctoken_data[symbol]["underlying_contract"]
+            )
 
-                if sett not in balances:
-                    balances[sett] = {}
+            if sett not in balances:
+                balances[sett] = {}
 
-                if account not in balances[sett]:
-                    balances[sett][account] = balance
-                else:
-                    balances[sett][account] += balance
-
-            if len(results["accountCTokens"]) == 0:
-                break
+            if account not in balances[sett]:
+                balances[sett][account] = balance
             else:
-                console.log(f"Fetching {len(results['accountCTokens'])} fuse balances")
+                balances[sett][account] += balance
 
-        console.log(f"Fetched {len(balances)} total fuse balances")
-        return balances
+        if len(results["accountCTokens"]) == 0:
+            break
+        else:
+            console.log(f"Fetching {len(results['accountCTokens'])} fuse balances")
 
-    except Exception as e:
-        discord_url = get_discord_url(chain, BotType.Boost)
-        send_message_to_discord(
-            "**BADGER BOOST ERROR**",
-            f":x: Error in Fetching Fuse Token Balance",
-            [
-                {
-                    "name": "Error Type",
-                    "value": type(e),
-                    "inline": True,
-                    "name": "Error Description",
-                    "value": e.args,
-                    "inline": True,
-                }
-            ],
-            "Boost Bot",
-            url=discord_url,
-        )
-        raise e
+    console.log(f"Fetched {len(balances)} total fuse balances")
+    return balances

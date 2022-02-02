@@ -7,7 +7,7 @@ from web3.main import Web3
 
 from helpers.discord import send_error_to_discord
 from helpers.enums import Network
-from subgraph.subgraph_utils import make_gql_client
+from subgraph.subgraph_utils import SubgraphClient, make_gql_client
 
 console = Console()
 
@@ -17,7 +17,7 @@ def fetch_nfts(chain: str, block: int) -> Dict:
     if chain != Network.Ethereum:
         return {}
     last_nft_id = ""
-    nft_client = make_gql_client("nfts")
+    nft_client = SubgraphClient("nfts", chain)
     query = gql(
         """
     query nfts($block_number: Block_height, $nft_filter: NFTBalance_filter) {
@@ -32,25 +32,21 @@ def fetch_nfts(chain: str, block: int) -> Dict:
         "block_number": {"number": block},
         "nft_filter": {"id_gt": last_nft_id, "amount_gt": 0},
     }
-    try:
-        while True:
-            variables["nft_filter"]["id_gt"] = last_nft_id
-            results = nft_client.execute(query, variable_values=variables)
-            nft_data = results["nftbalances"]
-            for result in nft_data:
-                nft_addr, nft_id, user = result["id"].split("-")
-                user = Web3.toChecksumAddress(user)
-                if user not in nft_balances:
-                    nft_balances[user] = []
-                nft_balances[user].append(
-                    {"address": Web3.toChecksumAddress(nft_addr), "id": nft_id}
-                )
-            if len(nft_data) == 0:
-                break
-            else:
-                console.log(f"Fetching {len(nft_data)} nft balances")
-                last_nft_id = nft_data[-1]["id"]
-        return nft_balances
-    except Exception as e:
-        send_error_to_discord(e, "Error in Fetching Nfts", "Subgraph Error", chain)
-        raise e
+    while True:
+        variables["nft_filter"]["id_gt"] = last_nft_id
+        results = nft_client.execute(query, variable_values=variables)
+        nft_data = results["nftbalances"]
+        for result in nft_data:
+            nft_addr, nft_id, user = result["id"].split("-")
+            user = Web3.toChecksumAddress(user)
+            if user not in nft_balances:
+                nft_balances[user] = []
+            nft_balances[user].append(
+                {"address": Web3.toChecksumAddress(nft_addr), "id": nft_id}
+            )
+        if len(nft_data) == 0:
+            break
+        else:
+            console.log(f"Fetching {len(nft_data)} nft balances")
+            last_nft_id = nft_data[-1]["id"]
+    return nft_balances
