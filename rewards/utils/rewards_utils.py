@@ -50,36 +50,6 @@ def combine_rewards(rewards_list: List[RewardsList], cycle) -> RewardsList:
     return combined_rewards
 
 
-def distribute_rewards_to_snapshot(
-    amount: float,
-    snapshot: Snapshot,
-    token: str,
-    block: int,
-    custom_rewards: Dict[str, Callable] = {},
-) -> RewardsList:
-    """
-    Distribute a certain amount of rewards to a snapshot of users
-    """
-    rewards = RewardsList()
-    custom_rewards_list = []
-    total = snapshot.total_balance()
-    if total == 0:
-        unit = 0
-    else:
-        unit = amount / total
-    for addr, balance in snapshot:
-        reward_amount = Decimal(balance) * unit
-        assert reward_amount >= 0
-        if addr in custom_rewards:
-            custom_rewards_calc = custom_rewards[addr]
-            custom_rewards_list.append(
-                custom_rewards_calc(reward_amount, token, snapshot.token, block)
-            )
-        else:
-            rewards.increase_user_rewards(addr, token, reward_amount)
-    return combine_rewards([rewards] + custom_rewards_list, 0)
-
-
 def distribute_rewards_from_total_snapshot(
         amount: Union[int, Decimal], snapshot: Snapshot, token: str,
         block: int, custom_rewards: Optional[Dict[str, Callable]] = None,
