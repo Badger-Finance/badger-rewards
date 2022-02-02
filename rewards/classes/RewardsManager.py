@@ -1,9 +1,9 @@
 from collections import defaultdict
+from copy import deepcopy
 from decimal import Decimal
-from typing import Dict, List, Tuple
-
 from rich.console import Console
 from tabulate import tabulate
+from typing import Dict, List, Tuple
 
 from badger_api.requests import fetch_token
 from config.singletons import env_config
@@ -245,6 +245,7 @@ class RewardsManager:
         return total_to_distribute
 
     def boost_sett(self, sett: str, snapshot: Snapshot) -> Snapshot:
+        snapshot = deepcopy(snapshot)
         if snapshot.type == BalanceType.NonNative:
             pre_boost = {}
             for user, balance in snapshot:
