@@ -168,7 +168,7 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_bal
     [Network.Ethereum, Network.Arbitrum]
 )
 @pytest.mark.parametrize(
-    "snapshots_number",
+    "num_historical_snapshots",
     [3, 6, 5]
 )
 def test_total_harvest_sett_snapshot__even_balance(
@@ -221,7 +221,7 @@ def test_total_harvest_sett_snapshot__even_balance_no_snapshots(
 
 
 @pytest.mark.parametrize(
-    "snapshots_number",
+    "num_historical_snapshots",
     [14, 20, 100]
 )
 def test_total_harvest_sett_snapshot__invalid_rate(
