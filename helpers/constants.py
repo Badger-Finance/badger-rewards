@@ -371,6 +371,9 @@ CLAIMABLE_TOKENS = {
     Network.Polygon: {BalanceType.Native: [POLY_BADGER], BalanceType.NonNative: []},
 }
 
+UNCLAIMED_REWARDS_TOKENS = {
+    Network.Ethereum: [SETTS[Network.Ethereum]["cvx_crv"], SETTS[Network.Ethereum]["bvecvx"]]
+}
 BOOSTED_EMISSION_TOKENS = {
     Network.Ethereum: [BADGER, DIGG],
     Network.Arbitrum: [ARB_BADGER],
@@ -392,5 +395,6 @@ DECIMAL_MAPPING = {
     Network.Arbitrum: 1e18,
 }
 
-NUMBER_OF_SNAPSHOTS_FOR_SETT = 3
+NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS = 3
+NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS = 2
 ZERO_CYCLE = 0

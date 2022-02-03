@@ -5,6 +5,7 @@ from rich.console import Console
 
 from config.singletons import env_config
 from helpers.constants import CHAIN_IDS
+from helpers.discord import console_and_discord
 from helpers.enums import Network
 from rewards.aws.helpers import get_bucket, s3
 
@@ -113,15 +114,21 @@ def upload_tree(
         )
 
     for target in upload_targets:
-        console.print(
-            "Uploading file to s3://" + target["bucket"] + "/" + target["key"]
-        )
-        s3.put_object(
-            Body=str(json.dumps(data)),
-            Bucket=target["bucket"],
-            Key=target["key"],
-            ACL="bucket-owner-full-control",
-        )
-        console.print(
-            "✅ Uploaded file to s3://" + target["bucket"] + "/" + target["key"]
-        )
+        try:
+            console.print(
+                "Uploading file to s3://" + target["bucket"] + "/" + target["key"]
+            )
+            s3.put_object(
+                Body=str(json.dumps(data)),
+                Bucket=target["bucket"],
+                Key=target["key"],
+                ACL="bucket-owner-full-control",
+            )
+            console.print(
+                "✅ Uploaded file to s3://" + target["bucket"] + "/" + target["key"]
+            )
+        except Exception as e:
+            console_and_discord(f'Error uploading approval file to bucket {target["bucket"]}, temp file saved: {e}', chain, mentions='<@&804147406043086850>')
+            with open('./temp_data/temp_tree.json', 'w') as outfile:
+                    outfile.write(str(json.dumps(data)))
+            raise e
