@@ -41,12 +41,12 @@ def chain_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
     return balances_by_sett
 
 
-def total_harvest_sett_snapshot(
+def total_twap_sett_snapshot(
         chain: Network, start_block: int, end_block: int,
         sett: str, blacklist: bool, number_of_snapshots: int,
 ) -> Snapshot:
     """
-    Get a snapshot for total harvest period.
+    Get a snapshot for total period.
     That should sum up all Snapshots balances
         for the num_historical_snapshots + snapshot at end_block
     """
