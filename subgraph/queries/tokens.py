@@ -64,7 +64,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
                     f"Fetching {len(next_page['tokenBalances'])} across balances"
                 )
                 for entry in next_page["tokenBalances"]:
-                    address = entry["id"].split("-")[0]
+                    address = entry["id"].split("-")[1]
                     amount = float(entry["balance"])
                     if amount > 0:
                         across_balances[address] = multiplier * amount / DECIMAL_MAPPING[chain]
