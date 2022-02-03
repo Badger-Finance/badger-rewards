@@ -1,7 +1,7 @@
 import json
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from helpers.enums import Network
-from rewards.utils.rewards_utils import distribute_rewards_to_snapshot, combine_rewards
+from rewards.utils.rewards_utils import distribute_rewards_to_snapshot, combine_rewards, merkle_tree_to_rewards_list
 
 
 def migration_rewards(tree, tree_manager):
