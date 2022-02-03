@@ -9,7 +9,7 @@ from eth_utils.hexadecimal import encode_hex
 from rich.console import Console
 
 from badger_api.requests import fetch_token
-from helpers.constants import DIGG
+from config.constants.addresses import DIGG
 from helpers.digg_utils import digg_utils
 
 console = Console()

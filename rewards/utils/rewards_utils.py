@@ -4,7 +4,7 @@ from typing import Callable, Dict, List, Optional
 from rich.console import Console
 from web3 import Web3
 
-from helpers.constants import ZERO_CYCLE
+from config.constants.emissions import ZERO_CYCLE
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
 

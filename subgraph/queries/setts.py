@@ -7,7 +7,7 @@ from graphql.language.ast import DocumentNode
 from rich.console import Console
 from web3 import Web3
 
-from helpers.constants import SETTS
+from config.constants.chain_mappings import SETTS
 from helpers.discord import send_error_to_discord
 from helpers.enums import Network
 from subgraph.subgraph_utils import make_gql_client

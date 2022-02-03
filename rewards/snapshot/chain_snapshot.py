@@ -5,7 +5,7 @@ from rich.console import Console
 from web3 import Web3
 
 from badger_api.requests import fetch_token
-from helpers.constants import (
+from config.constants.emissions import (
     DISABLED_VAULTS,
     EMISSIONS_BLACKLIST,
     NATIVE,

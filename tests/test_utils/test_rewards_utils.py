@@ -1,4 +1,4 @@
-from helpers.constants import BADGER
+from config.constants.addresses import BADGER
 from helpers.enums import Network
 from rewards.rewards_checker import token_diff_table_item, verify_rewards
 

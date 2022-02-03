@@ -6,7 +6,9 @@ from math import isclose
 import boto3
 from dotenv import load_dotenv
 
-from helpers.constants import BOOST_CHAINS, CHAIN_IDS, S3_BUCKETS
+from config.constants.aws import S3_BUCKETS
+from config.constants.chain_mappings import CHAIN_IDS
+from config.constants.emissions import BOOST_CHAINS
 from helpers.enums import BucketType, Environment
 
 load_dotenv()

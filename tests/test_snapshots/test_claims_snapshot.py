@@ -7,18 +7,18 @@ from botocore.exceptions import ClientError
 from pytest import approx
 
 from badger_api.requests import badger_api
-from helpers.constants import (
+from config.constants.addresses import (
     ARB_BADGER,
+    ARB_BSWAPR_WETH_SWAPR,
     BADGER,
-    BOOST_CHAINS,
-    CVX_CRV_ADDRESS,
+    BCVXCRV,
     DIGG,
-    NETWORK_TO_BADGER_TOKEN,
     POLY_BADGER,
     POLY_SUSHI,
-    SWAPR_WETH_SWAPR_ARB_ADDRESS,
     XSUSHI,
 )
+from config.constants.chain_mappings import NETWORK_TO_BADGER_TOKEN
+from config.constants.emissions import BOOST_CHAINS
 from helpers.digg_utils import digg_utils
 from helpers.enums import BalanceType, Network
 from rewards.snapshot.claims_snapshot import claims_snapshot, claims_snapshot_usd
@@ -40,7 +40,7 @@ CLAIMABLE_BALANCES_DATA_ETH = {
                 "balance": "148480869281534217908",
             },
             {
-                "address": CVX_CRV_ADDRESS,
+                "address": BCVXCRV,
                 "balance": "2421328289687344724270258601055314109178877723910682205504219578892288",
             },
             {
@@ -55,7 +55,7 @@ CLAIMABLE_BALANCES_DATA_ETH = {
             },
             {"address": DIGG, "balance": "148480869281534217908"},
             {
-                "address": CVX_CRV_ADDRESS,
+                "address": BCVXCRV,
                 "balance": "2656585570737360069",
             },
             {
@@ -99,7 +99,7 @@ CLAIMABLE_BALANCES_DATA_ARB = {
                 "balance": "148480869281534217908",
             },
             {
-                "address": SWAPR_WETH_SWAPR_ARB_ADDRESS,
+                "address": ARB_BSWAPR_WETH_SWAPR,
                 "balance": "2421328289687344724270258601055314109178877723910682205504219578892288",
             },
         ],
@@ -109,7 +109,7 @@ CLAIMABLE_BALANCES_DATA_ARB = {
                 "balance": "8202381382803713155",
             },
             {
-                "address": SWAPR_WETH_SWAPR_ARB_ADDRESS,
+                "address": ARB_BSWAPR_WETH_SWAPR,
                 "balance": "2656585570737360069",
             },
         ],
@@ -166,11 +166,11 @@ def test_claims_snapshot__happy(chain, data, claimable_block, monkeypatch):
     non_native_token = None
     if chain == Network.Ethereum:
         excluded_token = XSUSHI
-        non_native_token = CVX_CRV_ADDRESS
+        non_native_token = BCVXCRV
     elif chain == Network.Polygon:
         excluded_token = POLY_SUSHI
     elif chain == Network.Arbitrum:
-        excluded_token = SWAPR_WETH_SWAPR_ARB_ADDRESS
+        excluded_token = ARB_BSWAPR_WETH_SWAPR
     for token in [excluded_token, non_native_token]:
         if token:
             snapshot = snapshots[excluded_token]
@@ -215,10 +215,10 @@ def test_claims_snapshot_usd__happy(claimable_block, monkeypatch):
             f"{badger_api}/prices?chain={boost_chain}",
             json={
                 BADGER: BADGER_PRICE,
-                CVX_CRV_ADDRESS: CVX_CRV_PRICE,
+                BCVXCRV: CVX_CRV_PRICE,
                 XSUSHI: XSUSHI_PRICE,
                 DIGG: DIGG_PRICE,
-                SWAPR_WETH_SWAPR_ARB_ADDRESS: SWAPR_WETH_SWAPR_PRICE,
+                ARB_BSWAPR_WETH_SWAPR: SWAPR_WETH_SWAPR_PRICE,
             },
             status=200,
         )
@@ -236,7 +236,7 @@ def test_claims_snapshot_usd__happy(claimable_block, monkeypatch):
     # For this wallet non-native balance is only cvxCRV token
     expected_non_native_balance = 0
     for claim in CLAIMABLE_BALANCES_DATA_ETH["rewards"][TEST_WALLET]:
-        if claim["address"] == CVX_CRV_ADDRESS:
+        if claim["address"] == BCVXCRV:
             expected_non_native_balance = (
                 CVX_CRV_PRICE * int(claim["balance"]) / math.pow(10, 18)
             )
