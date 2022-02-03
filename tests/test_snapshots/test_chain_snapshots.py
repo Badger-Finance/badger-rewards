@@ -14,7 +14,7 @@ from rewards.snapshot.chain_snapshot import (
     chain_snapshot_usd,
     parse_sett_balances,
     sett_snapshot,
-    total_harvest_sett_snapshot,
+    total_twap_sett_snapshot,
 )
 
 BALANCES_DATA = {
@@ -174,7 +174,7 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_bal
 )
 def test_total_harvest_sett_snapshot__even_balance(
         chain, num_historical_snapshots: int, mock_fetch_sett_balances, responses_mock_token_balance):
-    snapshot = total_harvest_sett_snapshot(
+    snapshot = total_twap_sett_snapshot(
         chain, 13710328, 13710338, BBADGER, blacklist=True,
         num_historical_snapshots=num_historical_snapshots
     )
@@ -196,7 +196,7 @@ def test_total_harvest_sett_snapshot__even_balance_single_snap(
     """
     If num_historical_snapshots is 1, we should only take 2 snapshots for first and last blocks
     """
-    snapshot = total_harvest_sett_snapshot(
+    snapshot = total_twap_sett_snapshot(
         chain, 13710328, 13710338, BBADGER, blacklist=True,
         num_historical_snapshots=1
     )
@@ -213,7 +213,7 @@ def test_total_harvest_sett_snapshot__even_balance_no_snapshots(
     """
     If num_historical_snapshots is 0, we should only take end block snapshot
     """
-    snapshot = total_harvest_sett_snapshot(
+    snapshot = total_twap_sett_snapshot(
         chain, 13710328, 13710338, BBADGER, blacklist=True,
         num_historical_snapshots=0
     )
@@ -227,7 +227,7 @@ def test_total_harvest_sett_snapshot__even_balance_no_snapshots(
 )
 def test_total_harvest_sett_snapshot__invalid_rate(
         num_historical_snapshots: int, mock_fetch_sett_balances, responses_mock_token_balance):
-    snapshot = total_harvest_sett_snapshot(
+    snapshot = total_twap_sett_snapshot(
         Network.Ethereum, 13710328, 13710338, BBADGER, blacklist=True,
         num_historical_snapshots=num_historical_snapshots
     )
@@ -252,7 +252,7 @@ def test_total_harvest_sett_snapshot__uneven_balance(chain, mocker, responses_mo
             {'0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0},
         ]
     ):
-        snapshot = total_harvest_sett_snapshot(
+        snapshot = total_twap_sett_snapshot(
             Network.Ethereum, 13710328, 13710338, BBADGER, blacklist=True,
             num_historical_snapshots=2
         )
@@ -264,7 +264,7 @@ def test_total_harvest_sett_snapshot__uneven_balance(chain, mocker, responses_mo
 
 def test_total_harvest_sett_snapshot__invalid_blocks():
     with pytest.raises(AssertionError):
-        total_harvest_sett_snapshot(
+        total_twap_sett_snapshot(
             Network.Ethereum, 13710338, 13710328, BBADGER, blacklist=True,
             num_historical_snapshots=1
         )
