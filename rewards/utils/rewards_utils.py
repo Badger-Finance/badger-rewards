@@ -1,6 +1,5 @@
 from decimal import Decimal
-from typing import Callable, Dict, List, Optional
-from typing import Union
+from typing import Callable, Dict, List, Optional, Union
 
 from rich.console import Console
 from web3 import Web3
@@ -12,7 +11,7 @@ from rewards.classes.Snapshot import Snapshot
 console = Console()
 
 
-def get_cumulative_claimable_for_token(claim, token: str):
+def get_cumulative_claimable_for_token(claim, token: str) -> int:
     tokens = claim["tokens"]
     amounts = claim["cumulativeAmounts"]
 
@@ -53,7 +52,7 @@ def combine_rewards(rewards_list: List[RewardsList], cycle) -> RewardsList:
 def distribute_rewards_from_total_snapshot(
         amount: Union[int, Decimal], snapshot: Snapshot, token: str,
         block: int, custom_rewards: Optional[Dict[str, Callable]] = None,
-):
+) -> RewardsList:
     if not custom_rewards:
         custom_rewards = {}
     rewards = RewardsList()
@@ -98,5 +97,5 @@ def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
     return result
 
 
-def merkle_tree_to_rewards_list(tree):
+def merkle_tree_to_rewards_list(tree) -> RewardsList:
     return process_cumulative_rewards(tree, RewardsList(int(tree["cycle"])))
