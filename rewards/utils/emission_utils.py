@@ -145,7 +145,7 @@ def parse_nft_weight_schedule(weight_schedule: List) -> NFTWeightSchedule:
 def parse_nft_weight_schedules(weight_schedules: List) -> List[NFTWeightSchedule]:
     return [parse_nft_weight_schedule(ws) for ws in weight_schedules]
 
-def across_lp_multiplier() -> float:
+def get_across_lp_multiplier() -> float:
     bridge = make_contract(ACROSS_BRIDGE, abi_name=Abi.BridgePoolProd, chain=Network.Ethereum)
     
     liquidReserves = bridge.liquidReserves().call()

@@ -15,7 +15,7 @@ from helpers.discord import (
 )
 from helpers.enums import Abi, BotType, Network
 from helpers.web3_utils import make_contract
-from rewards.utils.emission_utils import across_lp_multiplier
+from rewards.utils.emission_utils import get_across_lp_multiplier
 from subgraph.subgraph_utils import make_gql_client
 
 console = Console()
@@ -44,7 +44,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
     query = token_query()
     continue_fetching = True
     last_id = "0x0000000000000000000000000000000000000000"
-    multiplier = across_lp_multiplier()
+    multiplier = get_across_lp_multiplier()
     console.log(f"Across lp multiplier {multiplier}")
     across_balances = {}
     client = make_gql_client("across")

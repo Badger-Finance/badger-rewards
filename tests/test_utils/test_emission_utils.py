@@ -10,6 +10,7 @@ set_env_vars()
 
 from rewards.utils.emission_utils import (
     fetch_unboosted_vaults,
+    get_across_lp_multiplier,
     get_flat_emission_rate,
     get_nft_weight,
     get_token_weight,
@@ -78,6 +79,10 @@ def test_get_token_weight():
     for network, cases in all_cases.items():
         for token, weight in cases.items():
             assert get_token_weight(token, network) == weight
+
+def test_get_across_lp_multiplier():
+    assert get_across_lp_multiplier() > 1
+
 
 
 def test_fetch_unboosted_vaults(monkeypatch):
