@@ -175,7 +175,7 @@ def test_total_harvest_sett_snapshot__even_balance(
         chain, num_historical_snapshots: int, mock_fetch_sett_balances, responses_mock_token_balance):
     snapshot = total_twap_sett_snapshot(
         chain, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
-        number_of_snapshots=num_historical_snapshots
+        num_historical_snapshots=num_historical_snapshots
     )
     assert snapshot.type == BalanceType.Native
     assert snapshot.ratio == 1
@@ -228,7 +228,7 @@ def test_total_harvest_sett_snapshot__invalid_rate(
         num_historical_snapshots: int, mock_fetch_sett_balances, responses_mock_token_balance):
     snapshot = total_twap_sett_snapshot(
         Network.Ethereum, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
-        number_of_snapshots=num_historical_snapshots
+        num_historical_snapshots=num_historical_snapshots
     )
     assert snapshot.type == BalanceType.Native
     assert snapshot.ratio == 1
@@ -253,7 +253,7 @@ def test_total_harvest_sett_snapshot__uneven_balance(chain, mocker, responses_mo
     ):
         snapshot = total_twap_sett_snapshot(
             Network.Ethereum, 13710328, 13710338, BBADGER_ADDRESS, blacklist=True,
-            number_of_snapshots=2
+            num_historical_snapshots=2
         )
     assert snapshot.token == BBADGER_ADDRESS
     expected_amount: Decimal = Decimal((initial_balance + 0.01 + 0))
@@ -265,7 +265,7 @@ def test_total_harvest_sett_snapshot__invalid_blocks():
     with pytest.raises(AssertionError):
         total_twap_sett_snapshot(
             Network.Ethereum, 13710338, 13710328, BBADGER_ADDRESS, blacklist=True,
-            number_of_snapshots=1
+            num_historical_snapshots=1
         )
 
 
