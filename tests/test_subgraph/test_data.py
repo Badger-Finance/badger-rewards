@@ -54,6 +54,19 @@ BADGER_DISTRIBUTIONS_TEST_DATA = {
          'sett': {'id': '0x55912d0cf83b75c492e761932abc4db4a5cb1b17'},
          'strategy': {'id': '0x1c1fd689103bbfd701b3b7d41a3807f12814033d'},
          'timestamp': 1633059634,
-         'token': {'id': '0x0x53c8e199eb2cb7c01543c137078a038937a68e40',
+         'token': {'id': '0x55912d0cf83b75c492e761932abc4db4a5cb1b17',
                    'symbol': 'bCVX'}},
     ]}
+
+ACROSS_BALANCES_TEST_DATA = {
+    'tokenBalances':[
+        {
+        'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6-0x1c1fd689103bbfd701b3b7d41a3807f12814033d',
+        'balance': '341229067236959371031'
+        },
+        {
+        'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6-0x0x2b5455aac8d64c14786c3a29858e43b5945819c0',
+        'balance': '1013601936174311306582'
+        },
+    ]
+}

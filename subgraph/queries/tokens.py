@@ -66,7 +66,6 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
                 for entry in next_page["tokenBalances"]:
                     address = entry["id"].split("-")[1]
                     amount = int(entry["balance"])
-                    print(amount)
                     if amount > 0:
                         across_balances[address] = multiplier * amount / DECIMAL_MAPPING[chain]
 
@@ -75,7 +74,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
             e, "Error in Fetching Across Balance", "Subgraph Error", chain
         )
         raise e
-
+    print(across_balances)
     return across_balances
 
 
