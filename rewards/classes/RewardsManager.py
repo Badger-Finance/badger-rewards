@@ -38,6 +38,7 @@ class RewardsManager:
     CUSTOM_BEHAVIOUR = {
         ETH_BADGER_TREE: unclaimed_rewards_handler,
         IBBTC_PEAK: ibbtc_peak_handler,
+        BVECVX_CVX_LP: bvecvx_lp_handler
     }
 
     def __init__(self, chain: Network, cycle: int, start: int, end: int, boosts):
