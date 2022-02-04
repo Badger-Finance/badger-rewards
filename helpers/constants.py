@@ -87,6 +87,7 @@ IBBTC_Y_PEAK = "0x825218beD8BE0B30be39475755AceE0250C50627"
 IBBTC_MULTISIG = "0xB76782B51BFf9C27bA69C77027e20Abd92Bcf3a8"
 BADGER_PAYMENTS = "0xD4868d98849a58F743787c77738D808376210292"
 
+ACROSS_BRIDGE = "0x43298F9f91a4545dF64748e78a2c777c580573d6"
 
 ETH_REWARDS_LOGGER = "0x0A4F4e92C3334821EbB523324D09E321a6B0d8ec"
 ETH_GAS_ORACLE = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
@@ -130,6 +131,7 @@ SETTS = {
     Network.Ethereum: {
         "badger": BBADGER_ADDRESS,
         "ren_crv": "0x6dEf55d2e18486B9dDfaA075bc4e4EE0B28c1545",
+        "rem_digg": "0x99F39D495C6A5237f43602f3Ab5F49786E46c9B0",
         "rem_badger": "0x6aF7377b5009d7d154F36FE9e235aE1DA27Aea22",
         "sbtc_crv": "0xd04c48A53c111300aD41190D63681ed3dAd998eC",
         "tbtc_crv": "0xb9D076fDe463dbc9f915E5392F807315Bf940334",
@@ -251,6 +253,7 @@ NATIVE = [
     SETTS[Network.Ethereum]["uni_digg_wbtc"],
     SETTS[Network.Ethereum]["sushi_digg_wbtc"],
     SETTS[Network.Ethereum]["rem_badger"],
+    SETTS[Network.Ethereum]["rem_digg"],
     SETTS[Network.Arbitrum]["swapr_weth_badger"],
 ]
 
@@ -394,5 +397,8 @@ DECIMAL_MAPPING = {
     Network.Arbitrum: 1e18,
 }
 
-NUMBER_OF_HISTORICAL_SNAPSHOTS = 3
+NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS = 3
+NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS = 2
 ZERO_CYCLE = 0
+
+DIGG_SETTS = [SETTS[Network.Ethereum]["digg"], SETTS[Network.Ethereum]["rem_digg"]]
