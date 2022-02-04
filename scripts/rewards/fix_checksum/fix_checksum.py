@@ -5,8 +5,8 @@ from eth_account import Account
 from eth_utils.hexadecimal import encode_hex
 from web3 import Web3
 
+from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
-from helpers.constants import CHAIN_IDS
 from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_latest_tree, upload_tree
 from rewards.calc_rewards import approve_root, propose_root

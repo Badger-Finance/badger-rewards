@@ -1,7 +1,8 @@
 from eth_utils.hexadecimal import encode_hex
 from web3 import Web3
 
-from helpers.constants import CHAIN_IDS, IBBTC_MULTISIG, IBBTC_PEAK, SETTS, TECH_OPS
+from config.constants.addresses import IBBTC_MULTISIG, IBBTC_PEAK, TECH_OPS
+from config.constants.chain_mappings import CHAIN_IDS, SETTS
 from helpers.enums import Network
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.classes.TreeManager import TreeManager

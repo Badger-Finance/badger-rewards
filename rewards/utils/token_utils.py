@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from badger_api.requests import fetch_token
-from helpers.constants import DIGG
+from config.constants.addresses import DIGG
 from helpers.digg_utils import digg_utils
 from helpers.enums import Network
 

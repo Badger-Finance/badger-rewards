@@ -1,6 +1,6 @@
 from typing import Counter, Dict, Tuple
 
-from helpers.constants import BADGER, DIGG
+from config.constants.addresses import BADGER, DIGG
 from rewards.classes.Snapshot import Snapshot
 from subgraph.queries.tokens import (
     fetch_across_balances,

@@ -2,7 +2,7 @@ from functools import lru_cache
 from typing import Dict, Optional, Tuple
 
 from badger_api.config import get_api_base_path
-from helpers.constants import BOOST_CHAINS
+from config.constants.emissions import BOOST_CHAINS
 from helpers.enums import Network
 from helpers.http_client import http_client
 

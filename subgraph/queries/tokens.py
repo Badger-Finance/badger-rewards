@@ -6,7 +6,7 @@ from gql import Client, gql
 from rich.console import Console
 from web3 import Web3
 
-from helpers.constants import DECIMAL_MAPPING
+from config.constants.chain_mappings import DECIMAL_MAPPING
 from helpers.digg_utils import digg_utils
 from helpers.discord import (
     get_discord_url,

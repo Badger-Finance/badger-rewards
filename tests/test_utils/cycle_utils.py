@@ -6,7 +6,7 @@ from typing import Dict
 from brownie import Contract, web3
 from eth_account import Account
 
-from helpers.constants import ABI_DIRS, EMISSIONS_CONTRACTS
+from config.constants.chain_mappings import ABI_DIRS, EMISSIONS_CONTRACTS
 from helpers.enums import Network
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.tree_utils import calc_next_cycle_range, get_last_proposed_cycle

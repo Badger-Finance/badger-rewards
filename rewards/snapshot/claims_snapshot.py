@@ -5,7 +5,8 @@ from typing import Dict, Tuple
 
 from badger_api.claimable import get_claimable_data
 from badger_api.requests import fetch_token_decimals
-from helpers.constants import CLAIMABLE_TOKENS, DIGG
+from config.constants.addresses import DIGG
+from config.constants.chain_mappings import CLAIMABLE_TOKENS
 from helpers.digg_utils import digg_utils
 from helpers.discord import console_and_discord
 from helpers.enums import BalanceType, DiscordRoles, Network
