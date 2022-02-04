@@ -149,7 +149,7 @@ def get_across_lp_multiplier() -> float:
     bridge = make_contract(ACROSS_BRIDGE, abi_name=Abi.BridgePoolProd, chain=Network.Ethereum)
     
     liquid_reserves = bridge.liquidReserves().call()
-    utilized_reserves = bridge.utilizedReserves().call()
+    utilized_reserves = max(bridge.utilizedReserves().call(), 0)
     undistributed_lp_fees = bridge.undistributedLpFees().call()
     total_supply = bridge.totalSupply().call()
     return (liquid_reserves + utilized_reserves - undistributed_lp_fees) / total_supply
