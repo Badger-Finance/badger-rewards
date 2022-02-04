@@ -56,6 +56,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
                 "blockNumber": {"number": block_number},
             }
             next_page = client.execute(query, variable_values=variables)
+            print(next_page)
             if len(next_page["tokenBalances"]) == 0:
                 continue_fetching = False
             else:
