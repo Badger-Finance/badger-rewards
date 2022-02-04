@@ -16,6 +16,7 @@ subgraph_urls = {
         "fuse": "https://api.thegraph.com/subgraphs/name/darruma/fuse-subgraph-badger",
         "thegraph": "https://api.thegraph.com/index-node/graphql",
         "nfts": "https://api.thegraph.com/subgraphs/name/darruma/badger-nfts",
+        "across": "https://api.thegraph.com/subgraphs/name/darruma/badger-across"
     },
     Environment.Staging: {
     }

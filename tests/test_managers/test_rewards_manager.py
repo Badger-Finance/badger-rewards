@@ -417,3 +417,15 @@ def test_calculate_tree_distributions__totals(mocker, boosts_split):
         tree_rewards.claims[second_user][another_token] ==
         pytest.approx(Decimal(second_amount_distributed * 0.8))
     )
+
+def test_report_invalid_totals(mocker, boosts_split):
+    block = mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
+    plain_text = mocker.patch("rewards.classes.RewardsManager.send_plain_text_to_discord")
+    rewards_manager = RewardsManager(
+        Network.Ethereum, 123, 12997653, 13331083, boosts_split["userData"]
+    )
+    with pytest.raises(Exception):
+        rewards_manager.report_invalid_totals([])
+
+    assert block.call_count == 1
+    assert plain_text.call_count == 1

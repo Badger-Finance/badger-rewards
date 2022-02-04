@@ -7,6 +7,7 @@ from rich.console import Console
 from web3 import Web3
 from web3.contract import ContractFunctions
 
+from config.constants.addresses import ACROSS_BRIDGE
 from config.constants.chain_mappings import EMISSIONS_CONTRACTS
 from config.constants.emissions import DISABLED_VAULTS, NATIVE
 from helpers.discord import get_discord_url, send_message_to_discord
@@ -140,3 +141,12 @@ def parse_nft_weight_schedule(weight_schedule: List) -> NFTWeightSchedule:
 
 def parse_nft_weight_schedules(weight_schedules: List) -> List[NFTWeightSchedule]:
     return [parse_nft_weight_schedule(ws) for ws in weight_schedules]
+
+def get_across_lp_multiplier() -> float:
+    bridge = make_contract(ACROSS_BRIDGE, abi_name=Abi.BridgePoolProd, chain=Network.Ethereum)
+    
+    liquid_reserves = bridge.liquidReserves().call()
+    utilized_reserves = max(bridge.utilizedReserves().call(), 0)
+    undistributed_lp_fees = bridge.undistributedLpFees().call()
+    total_supply = bridge.totalSupply().call()
+    return (liquid_reserves + utilized_reserves - undistributed_lp_fees) / total_supply

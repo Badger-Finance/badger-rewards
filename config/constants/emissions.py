@@ -57,6 +57,7 @@ NATIVE = [
     addresses.BUNI_DIGG_WBTC,
     addresses.BSLP_DIGG_WBTC,
     addresses.REM_BADGER,
+    addresses.REM_DIGG,
     # arbitrum
     addresses.ARB_BSWAPR_WETH_BADGER,
 ]
@@ -78,6 +79,8 @@ PRO_RATA_VAULTS = [
     addresses.BVECVX_CVX_LP_SETT,
 ]
 
+DIGG_SETTS = [addresses.BDIGG, addresses.REM_DIGG]
+
 BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]
 
 SANITY_TOKEN_AMOUNT = 4000 * 1e18
@@ -85,4 +88,8 @@ BOOST_BLOCK_DELAY = 10
 
 NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS = 3
 NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS = 2
+
+# accepting distributions within 1% of expected values, REWARD_ERROR_TOLERANCE = 0.01
+REWARD_ERROR_TOLERANCE = 0.01
+
 ZERO_CYCLE = 0

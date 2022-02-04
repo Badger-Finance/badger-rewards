@@ -11,6 +11,7 @@ from rich.console import Console
 from badger_api.requests import fetch_token
 from config.constants.addresses import DIGG
 from helpers.digg_utils import digg_utils
+from rewards.utils.token_utils import token_amount_base_10
 
 console = Console()
 
@@ -48,13 +49,10 @@ class RewardsList:
     def totals_info(self, chain: str) -> str:
         info = []
         for token, amount in self.totals.items():
+            readable_amount = token_amount_base_10(chain, token, amount)
             token_info = fetch_token(chain, token)
             name = token_info.get("name", "")
-            decimals = token_info.get("decimals", 18)
-            if token == DIGG:
-                amount = digg_utils.shares_to_fragments(amount)
-
-            info.append(f"{name}: {round(amount/pow(10,decimals), 5)}")
+            info.append(f"{name}: {readable_amount}")
         return "\n".join(info)
 
     def track_user_metadata_source(self, source, user, metadata):

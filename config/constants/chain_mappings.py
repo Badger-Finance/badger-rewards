@@ -33,6 +33,7 @@ SETTS = {
         "bvecvx": addresses.BVECVX,
         "bvecvx_cvx": addresses.BVECVX_CVX_LP_SETT,
         "ibbtc_crv": addresses.BCRV_IBBTC,
+        "rem_digg": addresses.REM_DIGG
     },
     Network.Arbitrum: {
         "sushi_weth_sushi": addresses.ARB_BSLP_WETH_SUSHI,
