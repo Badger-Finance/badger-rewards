@@ -153,4 +153,3 @@ def get_across_lp_multiplier() -> float:
     undistributed_lp_fees = bridge.undistributedLpFees().call()
     total_supply = bridge.totalSupply().call()
     return (liquid_reserves + utilized_reserves - undistributed_lp_fees) / total_supply
-    
