@@ -7,14 +7,13 @@ from rich.console import Console
 from tabulate import tabulate
 
 from badger_api.requests import fetch_token
-from config.singletons import env_config
-from helpers.constants import (
-    BOOSTED_EMISSION_TOKENS,
-    ETH_BADGER_TREE,
-    IBBTC_PEAK,
+from config.constants.addresses import ETH_BADGER_TREE, IBBTC_PEAK
+from config.constants.chain_mappings import BOOSTED_EMISSION_TOKENS
+from config.constants.emissions import (
     NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS,
     NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS,
 )
+from config.singletons import env_config
 from helpers.discord import (
     get_discord_url,
     send_code_block_to_discord,

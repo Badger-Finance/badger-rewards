@@ -7,7 +7,8 @@ from unittest import TestCase
 import pytest
 from web3 import Web3
 
-from helpers.constants import BADGER, DECIMAL_MAPPING, SETTS
+from config.constants.addresses import BADGER
+from config.constants.chain_mappings import DECIMAL_MAPPING, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
 from tests.test_subgraph.test_data import BADGER_DISTRIBUTIONS_TEST_DATA

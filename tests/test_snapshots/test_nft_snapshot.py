@@ -3,7 +3,7 @@ from unittest import TestCase
 
 import pytest
 
-from helpers.constants import BADGER
+from config.constants.addresses import BADGER
 from helpers.enums import Network
 from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 

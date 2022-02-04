@@ -1,4 +1,4 @@
-from helpers.constants import DIGG
+from config.constants.addresses import DIGG
 from helpers.enums import Abi, Network
 from helpers.web3_utils import make_contract
 

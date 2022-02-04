@@ -1,7 +1,7 @@
 from decimal import Decimal, DecimalException
 from typing import Dict
 
-from helpers.constants import BADGER
+from config.constants.addresses import BADGER
 from helpers.enums import BalanceType, Network
 from rewards.classes.Snapshot import Snapshot
 from rewards.utils.emission_utils import get_nft_weight

@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, Optional, Tuple, Union
 from rich.console import Console
 from web3 import Web3
 
-from helpers.constants import REWARD_ERROR_TOLERANCE, ZERO_CYCLE
+from config.constants.emissions import REWARD_ERROR_TOLERANCE, ZERO_CYCLE
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot

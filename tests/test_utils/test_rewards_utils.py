@@ -1,6 +1,8 @@
 from decimal import Decimal
 
-from helpers.constants import BADGER, REWARD_ERROR_TOLERANCE, SETTS
+from config.constants.addresses import BADGER
+from config.constants.chain_mappings import SETTS
+from config.constants.emissions import REWARD_ERROR_TOLERANCE
 from helpers.enums import Network
 from rewards.rewards_checker import token_diff_table_item, verify_rewards
 from rewards.utils.rewards_utils import (

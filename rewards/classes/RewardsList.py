@@ -9,6 +9,8 @@ from eth_utils.hexadecimal import encode_hex
 from rich.console import Console
 
 from badger_api.requests import fetch_token
+from config.constants.addresses import DIGG
+from helpers.digg_utils import digg_utils
 from rewards.utils.token_utils import token_amount_base_10
 
 console = Console()

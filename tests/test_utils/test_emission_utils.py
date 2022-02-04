@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import pytest
 
-from helpers.constants import SETTS
+from config.constants.chain_mappings import SETTS
 from helpers.enums import Network
 from tests.utils import set_env_vars
 

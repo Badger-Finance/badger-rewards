@@ -7,12 +7,9 @@ from rich.console import Console
 from web3 import Web3
 from web3.contract import ContractFunctions
 
-from helpers.constants import (
-    ACROSS_BRIDGE,
-    DISABLED_VAULTS,
-    EMISSIONS_CONTRACTS,
-    NATIVE,
-)
+from config.constants.addresses import ACROSS_BRIDGE
+from config.constants.chain_mappings import EMISSIONS_CONTRACTS
+from config.constants.emissions import DISABLED_VAULTS, NATIVE
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BotType, Network
 from helpers.web3_utils import make_contract

@@ -1,6 +1,6 @@
 import json
 
-from helpers.constants import DIGG
+from config.constants.addresses import DIGG
 from helpers.digg_utils import digg_utils
 from helpers.enums import Network
 from rewards.snapshot.claims_snapshot import claims_snapshot
