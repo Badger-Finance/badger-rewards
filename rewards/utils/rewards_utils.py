@@ -14,7 +14,7 @@ from rewards.utils.token_utils import token_amount_base_10
 console = Console()
 
 
-def get_cumulative_claimable_for_token(claim, token: str):
+def get_cumulative_claimable_for_token(claim, token: str) -> int:
     tokens = claim["tokens"]
     amounts = claim["cumulativeAmounts"]
 
@@ -55,7 +55,7 @@ def combine_rewards(rewards_list: List[RewardsList], cycle) -> RewardsList:
 def distribute_rewards_from_total_snapshot(
         amount: Union[int, Decimal], snapshot: Snapshot, token: str,
         block: int, custom_rewards: Optional[Dict[str, Callable]] = None,
-):
+) -> RewardsList:
     if not custom_rewards:
         custom_rewards = {}
     rewards = RewardsList()
@@ -100,7 +100,7 @@ def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
     return result
 
 
-def merkle_tree_to_rewards_list(tree):
+def merkle_tree_to_rewards_list(tree) -> RewardsList:
     return process_cumulative_rewards(tree, RewardsList(int(tree["cycle"])))
 
 def get_actual_expected_totals(sett_totals: Dict[str, Dict[str, Decimal]]) -> Tuple[Dict[str, Decimal], Dict[str, Decimal]]:
