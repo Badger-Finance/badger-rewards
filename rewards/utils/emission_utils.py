@@ -148,9 +148,9 @@ def parse_nft_weight_schedules(weight_schedules: List) -> List[NFTWeightSchedule
 def get_across_lp_multiplier() -> float:
     bridge = make_contract(ACROSS_BRIDGE, abi_name=Abi.BridgePoolProd, chain=Network.Ethereum)
     
-    liquidReserves = bridge.liquidReserves().call()
-    utilizedReserves = bridge.utilizedReserves().call()
-    undistributedLpFees = bridge.undistributedLpFees().call()
-    totalSupply = bridge.totalSupply().call()
-    return (liquidReserves + utilizedReserves - undistributedLpFees) / totalSupply
+    liquid_reserves = bridge.liquidReserves().call()
+    utilized_reserves = bridge.utilizedReserves().call()
+    undistributed_lp_fees = bridge.undistributedLpFees().call()
+    total_supply = bridge.totalSupply().call()
+    return (liquid_reserves + utilized_reserves - undistributed_lp_fees) / total_supply
     

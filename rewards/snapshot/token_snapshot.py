@@ -14,8 +14,8 @@ def token_snapshot(chain: str, block: int) -> Tuple[Snapshot, Snapshot]:
     token_client = make_gql_client(f"tokens-{chain}")
     badger_bals, digg_bals = fetch_token_balances(token_client, block, chain)
     across_bals = fetch_across_balances(block, chain)
-    badger_bals = Counter(badger_bals) + Counter(across_bals)
-    return Snapshot(BADGER, badger_bals), Snapshot(DIGG, digg_bals)
+    cumulative_badger_bals = Counter(badger_bals) + Counter(across_bals)
+    return Snapshot(BADGER, cumulative_badger_bals), Snapshot(DIGG, digg_bals)
 
 
 def fuse_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
