@@ -8,7 +8,7 @@ from badger_api.requests import fetch_token_decimals
 from helpers.constants import CLAIMABLE_TOKENS, DIGG
 from helpers.digg_utils import digg_utils
 from helpers.discord import console_and_discord
-from helpers.enums import BalanceType, Network
+from helpers.enums import BalanceType, DiscordRoles, Network
 from helpers.web3_utils import make_token
 from rewards.classes.Snapshot import Snapshot
 
@@ -49,7 +49,7 @@ def claims_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
             token_type = BalanceType.Excluded
         snapshots[token] = Snapshot(token, claims, ratio=1, type=token_type)
     if len(snapshots) == 0:
-          console_and_discord(f'Error: No claimable', chain, mentions='<@&804147406043086850>')
+          console_and_discord(f'Error: No claimable', chain, mentions=DiscordRoles.RewardsPod)
     return snapshots
 
 

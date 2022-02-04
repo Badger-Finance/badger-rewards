@@ -402,4 +402,7 @@ NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS = 3
 NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS = 2
 ZERO_CYCLE = 0
 
+# OK with token distributions being within 1% of expected values
+REWARD_ERROR_TOLERANCE = .01
+
 DIGG_SETTS = [SETTS[Network.Ethereum]["digg"], SETTS[Network.Ethereum]["rem_digg"]]
