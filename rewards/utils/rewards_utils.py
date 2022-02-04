@@ -1,6 +1,5 @@
 from decimal import Decimal
-from typing import Callable, Dict, List, Optional
-from typing import Union
+from typing import Callable, Dict, List, Optional, Union
 
 from rich.console import Console
 from web3 import Web3

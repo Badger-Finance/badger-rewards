@@ -1,7 +1,6 @@
-from decimal import Decimal
-from typing import Dict, List
 from copy import deepcopy
-from typing import Tuple
+from decimal import Decimal
+from typing import Dict, List, Tuple
 
 from rich.console import Console
 from tabulate import tabulate
@@ -12,8 +11,8 @@ from helpers.constants import (
     BOOSTED_EMISSION_TOKENS,
     ETH_BADGER_TREE,
     IBBTC_PEAK,
-    NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS,
     NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS,
+    NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS,
 )
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BalanceType, Network
