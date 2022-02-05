@@ -42,11 +42,6 @@ console = Console()
 
 
 class RewardsManager:
-    CUSTOM_BEHAVIOUR = {
-        ETH_BADGER_TREE: unclaimed_rewards_handler,
-        IBBTC_PEAK: ibbtc_peak_handler,
-        BVECVX_CVX_LP: bvecvx_lp_handler
-    }
 
     def __init__(self, chain: Network, cycle: int, start: int, end: int, boosts):
         self.chain = chain
@@ -57,6 +52,11 @@ class RewardsManager:
         self.end = int(end)
         self.boosts = boosts
         self.apy_boosts = {}
+        self.custom_behaviour = {
+            ETH_BADGER_TREE: unclaimed_rewards_handler,
+            IBBTC_PEAK: ibbtc_peak_handler,
+            BVECVX_CVX_LP: bvecvx_lp_handler
+        }
 
     def fetch_sett_snapshot(
         self, start_block: int, end_block: int, sett: str, blacklist: bool = True
@@ -103,7 +103,7 @@ class RewardsManager:
                         snapshot=snapshot,
                         token=token,
                         block=self.end,
-                        custom_rewards=self.CUSTOM_BEHAVIOUR,
+                        custom_rewards=self.custom_behaviour,
                     )
                 )
             if boosted_emissions > 0:
@@ -113,7 +113,7 @@ class RewardsManager:
                         snapshot=self.boost_sett(sett, snapshot),
                         token=token,
                         block=self.end,
-                        custom_rewards=self.CUSTOM_BEHAVIOUR,
+                        custom_rewards=self.custom_behaviour,
                     )
                 )
 
@@ -307,7 +307,7 @@ class RewardsManager:
             all_dist_rewards.append(
                 distribute_rewards_from_total_snapshot(
                     amount, snapshot, token,
-                    block=self.end, custom_rewards=self.CUSTOM_BEHAVIOUR,
+                    block=self.end, custom_rewards=self.custom_behaviour,
                 )
             )
         return combine_rewards(all_dist_rewards, self.cycle)

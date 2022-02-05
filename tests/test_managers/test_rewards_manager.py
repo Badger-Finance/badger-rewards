@@ -8,6 +8,9 @@ import pytest
 from web3 import Web3
 
 from config.constants.addresses import BADGER
+from config.constants.addresses import BVECVX_CVX_LP
+from config.constants.addresses import ETH_BADGER_TREE
+from config.constants.addresses import IBBTC_PEAK
 from config.constants.chain_mappings import DECIMAL_MAPPING, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.Schedule import Schedule
@@ -312,6 +315,37 @@ def test_calculate_sett_rewards__equal_balances_for_period(
     ) / Decimal(1e18) == total_badger
 
 
+@pytest.mark.parametrize(
+    "handler_path, addr",
+    [
+        ("rewards.classes.RewardsManager.bvecvx_lp_handler", BVECVX_CVX_LP),
+        ("rewards.classes.RewardsManager.ibbtc_peak_handler", IBBTC_PEAK),
+        ("rewards.classes.RewardsManager.unclaimed_rewards_handler", ETH_BADGER_TREE),
+    ]
+)
+def test_calculate_sett_rewards__call_custom_handler_bvecvx(
+        schedule, mocker, boosts_split, mock_discord, handler_path, addr
+):
+    mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
+    mocker.patch("rewards.classes.RewardsManager.check_token_totals_in_range")
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_sett_balances",
+        return_value={addr: 1000}
+    )
+    custom_handler = mocker.patch(handler_path)
+    sett = SETTS[Network.Ethereum]["ibbtc_crv"]
+    all_schedules = {sett: {BADGER: [schedule(sett, 100)]}}
+
+    rewards_manager = RewardsManager(
+        Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
+    )
+
+    rewards_manager.calculate_all_sett_rewards(
+        [sett], all_schedules,
+    )
+    assert custom_handler.called
+
+
 def test_calculate_sett_rewards__balances_vary_for_period(
         schedule, mocker, boosts_split, mock_discord
 ):
@@ -417,6 +451,7 @@ def test_calculate_tree_distributions__totals(mocker, boosts_split):
         tree_rewards.claims[second_user][another_token] ==
         pytest.approx(Decimal(second_amount_distributed * 0.8))
     )
+
 
 def test_report_invalid_totals(mocker, boosts_split):
     block = mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")

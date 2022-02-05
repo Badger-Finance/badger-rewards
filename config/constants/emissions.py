@@ -17,7 +17,6 @@ REWARDS_BLACKLIST = {
     addresses.SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     addresses.BBADGER: "Badger Vault",
     addresses.BADGER_PAYMENTS: "Badger Payments",
-    addresses.BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
 
 STAKE_RATIO_RANGES = list(
