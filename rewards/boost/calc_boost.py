@@ -8,21 +8,21 @@ from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BotType
 from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses
 from subgraph.queries.nfts import fetch_nfts
+from rewards.classes.Boost import BoostBalances
 
 console = Console()
 
 
-def calc_stake_ratio(
-    address: str, native_setts: Dict[str, float], non_native_setts: Dict[str, float]
-) -> int:
+def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
     """
     Calculate the stake ratio for an address
     :param address: address to find stake ratio for
     :param native_setts: native balances
     :param non_native_setts: non native balances
     """
-    native_balance = native_setts.get(address, 0)
-    non_native_balance = non_native_setts.get(address, 0)
+    native_balance = boost_bals.native.get(address, 0)
+    non_native_balance = boost_bals.non_native.get(address, 0)
+    bvecvx_balance = boost_bals.bvecvx_bals.get(address, 0)
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
@@ -96,27 +96,23 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     """
     discord_url = get_discord_url(chain, BotType.Boost)
     console.log(f"Calculating boost at block {current_block} ...")
-    native_setts, non_native_setts, nft_balances = calc_boost_balances(
-        current_block - BOOST_BLOCK_DELAY, chain
-    )
+    boost_bals = calc_boost_balances(current_block - BOOST_BLOCK_DELAY, chain)
 
-    all_addresses = calc_union_addresses(native_setts, non_native_setts)
+    all_addresses = calc_union_addresses(boost_bals.native, boost_bals.non_native)
     console.log(f"{len(all_addresses)} addresses fetched")
     boost_data = {}
 
-    stake_ratios_list = [
-        calc_stake_ratio(addr, native_setts, non_native_setts) for addr in all_addresses
-    ]
+    stake_ratios_list = [calc_stake_ratio(addr, boost_bals) for addr in all_addresses]
     stake_ratios = dict(zip(all_addresses, stake_ratios_list))
     badger_boost_data, stake_data = get_badger_boost_data(stake_ratios)
     nfts = fetch_nfts(chain, current_block)
 
     boost_info = init_boost_data(all_addresses)
-    allocate_nft_balances_to_users(boost_info, nft_balances)
+    allocate_nft_balances_to_users(boost_info, boost_bals.nfts)
     allocate_nft_to_users(boost_info, all_addresses, nfts)
     assign_stake_ratio_to_users(boost_info, stake_ratios)
-    assign_native_balances_to_users(boost_info, native_setts)
-    assign_non_native_balances_to_users(boost_info, non_native_setts)
+    assign_native_balances_to_users(boost_info, boost_bals.native)
+    assign_non_native_balances_to_users(boost_info, boost_bals.non_native)
 
     for addr, boost in badger_boost_data.items():
         boost_metadata = boost_info.get(addr, {})
