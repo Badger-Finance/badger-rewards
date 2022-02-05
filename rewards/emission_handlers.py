@@ -24,9 +24,9 @@ def unclaimed_rewards_handler(amount: Decimal, token: str, sett: str, block: int
         return distribute_rewards_from_total_snapshot(amount, claimable[sett], token, block)
 
 
-def bvecvx_lp_handler(amount, token: str, sett: str, block: int):
+def bvecvx_lp_handler(amount, token: str, __: str, block: int) -> RewardsList:
     bbvecvx_cvx_lp = SETTS[Network.Ethereum]["bvecvx_cvx"]
-    snapshot = sett_snapshot(Network.Ethereum, block, bbvecvx_cvx_lp)
+    snapshot = sett_snapshot(Network.Ethereum, block, bbvecvx_cvx_lp, blacklist=True)
     if token == BADGER:
         return RewardsList()
     else:
