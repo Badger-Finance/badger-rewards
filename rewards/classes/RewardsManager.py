@@ -59,14 +59,13 @@ class RewardsManager:
         }
 
     def fetch_sett_snapshot(
-        self, start_block: int, end_block: int, sett: str, blacklist: bool = True
+        self, start_block: int, end_block: int, sett: str
     ) -> Snapshot:
         return total_twap_sett_snapshot(
             self.chain,
             start_block,
             end_block,
             sett,
-            blacklist=blacklist,
             num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS
         )
 
@@ -300,7 +299,6 @@ class RewardsManager:
                 start_block,
                 end_block,
                 sett,
-                blacklist=False,
                 num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS
             )
             amount = int(dist["amount"])
