@@ -70,7 +70,7 @@ def total_twap_sett_snapshot(
     return snapshot
 
 
-def sett_snapshot(chain: Network, block: int, sett: str, blacklist: bool) -> Snapshot:
+def sett_snapshot(chain: Network, block: int, sett: str) -> Snapshot:
     """
     Take a snapshot of a sett on a chain at a certain block
     :param chain:
@@ -82,7 +82,7 @@ def sett_snapshot(chain: Network, block: int, sett: str, blacklist: bool) -> Sna
     name = token.get("name", "")
     console.log(f"Taking snapshot on {chain} of {name} ({sett}) at {block}\n")
     sett_balances = fetch_sett_balances(chain, block, sett)
-    return parse_sett_balances(sett, sett_balances, chain, blacklist)
+    return parse_sett_balances(sett, sett_balances, chain)
 
 
 def parse_sett_balances(
