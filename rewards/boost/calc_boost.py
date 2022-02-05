@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Tuple
 from rich.console import Console
 from tabulate import tabulate
 
-from helpers.constants import BOOST_BLOCK_DELAY, STAKE_RATIO_RANGES
+from config.constants.emissions import BOOST_BLOCK_DELAY, STAKE_RATIO_RANGES
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BotType
 from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses

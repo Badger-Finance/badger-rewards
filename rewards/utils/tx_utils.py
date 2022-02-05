@@ -6,7 +6,7 @@ from typing import Optional, Tuple
 from eth_typing import HexStr
 from web3 import Web3, exceptions
 
-from helpers.constants import DECIMAL_MAPPING, EMISSIONS_CONTRACTS
+from config.constants.chain_mappings import DECIMAL_MAPPING, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BotType, Network
 from helpers.http_client import http_client

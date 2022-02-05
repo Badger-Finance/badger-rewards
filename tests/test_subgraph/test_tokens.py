@@ -1,7 +1,9 @@
+from copy import deepcopy
+
 from helpers.enums import Network
 from subgraph.queries.tokens import fetch_across_balances
 from tests.test_subgraph.test_data import ACROSS_BALANCES_TEST_DATA
-from copy import deepcopy
+
 
 def test_fetch_across_balances(mocker):
     mocker.patch(

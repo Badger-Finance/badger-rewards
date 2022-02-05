@@ -4,7 +4,7 @@ from decimal import Decimal
 from eth_utils.hexadecimal import encode_hex
 from web3 import Web3
 
-from helpers.constants import CHAIN_IDS
+from config.constants.chain_mappings import CHAIN_IDS
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.utils.rewards_utils import merkle_tree_to_rewards_list
 
