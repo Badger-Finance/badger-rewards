@@ -135,25 +135,6 @@ def test_parse_sett_balances(chain):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_parse_sett_balances__blacklisted(chain, mocker):
-    mocker.patch(
-        "rewards.snapshot.chain_snapshot.REWARDS_BLACKLIST",
-        {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": "some blacklisted stuff"}
-    )
-    snapshot = parse_sett_balances(
-        BBADGER,
-        balances={
-            '0x0000000000007F150Bd6f54c40A34d7C3d5e9f56': 0.04533617521779346,
-        },
-        chain=chain,
-    )
-    assert snapshot.balances == {}
-
-
-@pytest.mark.parametrize(
-    "chain",
-    [Network.Ethereum, Network.Arbitrum]
-)
 def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_balance):
     snapshot = sett_snapshot(chain, 13710328, BBADGER)
     assert snapshot.type == BalanceType.Native

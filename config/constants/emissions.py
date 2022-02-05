@@ -8,7 +8,7 @@ from helpers.enums import BalanceType, BotType, BucketType, Environment, Network
 SCHEDULE_REWARDS_BLACKLIST = {
     addresses.DEV_MULTISIG: "Badger Dev Multisig",
     addresses.TECH_OPS: "Badger Tech Ops",
-    addresses.REASURY_OPS: "Badger Treasury Ops",
+    addresses.TREASURY_OPS: "Badger Treasury Ops",
     addresses.TREASURY_VAULT: "Badger Treasury Vault",
     addresses.IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
 }
@@ -16,7 +16,7 @@ SCHEDULE_REWARDS_BLACKLIST = {
 TREE_REWARDS_BLACKLIST = {
     addresses.CREAM_BBADGER: "Cream bBadger",
     addresses.SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
-    addresses.SETTS[Network.Ethereum]["badger"]: "Badger Vault",
+    addresses.BBADGER: "Badger Vault",
     addresses.BADGER_PAYMENTS: "Badger Payments",
 }
 NATIVE_TOKEN_REWARDS = {

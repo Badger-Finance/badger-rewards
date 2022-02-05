@@ -16,11 +16,12 @@ console = Console()
 
 
 class Snapshot:
-    def __init__(self, token, balances, ratio=1, type="none"):
+    def __init__(self, token, balances, ratio=1, type="none", chain: Network = Network.Ethereum):
         self.type = type
         self.ratio = Decimal(ratio)
         self.token = Web3.toChecksumAddress(token)
         self.balances = self.parse_balances(balances)
+        self.chain = chain
 
     def __repr__(self) -> str:
         return json.dumps(self.balances, indent=4)
