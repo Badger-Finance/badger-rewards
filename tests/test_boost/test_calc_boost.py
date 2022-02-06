@@ -12,6 +12,7 @@ from rewards.boost.calc_boost import (
     calc_stake_ratio,
     get_badger_boost_data,
 )
+from rewards.classes.Boost import BoostBalances
 
 TEST_USER = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
 
@@ -21,11 +22,10 @@ def mock_discord_send_code(mocker):
     mocker.patch("rewards.boost.calc_boost.get_discord_url")
     return mocker.patch("rewards.boost.calc_boost.send_code_block_to_discord")
 
-
 def test_calc_stake_ratio__happy():
     target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.1}
     assert (
-        calc_stake_ratio(TEST_USER, target, target)
+        calc_stake_ratio(TEST_USER, BoostBalances(target, target, {}, {}))
         == list(target.values())[0] / list(target.values())[0]
     )
 
@@ -35,8 +35,10 @@ def test_calc_stake_ratio__zero_native():
     assert (
         calc_stake_ratio(
             TEST_USER,
-            {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0},
+            BoostBalances({"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0},
             target,
+            {},
+            {})
         )
         == 0
     )
@@ -46,7 +48,7 @@ def test_calc_stake_ratio__zero_non_native():
     target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.1}
     assert (
         calc_stake_ratio(
-            TEST_USER, target, {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0}
+            TEST_USER, BoostBalances(target, {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0}, {},{})
         )
         == 0
     )
@@ -69,7 +71,11 @@ def test_get_badger_boost_data():
     assert stake_data[1] == 2
 
 
-def test_badger_boost__happy(mock_discord_send_code, mock_snapshots):
+def test_badger_boost__happy(mock_discord_send_code, mock_snapshots, mocker):
+    mocker.patch(
+        "rewards.boost.boost_utils.claims_snapshot",
+        return_value=({}),
+    )
     result = badger_boost(123, Network.Ethereum)
     assert mock_discord_send_code.called
     # Check boosts for different data points

@@ -9,7 +9,7 @@ from rewards.snapshot.chain_snapshot import chain_snapshot_usd, sett_snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot, claims_snapshot_usd
 from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 from rewards.snapshot.token_snapshot import token_snapshot_usd
-from rewards.classes.Boost import BoostBalances, BoostData
+from rewards.classes.Boost import BoostBalances
 
 console = Console()
 
@@ -52,9 +52,9 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     bvecvx_bals = sett_snapshot(chain, block, addresses.BVECVX, blacklist=True)
     console.log(f"\n === Taking claims snapshot on {chain} === \n")
     native_claimable, non_native_claimable = claims_snapshot_usd(chain, block)
-    bvecvx_claimable = claims_snapshot(chain, block)[addresses.BVECVX]
+    bvecvx_claimable = claims_snapshot(chain, block).get(addresses.BVECVX)
 
-    bvecvx_usd = (bvecvx_bals + bvecvx_claimable).convert_to_usd().balances
+    bvecvx_usd = (bvecvx_bals + bvecvx_claimable).convert_to_usd(chain).balances
     native += Counter(native_claimable)
     non_native += Counter(non_native_claimable)
     console.log(f"\n === Taking nft snapshot on {chain} === \n")
