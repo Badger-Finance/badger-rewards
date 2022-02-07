@@ -20,7 +20,7 @@ from helpers.discord import (
     send_plain_text_to_discord,
 )
 from helpers.enums import BalanceType, DiscordRoles, Network
-from helpers.time_utils import to_hours, to_utc_date
+from badger_utils.time_utils import seconds_to_hours, to_utc_date
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
@@ -242,8 +242,8 @@ class RewardsManager:
                     )
 
                     console.log(
-                        f"Total duration of schedule elapsed is {to_hours(range_duration)}"
-                        f" hours out of {to_hours(schedule.duration)} hours"
+                        f"Total duration of schedule elapsed is {seconds_to_hours(range_duration)}"
+                        f" hours out of {seconds_to_hours(schedule.duration)} hours"
                         f" or {percentage_total_duration}% of total duration.",
                     )
             total_to_distribute += to_distribute
