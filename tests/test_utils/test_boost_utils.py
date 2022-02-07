@@ -4,6 +4,7 @@ from rewards.boost.boost_utils import (
     calc_boost_balances,
     calc_union_addresses,
     filter_dust,
+    get_bvecvx_lp_ratio,
 )
 from tests.conftest import (
     CHAIN_CLAIMS_SNAPSHOT_DATA,
@@ -100,3 +101,7 @@ def test_calc_union_addresses():
         "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56",
         "0x0000000000007F150Bd6f54c40A34d7C3d5e9f561",
     }
+
+def test_get_bvecvx_lp_ratio():
+    ratio = get_bvecvx_lp_ratio()
+    assert 0 < ratio < 1
