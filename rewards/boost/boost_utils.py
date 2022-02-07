@@ -16,7 +16,7 @@ console = Console()
 
 def get_bvecvx_lp_ratio() -> float:
     bvecvx_pool = make_contract(addresses.BVECVX_CVX_LP, Abi.Stableswap, Network.Ethereum)
-    balances = bvecvx_pool.get_balances()
+    balances = bvecvx_pool.get_balances().call()
     return balances[1]/ sum(balances) # balances contains [cvx, bcvx]
 
 def calc_union_addresses(
