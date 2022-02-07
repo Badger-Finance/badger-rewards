@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from decimal import Decimal
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
 
 from rich.console import Console
 from web3 import Web3
@@ -16,7 +16,7 @@ console = Console()
 
 
 class Snapshot:
-    def __init__(self, token, balances, ratio=1, type="none", chain: Network = Network.Ethereum):
+    def __init__(self, token, balances, ratio=1, type="none", chain: Optional[Network] = Network.Ethereum):
         self.type = type
         self.ratio = Decimal(ratio)
         self.token = Web3.toChecksumAddress(token)
