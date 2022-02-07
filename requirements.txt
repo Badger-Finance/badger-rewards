@@ -24,4 +24,4 @@ python-dotenv==0.16.0
 requests==2.26.0
 rich==9.3.0
 tabulate==0.8.7
-badger-utils==0.2.4
+badger-utils==0.2.5
