@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Tuple
 from rich.console import Console
 from tabulate import tabulate
 
-from config.constants.emissions import BOOST_BLOCK_DELAY, STAKE_RATIO_RANGES
+from config.constants.emissions import BOOST_BLOCK_DELAY, BVECVX_BOOST_WEIGHT, STAKE_RATIO_RANGES
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BotType
 from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses
@@ -24,7 +24,7 @@ def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
     non_native_balance = boost_bals.non_native.get(address, 0)
     bvecvx_balance = boost_bals.bvecvx.get(address, 0)
     if bvecvx_balance > 0 and native_balance > 0:
-        native_balance = native_balance + min(0.5 * bvecvx_balance, 0.5 * native_balance)
+        native_balance = native_balance + min(BVECVX_BOOST_WEIGHT * bvecvx_balance, BVECVX_BOOST_WEIGHT * native_balance)
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
