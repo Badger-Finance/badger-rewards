@@ -1,6 +1,8 @@
 version: '3.3'
 services:
     eth-approve-bot:
+        volumes:
+            - $PWD/temp_data/:/boost/temp_data/
         image: eth-approve-bot
         command: python -m scripts.rewards.eth.approve_eth
         build: 

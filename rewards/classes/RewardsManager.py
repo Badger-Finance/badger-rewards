@@ -1,31 +1,50 @@
+from collections import defaultdict
+from copy import deepcopy
 from decimal import Decimal
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from rich.console import Console
 from tabulate import tabulate
 
 from badger_api.requests import fetch_token
+from config.constants.addresses import ETH_BADGER_TREE, IBBTC_PEAK
+from config.constants.chain_mappings import BOOSTED_EMISSION_TOKENS
+from config.constants.emissions import (
+    NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS,
+    NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS,
+)
 from config.singletons import env_config
-from helpers.constants import BOOSTED_EMISSION_TOKENS, ETH_BADGER_TREE, IBBTC_PEAK
-from helpers.discord import get_discord_url, send_code_block_to_discord
-from helpers.enums import BalanceType
-from helpers.time_utils import to_hours, to_utc_date
-from rewards.classes.CycleLogger import cycle_logger
+from helpers.discord import (
+    get_discord_url,
+    send_code_block_to_discord,
+    send_plain_text_to_discord,
+)
+from helpers.enums import BalanceType, DiscordRoles, Network
+from badger_utils.time_utils import seconds_to_hours, to_utc_date
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
 from rewards.emission_handlers import ibbtc_peak_handler, unclaimed_rewards_handler
 from rewards.explorer import get_block_by_timestamp
-from rewards.snapshot.chain_snapshot import sett_snapshot
+from rewards.snapshot.chain_snapshot import total_twap_sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
-from rewards.utils.rewards_utils import combine_rewards, distribute_rewards_to_snapshot
+from rewards.utils.rewards_utils import (
+    check_token_totals_in_range,
+    combine_rewards,
+    distribute_rewards_from_total_snapshot,
+)
 from subgraph.queries.harvests import fetch_tree_distributions
 
 console = Console()
 
 
 class RewardsManager:
-    def __init__(self, chain: str, cycle: int, start: int, end: int, boosts):
+    CUSTOM_BEHAVIOUR = {
+        ETH_BADGER_TREE: unclaimed_rewards_handler,
+        IBBTC_PEAK: ibbtc_peak_handler,
+    }
+
+    def __init__(self, chain: Network, cycle: int, start: int, end: int, boosts):
         self.chain = chain
         self.web3 = env_config.get_web3(chain)
         self.discord_url = get_discord_url(chain)
@@ -36,34 +55,37 @@ class RewardsManager:
         self.apy_boosts = {}
 
     def fetch_sett_snapshot(
-        self, block: int, sett: str, blacklist: bool = True
+        self, start_block: int, end_block: int, sett: str, blacklist: bool = True
     ) -> Snapshot:
-        return sett_snapshot(self.chain, block, sett, blacklist)
+        return total_twap_sett_snapshot(
+            self.chain,
+            start_block,
+            end_block,
+            sett,
+            blacklist=blacklist,
+            num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS
+        )
 
     def calculate_sett_rewards(
         self, sett: str, schedules_by_token: Dict[str, List[Schedule]]
-    ) -> RewardsList:
-        start_time = self.web3.eth.get_block(self.start)["timestamp"]
-        end_time = self.web3.eth.get_block(self.end)["timestamp"]
-        sett_snapshot = self.fetch_sett_snapshot(self.end, sett)
-
+    ) -> Tuple[RewardsList, RewardsList, RewardsList, Dict[str, Decimal]]:
         """
         Vaults can have a split of boosted and non boosted emissions
         which are calculated using the boosted balances and the normal
         balances respectively
-        
         """
+        start_time = self.web3.eth.get_block(self.start)["timestamp"]
+        end_time = self.web3.eth.get_block(self.end)["timestamp"]
+        snapshot = self.fetch_sett_snapshot(self.start, self.end, sett)
         flat_rewards_list = []
         boosted_rewards_list = []
-        custom_behaviour = {
-            ETH_BADGER_TREE: unclaimed_rewards_handler,
-            IBBTC_PEAK: ibbtc_peak_handler,
-        }
+        expected_distribution_amounts = {}
 
         for token, schedules in schedules_by_token.items():
             end_dist = self.get_distributed_for_token_at(token, end_time, schedules)
             start_dist = self.get_distributed_for_token_at(token, start_time, schedules)
             token_distribution = end_dist - start_dist
+            expected_distribution_amounts[token] = token_distribution
             if token in BOOSTED_EMISSION_TOKENS.get(self.chain, []):
                 emissions_rate = get_flat_emission_rate(sett, self.chain)
             else:
@@ -72,22 +94,22 @@ class RewardsManager:
             boosted_emissions = token_distribution * (1 - emissions_rate)
             if flat_emissions > 0:
                 flat_rewards_list.append(
-                    distribute_rewards_to_snapshot(
+                    distribute_rewards_from_total_snapshot(
                         amount=flat_emissions,
-                        snapshot=sett_snapshot,
+                        snapshot=snapshot,
                         token=token,
                         block=self.end,
-                        custom_rewards=custom_behaviour,
+                        custom_rewards=self.CUSTOM_BEHAVIOUR,
                     )
                 )
             if boosted_emissions > 0:
                 boosted_rewards_list.append(
-                    distribute_rewards_to_snapshot(
+                    distribute_rewards_from_total_snapshot(
                         boosted_emissions,
-                        snapshot=self.boost_sett(sett, sett_snapshot),
+                        snapshot=self.boost_sett(sett, snapshot),
                         token=token,
                         block=self.end,
-                        custom_rewards=custom_behaviour,
+                        custom_rewards=self.CUSTOM_BEHAVIOUR,
                     )
                 )
 
@@ -98,6 +120,7 @@ class RewardsManager:
             combine_rewards([flat_rewards, boosted_rewards], self.cycle),
             flat_rewards,
             boosted_rewards,
+            expected_distribution_amounts,
         )
 
     def calculate_all_sett_rewards(
@@ -105,11 +128,12 @@ class RewardsManager:
     ) -> RewardsList:
         all_rewards = []
         table = []
+        rewards_per_sett = defaultdict(dict)
         for sett in setts:
             sett_token = fetch_token(self.chain, sett)
             sett_name = sett_token.get("name", "")
             console.log(f"Calculating rewards for {sett_name}")
-            rewards, flat, boosted = self.calculate_sett_rewards(
+            rewards, flat, boosted, expected = self.calculate_sett_rewards(
                 sett, all_schedules[sett]
             )
             table.append(
@@ -120,13 +144,33 @@ class RewardsManager:
                 ]
             )
             all_rewards.append(rewards)
-
+            rewards_per_sett[sett]["actual"] = rewards.totals.toDict()
+            rewards_per_sett[sett]["expected"] = expected
+        
         send_code_block_to_discord(
             msg=tabulate(table, headers=["vault", "boosted rewards", "flat rewards"]),
             username="Rewards Bot",
             url=self.discord_url,
         )
+
+        invalid_totals = check_token_totals_in_range(self.chain, rewards_per_sett)
+        if len(invalid_totals):
+            self.report_invalid_totals(invalid_totals)
+            
         return combine_rewards(all_rewards, self.cycle)
+    
+    def report_invalid_totals(self, invalid_totals: List[List[str]]) -> None:
+        send_plain_text_to_discord(
+            msg=f"INCORRECT REWARDS DISTRIBTION {DiscordRoles.RewardsPod}",
+            username="Rewards Bot",
+            url=self.discord_url,
+        )
+        send_code_block_to_discord(
+            msg=tabulate(invalid_totals, headers=["token", "min expected", "max expected", "actual"]),
+            username="Rewards Bot",
+            url=self.discord_url,
+        )
+        raise Exception(f"trying to distribute invalid reward amounts: {invalid_totals}")
 
     def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
         sett_multipliers = {}
@@ -198,8 +242,8 @@ class RewardsManager:
                     )
 
                     console.log(
-                        f"Total duration of schedule elapsed is {to_hours(range_duration)}"
-                        f" hours out of {to_hours(schedule.duration)} hours"
+                        f"Total duration of schedule elapsed is {seconds_to_hours(range_duration)}"
+                        f" hours out of {seconds_to_hours(schedule.duration)} hours"
                         f" or {percentage_total_duration}% of total duration.",
                     )
             total_to_distribute += to_distribute
@@ -207,6 +251,7 @@ class RewardsManager:
         return total_to_distribute
 
     def boost_sett(self, sett: str, snapshot: Snapshot) -> Snapshot:
+        snapshot = deepcopy(snapshot)
         if snapshot.type == BalanceType.NonNative:
             pre_boost = {}
             for user, balance in snapshot:
@@ -233,28 +278,31 @@ class RewardsManager:
             self.chain,
         )
         console.log(
-            f"Fetched {len(tree_distributions)} tree distributions between {self.start} and {self.end}"
+            f"Fetched {len(tree_distributions)} "
+            f"tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
-        custom_behaviour = {
-            ETH_BADGER_TREE: unclaimed_rewards_handler,
-            IBBTC_PEAK: ibbtc_peak_handler,
-        }
+
         for dist in tree_distributions:
-            block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
+            start_block = get_block_by_timestamp(
+                self.chain, int(dist["end_of_previous_dist_timestamp"])
+            )
+            end_block = get_block_by_timestamp(self.chain, int(dist["timestamp"]))
             token = dist["token"]
             sett = dist["sett"]
-            # Dont blacklist tree rewards for emissions contracts
-            snapshot = self.fetch_sett_snapshot(block, sett, blacklist=False)
-            amount = int(dist["amount"])
-
-            cycle_logger.add_tree_distribution(sett, dist)
-            cycle_logger.add_sett_token_data(
-                sett, self.web3.toChecksumAddress(token), amount
+            snapshot = total_twap_sett_snapshot(
+                self.chain,
+                start_block,
+                end_block,
+                sett,
+                blacklist=False,
+                num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS
             )
+            amount = int(dist["amount"])
             all_dist_rewards.append(
-                distribute_rewards_to_snapshot(
-                    amount, snapshot, token, self.end, custom_behaviour
+                distribute_rewards_from_total_snapshot(
+                    amount, snapshot, token,
+                    block=self.end, custom_rewards=self.CUSTOM_BEHAVIOUR,
                 )
             )
         return combine_rewards(all_dist_rewards, self.cycle)

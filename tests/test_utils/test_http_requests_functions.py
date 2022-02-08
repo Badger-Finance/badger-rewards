@@ -7,7 +7,7 @@ from badger_api.requests import (
     fetch_token_names,
     fetch_token_prices,
 )
-from helpers.constants import BOOST_CHAINS
+from config.constants.emissions import BOOST_CHAINS
 from rewards.explorer import fetch_block_by_timestamp
 
 

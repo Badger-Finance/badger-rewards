@@ -5,7 +5,7 @@ from rich.console import Console
 from web3 import Web3
 
 from badger_api.requests import fetch_token
-from helpers.constants import (
+from config.constants.emissions import (
     DISABLED_VAULTS,
     EMISSIONS_BLACKLIST,
     NATIVE,
@@ -39,6 +39,35 @@ def chain_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
         balances_by_sett[sett_addr] = sett_balances
 
     return balances_by_sett
+
+
+def total_twap_sett_snapshot(
+        chain: Network, start_block: int, end_block: int,
+        sett: str, blacklist: bool, num_historical_snapshots: int,
+) -> Snapshot:
+    """
+    Get a snapshot for total period.
+    That should sum up all Snapshots balances
+        for the num_historical_snapshots + snapshot at end_block
+    """
+    assert end_block >= start_block
+    snapshot = sett_snapshot(chain, end_block, sett, blacklist)
+    if end_block == start_block or num_historical_snapshots == 0:
+        return snapshot
+    snapshot += sett_snapshot(chain, start_block, sett, blacklist)
+    rate = int((end_block - start_block) / num_historical_snapshots)
+    # If rate == 0 it means that number of snapshots is too big, and it cannot be calculated
+    # properly.
+    # For ex: start block = 100, end block = 110 and num of snaps = 14,
+    # requesting more snapshots than blocks in the timeframe
+    if rate == 0:
+        return snapshot
+    current_block = start_block
+    for i in range(num_historical_snapshots - 1):
+        current_block += rate
+        snapshot += sett_snapshot(chain, current_block, sett, blacklist)
+
+    return snapshot
 
 
 def sett_snapshot(chain: Network, block: int, sett: str, blacklist: bool) -> Snapshot:

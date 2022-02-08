@@ -5,7 +5,7 @@ from rich.console import Console
 from tabulate import tabulate
 
 from badger_api.requests import fetch_token
-from helpers.constants import TOKENS_TO_CHECK
+from config.constants.chain_mappings import TOKENS_TO_CHECK
 from helpers.digg_utils import digg_utils
 from helpers.discord import (
     get_discord_url,

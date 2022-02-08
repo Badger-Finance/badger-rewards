@@ -1,4 +1,4 @@
-from helpers.constants import DIGG
+from config.constants.addresses import DIGG
 from helpers.enums import Abi, Network
 from helpers.web3_utils import make_contract
 
@@ -13,6 +13,11 @@ class DiggUtils:
         if shares == 0:
             return 0
         return shares / self.shares_per_fragment
+    
+    def fragments_to_shares(self, fragments: int) -> float:
+        if fragments == 0:
+            return 0
+        return fragments * self.shares_per_fragment
 
 
 digg_utils = DiggUtils()

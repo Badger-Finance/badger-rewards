@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 from typing import Any, Dict, List, Tuple
 
 from dotmap import DotMap
@@ -8,8 +9,9 @@ from eth_utils.hexadecimal import encode_hex
 from rich.console import Console
 
 from badger_api.requests import fetch_token
-from helpers.constants import DIGG
+from config.constants.addresses import DIGG
 from helpers.digg_utils import digg_utils
+from rewards.utils.token_utils import token_amount_base_10
 
 console = Console()
 
@@ -39,21 +41,18 @@ class RewardsList:
         }
         return json.dumps(log_obj, indent=4)
 
-    def increase_user_rewards_source(self, source, user, token, toAdd):
+    def increase_user_rewards_source(self, source, user, token, to_add):
         if not self.sources[source][user][token]:
             self.sources[source][user][token] = 0
-        self.sources[source][user][token] += toAdd
+        self.sources[source][user][token] += to_add
 
     def totals_info(self, chain: str) -> str:
         info = []
         for token, amount in self.totals.items():
+            readable_amount = token_amount_base_10(chain, token, amount)
             token_info = fetch_token(chain, token)
             name = token_info.get("name", "")
-            decimals = token_info.get("decimals", 18)
-            if token == DIGG:
-                amount = digg_utils.shares_to_fragments(amount)
-
-            info.append(f"{name}: {round(amount/pow(10,decimals), 5)}")
+            info.append(f"{name}: {readable_amount}")
         return "\n".join(info)
 
     def track_user_metadata_source(self, source, user, metadata):
@@ -75,7 +74,7 @@ class RewardsList:
             ), f"Token {token} is not checksummed"
             tokens[token.lower()] = True
 
-    def decrease_user_rewards(self, user, token, to_decrease):
+    def decrease_user_rewards(self, user, token, to_decrease: Decimal):
         if user in self.claims and token in self.claims[user]:
             self.claims[user][token] -= to_decrease
 
@@ -84,10 +83,10 @@ class RewardsList:
             if self.totals[token] == 0 and self.totals[to_checksum_address(token)] > 0:
                 del self.totals[token]
 
-    def increase_user_rewards(self, user, token, toAdd):
-        if toAdd < 0:
+    def increase_user_rewards(self, user, token, to_add: Decimal):
+        if to_add < 0:
             print("NEGATIVE to ADD")
-            toAdd = 0
+            to_add = 0
 
         """
         If user has rewards, increase. If not, set their rewards to this initial value
@@ -96,14 +95,14 @@ class RewardsList:
         user = to_checksum_address(user)
         token = to_checksum_address(token)
         if user in self.claims and token in self.claims[user]:
-            self.claims[user][token] += toAdd
+            self.claims[user][token] += to_add
         else:
-            self.claims[user][token] = toAdd
+            self.claims[user][token] = to_add
 
         if token in self.totals:
-            self.totals[token] += toAdd
+            self.totals[token] += to_add
         else:
-            self.totals[token] = toAdd
+            self.totals[token] = to_add
 
         self.user_rewards_sanity_check()
 

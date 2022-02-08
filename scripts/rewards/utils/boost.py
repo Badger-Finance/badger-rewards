@@ -1,7 +1,7 @@
 from rich.console import Console
 
+from config.constants.emissions import BOOST_CHAINS
 from config.singletons import env_config
-from helpers.constants import BOOST_CHAINS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType
 from rewards.aws.boost import add_user_data
