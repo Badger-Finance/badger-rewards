@@ -1,18 +1,24 @@
 import base64
 import json
 import logging
-from math import prod
 
 import boto3
 from botocore.exceptions import ClientError
 from decouple import config
 
+from config.singletons import env_config
+
 logger = logging.getLogger("aws-helpers")
 
 DYNAMO_ASSUME_ROLE = "arn:aws:iam::784874126256:role/k8s-bots"
 
+
 def get_metadata_table(production: bool):
     return "metadata-prod" if production else "metadata-staging"
+
+
+def get_rewards_table():
+    return "rewards-prod" if env_config.production else "rewards-staging"
 
 
 def get_snapshot_table(production: bool):
