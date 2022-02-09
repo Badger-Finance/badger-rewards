@@ -16,7 +16,7 @@ def get_metadata_table(production: bool):
     return "metadata-prod" if production else "metadata-staging"
 
 
-def get_rewards_table(production):
+def get_rewards_table(production: bool) -> str:
     return "rewards-prod" if production else "rewards-staging"
 
 
