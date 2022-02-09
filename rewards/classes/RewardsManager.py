@@ -161,7 +161,7 @@ class RewardsManager:
     
     def report_invalid_totals(self, invalid_totals: List[List[str]]) -> None:
         send_plain_text_to_discord(
-            msg=f"INCORRECT REWARDS DISTRIBTION {DiscordRoles.RewardsPod}",
+            message=f"INCORRECT REWARDS DISTRIBTION {DiscordRoles.RewardsPod}",
             username="Rewards Bot",
             url=self.discord_url,
         )
