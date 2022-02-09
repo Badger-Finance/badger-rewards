@@ -13,6 +13,8 @@ logging.getLogger("gql.transport.aiohttp").setLevel("WARNING")
 
 
 class EnvConfig:
+    rpc_logger = logging.getLogger("rpc-logger")
+
     def __init__(self):
         environment = config("ENV", "").lower()
         self.test = environment == Environment.Test
@@ -41,19 +43,40 @@ class EnvConfig:
             ),
         }
         # TODO: set polygon back to paid node
-        polygon = Web3(Web3.HTTPProvider("https://polygon-rpc.com/"))
-        polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
+        polygon = [
+            Web3(Web3.HTTPProvider("https://polygon-rpc.com/")),
+            self.make_provider("quiknode/poly-node-url", "NODE_URL"),
+        ]
+        for node in polygon:
+            node.middleware_onion.inject(geth_poa_middleware, layer=0)
 
         self.web3 = {
-            Network.Ethereum: self.make_provider("quiknode/eth-node-url", "NODE_URL"),
-            Network.Arbitrum: Web3(Web3.HTTPProvider("https://arb1.arbitrum.io/rpc")),
+            Network.Ethereum: [
+                self.make_provider("quiknode/eth-node-url", "NODE_URL"),
+            ],
+            Network.Arbitrum: [
+                Web3(Web3.HTTPProvider("https://arb1.arbitrum.io/rpc")),
+                self.make_provider("moralis/arbitrum-node-url", "ARBITRUM_NODE_URL"),
+                self.make_provider("alchemy/arbitrum-node-url", "ARBITRUM_NODE_URL"),
+            ],
             Network.Polygon: polygon,
         }
 
         self.is_valid_config()
 
     def get_web3(self, chain: str = Network.Ethereum) -> Web3:
-        return self.web3[chain]
+        return self.get_healthy_node(chain)  
+    
+    def get_healthy_node(self, chain: Network) -> Web3:
+        for node in self.web3[chain]:
+            try:
+                node.eth.get_block_number()
+                return node
+            except Exception as e:
+                self.rpc_logger.info(f"{node.provider.endpoint_uri} unhealthy")
+                self.rpc_logger.info(e)
+
+        raise Exception(f"No healthy nodes for chain: {chain}")
 
     def get_explorer_api_key(self, chain: str) -> str:
         return self.explorer_api_keys[chain]
