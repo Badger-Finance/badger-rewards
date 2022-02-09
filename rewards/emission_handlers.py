@@ -1,8 +1,6 @@
 from decimal import Decimal
-
 from rich.console import Console
 
-from config.constants.addresses import BADGER
 from config.constants.addresses import IBBTC_MULTISIG
 from config.constants.chain_mappings import SETTS
 from config.constants.chain_mappings import UNCLAIMED_REWARDS_TOKENS
@@ -27,15 +25,12 @@ def unclaimed_rewards_handler(amount: Decimal, token: str, sett: str, block: int
 def bvecvx_lp_handler(amount, token: str, __: str, block: int) -> RewardsList:
     bbvecvx_cvx_lp = SETTS[Network.Ethereum]["bvecvx_cvx"]
     snapshot = sett_snapshot(Network.Ethereum, block, bbvecvx_cvx_lp)
-    if token == BADGER:
-        return RewardsList()
-    else:
-        return distribute_rewards_from_total_snapshot(
-            amount,
-            snapshot,
-            token,
-            block
-        )
+    return distribute_rewards_from_total_snapshot(
+        amount,
+        snapshot,
+        token,
+        block
+    )
 
 
 def ibbtc_peak_handler(amount: Decimal, token: str, sett: str, block: int) -> RewardsList:
