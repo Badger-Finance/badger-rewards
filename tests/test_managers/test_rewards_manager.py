@@ -295,7 +295,7 @@ def test_calculate_sett_rewards__check_analytics(
     )
     for sett, data in analytics.items():
         assert data['sett_name'] is not None
-        assert data['boosted_rewards'] is not None
+        assert data['boosted_rewards'][BADGER] is not None
         assert data['flat_rewards'] is not None
 
 

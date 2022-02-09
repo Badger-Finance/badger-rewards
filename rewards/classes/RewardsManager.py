@@ -150,8 +150,8 @@ class RewardsManager:
             )
             rewards_analytics[sett] = {
                 'sett_name': sett_name,
-                'boosted_rewards': boosted.totals_info(self.chain),
-                'flat_rewards': flat.totals_info(self.chain),
+                'boosted_rewards': boosted.totals_info_raw(self.chain),
+                'flat_rewards': flat.totals_info_raw(self.chain),
             }
             all_rewards.append(rewards)
             rewards_per_sett[sett]["actual"] = rewards.totals.toDict()
