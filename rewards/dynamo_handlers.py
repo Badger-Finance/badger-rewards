@@ -10,7 +10,7 @@ from config.singletons import env_config
 
 
 def put_rewards_data(
-        chain: Network, cycle: int, end_block: int,
+        chain: Network, cycle: int, start_block: int, end_block: int,
         rewards_data: Dict
 ) -> None:
     """
@@ -21,11 +21,12 @@ def put_rewards_data(
     try:
         table.put_item(
             Item={
-                'network-cycle': f"{chain}-{cycle}",
+                'networkCycle': f"{chain}-{cycle}",
                 'cycle': cycle,
                 'network': chain,
-                'end_block': end_block,
-                'rewards_data': rewards_data,
+                'startBlock': start_block,
+                'endBlock': end_block,
+                'rewardsData': rewards_data,
             }
         )
     except ClientError as e:

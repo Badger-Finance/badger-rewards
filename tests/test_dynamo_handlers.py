@@ -25,13 +25,25 @@ def dynamodb_rewards_table() -> Table:
         )
         dynamodb_client.create_table(
             TableName="rewards-staging",
-            AttributeDefinitions=[
-                {"AttributeName": "network-cycle", "AttributeType": "S"},
-                {"AttributeName": "cycle", "AttributeType": "N"},
-            ],
             KeySchema=[
-                {"AttributeName": "network-cycle", "KeyType": "HASH"},
+                {"AttributeName": "networkCycle", "KeyType": "HASH"},
                 {"AttributeName": "cycle", "KeyType": "RANGE"},
+            ],
+            AttributeDefinitions=[
+                {"AttributeName": "networkCycle", "AttributeType": "S"},
+                {"AttributeName": "cycle", "AttributeType": "N"},
+                {"AttributeName": "endBlock", "AttributeType": "N"},
+                {"AttributeName": "network", "AttributeType": "S"},
+            ],
+            GlobalSecondaryIndexes=[
+                {
+                    "IndexName": "IndexRewardsOnNetworkAndEndBlock",
+                    "KeySchema": [
+                        {"AttributeName": "network", "KeyType": "HASH"},
+                        {"AttributeName": "endBlock", "KeyType": "RANGE"},
+                    ],
+                    "Projection": {"ProjectionType": "ALL"},
+                }
             ],
         )
         dynamodb_resource = boto3.resource(
@@ -47,22 +59,24 @@ def dynamodb_rewards_table() -> Table:
 
 def test_put_rewards_happy(dynamodb_rewards_table):
     cycle = 123
+    start_block = 1
     end_block = 100
     network = Network.Ethereum
     rewards_data = {'some': "data"}
-    put_rewards_data(Network.Ethereum, cycle, end_block, rewards_data)
+    put_rewards_data(Network.Ethereum, cycle, start_block, end_block, rewards_data)
     # noinspection PyArgumentList
     response = dynamodb_rewards_table.get_item(
         Key={
-            'network-cycle': f"{network}-{cycle}",
+            'networkCycle': f"{network}-{cycle}",
             'cycle': cycle
         }
     )
     item = response['Item']
     assert item['cycle'] == cycle
-    assert item['network-cycle'] == f"{network}-{cycle}"
-    assert item['end_block'] == end_block
-    assert item['rewards_data'] == rewards_data
+    assert item['networkCycle'] == f"{network}-{cycle}"
+    assert item['startBlock'] == start_block
+    assert item['endBlock'] == end_block
+    assert item['rewardsData'] == rewards_data
 
 
 def test_put_rewards_unhappy(dynamodb_rewards_table, mocker):
@@ -80,5 +94,5 @@ def test_put_rewards_unhappy(dynamodb_rewards_table, mocker):
             )
         )
     )
-    put_rewards_data(Network.Ethereum, 1, 123, {})
+    put_rewards_data(Network.Ethereum, 1, 123, 123, {})
     assert discord.called

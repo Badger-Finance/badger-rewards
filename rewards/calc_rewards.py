@@ -161,7 +161,7 @@ def approve_root(
             upload_boosts(boosts, chain)
             cycle_logger.save(tree_manager.next_cycle, chain)
             put_rewards_data(
-                chain, tree_manager.next_cycle, end,
+                chain, tree_manager.next_cycle, start, end,
                 rewards_data['sett_rewards_analytics']
             )
             return rewards_data
