@@ -57,7 +57,6 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
                 "blockNumber": {"number": block_number},
             }
             next_page = client.execute(query, variable_values=variables)
-            print(next_page)
             if len(next_page["tokenBalances"]) == 0:
                 continue_fetching = False
             else:
@@ -76,7 +75,6 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
             e, "Error in Fetching Across Balance", "Subgraph Error", chain
         )
         raise e
-    print(across_balances)
     return across_balances
 
 
@@ -132,12 +130,12 @@ def fetch_token_balances(
 
 
 def fetch_fuse_token_info(chain: Network, block: int) -> Dict:
-    if chain == Network.Ethereum:
+    if chain != Network.Ethereum:
         return {}
 
     return {
         "0x3472A5A71965499acd81997a54BBA8D852C6E53d": {
-            "underlying_contract": "0x3472A5A71965499acd81997a54BBA8D852C6E53d",
+            "underlying": "0x3472A5A71965499acd81997a54BBA8D852C6E53d",
             "symbol": "fBADGER-22",
             "contract": "0x6780B4681aa8efE530d075897B3a4ff6cA5ed807",
         },
@@ -149,11 +147,13 @@ def fetch_fuse_token_info(chain: Network, block: int) -> Dict:
     }
 
 def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, Decimal]:
-    if chain == Network.Ethereum:
+
+    if chain != Network.Ethereum:
         return {}
 
     fuse_client = make_gql_client("fuse")
     token_info = fetch_fuse_token_info(chain, block).get(token)
+    console.log(f"Fetching {token_info['symbol']} token from fuse pool")
     ftoken = make_contract(
         Web3.toChecksumAddress(token_info["contract"]),
         abi_name=Abi.CErc20Delegator,
@@ -188,7 +188,7 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
     balances = {}
     variables = {
         "block_number": {"number": block},
-        "token_filter": {"id_gt": last_token_id, "symbol_in": list(token_info["symbol"])},
+        "token_filter": {"id_gt": last_token_id, "symbol": token_info["symbol"]},
     }
     try:
         while True:
@@ -201,7 +201,7 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
                 account = Web3.toChecksumAddress(result["account"]["id"])
                 if balance <= 0:
                     continue
-                balances[account] += balance
+                balances[account] = balances.get(account, 0) + balance
             if len(results["accountCTokens"]) == 0:
                 break
             else:
