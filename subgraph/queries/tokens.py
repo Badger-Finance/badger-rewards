@@ -1,6 +1,7 @@
 import math
 from functools import lru_cache
 from typing import Dict, Optional, Tuple
+from decimal import Decimal
 
 from gql import Client, gql
 from rich.console import Console
@@ -129,6 +130,92 @@ def fetch_token_balances(
 
     return badger_balances, digg_balances
 
+
+def fetch_fuse_token_info(chain: Network, block: int) -> Dict:
+    fuse_client = make_gql_client("fuse")
+
+def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, Decimal]:
+    if chain == Network.Ethereum:
+        return {}
+
+    fuse_client = make_gql_client("fuse")
+    token_info = fetch_fuse_token_info(chain, block).get(token)
+    ftoken = make_contract(
+        Web3.toChecksumAddress(token_info["contract"]),
+        abi_name=Abi.CErc20Delegator,
+        chain=chain
+    )
+    underlying = make_contract(
+        Web3.toChecksumAddress(token_info["underlying"]),
+        abi_name=Abi.ERC20,
+        chain=chain
+    )
+    decimals = int(ftoken.decimals().call())
+    underlying_decimals = int(underlying.decimals().call())
+    mantissa = 18 + underlying_decimals + decimals
+    exchange_rate = float(ftoken.exchangeRateStored().call()) / math.pow(10, mantissa)
+    last_token_id = "0x0000000000000000000000000000000000000000"
+
+    query = gql(
+        f"""
+        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {{
+            accountCTokens(block: $block_number, where: $token_filter) {{
+                id
+                symbol
+                account{{
+                    id
+                }}
+                cTokenBalance
+            }}
+        }}
+        """
+    )
+
+    balances = {}
+    variables = {
+        "block_number": {"number": block},
+        "token_filter": {"id_gt": last_token_id, "symbol_in": list(token_info["symbol"])},
+    }
+    try:
+        while True:
+            variables["token_filter"]["id_gt"] = last_token_id
+            results = fuse_client.execute(query, variable_values=variables)
+            for result in results["accountCTokens"]:
+                last_token_id = result["id"]
+                ctoken_balance = float(result["cTokenBalance"])
+                balance = ctoken_balance * exchange_rate
+                account = Web3.toChecksumAddress(result["account"]["id"])
+                if balance <= 0:
+                    continue
+                balances[account] += balance
+            if len(results["accountCTokens"]) == 0:
+                break
+            else:
+                console.log(f"Fetching {len(results['accountCTokens'])} fuse balances")
+
+        console.log(f"Fetched {len(balances)} total fuse balances")
+        return balances
+
+    except Exception as e:
+        discord_url = get_discord_url(chain, BotType.Boost)
+        send_message_to_discord(
+            "**BADGER BOOST ERROR**",
+            f":x: Error in Fetching Fuse Token Balance",
+            [
+                {
+                    "name": "Error Type",
+                    "value": type(e),
+                    "inline": True,
+                    "name": "Error Description",
+                    "value": e.args,
+                    "inline": True,
+                }
+            ],
+            "Boost Bot",
+            url=discord_url,
+        )
+        raise e
+    
 
 def fetch_fuse_pool_balances(client, chain, block):
     if chain != Network.Ethereum:
