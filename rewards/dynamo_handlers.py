@@ -29,6 +29,7 @@ def put_rewards_data(
             }
         )
     except ClientError as e:
+        # Gracefully quit function without raising exception
         send_error_to_discord(
             e,
             f"Database Error \n ```{e.response['Error']['Message']}```",

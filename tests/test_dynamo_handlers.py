@@ -1,7 +1,9 @@
 import os
+from unittest.mock import MagicMock
 
 import boto3
 import pytest
+from botocore.exceptions import ClientError
 from moto import mock_dynamodb2
 from moto.core import patch_resource
 from moto.dynamodb2.models import Table
@@ -61,3 +63,22 @@ def test_put_rewards_happy(dynamodb_rewards_table):
     assert item['network-cycle'] == f"{network}-{cycle}"
     assert item['end_block'] == end_block
     assert item['rewards_data'] == rewards_data
+
+
+def test_put_rewards_unhappy(dynamodb_rewards_table, mocker):
+    """
+    Test for situation when dynamo raises err on table.put_item()
+    """
+    discord = mocker.patch(
+        "rewards.dynamo_handlers.send_error_to_discord",
+    )
+    mocker.patch(
+        "rewards.dynamo_handlers.dynamodb.Table",
+        return_value=MagicMock(
+            put_item=MagicMock(
+                side_effect=ClientError({'Error': {'Message': "stuff happened"}}, '')
+            )
+        )
+    )
+    put_rewards_data(Network.Ethereum, 1, 123, {})
+    assert discord.called
