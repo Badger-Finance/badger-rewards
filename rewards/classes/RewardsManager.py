@@ -7,7 +7,7 @@ from rich.console import Console
 from tabulate import tabulate
 
 from badger_api.requests import fetch_token
-from config.constants.addresses import ETH_BADGER_TREE, IBBTC_PEAK, BADGER_FUSE_POOL
+from config.constants.addresses import ETH_BADGER_TREE, IBBTC_PEAK, FBVECVXLP, FBVECVX
 from config.constants.chain_mappings import BOOSTED_EMISSION_TOKENS
 from config.constants.emissions import (
     NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS,
@@ -42,7 +42,8 @@ class RewardsManager:
     CUSTOM_BEHAVIOUR = {
         ETH_BADGER_TREE: unclaimed_rewards_handler,
         IBBTC_PEAK: ibbtc_peak_handler,
-        BADGER_FUSE_POOL: fuse_pool_handler
+        FBVECVXLP: fuse_pool_handler,
+        FBVECVX: fuse_pool_handler
     }
 
     def __init__(self, chain: Network, cycle: int, start: int, end: int, boosts):
