@@ -6,7 +6,6 @@ from config.constants.chain_mappings import UNCLAIMED_REWARDS_TOKENS
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
 from rewards.snapshot.claims_snapshot import claims_snapshot
-from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.snapshot.token_snapshot import fuse_snapshot_of_token
 from rewards.utils.rewards_utils import distribute_rewards_from_total_snapshot
 
@@ -35,7 +34,7 @@ def ibbtc_peak_handler(amount: Decimal, token: str, sett: str, block: int) -> Re
     return rewards
 
 
-def rari_pool_handler(amount: Decimal, token: str, sett: str, block: int) -> RewardsList:
+def fuse_pool_handler(amount: Decimal, token: str, sett: str, block: int) -> RewardsList:
     """ 
     Redirect rewards from rari pool contract to token holders in pool
     """

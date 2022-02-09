@@ -7,7 +7,7 @@ from rich.console import Console
 from tabulate import tabulate
 
 from badger_api.requests import fetch_token
-from config.constants.addresses import ETH_BADGER_TREE, IBBTC_PEAK
+from config.constants.addresses import ETH_BADGER_TREE, IBBTC_PEAK, BADGER_FUSE_POOL
 from config.constants.chain_mappings import BOOSTED_EMISSION_TOKENS
 from config.constants.emissions import (
     NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS,
@@ -24,7 +24,7 @@ from badger_utils.time_utils import seconds_to_hours, to_utc_date
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
-from rewards.emission_handlers import ibbtc_peak_handler, unclaimed_rewards_handler
+from rewards.emission_handlers import fuse_pool_handler, ibbtc_peak_handler, unclaimed_rewards_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import total_twap_sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
@@ -42,6 +42,7 @@ class RewardsManager:
     CUSTOM_BEHAVIOUR = {
         ETH_BADGER_TREE: unclaimed_rewards_handler,
         IBBTC_PEAK: ibbtc_peak_handler,
+        BADGER_FUSE_POOL: fuse_pool_handler
     }
 
     def __init__(self, chain: Network, cycle: int, start: int, end: int, boosts):
