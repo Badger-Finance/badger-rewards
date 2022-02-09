@@ -132,7 +132,21 @@ def fetch_token_balances(
 
 
 def fetch_fuse_token_info(chain: Network, block: int) -> Dict:
-    fuse_client = make_gql_client("fuse")
+    if chain == Network.Ethereum:
+        return {}
+
+    return {
+        "0x3472A5A71965499acd81997a54BBA8D852C6E53d": {
+            "underlying_contract": "0x3472A5A71965499acd81997a54BBA8D852C6E53d",
+            "symbol": "fBADGER-22",
+            "contract": "0x6780B4681aa8efE530d075897B3a4ff6cA5ed807",
+        },
+        "0x798D1bE841a82a273720CE31c822C61a67a601C3": {
+            "underlying": "0x798D1bE841a82a273720CE31c822C61a67a601C3",
+            "symbol": "fDIGG-22",
+            "contract": "0x792a676dD661E2c182435aaEfC806F1d4abdC486",
+        },
+    }
 
 def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, Decimal]:
     if chain == Network.Ethereum:
