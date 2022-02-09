@@ -125,9 +125,10 @@ class RewardsManager:
 
     def calculate_all_sett_rewards(
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
-    ) -> RewardsList:
+    ) -> Tuple[RewardsList, Dict[str, Dict]]:
         all_rewards = []
         table = []
+        rewards_analytics = {}
         rewards_per_sett = defaultdict(dict)
         for sett in setts:
             sett_token = fetch_token(self.chain, sett)
@@ -143,6 +144,11 @@ class RewardsManager:
                     flat.totals_info(self.chain),
                 ]
             )
+            rewards_analytics[sett] = {
+                'sett_name': sett_name,
+                'boosted_rewards': boosted.totals_info(self.chain),
+                'flat_rewards': flat.totals_info(self.chain),
+            }
             all_rewards.append(rewards)
             rewards_per_sett[sett]["actual"] = rewards.totals.toDict()
             rewards_per_sett[sett]["expected"] = expected
@@ -157,7 +163,7 @@ class RewardsManager:
         if len(invalid_totals):
             self.report_invalid_totals(invalid_totals)
             
-        return combine_rewards(all_rewards, self.cycle)
+        return combine_rewards(all_rewards, self.cycle), rewards_analytics
     
     def report_invalid_totals(self, invalid_totals: List[List[str]]) -> None:
         send_plain_text_to_discord(

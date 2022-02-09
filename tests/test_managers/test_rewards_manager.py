@@ -228,7 +228,7 @@ def test_splits(
         logger.info(f"Generating rewards with {rate*100}% pro rata rewards")
         rewards_list = []
         tree_rewards = rewards_manager_split.calculate_tree_distributions()
-        sett_rewards = rewards_manager_split.calculate_all_sett_rewards(
+        sett_rewards, __ = rewards_manager_split.calculate_all_sett_rewards(
             all_setts, all_schedules
         )
         rewards_list.append(tree_rewards)
@@ -269,6 +269,35 @@ def test_splits(
     ]
 
 
+def test_calculate_sett_rewards__check_analytics(
+        schedule, mocker, boosts_split, mock_discord
+):
+    mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_sett_balances",
+        return_value={
+            FIRST_USER: 1000,
+            SECOND_USER: 1000,
+            THIRD_USER: 1000,
+        }
+    )
+    sett = SETTS[Network.Ethereum]["ibbtc_crv"]
+    total_badger = 100
+    all_schedules = {sett: {BADGER: [schedule(sett, total_badger)]}}
+
+    rewards_manager = RewardsManager(
+        Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
+    )
+
+    __, analytics = rewards_manager.calculate_all_sett_rewards(
+        [sett], all_schedules,
+    )
+    for sett, data in analytics.items():
+        assert data['sett_name'] is not None
+        assert data['boosted_rewards'] is not None
+        assert data['flat_rewards'] is not None
+
+
 def test_calculate_sett_rewards__equal_balances_for_period(
         schedule, mocker, boosts_split, mock_discord
 ):
@@ -289,7 +318,7 @@ def test_calculate_sett_rewards__equal_balances_for_period(
         Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
     )
 
-    rewards = rewards_manager.calculate_all_sett_rewards(
+    rewards, __ = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
     # First user has boost = 1, so they get smallest amount of rewards because of unboosted balance
@@ -345,7 +374,7 @@ def test_calculate_sett_rewards__balances_vary_for_period(
         Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
     )
 
-    rewards = rewards_manager.calculate_all_sett_rewards(
+    rewards, __ = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
     assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
@@ -417,6 +446,7 @@ def test_calculate_tree_distributions__totals(mocker, boosts_split):
         tree_rewards.claims[second_user][another_token] ==
         pytest.approx(Decimal(second_amount_distributed * 0.8))
     )
+
 
 def test_report_invalid_totals(mocker, boosts_split):
     block = mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
