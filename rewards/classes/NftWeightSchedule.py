@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from helpers.time_utils import to_utc_date
+from badger_utils.time_utils import to_utc_date
 
 
 @dataclass

@@ -6,7 +6,7 @@ from gql import Client, gql
 from rich.console import Console
 from web3 import Web3
 
-from helpers.constants import DECIMAL_MAPPING
+from config.constants.chain_mappings import DECIMAL_MAPPING
 from helpers.digg_utils import digg_utils
 from helpers.discord import (
     get_discord_url,
@@ -15,16 +15,14 @@ from helpers.discord import (
 )
 from helpers.enums import Abi, BotType, Network
 from helpers.web3_utils import make_contract
+from rewards.utils.emission_utils import get_across_lp_multiplier
+from subgraph.subgraph_utils import make_gql_client
 
 console = Console()
 
 
-@lru_cache(maxsize=None)
-def fetch_token_balances(
-    client: Client, block_number: int, chain: str
-) -> Tuple[Dict[str, int], Dict[str, int]]:
-    increment = 1000
-    query = gql(
+def token_query():
+    return gql(
         """
         query fetchWalletBalance($firstAmount: Int, $lastID: ID,$blockNumber:Block_height) {
             tokenBalances(first: $firstAmount, where: { id_gt: $lastID  },block: $blockNumber) {
@@ -37,6 +35,56 @@ def fetch_token_balances(
         }
     """
     )
+
+
+def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
+    if chain != Network.Ethereum:
+        return {}
+    increment = 1000
+    query = token_query()
+    continue_fetching = True
+    last_id = "0x0000000000000000000000000000000000000000"
+    multiplier = get_across_lp_multiplier()
+    console.log(f"Across lp multiplier {multiplier}")
+    across_balances = {}
+    client = make_gql_client("across")
+    try:
+        while continue_fetching:
+            variables = {
+                "firstAmount": increment,
+                "lastID": last_id,
+                "blockNumber": {"number": block_number},
+            }
+            next_page = client.execute(query, variable_values=variables)
+            print(next_page)
+            if len(next_page["tokenBalances"]) == 0:
+                continue_fetching = False
+            else:
+                last_id = next_page["tokenBalances"][-1]["id"]
+                console.log(
+                    f"Fetching {len(next_page['tokenBalances'])} across balances"
+                )
+                for entry in next_page["tokenBalances"]:
+                    address = entry["id"].split("-")[1]
+                    amount = int(entry["balance"])
+                    if amount > 0:
+                        across_balances[address] = multiplier * amount / DECIMAL_MAPPING[chain]
+
+    except Exception as e:
+        send_error_to_discord(
+            e, "Error in Fetching Across Balance", "Subgraph Error", chain
+        )
+        raise e
+    print(across_balances)
+    return across_balances
+
+
+@lru_cache(maxsize=None)
+def fetch_token_balances(
+    client: Client, block_number: int, chain: str
+) -> Tuple[Dict[str, int], Dict[str, int]]:
+    increment = 1000
+    query = token_query()
 
     continue_fetching = True
     last_id = "0x0000000000000000000000000000000000000000"
@@ -60,7 +108,7 @@ def fetch_token_balances(
                 )
                 for entry in next_page["tokenBalances"]:
                     address = entry["id"].split("-")[0]
-                    amount = float(entry["balance"])
+                    amount = int(entry["balance"])
                     if amount > 0:
                         if entry["token"]["symbol"] == "BADGER":
                             badger_balances[address] = amount / DECIMAL_MAPPING[chain]

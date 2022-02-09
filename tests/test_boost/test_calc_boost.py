@@ -1,6 +1,6 @@
 import pytest
 
-from helpers.constants import STAKE_RATIO_RANGES
+from config.constants.emissions import STAKE_RATIO_RANGES
 from helpers.enums import Network
 from rewards.boost.calc_boost import (
     allocate_nft_balances_to_users,

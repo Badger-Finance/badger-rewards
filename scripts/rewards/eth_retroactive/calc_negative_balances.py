@@ -1,6 +1,6 @@
 import json
 
-from helpers.constants import BADGER, DIGG
+from config.constants.addresses import BADGER, DIGG
 from helpers.enums import Network
 from rewards.aws.trees import download_latest_tree
 from scripts.rewards.utils.managers import get_tree_manager

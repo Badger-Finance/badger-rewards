@@ -24,7 +24,7 @@ set_env_vars()
 
 from unittest import TestCase
 
-from helpers.constants import BOOST_CHAINS
+from config.constants.emissions import BOOST_CHAINS
 from rewards.classes.TreeManager import TreeManager
 
 
