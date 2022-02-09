@@ -10,6 +10,7 @@ from web3 import Web3
 from config.constants.addresses import BADGER
 from config.constants.chain_mappings import DECIMAL_MAPPING, SETTS
 from helpers.enums import BalanceType, Network
+from rewards.classes.RewardsManager import InvalidRewardsTotalException
 from rewards.classes.Schedule import Schedule
 from tests.test_subgraph.test_data import BADGER_DISTRIBUTIONS_TEST_DATA
 from tests.utils import (
@@ -454,7 +455,7 @@ def test_report_invalid_totals(mocker, boosts_split):
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 12997653, 13331083, boosts_split["userData"]
     )
-    with pytest.raises(Exception):
+    with pytest.raises(InvalidRewardsTotalException):
         rewards_manager.report_invalid_totals([])
 
     assert block.call_count == 1

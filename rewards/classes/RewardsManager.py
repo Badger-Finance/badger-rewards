@@ -38,6 +38,10 @@ from subgraph.queries.harvests import fetch_tree_distributions
 console = Console()
 
 
+class InvalidRewardsTotalException(Exception):
+    pass
+
+
 class RewardsManager:
     CUSTOM_BEHAVIOUR = {
         ETH_BADGER_TREE: unclaimed_rewards_handler,
@@ -172,11 +176,15 @@ class RewardsManager:
             url=self.discord_url,
         )
         send_code_block_to_discord(
-            msg=tabulate(invalid_totals, headers=["token", "min expected", "max expected", "actual"]),
+            msg=tabulate(
+                invalid_totals, headers=["token", "min expected", "max expected", "actual"]
+            ),
             username="Rewards Bot",
             url=self.discord_url,
         )
-        raise Exception(f"trying to distribute invalid reward amounts: {invalid_totals}")
+        raise InvalidRewardsTotalException(
+            f"trying to distribute invalid reward amounts: {invalid_totals}"
+        )
 
     def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
         sett_multipliers = {}
