@@ -11,6 +11,8 @@ logging.getLogger("gql.transport.aiohttp").setLevel(logging.WARNING)
 
 logging.getLogger("gql.transport.aiohttp").setLevel("WARNING")
 
+class NoHealthyNode(Exception):
+    pass
 
 class EnvConfig:
     rpc_logger = logging.getLogger("rpc-logger")
@@ -42,10 +44,11 @@ class EnvConfig:
                 "keepers/arbiscan", "ARBISCAN_TOKEN", kube=self.kube
             ),
         }
-        # TODO: set polygon back to paid node
+
         polygon = [
             Web3(Web3.HTTPProvider("https://polygon-rpc.com/")),
-            self.make_provider("quiknode/poly-node-url", "NODE_URL"),
+            self.make_provider("quiknode/poly-node-url", "POLY_NODE_URL"),
+            self.make_provider("alchemy/poly-node-url", "POLY_NODE_URL"),
         ]
         for node in polygon:
             node.middleware_onion.inject(geth_poa_middleware, layer=0)
@@ -53,6 +56,9 @@ class EnvConfig:
         self.web3 = {
             Network.Ethereum: [
                 self.make_provider("quiknode/eth-node-url", "NODE_URL"),
+                self.make_provider("alchemy/eth-node-url", "NODE_URL"),
+                Web3(Web3.HTTPProvider("https://main-rpc.linkpool.io/")),
+                Web3(Web3.HTTPProvider("https://rpc.flashbots.net/")),
             ],
             Network.Arbitrum: [
                 Web3(Web3.HTTPProvider("https://arb1.arbitrum.io/rpc")),
@@ -76,7 +82,7 @@ class EnvConfig:
                 self.rpc_logger.info(f"{node.provider.endpoint_uri} unhealthy")
                 self.rpc_logger.info(e)
 
-        raise Exception(f"No healthy nodes for chain: {chain}")
+        raise NoHealthyNode(f"No healthy nodes for chain: {chain}")
 
     def get_explorer_api_key(self, chain: str) -> str:
         return self.explorer_api_keys[chain]
