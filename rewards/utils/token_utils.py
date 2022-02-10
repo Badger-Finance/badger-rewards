@@ -12,4 +12,4 @@ def token_amount_base_10(chain: Network, token: str, amount: Decimal) -> str:
     if token == DIGG:
         amount = digg_utils.shares_to_fragments(amount)
 
-    return str(round(amount/pow(10,decimals), 5))
+    return str(round(amount/pow(10, decimals), 5))

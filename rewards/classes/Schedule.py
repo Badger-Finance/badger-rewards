@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from helpers.time_utils import to_days, to_utc_date
+from badger_utils.time_utils import seconds_to_days, to_utc_date
 
 
 @dataclass
@@ -18,6 +18,6 @@ class Schedule:
             f"token={self.token},"
             f"initalTokensLocked={self.initialTokensLocked},"
             f"startTime={to_utc_date(self.startTime)},"
-            f"duration={to_days(self.duration)} days,"
+            f"duration={seconds_to_days(self.duration)} days,"
             f"endTime={to_utc_date(self.endTime)}"
         )

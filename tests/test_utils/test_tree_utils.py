@@ -46,18 +46,19 @@ def tree_manager(cycle_key, request) -> TreeManager:
     indirect=True,
 )
 def test_get_last_proposed_cycle(tree_manager):
-    if tree_manager.has_pending_root():
-        rewards = tree_manager.fetch_current_tree()
-        claim_end = tree_manager.last_propose_end_block()
-        claim_start = tree_manager.last_propose_start_block()
-        assert get_last_proposed_cycle(tree_manager.chain, tree_manager) == (
-            rewards,
-            claim_start,
-            claim_end,
-        )
-    else:
-        assert get_last_proposed_cycle(tree_manager.chain, tree_manager) == ({}, 0, 0)
-        
+    tree_manager.has_pending_root = lambda: True
+    rewards = tree_manager.fetch_current_tree()
+    claim_end = tree_manager.last_propose_end_block()
+    claim_start = tree_manager.last_propose_start_block()
+    assert get_last_proposed_cycle(tree_manager.chain, tree_manager) == (
+        rewards,
+        claim_start,
+        claim_end,
+    )
+    tree_manager.has_pending_root = lambda: False
+    assert get_last_proposed_cycle(tree_manager.chain, tree_manager) == ({}, 0, 0)
+
+
 @pytest.mark.parametrize(
     "tree_manager",
     chains,
