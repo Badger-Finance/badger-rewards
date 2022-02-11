@@ -1,14 +1,18 @@
+from urllib.parse import urlparse
+
 from gql import Client
 
 from subgraph.subgraph_utils import make_gql_client, subgraph_url
 
 
 def test_subgraph_url__happy_path():
-    assert ".thegraph.com" in subgraph_url("nfts")
+    host = urlparse(subgraph_url("nfts")).hostname
+    assert host.endswith(".thegraph.com")
 
 
 def test_subgraph_url__happy_path_from_urls():
-    assert ".thegraph.com" in subgraph_url("thegraph")
+    host = urlparse(subgraph_url("thegraph")).hostname
+    assert host.endswith(".thegraph.com")
 
 
 def test_subgraph_url__unhappy_path():
