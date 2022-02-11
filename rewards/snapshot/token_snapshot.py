@@ -1,4 +1,3 @@
-from re import A
 from typing import Counter, Dict, Tuple
 
 from config.constants.addresses import BADGER, DIGG
