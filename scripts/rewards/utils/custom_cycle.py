@@ -1,15 +1,18 @@
 from web3 import Web3
-from helpers.constants import CHAIN_IDS
+import json
+from config.constants.chain_mappings import CHAIN_IDS
 from eth_utils.hexadecimal import encode_hex
 from eth_account import Account
 from config.singletons import env_config
 from helpers.enums import Network
 from rewards.aws.helpers import get_secret
-from rewards.aws.trees import download_latest_tree
+from rewards.aws.trees import download_latest_tree, upload_tree
+from decouple import config
 from rewards.classes.TreeManager import TreeManager
+from rewards.classes.MerkleTree import rewards_to_merkle_tree
 
 
-def custom_propose(chain, custom_calc):
+def custom_propose(chain: Network, custom_calc):
     tree = download_latest_tree(chain)
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
@@ -19,11 +22,11 @@ def custom_propose(chain, custom_calc):
     )
     propose_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
 
-    rewards_data = custom_calculation(tree, propose_tree_manager, custom_calc)
+    rewards_data = custom_calculation(tree, propose_tree_manager, custom_calc, chain)
     tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
 
 
-def custom_approve(chain, custom_calc):
+def custom_approve(chain: Network, custom_calc):
     tree = download_latest_tree(chain)
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
@@ -69,7 +72,7 @@ def custom_eth_approve(chain, custom_calc):
         )
 
 
-def custom_calculation(tree, tree_manager, custom_calc):
+def custom_calculation(tree, tree_manager, custom_calc, chain):
     rewards_list = custom_calc(tree, tree_manager)
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
