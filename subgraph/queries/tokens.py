@@ -18,6 +18,9 @@ console = Console()
 
 
 def token_query():
+    """
+    Graphql query for fetching tokens on a subgraph
+    """
     return gql(
         """
         query fetchWalletBalance($firstAmount: Int, $lastID: ID,$blockNumber:Block_height) {
@@ -34,6 +37,9 @@ def token_query():
 
 
 def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
+    """
+    Fetch lp balances from across protocol and convert to badger tokens
+    """
     if chain != Network.Ethereum:
         return {}
     increment = 1000
@@ -69,10 +75,14 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
 
 @lru_cache(maxsize=None)
 def fetch_token_balances(
-    client: Client, block_number: int, chain: str
+     block_number: int, chain: Network
 ) -> Tuple[Dict[str, int], Dict[str, int]]:
+    """
+    Fetch badger and digg tokens
+    """
     increment = 1000
     query = token_query()
+    client = SubgraphClient(f"tokens-{chain}", chain)
 
     continue_fetching = True
     last_id = "0x0000000000000000000000000000000000000000"
@@ -112,6 +122,9 @@ def fetch_token_balances(
 
 
 def fetch_fuse_pool_balances(chain: Network, block: int):
+    """
+    Fetch badger and digg token balances deposited in fuse
+    """
     if chain != Network.Ethereum:
         console.log("Fuse pools are only active on ETH")
         return {}

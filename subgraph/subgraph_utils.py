@@ -16,8 +16,7 @@ def subgraph_url(name: str) -> str:
     staging_urls = subgraph_urls[Environment.Staging]
     if env_config.production:
         return prod_urls.get(name, "")
-    else:
-        return staging_urls.get(name, prod_urls.get(name, ""))
+    return staging_urls.get(name, prod_urls.get(name, ""))
 
 
 def make_gql_client(name: str) -> Optional[Client]:
@@ -32,7 +31,10 @@ def make_gql_client(name: str) -> Optional[Client]:
 
 
 class SubgraphClient:
-    def __init__(self, name, chain: Network):
+    """
+    Wrapper around graphql for subgraphs to handle errors
+    """
+    def __init__(self, name: str, chain: Network):
         self.client = make_gql_client(name)
         self.chain = chain
 
@@ -40,13 +42,13 @@ class SubgraphClient:
         transport_url = self.client.transport.url
         try:
             return self.client.execute(*args, **kwargs)
-        except Exception as e:
+        except Exception as error:
             send_error_to_discord(
-                e,
+                error,
                 error_msg=f"Error with subgraph: {transport_url}",
                 error_type="Subgraph Error",
                 chain=self.chain
             )
-            raise e
+            raise error
 
 

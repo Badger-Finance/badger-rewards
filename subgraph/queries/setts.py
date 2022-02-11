@@ -16,10 +16,12 @@ console = Console()
 
 
 @lru_cache
-def last_synced_block(chain):
-
+def last_synced_block(chain: Network):
+    """
+    Return the last synced block of the setts subgraph of a chain
+    """
     thegraph_client = SubgraphClient("thegraph", Network.Ethereum)
-    deployment_id = fetch_deployment_id(chain)
+    deployment_id = fetch_deployment_id(chain, chain)
     query = gql(
         f"""
         query last_block {{
@@ -37,18 +39,18 @@ def last_synced_block(chain):
     return int(result["indexingStatuses"][0]["chains"][0]["latestBlock"]["number"])
 
 
-def fetch_deployment_id(chain: str) -> str:
-    client = SubgraphClient(chain, chain)
+def fetch_deployment_id(chain: Network, name: str) -> str:
+    """
+    Fetch the deployment id of a subgraph
+    """
+    client = SubgraphClient(name, chain)
     query = gql(
         """
         {
           _meta{
               deployment
-                
           }
-    
         }
-        
         """
     )
     result = client.execute(query)
@@ -80,7 +82,7 @@ def balances_query() -> DocumentNode:
     )
 
 
-def list_setts(chain: str) -> List[str]:
+def list_setts(chain: Network) -> List[str]:
     """
     List all setts from a particular chain
     :param chain:
@@ -100,7 +102,7 @@ def list_setts(chain: str) -> List[str]:
     return list(map(lambda s: Web3.toChecksumAddress(s["id"]), results["setts"]))
 
 
-def fetch_chain_balances(chain: str, block: int) -> Dict[str, Dict[str, int]]:
+def fetch_chain_balances(chain: Network, block: int) -> Dict[str, Dict[str, int]]:
     """Fetch a chains balances at a particular block
 
     :param chain:
@@ -140,7 +142,7 @@ def fetch_chain_balances(chain: str, block: int) -> Dict[str, Dict[str, int]]:
     return balances
 
 
-def fetch_sett_balances(chain: str, block: int, sett: str):
+def fetch_sett_balances(chain: Network, block: int, sett: str):
     """
     Fetch sett balance on a chain at a block
     :param chain:
