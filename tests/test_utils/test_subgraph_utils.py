@@ -4,11 +4,11 @@ from subgraph.subgraph_utils import make_gql_client, subgraph_url
 
 
 def test_subgraph_url__happy_path():
-    assert "thegraph.com" in subgraph_url("nfts")
+    assert ".thegraph.com" in subgraph_url("nfts")
 
 
 def test_subgraph_url__happy_path_from_urls():
-    assert "thegraph.com" in subgraph_url("thegraph")
+    assert ".thegraph.com" in subgraph_url("thegraph")
 
 
 def test_subgraph_url__unhappy_path():
