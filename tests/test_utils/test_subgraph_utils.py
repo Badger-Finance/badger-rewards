@@ -2,16 +2,22 @@ from urllib.parse import urlparse
 
 from gql import Client
 
+from helpers.enums import Environment
+from subgraph.config import subgraph_urls
 from subgraph.subgraph_utils import make_gql_client, subgraph_url
 
 
 def test_subgraph_url__happy_path():
-    host = urlparse(subgraph_url("nfts")).hostname
+    url = subgraph_url("nfts")
+    host = urlparse(url).hostname
+    assert url in subgraph_urls[Environment.Production].values()
     assert host.endswith(".thegraph.com")
 
 
 def test_subgraph_url__happy_path_from_urls():
-    host = urlparse(subgraph_url("thegraph")).hostname
+    url = subgraph_url("thegraph")
+    host = urlparse(url).hostname
+    assert url in subgraph_urls[Environment.Production].values()
     assert host.endswith(".thegraph.com")
 
 
