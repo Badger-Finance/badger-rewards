@@ -9,8 +9,8 @@ from hexbytes import HexBytes
 from rich.console import Console
 from web3.contract import ContractFunction
 
+from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
-from helpers.constants import CHAIN_IDS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from helpers.web3_utils import get_badger_tree

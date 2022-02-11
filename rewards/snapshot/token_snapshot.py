@@ -1,13 +1,19 @@
-from typing import Dict, Tuple
+from typing import Counter, Dict, Tuple
 
-from helpers.constants import BADGER, DIGG
+from config.constants.addresses import BADGER, DIGG
 from rewards.classes.Snapshot import Snapshot
-from subgraph.queries.tokens import fetch_fuse_pool_balances, fetch_token_balances
+from subgraph.queries.tokens import (
+    fetch_across_balances,
+    fetch_fuse_pool_balances,
+    fetch_token_balances,
+)
 
 
 def token_snapshot(chain: str, block: int) -> Tuple[Snapshot, Snapshot]:
     badger_bals, digg_bals = fetch_token_balances(block, chain)
-    return Snapshot(BADGER, badger_bals), Snapshot(DIGG, digg_bals)
+    across_bals = fetch_across_balances(block, chain)
+    cumulative_badger_bals = Counter(badger_bals) + Counter(across_bals)
+    return Snapshot(BADGER, cumulative_badger_bals), Snapshot(DIGG, digg_bals)
 
 
 def fuse_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:

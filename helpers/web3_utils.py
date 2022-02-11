@@ -2,8 +2,8 @@ import json
 
 from web3.contract import ContractFunctions
 
+from config.constants.chain_mappings import EMISSIONS_CONTRACTS
 from config.singletons import env_config
-from helpers.constants import EMISSIONS_CONTRACTS
 from helpers.enums import Abi
 
 
