@@ -52,12 +52,3 @@ def test_matches_pending_hash(tree_manager):
 
     random_hash = "0xb8ed7da2062b6bdf6f20bcdb4ab35538592216ac70a4bfe986af748603debfd8"
     assert not tree_manager.matches_pending_hash(random_hash)
-
-
-@pytest.mark.parametrize(
-    "tree_manager",
-    [Network.Ethereum],
-    indirect=True,
-)
-def test_tree_manager_pending_root_false_by_default(tree_manager: TreeManager):
-    assert tree_manager.has_pending_root() is False
