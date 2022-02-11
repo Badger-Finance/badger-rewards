@@ -50,5 +50,3 @@ class SubgraphClient:
                 chain=self.chain
             )
             raise error
-
-

@@ -91,7 +91,7 @@ def list_setts(chain: Network) -> List[str]:
     query = gql(
         """
     {
-	    setts(first:100) {
+        setts(first:100) {
             id
             name
         }

@@ -130,5 +130,5 @@ def upload_tree(
         except Exception as e:
             console_and_discord(f'Error uploading approval file to bucket {target["bucket"]}, temp file saved: {e}', chain, mentions=DiscordRoles.RewardsPod)
             with open('./temp_data/temp_tree.json', 'w') as outfile:
-                    outfile.write(str(json.dumps(data)))
+                outfile.write(str(json.dumps(data)))
             raise e

@@ -149,8 +149,8 @@ def get_actual_expected_totals(sett_totals: Dict[str, Dict[str, Decimal]]) -> Tu
                     actual_totals[token] += amount
                 elif dist_type == "expected":
                     expected_totals[token] += amount
-    
     return actual_totals, expected_totals
+
 
 def check_token_totals_in_range(chain: Network, rewards_per_sett: Dict[str, Dict[str, Dict[str, Decimal]]]) -> List[Optional[List[str]]]:
     """Check that the total amount of tokens to be distributed falls within the expected range
@@ -175,5 +175,4 @@ def check_token_totals_in_range(chain: Network, rewards_per_sett: Dict[str, Dict
             max_expected = token_amount_base_10(chain, token, max_expected)
             actual = token_amount_base_10(chain, token, actual)
             invalid_totals.append([token, min_expected, max_expected, actual])
-    
     return invalid_totals
