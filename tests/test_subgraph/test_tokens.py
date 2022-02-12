@@ -1,8 +1,8 @@
 from copy import deepcopy
-
+import config.constants.addresses as addresses
 from helpers.enums import Network
-from subgraph.queries.tokens import fetch_across_balances
-from tests.test_subgraph.test_data import ACROSS_BALANCES_TEST_DATA
+from subgraph.queries.tokens import fetch_across_balances, fetch_fuse_pool_token
+from tests.test_subgraph.test_data import ACROSS_BALANCES_TEST_DATA, FUSE_TOKEN_TEST_DATA
 
 
 def test_fetch_across_balances(mocker):
@@ -36,3 +36,45 @@ def test_fetch_across_balances_empty(mocker):
     )
     across_bals = fetch_across_balances(1728601720, Network.Ethereum)
     assert across_bals == {}
+
+
+
+def mock_make_token(mocker):
+
+    class Call:
+        def __init__(self, value):
+            def return_value():
+                return value
+            self.call = return_value
+
+    class MockToken:
+        def __init__(self, decimals, exchange_rate):
+            def decimal_call():
+                def call():
+                    return Call(decimals)
+                return call
+            
+            def exchange_rate_call():
+                def call():
+                    return Call(exchange_rate)
+                return call
+
+            self.decimals = decimal_call
+            self.exchangeRateStored = exchange_rate_call
+
+    mock_token = MockToken(18, 1.1)
+    mocker.patch(
+        "subgraph.queries.tokens.make_token",
+        return_value=mock_token
+    )
+
+    
+def test_fetch_fuse_pool_token(mocker, mock_make_token):
+    mocker.patch(
+        "subgraph.subgraph_utils.Client.execute",
+        side_effect=[
+            deepcopy(FUSE_TOKEN_TEST_DATA),
+            {'accountCTokens': []}
+        ],
+    )
+    badger_fuse_balances = fetch_fuse_pool_token(Network.Ethereum,1728601720, addresses.BADGER)

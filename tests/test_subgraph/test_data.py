@@ -70,3 +70,8 @@ ACROSS_BALANCES_TEST_DATA = {
         },
     ]
 }
+
+FUSE_TOKEN_TEST_DATA = {
+    'accountCTokens':[]
+}
+
