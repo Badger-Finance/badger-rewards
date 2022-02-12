@@ -1,6 +1,7 @@
 from copy import deepcopy
 import config.constants.addresses as addresses
 from helpers.enums import Network
+import pytest
 from subgraph.queries.tokens import fetch_across_balances, fetch_fuse_pool_token
 from tests.test_subgraph.test_data import ACROSS_BALANCES_TEST_DATA, FUSE_TOKEN_TEST_DATA
 
@@ -38,33 +39,22 @@ def test_fetch_across_balances_empty(mocker):
     assert across_bals == {}
 
 
-
+@pytest.fixture
 def mock_make_token(mocker):
 
     class Call:
         def __init__(self, value):
-            def return_value():
-                return value
-            self.call = return_value
+            self.value = value
+            self.call = lambda: self.value
 
     class MockToken:
-        def __init__(self, decimals, exchange_rate):
-            def decimal_call():
-                def call():
-                    return Call(decimals)
-                return call
-            
-            def exchange_rate_call():
-                def call():
-                    return Call(exchange_rate)
-                return call
+        def __init__(self, decimals, exchange_rate, _=None):
+            self.decimals = lambda: Call(decimals)
+            self.exchangeRateStored = lambda: Call(exchange_rate)
 
-            self.decimals = decimal_call
-            self.exchangeRateStored = exchange_rate_call
-
-    mock_token = MockToken(18, 1.1)
+    mock_token = MockToken(18, 1.1, '')
     mocker.patch(
-        "subgraph.queries.tokens.make_token",
+        "subgraph.queries.tokens.make_contract",
         return_value=mock_token
     )
 
