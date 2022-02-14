@@ -3,6 +3,7 @@ import json
 from config.constants.chain_mappings import CHAIN_IDS
 from eth_utils.hexadecimal import encode_hex
 from eth_account import Account
+from config.env_config import EnvConfig
 from config.singletons import env_config
 from helpers.enums import Network
 from rewards.aws.helpers import get_secret
@@ -23,7 +24,8 @@ def custom_propose(chain: Network, custom_calc: Callable, custom_test: Callable)
     propose_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
 
     rewards_data = custom_calculation(tree, propose_tree_manager, chain, custom_calc, custom_test)
-    tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
+    if env_config.production:
+        tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
 
 
 def custom_approve(chain: Network, custom_calc: Callable, custom_test: Callable):
@@ -37,14 +39,15 @@ def custom_approve(chain: Network, custom_calc: Callable, custom_test: Callable)
     approve_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
 
     rewards_data = custom_calculation(tree, approve_tree_manager, chain, custom_calc, custom_test)
-    tx_hash, succeded = approve_tree_manager.approve_root(rewards_data)
-    if succeded:
-        upload_tree(
-            rewards_data["fileName"],
-            rewards_data["merkleTree"],
-            chain,
-            staging=env_config.test or env_config.staging,
-        )
+    if env_config.production:
+        tx_hash, succeded = approve_tree_manager.approve_root(rewards_data)
+        if succeded:
+            upload_tree(
+                rewards_data["fileName"],
+                rewards_data["merkleTree"],
+                chain,
+                staging=env_config.test or env_config.staging,
+            )
 
 
 def custom_eth_approve(chain, custom_calc: Callable, custom_test: Callable):
@@ -62,14 +65,15 @@ def custom_eth_approve(chain, custom_calc: Callable, custom_test: Callable):
 
     approve_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
     rewards_data = custom_calculation(tree, approve_tree_manager, chain, custom_calc, custom_test)
-    tx_hash, succeded = approve_tree_manager.approve_root(rewards_data)
-    if succeded:
-        upload_tree(
-            rewards_data["fileName"],
-            rewards_data["merkleTree"],
-            chain,
-            staging=env_config.test or env_config.staging,
-        )
+    if env_config.production:
+        tx_hash, succeded = approve_tree_manager.approve_root(rewards_data)
+        if succeded:
+            upload_tree(
+                rewards_data["fileName"],
+                rewards_data["merkleTree"],
+                chain,
+                staging=env_config.test or env_config.staging,
+            )
 
 
 def custom_calculation(tree, tree_manager, chain, custom_calc: Callable, custom_test: Callable = None):
