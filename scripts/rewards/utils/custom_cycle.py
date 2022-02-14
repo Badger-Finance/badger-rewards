@@ -22,7 +22,7 @@ def custom_propose(chain: Network, custom_calc: Callable):
     )
     propose_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
 
-    rewards_data = custom_calculation(tree, propose_tree_manager, custom_calc, chain)
+    rewards_data = custom_calculation(tree, propose_tree_manager, chain, custom_calc)
     tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
 
 
@@ -36,7 +36,7 @@ def custom_approve(chain: Network, custom_calc: Callable):
     )
     approve_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
 
-    rewards_data = custom_calculation(tree, approve_tree_manager, custom_calc)
+    rewards_data = custom_calculation(tree, approve_tree_manager, chain, custom_calc)
     tx_hash, succeded = approve_tree_manager.approve_root(rewards_data)
     if succeded:
         upload_tree(
@@ -61,7 +61,7 @@ def custom_eth_approve(chain, custom_calc: Callable):
     cycle_key = Account.decrypt(key_file_json, key_decrypt_password)
 
     approve_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
-    rewards_data = custom_calculation(tree, approve_tree_manager, custom_calc)
+    rewards_data = custom_calculation(tree, approve_tree_manager, chain, custom_calc)
     tx_hash, succeded = approve_tree_manager.approve_root(rewards_data)
     if succeded:
         upload_tree(
@@ -72,7 +72,7 @@ def custom_eth_approve(chain, custom_calc: Callable):
         )
 
 
-def custom_calculation(tree, tree_manager, custom_calc: Callable, chain):
+def custom_calculation(tree, tree_manager, chain, custom_calc: Callable):
     rewards_list = custom_calc(tree, tree_manager)
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
