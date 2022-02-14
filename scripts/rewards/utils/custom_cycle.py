@@ -12,7 +12,7 @@ from rewards.classes.TreeManager import TreeManager
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from typing import Callable
 
-def custom_propose(chain: Network, custom_calc: Callable):
+def custom_propose(chain: Network, custom_calc: Callable, custom_test: Callable):
     tree = download_latest_tree(chain)
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
@@ -22,11 +22,11 @@ def custom_propose(chain: Network, custom_calc: Callable):
     )
     propose_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
 
-    rewards_data = custom_calculation(tree, propose_tree_manager, chain, custom_calc)
+    rewards_data = custom_calculation(tree, propose_tree_manager, chain, custom_calc, custom_test)
     tx_hash, succeded = propose_tree_manager.propose_root(rewards_data)
 
 
-def custom_approve(chain: Network, custom_calc: Callable):
+def custom_approve(chain: Network, custom_calc: Callable, custom_test: Callable):
     tree = download_latest_tree(chain)
     cycle_key = get_secret(
         "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
@@ -36,7 +36,7 @@ def custom_approve(chain: Network, custom_calc: Callable):
     )
     approve_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
 
-    rewards_data = custom_calculation(tree, approve_tree_manager, chain, custom_calc)
+    rewards_data = custom_calculation(tree, approve_tree_manager, chain, custom_calc, custom_test)
     tx_hash, succeded = approve_tree_manager.approve_root(rewards_data)
     if succeded:
         upload_tree(
@@ -47,7 +47,7 @@ def custom_approve(chain: Network, custom_calc: Callable):
         )
 
 
-def custom_eth_approve(chain, custom_calc: Callable):
+def custom_eth_approve(chain, custom_calc: Callable, custom_test: Callable):
     tree = download_latest_tree(chain)
     key_decrypt_password = get_secret(
         "DECRYPT_PASSWORD_ARN",
@@ -61,7 +61,7 @@ def custom_eth_approve(chain, custom_calc: Callable):
     cycle_key = Account.decrypt(key_file_json, key_decrypt_password)
 
     approve_tree_manager = TreeManager(chain, Account.from_key(cycle_key))
-    rewards_data = custom_calculation(tree, approve_tree_manager, chain, custom_calc)
+    rewards_data = custom_calculation(tree, approve_tree_manager, chain, custom_calc, custom_test)
     tx_hash, succeded = approve_tree_manager.approve_root(rewards_data)
     if succeded:
         upload_tree(
@@ -72,11 +72,13 @@ def custom_eth_approve(chain, custom_calc: Callable):
         )
 
 
-def custom_calculation(tree, tree_manager, chain, custom_calc: Callable):
+def custom_calculation(tree, tree_manager, chain, custom_calc: Callable, custom_test: Callable = None):
+
     rewards_list = custom_calc(tree, tree_manager)
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
     merkle_tree = rewards_to_merkle_tree(rewards_list, start_block, end_block)
+    assert custom_test(tree, merkle_tree)
     root_hash = Web3.keccak(text=merkle_tree["merkleRoot"])
     chain_id = CHAIN_IDS[chain]
 
