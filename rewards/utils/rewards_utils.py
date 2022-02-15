@@ -18,8 +18,6 @@ def get_cumulative_claimable_for_token(claim, token: str) -> int:
     tokens = claim["tokens"]
     amounts = claim["cumulativeAmounts"]
 
-    console.log(tokens, amounts)
-
     for i in range(len(tokens)):
         address = tokens[i]
         if token == address:
