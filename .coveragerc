@@ -5,3 +5,4 @@ omit =
     images/*
     tests/*
     integration_tests/*
+    scripts/*
