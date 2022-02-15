@@ -72,6 +72,7 @@ def allocate_bvecvx_to_users(boost_info: Dict, bvecvx_balances: Dict):
     for user, bvecvx_balance in bvecvx_balances.items():
         if user in boost_info:
             boost_info[user]["bveCvxBalance"] = bvecvx_balance
+            boost_info[user]["nativeBalance"] += bvecvx_balance
 
 
 def allocate_nft_to_users(boost_info: Dict, addresses: List[str], nfts: Dict):
