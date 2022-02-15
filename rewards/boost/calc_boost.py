@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Tuple
-
+from decimal import Decimal
 from rich.console import Console
 from tabulate import tabulate
 
@@ -24,7 +24,7 @@ def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
     non_native_balance = boost_bals.non_native.get(address, 0)
     bvecvx_balance = boost_bals.bvecvx.get(address, 0)
     if bvecvx_balance > 0 and native_balance > 0:
-        native_balance = native_balance + min(BVECVX_BOOST_WEIGHT * bvecvx_balance, BVECVX_BOOST_WEIGHT * native_balance)
+        native_balance = native_balance + min(Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance, Decimal(BVECVX_BOOST_WEIGHT) * native_balance)
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
@@ -70,7 +70,8 @@ def allocate_nft_balances_to_users(boost_info: Dict, nft_balances: Dict) -> None
 
 def allocate_bvecvx_to_users(boost_info: Dict, bvecvx_balances: Dict):
     for user, bvecvx_balance in bvecvx_balances.items():
-        boost_info[user]["bveCvxBalance"] = bvecvx_balance
+        if user in boost_info:
+            boost_info[user]["bveCvxBalance"] = bvecvx_balance
 
 
 def allocate_nft_to_users(boost_info: Dict, addresses: List[str], nfts: Dict):
