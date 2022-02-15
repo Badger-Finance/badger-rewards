@@ -68,6 +68,10 @@ def allocate_nft_balances_to_users(boost_info: Dict, nft_balances: Dict) -> None
     for user, nft_balance in nft_balances.items():
         boost_info[user]["nftBalance"] = nft_balance
 
+def allocate_bvecvx_to_users(boost_info: Dict, bvecvx_balances: Dict):
+    for user, bvecvx_balance in bvecvx_balances.items():
+        boost_info[user]["bveCvxBalance"] = bvecvx_balance
+
 
 def allocate_nft_to_users(boost_info: Dict, addresses: List[str], nfts: Dict):
     for user, nft_balances in nfts.items():
@@ -111,6 +115,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
 
     boost_info = init_boost_data(all_addresses)
     allocate_nft_balances_to_users(boost_info, boost_bals.nfts)
+    allocate_bvecvx_to_users(boost_info, boost_bals.bvecvx)
     allocate_nft_to_users(boost_info, all_addresses, nfts)
     assign_stake_ratio_to_users(boost_info, stake_ratios)
     assign_native_balances_to_users(boost_info, boost_bals.native)
@@ -122,6 +127,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
             "boost": boost,
             "nativeBalance": boost_metadata.get("nativeBalance", 0),
             "nonNativeBalance": boost_metadata.get("nonNativeBalance", 0),
+            "bveCvxBalance": boost_metadata.get("bveCvxBalance", 0),
             "nftBalance": boost_metadata.get("nftBalance", 0),
             "stakeRatio": boost_metadata.get("stakeRatio", 0),
             "multipliers": {},

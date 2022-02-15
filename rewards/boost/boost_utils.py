@@ -75,7 +75,7 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
         bvecvx_bals = sett_snapshot(chain, block, addresses.BVECVX, blacklist=True)
         bvecvx_lp_bals = sett_snapshot(chain, block, addresses.BVECVX_CVX_LP, blacklist=True)
         ratio = get_bvecvx_lp_ratio()
-        for addr, value in bvecvx_bals:
+        for addr, value in bvecvx_lp_bals:
             bvecvx_lp_bals.boost_balance(addr, ratio)
         bvecvx_usd = (bvecvx_bals + bvecvx_claimable + bvecvx_lp_bals).convert_to_usd(chain).balances
 
