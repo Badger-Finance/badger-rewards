@@ -17,7 +17,7 @@ console = Console()
 def get_bvecvx_lp_ratio() -> float:
     bvecvx_pool = make_contract(addresses.BVECVX_CVX_LP, Abi.Stableswap, Network.Ethereum)
     balances = bvecvx_pool.get_balances().call()
-    return balances[1]/ sum(balances) # balances contains [cvx, bcvx]
+    return balances[1]/ sum(balances) #  [cvx, bvecvx]
 
 def calc_union_addresses(
     native_setts: Dict[str, float], non_native_setts: Dict[str, float]
@@ -52,7 +52,6 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     non_native = Counter()
     console.log(f"\n === Taking claims snapshot on {chain} === \n")
     native_claimable, non_native_claimable = claims_snapshot_usd(chain, block)
-    bvecvx_claimable = claims_snapshot(chain, block).get(addresses.BVECVX)
     native += Counter(native_claimable)
     non_native += Counter(non_native_claimable)
     console.log(f"\n === Taking nft snapshot on {chain} === \n")
