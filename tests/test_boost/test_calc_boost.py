@@ -90,6 +90,7 @@ def test_badger_boost__happy(mock_discord_send_code, mock_snapshots, mocker):
         assert "stakeRatio" in keys
         assert "multipliers" in keys
         assert "nfts" in keys
+        assert "bveCvxBalance" in keys
 
 
 def test_allocate_nft_balances_to_users():

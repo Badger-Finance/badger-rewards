@@ -1,4 +1,5 @@
 import pytest
+
 from helpers.enums import Network
 from rewards.boost.boost_utils import (
     calc_boost_balances,
@@ -11,6 +12,7 @@ from tests.conftest import (
     CHAIN_SETT_SNAPSHOT_DATA,
     NFT_SNAPSHOT_DATA,
 )
+
 
 @pytest.fixture
 def mock_claims_snapshot(mocker):
