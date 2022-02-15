@@ -18,7 +18,7 @@ from subgraph.queries.nfts import fetch_nfts
 console = Console()
 
 
-def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal):
+def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal) -> Decimal:
     """
     Calculate the amoutn of bvecvx to add to a user's native balance
     :param native_balance: user's current native balance
