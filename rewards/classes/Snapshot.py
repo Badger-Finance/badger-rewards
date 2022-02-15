@@ -50,6 +50,8 @@ class Snapshot:
 
     def __add__(self, other: Snapshot) -> Snapshot:
         new_bals = self.balances.copy()
+        if other == None:
+            return self
         for addr, bal in other:
             new_bals[addr] = new_bals.get(addr, 0) + bal
 
