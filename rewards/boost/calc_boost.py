@@ -25,7 +25,7 @@ def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal)
     :param bvecvx_balance: user's total bvecvx balance
     """
     if bvecvx_balance > 0 and native_balance > 0:
-        return native_balance + min(Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance, Decimal(BVECVX_BOOST_WEIGHT) * native_balance) 
+        return min(Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance, Decimal(BVECVX_BOOST_WEIGHT) * native_balance) 
     return Decimal(0)
 
 
@@ -40,7 +40,7 @@ def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
     non_native_balance = boost_bals.non_native.get(address, 0)
     bvecvx_balance = boost_bals.bvecvx.get(address, 0)
     if bvecvx_balance > 0 and native_balance > 0:
-        native_balance = calc_bvecvx_native_balance(native_balance, bvecvx_balance)
+        native_balance += calc_bvecvx_native_balance(native_balance, bvecvx_balance)
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
@@ -86,7 +86,8 @@ def allocate_nft_balances_to_users(boost_info: Dict, nft_balances: Dict) -> None
 
 def allocate_bvecvx_to_users(boost_info: Dict, bvecvx_balances: Dict):
     for user, bvecvx_balance in bvecvx_balances.items():
-        calculated_bvecvx_balance = calc_bvecvx_native_balance(boost_info[user].get("nativeBalance", 0), bvecvx_balance)
+        native_balance = boost_info[user].get("nativeBalance", 0)
+        calculated_bvecvx_balance = native_balance + calc_bvecvx_native_balance(native_balance, bvecvx_balance)
         if user in boost_info:
             boost_info[user]["bveCvxBalance"] = calculated_bvecvx_balance
             boost_info[user]["nativeBalance"] = boost_info[user].get("nativeBalance", 0) + calculated_bvecvx_balance
