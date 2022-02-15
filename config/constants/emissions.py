@@ -20,6 +20,8 @@ REWARDS_BLACKLIST = {
     addresses.BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
 
+BVECVX_BOOST_WEIGHT = 0.5
+
 STAKE_RATIO_RANGES = list(
     [
         (0, 1),
