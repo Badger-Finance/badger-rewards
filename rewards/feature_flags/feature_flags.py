@@ -14,7 +14,7 @@ class FeatureFlags:
     Flag format should be {str: bool}
     """
     FLAGS: Dict[str, bool] = {
-        TEST_FLAG_ENABLED:  True
+        TEST_FLAG_ENABLED: True
     }
 
     def does_flag_exist(self, flag: str) -> bool:
