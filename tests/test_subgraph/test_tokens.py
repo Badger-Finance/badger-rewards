@@ -52,7 +52,7 @@ def mock_make_token(mocker):
             self.decimals = lambda: Call(decimals)
             self.exchangeRateStored = lambda: Call(exchange_rate)
 
-    mock_token = MockToken(18, 1100000000000000000, '')
+    mock_token = MockToken(18, 1.1, '')
     mocker.patch(
         "subgraph.queries.tokens.make_contract",
         return_value=mock_token
@@ -67,10 +67,10 @@ def test_fetch_fuse_pool_token(mocker, mock_make_token):
             {'accountCTokens': []}
         ],
     )
-    multiplier = 1100000000000000000 / 1e18
+    multiplier = 1.1
     expected_bals = {
         "0xC1e3EC0fE5A77aA7a264637B86C2E25182c82Daa": 300 * multiplier,
         "0x0279797ee0627d64FFa0D86f4f111F90E233B090": 1000 * multiplier
     }
-    badger_fuse_balances = fetch_fuse_pool_token(Network.Ethereum,1728601720, addresses.BADGER)
+    badger_fuse_balances = fetch_fuse_pool_token(Network.Ethereum, 1728601720, addresses.BADGER)
     assert badger_fuse_balances == expected_bals
