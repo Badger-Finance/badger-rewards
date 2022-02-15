@@ -13,6 +13,15 @@ from rewards.classes.Boost import BoostBalances
 console = Console()
 
 
+def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal):
+    """
+    Calculate the amoutn of bvecvx to add to a user's native balance
+    :param native_balance: user's current native balance
+    :param bvecvx_balance: user's total bvecvx balance
+    """
+    return native_balance + min(Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance, Decimal(BVECVX_BOOST_WEIGHT) * native_balance)
+
+
 def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
     """
     Calculate the stake ratio for an address
@@ -24,7 +33,7 @@ def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
     non_native_balance = boost_bals.non_native.get(address, 0)
     bvecvx_balance = boost_bals.bvecvx.get(address, 0)
     if bvecvx_balance > 0 and native_balance > 0:
-        native_balance = native_balance + min(Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance, Decimal(BVECVX_BOOST_WEIGHT) * native_balance)
+        native_balance = calc_bvecvx_native_balance(native_balance, bvecvx_balance)
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
