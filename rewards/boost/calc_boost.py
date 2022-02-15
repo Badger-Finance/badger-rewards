@@ -24,7 +24,9 @@ def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal)
     :param native_balance: user's current native balance
     :param bvecvx_balance: user's total bvecvx balance
     """
-    return native_balance + min(Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance, Decimal(BVECVX_BOOST_WEIGHT) * native_balance)
+    if bvecvx_balance > 0 and native_balance > 0:
+        return native_balance + min(Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance, Decimal(BVECVX_BOOST_WEIGHT) * native_balance) 
+    return Decimal(0)
 
 
 def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
