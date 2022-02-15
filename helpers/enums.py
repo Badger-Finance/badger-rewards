@@ -61,6 +61,7 @@ class Abi(str, Enum):
     CErc20Delegator = "CErc20Delegator"
     BridgePoolProd = "BridgePoolProd"
     Stableswap = "Stableswap"
+    Vault = "Vault"
 
     def __str__(self) -> str:
         return self.value

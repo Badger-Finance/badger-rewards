@@ -17,10 +17,15 @@ from rewards.snapshot.token_snapshot import token_snapshot_usd
 console = Console()
 
 
-def get_bvecvx_lp_ratio() -> float:
+def get_bvecvx_lp_ratio() -> Decimal:
     bvecvx_pool = make_contract(addresses.BVECVX_CVX_LP, Abi.Stableswap, Network.Ethereum)
     balances = bvecvx_pool.get_balances().call()
-    return balances[1]/ sum(balances) #  [cvx, bvecvx]
+    return Decimal(balances[1]/ sum(balances)) #  [cvx, bvecvx]
+
+def get_bvecvx_lp_ppfs() -> Decimal:
+    bvecvx_lp = make_contract(addresses.BVECVX_CVX_LP_SETT, Abi.Vault, Network.Ethereum)
+    price_per_full_share = bvecvx_lp.getPricePerFullShare().call()
+    return Decimal(price_per_full_share / 1e18)
 
 def calc_union_addresses(
     native_setts: Dict[str, float], non_native_setts: Dict[str, float]
@@ -76,10 +81,12 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     if chain == Network.Ethereum:
         bvecvx_claimable = claims_snapshot(chain, block).get(addresses.BVECVX)
         bvecvx_bals = sett_snapshot(chain, block, addresses.BVECVX, blacklist=True)
-        bvecvx_lp_bals = sett_snapshot(chain, block, addresses.BVECVX_CVX_LP, blacklist=True)
+        bvecvx_lp_bals = sett_snapshot(chain, block, addresses.BVECVX_CVX_LP_SETT, blacklist=True)
         ratio = get_bvecvx_lp_ratio()
+        ppfs = get_bvecvx_lp_ppfs()
         for addr, value in bvecvx_lp_bals:
             bvecvx_lp_bals.boost_balance(addr, ratio)
+            bvecvx_lp_bals.boost_balance(addr, ppfs)
         bvecvx_usd = (bvecvx_bals + bvecvx_claimable + bvecvx_lp_bals).convert_to_usd(chain).balances
 
     return BoostBalances(native, non_native, bvecvx_usd, nft_balances)
