@@ -2,15 +2,18 @@ from collections import Counter, namedtuple
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Dict, List, Tuple
+
 from rich.console import Console
-from helpers.web3_utils import make_contract
-from helpers.enums import Network, Abi
+
 import config.constants.addresses as addresses
+from helpers.enums import Abi, Network
+from helpers.web3_utils import make_contract
+from rewards.classes.Boost import BoostBalances
 from rewards.snapshot.chain_snapshot import chain_snapshot_usd, sett_snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot, claims_snapshot_usd
 from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 from rewards.snapshot.token_snapshot import token_snapshot_usd
-from rewards.classes.Boost import BoostBalances
+
 console = Console()
 
 

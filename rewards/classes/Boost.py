@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
-from typing import Dict, Optional
 from decimal import Decimal
+from typing import Dict, Optional
+
 
 @dataclass
 class BoostBalances:
