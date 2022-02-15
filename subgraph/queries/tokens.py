@@ -166,8 +166,9 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
     )
     decimals = int(ftoken.decimals().call())
     underlying_decimals = int(underlying.decimals().call())
-    mantissa = 18 + underlying_decimals + decimals
+    mantissa = 18 + underlying_decimals - decimals
     exchange_rate = float(ftoken.exchangeRateStored().call()) / math.pow(10, mantissa)
+    print(exchange_rate)
     last_token_id = "0x0000000000000000000000000000000000000000"
 
     query = gql(
@@ -196,7 +197,7 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
             results = fuse_client.execute(query, variable_values=variables)
             for result in results["accountCTokens"]:
                 last_token_id = result["id"]
-                ctoken_balance = float(result["cTokenBalance"])
+                ctoken_balance = float(result["cTokenBalance"]) / math.pow(10, decimals)
                 balance = ctoken_balance * exchange_rate
                 account = Web3.toChecksumAddress(result["account"]["id"])
                 if balance <= 0:
@@ -262,7 +263,6 @@ def fetch_fuse_pool_balances(client, chain, block):
         )
 
         ctoken_data[symbol]["decimals"] = int(ftoken.decimals().call())
-        console.log(ctoken_data[symbol]["decimals"])
         underlying_decimals = int(underlying.decimals().call())
         mantissa = 18 + underlying_decimals - ctoken_data[symbol]["decimals"]
         ctoken_data[symbol]["exchange_rate"] = float(

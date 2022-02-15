@@ -5,7 +5,6 @@ from helpers.enums import Network
 from rewards.classes.Snapshot import Snapshot
 from subgraph.queries.tokens import (
     fetch_across_balances,
-    fetch_fuse_pool_balances,
     fetch_token_balances,
     fetch_fuse_pool_token
 )
