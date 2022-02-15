@@ -1,16 +1,32 @@
-from typing import Any, Dict, List, Tuple
 from decimal import Decimal
+from typing import Any, Dict, List, Tuple
+
 from rich.console import Console
 from tabulate import tabulate
 
-from config.constants.emissions import BOOST_BLOCK_DELAY, BVECVX_BOOST_WEIGHT, STAKE_RATIO_RANGES
+from config.constants.emissions import (
+    BOOST_BLOCK_DELAY,
+    BVECVX_BOOST_WEIGHT,
+    STAKE_RATIO_RANGES,
+)
 from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BotType
 from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses
-from subgraph.queries.nfts import fetch_nfts
 from rewards.classes.Boost import BoostBalances
+from subgraph.queries.nfts import fetch_nfts
 
 console = Console()
+
+
+def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal) -> Decimal:
+    """
+    Calculate the amoutn of bvecvx to add to a user's native balance
+    :param native_balance: user's current native balance
+    :param bvecvx_balance: user's total bvecvx balance
+    """
+    if bvecvx_balance > 0 and native_balance > 0:
+        return min(Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance, Decimal(BVECVX_BOOST_WEIGHT) * native_balance) 
+    return Decimal(0)
 
 
 def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
@@ -23,8 +39,7 @@ def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
     native_balance = boost_bals.native.get(address, 0)
     non_native_balance = boost_bals.non_native.get(address, 0)
     bvecvx_balance = boost_bals.bvecvx.get(address, 0)
-    if bvecvx_balance > 0 and native_balance > 0:
-        native_balance = native_balance + min(Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance, Decimal(BVECVX_BOOST_WEIGHT) * native_balance)
+    native_balance += calc_bvecvx_native_balance(native_balance, bvecvx_balance)
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
@@ -68,8 +83,11 @@ def allocate_nft_balances_to_users(boost_info: Dict, nft_balances: Dict) -> None
 
 def allocate_bvecvx_to_users(boost_info: Dict, bvecvx_balances: Dict):
     for user, bvecvx_balance in bvecvx_balances.items():
+        native_balance = boost_info[user].get("nativeBalance", 0) if user in boost_info.keys() else Decimal(0)
+        calculated_bvecvx_balance = calc_bvecvx_native_balance(native_balance, bvecvx_balance)
         if user in boost_info:
-            boost_info[user]["bveCvxBalance"] = bvecvx_balance
+            boost_info[user]["bveCvxBalance"] = calculated_bvecvx_balance
+            boost_info[user]["nativeBalance"] = native_balance + calculated_bvecvx_balance
 
 
 def allocate_nft_to_users(boost_info: Dict, addresses: List[str], nfts: Dict):
@@ -114,11 +132,11 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
 
     boost_info = init_boost_data(all_addresses)
     allocate_nft_balances_to_users(boost_info, boost_bals.nfts)
-    allocate_bvecvx_to_users(boost_info, boost_bals.bvecvx)
     allocate_nft_to_users(boost_info, all_addresses, nfts)
     assign_stake_ratio_to_users(boost_info, stake_ratios)
     assign_native_balances_to_users(boost_info, boost_bals.native)
     assign_non_native_balances_to_users(boost_info, boost_bals.non_native)
+    allocate_bvecvx_to_users(boost_info, boost_bals.bvecvx)
 
     for addr, boost in badger_boost_data.items():
         boost_metadata = boost_info.get(addr, {})
