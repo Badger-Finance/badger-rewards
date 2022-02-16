@@ -6,6 +6,7 @@ from typing import Optional, Tuple
 from eth_typing import HexStr
 from web3 import Web3, exceptions
 
+from config.constants import ARB_FTM_GAS_MULTIPLIER
 from config.constants.chain_mappings import DECIMAL_MAPPING, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BotType, Network
@@ -91,7 +92,7 @@ def get_effective_gas_price(web3: Web3, chain: str = Network.Ethereum) -> int:
         if json:
             gas_price = web3.toWei(int(json.get("fast") * 1.1), "gwei")
     elif chain == Network.Arbitrum or chain == Network.Fantom:
-        gas_price = web3.eth.gas_price * 1.1
+        gas_price = web3.eth.gas_price * ARB_FTM_GAS_MULTIPLIER
     return gas_price
 
 

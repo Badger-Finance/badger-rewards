@@ -101,6 +101,7 @@ EMISSIONS_CONTRACTS = {
             "GasOracle": addresses.ARB_GAS_ORACLE,
         }
     ),
+    Network.Fantom: DotMap(),
 }
 
 CHAIN_IDS = {
