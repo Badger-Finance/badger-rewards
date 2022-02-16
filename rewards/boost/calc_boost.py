@@ -41,7 +41,7 @@ def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
     native_balance = Decimal(boost_bals.native.get(address, 0))
     non_native_balance = Decimal(boost_bals.non_native.get(address, 0))
     bvecvx_balance = Decimal(boost_bals.bvecvx.get(address, 0))
-    native_balance += calc_bvecvx_native_balance(native_balance, Decimal(bvecvx_balance))
+    native_balance += calc_bvecvx_native_balance(native_balance, bvecvx_balance)
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
