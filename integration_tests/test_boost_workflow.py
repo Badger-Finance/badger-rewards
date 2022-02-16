@@ -26,7 +26,7 @@ def mock_claims_snapshot_usd(*args, **kwargs):
     return native, non_native
 
 
-def test_boost_workflow(monkeypatch, mocker):
+def test_boost_workflow(monkeypatch):
     monkeypatch.setattr(
         "rewards.aws.boost.send_message_to_discord", mock_send_message_to_discord_prod
     )
