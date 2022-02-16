@@ -36,6 +36,7 @@ def test_get_environment():
         env_config = EnvConfig()
         assert env_config.get_environment() == expected
 
+
 def test_get_web3_happy(mocker):
     env_config = EnvConfig()
     env_config.web3[Network.Polygon] = [
@@ -89,4 +90,4 @@ def test_get_web3_unhappy(mocker):
         ),
     ]
     with pytest.raises(NoHealthyNode):
-        web3 = env_config.get_web3(Network.Polygon)
+        env_config.get_web3(Network.Polygon)

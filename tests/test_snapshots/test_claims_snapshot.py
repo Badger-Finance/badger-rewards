@@ -3,7 +3,6 @@ from decimal import Decimal
 
 import pytest
 import responses
-from botocore.exceptions import ClientError
 from pytest import approx
 
 from badger_api.requests import badger_api
