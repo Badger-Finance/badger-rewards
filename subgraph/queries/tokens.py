@@ -140,7 +140,8 @@ def fetch_token_balances(
     return badger_balances, digg_balances
 
 
-def fetch_fuse_pool_balances(client, chain, block):  # noqa: E501
+# flake8: noqa: E501
+def fetch_fuse_pool_balances(client, chain, block):
     if chain != Network.Ethereum:
         console.log("Fuse pools are only active on ETH")
         return {}

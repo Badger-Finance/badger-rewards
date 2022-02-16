@@ -13,6 +13,6 @@ if __name__ == "__main__":
                     sum_negative[token] += amount
                 else:
                     sum_negative[token] = amount
-    
+
     with open("negative_balances.json", "w") as fp2:
         json.dump(sum_negative, fp2)
