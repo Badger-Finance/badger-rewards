@@ -4,13 +4,17 @@ from config.constants.addresses import BADGER
 from config.constants.chain_mappings import SETTS
 from config.constants.emissions import REWARD_ERROR_TOLERANCE
 from helpers.enums import Network
-from rewards.rewards_checker import token_diff_table_item, verify_rewards
+from rewards.rewards_checker import (
+    token_diff_table_item,
+    verify_rewards,
+)
 from rewards.utils.rewards_utils import (
     check_token_totals_in_range,
     get_actual_expected_totals,
 )
 
 BVECVX = SETTS[Network.Ethereum]["bvecvx"]
+
 
 def test_token_diff_table():
     table_item = token_diff_table_item(
@@ -50,27 +54,28 @@ def test_verify_rewards__discord_get_called(mocker):
     )
     assert discord.call_count == 1
 
+
 def test_get_actual_expected_totals():
     IBBTC_SETT = SETTS[Network.Ethereum]["ibbtc_crv"]
     CVXCRV_SETT = SETTS[Network.Ethereum]["cvx_crv"]
     sett_totals = {
         IBBTC_SETT: {
             "actual": {
-                BADGER: Decimal(2e18), 
-                BVECVX: Decimal(1e18), 
+                BADGER: Decimal(2e18),
+                BVECVX: Decimal(1e18),
             },
             "expected": {
-                BADGER: Decimal(2e18), 
+                BADGER: Decimal(2e18),
                 BVECVX: Decimal(1e18),
-            },  
+            },
         },
         CVXCRV_SETT: {
             "actual": {
-                BADGER: Decimal(2e18), 
+                BADGER: Decimal(2e18),
                 BVECVX: Decimal(1e18),
             },
             "expected": {
-                BADGER: Decimal(2e18), 
+                BADGER: Decimal(2e18),
                 BVECVX: Decimal(1e18),
             },
         }
@@ -99,6 +104,7 @@ def test_get_actual_expected_totals():
         BADGER: Decimal(12e18),
         BVECVX: Decimal(2e18)
     }
+
 
 def test_check_token_totals_in_range(mocker):
     mocker.patch(
@@ -132,8 +138,8 @@ def test_check_token_totals_in_range(mocker):
         ),
     )
     invalid_totals = check_token_totals_in_range(Network.Ethereum, {})
-    actual = str(round(Decimal(2e18)/10**18, 5))
+    actual = str(round(Decimal(2e18) / 10 ** 18, 5))
     token = BVECVX
-    min_accepted = str(round(Decimal(3e18*(1-REWARD_ERROR_TOLERANCE))/10**18, 5))
-    max_accepted = str(round(Decimal(3e18*(1+REWARD_ERROR_TOLERANCE))/10**18, 5))
+    min_accepted = str(round(Decimal(3e18 * (1 - REWARD_ERROR_TOLERANCE)) / 10 ** 18, 5))
+    max_accepted = str(round(Decimal(3e18 * (1 + REWARD_ERROR_TOLERANCE)) / 10 ** 18, 5))
     assert invalid_totals == [[token, min_accepted, max_accepted, actual]]
