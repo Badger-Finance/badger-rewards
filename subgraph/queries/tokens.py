@@ -1,6 +1,6 @@
 import math
 from functools import lru_cache
-from typing import Dict, Optional, Tuple
+from typing import Dict, Tuple
 
 from gql import Client, gql
 from rich.console import Console
@@ -130,7 +130,7 @@ def fetch_token_balances(
     return badger_balances, digg_balances
 
 
-def fetch_fuse_pool_balances(client, chain, block):
+def fetch_fuse_pool_balances(client, chain, block):  # noqa: E501
     if chain != Network.Ethereum:
         console.log("Fuse pools are only active on ETH")
         return {}
@@ -171,7 +171,7 @@ def fetch_fuse_pool_balances(client, chain, block):
     last_token_id = "0x0000000000000000000000000000000000000000"
 
     query = gql(
-        f"""
+        """
         query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {{
             accountCTokens(block: $block_number, where: $token_filter) {{
                 id
@@ -230,14 +230,11 @@ def fetch_fuse_pool_balances(client, chain, block):
         discord_url = get_discord_url(chain, BotType.Boost)
         send_message_to_discord(
             "**BADGER BOOST ERROR**",
-            f":x: Error in Fetching Fuse Token Balance",
+            ":x: Error in Fetching Fuse Token Balance",
             [
                 {
                     "name": "Error Type",
                     "value": type(e),
-                    "inline": True,
-                    "name": "Error Description",
-                    "value": e.args,
                     "inline": True,
                 }
             ],

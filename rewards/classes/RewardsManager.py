@@ -156,7 +156,7 @@ class RewardsManager:
             all_rewards.append(rewards)
             rewards_per_sett[sett]["actual"] = rewards.totals.toDict()
             rewards_per_sett[sett]["expected"] = expected
-        
+
         send_code_block_to_discord(
             msg=tabulate(table, headers=["vault", "boosted rewards", "flat rewards"]),
             username="Rewards Bot",
@@ -166,7 +166,7 @@ class RewardsManager:
         invalid_totals = check_token_totals_in_range(self.chain, rewards_per_sett)
         if len(invalid_totals):
             self.report_invalid_totals(invalid_totals)
-            
+
         return combine_rewards(all_rewards, self.cycle), rewards_analytics
     
     def report_invalid_totals(self, invalid_totals: List[List[str]]) -> None:
@@ -236,7 +236,7 @@ class RewardsManager:
                             ),
                         )
                     )
-                if schedule.startTime <= end_time and schedule.endTime >= end_time:
+                if schedule.startTime <= end_time <= schedule.endTime:
                     percentage_out_of_total = (
                         (int(to_distribute) / int(schedule.initialTokensLocked) * 100)
                         if int(schedule.initialTokensLocked) > 0

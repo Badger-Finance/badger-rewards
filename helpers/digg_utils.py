@@ -13,7 +13,7 @@ class DiggUtils:
         if shares == 0:
             return 0
         return shares / self.shares_per_fragment
-    
+
     def fragments_to_shares(self, fragments: int) -> float:
         if fragments == 0:
             return 0

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Dict, Optional
+from typing import Dict
 
 
 @dataclass

@@ -2,7 +2,7 @@ from typing import Dict, Tuple
 
 from rich.console import Console
 
-from badger_api.claimable import get_claimable_metadata, get_latest_claimable_metadata
+from badger_api.claimable import get_claimable_metadata
 from rewards.classes.TreeManager import TreeManager
 from subgraph.queries.setts import last_synced_block
 
