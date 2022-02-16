@@ -1,15 +1,22 @@
 import json
-from typing import Dict, List, Tuple
+from typing import (
+    Dict,
+    List,
+    Tuple,
+)
 
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
 from rich.console import Console
 
-from config.constants.chain_mappings import CHAIN_IDS, EMISSIONS_CONTRACTS
+from config.constants.chain_mappings import (
+    CHAIN_IDS,
+    EMISSIONS_CONTRACTS,
+)
 from config.rewards_config import rewards_config
 from config.singletons import env_config
 from helpers.discord import console_and_discord
-from helpers.enums import Abi, BotType, Network
+from helpers.enums import Abi
 from helpers.web3_utils import make_contract
 from rewards.aws.boost import (
     add_multipliers,
@@ -23,16 +30,22 @@ from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Schedule import Schedule
 from rewards.classes.TreeManager import TreeManager
+from rewards.dynamo_handlers import put_rewards_data
 from rewards.rewards_checker import verify_rewards
-from rewards.utils.emission_utils import fetch_setts, parse_schedules
-from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewards
-from subgraph.queries.setts import list_setts
+from rewards.utils.emission_utils import (
+    fetch_setts,
+    parse_schedules,
+)
+from rewards.utils.rewards_utils import (
+    combine_rewards,
+    process_cumulative_rewards,
+)
 
 console = Console()
 
 
 def fetch_all_schedules(
-    chain: str, setts: List[str]
+        chain: str, setts: List[str]
 ) -> Tuple[Dict[str, Dict[str, List[Schedule]]], List[str]]:
     """
     Fetch all schedules on a particular chain
@@ -54,12 +67,12 @@ def fetch_all_schedules(
 
 
 def propose_root(
-    chain: str,
-    start: int,
-    end: int,
-    past_rewards: Dict,
-    tree_manager: TreeManager,
-    save=False,
+        chain: str,
+        start: int,
+        end: int,
+        past_rewards: Dict,
+        tree_manager: TreeManager,
+        save=False,
 ) -> None:
     """
     Propose a root on a chain
@@ -103,7 +116,7 @@ def propose_root(
 
 
 def approve_root(
-    chain: str, start: int, end: int, current_rewards: Dict, tree_manager: TreeManager
+        chain: str, start: int, end: int, current_rewards: Dict, tree_manager: TreeManager
 ):
     """Approve latest root on a chain
 
@@ -159,26 +172,31 @@ def approve_root(
             )
             upload_boosts(boosts, chain)
             cycle_logger.save(tree_manager.next_cycle, chain)
+            put_rewards_data(
+                chain, tree_manager.next_cycle, start, end,
+                rewards_data['sett_rewards_analytics']
+            )
             return rewards_data
     else:
         pending_hash = HexBytes(
             tree_manager.badger_tree.pendingMerkleContentHash().call()
         )
         console_and_discord(
-            f"Approve hash {rewards_data['rootHash']} doesn't match pending hash {pending_hash.hex()}",
+            f"Approve hash {rewards_data['rootHash']} "
+            f"doesn't match pending hash {pending_hash.hex()}",
             chain,
         )
         return rewards_data
 
 
 def generate_rewards_in_range(
-    chain: str,
-    start: int,
-    end: int,
-    save: bool,
-    past_tree: Dict,
-    tree_manager: TreeManager,
-    boosts: Dict,
+        chain: str,
+        start: int,
+        end: int,
+        save: bool,
+        past_tree: Dict,
+        tree_manager: TreeManager,
+        boosts: Dict,
 ):
     """Generate chain rewards for a chain within two blocks
 
@@ -188,6 +206,7 @@ def generate_rewards_in_range(
     :param save: flag to save file locally
     :param past_tree: past rewards merkle tree
     :param tree_manager: TreeManager object
+    :param boosts: Boost object
     """
     all_schedules, setts = fetch_all_schedules(chain, fetch_setts(chain))
 
@@ -203,7 +222,9 @@ def generate_rewards_in_range(
     rewards_list.append(tree_rewards)
 
     console.log("Calculating Sett Rewards...")
-    sett_rewards = rewards_manager.calculate_all_sett_rewards(setts, all_schedules)
+    sett_rewards, sett_rewards_analytics = rewards_manager.calculate_all_sett_rewards(
+        setts, all_schedules
+    )
     rewards_list.append(sett_rewards)
 
     new_rewards = combine_rewards(rewards_list, rewards_manager.cycle)
@@ -229,4 +250,5 @@ def generate_rewards_in_range(
         "fileName": file_name,
         "multiplierData": rewards_manager.get_sett_multipliers(),
         "userMultipliers": rewards_manager.get_user_multipliers(),
+        "sett_rewards_analytics": sett_rewards_analytics,
     }

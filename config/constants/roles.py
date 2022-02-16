@@ -9,6 +9,7 @@ class RoleRegistry:
         encoded = Web3.keccak(text=name).hex()
         self.roles[name] = encoded
 
+
 ADDRESS_ZERO = "0x0000000000000000000000000000000000000000"
 MAX_UINT_256 = str(int(2 ** 256 - 1))
 EMPTY_BYTES_32 = "0x0000000000000000000000000000000000000000000000000000000000000000"

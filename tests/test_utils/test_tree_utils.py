@@ -1,17 +1,24 @@
 import json
-import os
 
 import pytest
 from eth_account import Account
 from moto.core import patch_resource
 
 from rewards.aws.helpers import dynamodb
-from tests.utils import chains, mock_tree, set_env_vars, test_address, test_key
+from tests.utils import (
+    chains,
+    mock_tree,
+    set_env_vars,
+    test_key,
+)
 
 set_env_vars()
 
 from rewards.classes.TreeManager import TreeManager
-from rewards.utils.tree_utils import calc_next_cycle_range, get_last_proposed_cycle
+from rewards.utils.tree_utils import (
+    calc_next_cycle_range,
+    get_last_proposed_cycle,
+)
 
 
 def mock_download_tree(file_name: str, chain: str):
@@ -46,18 +53,19 @@ def tree_manager(cycle_key, request) -> TreeManager:
     indirect=True,
 )
 def test_get_last_proposed_cycle(tree_manager):
-    if tree_manager.has_pending_root():
-        rewards = tree_manager.fetch_current_tree()
-        claim_end = tree_manager.last_propose_end_block()
-        claim_start = tree_manager.last_propose_start_block()
-        assert get_last_proposed_cycle(tree_manager.chain, tree_manager) == (
-            rewards,
-            claim_start,
-            claim_end,
-        )
-    else:
-        assert get_last_proposed_cycle(tree_manager.chain, tree_manager) == ({}, 0, 0)
-        
+    tree_manager.has_pending_root = lambda: True
+    rewards = tree_manager.fetch_current_tree()
+    claim_end = tree_manager.last_propose_end_block()
+    claim_start = tree_manager.last_propose_start_block()
+    assert get_last_proposed_cycle(tree_manager.chain, tree_manager) == (
+        rewards,
+        claim_start,
+        claim_end,
+    )
+    tree_manager.has_pending_root = lambda: False
+    assert get_last_proposed_cycle(tree_manager.chain, tree_manager) == ({}, 0, 0)
+
+
 @pytest.mark.parametrize(
     "tree_manager",
     chains,

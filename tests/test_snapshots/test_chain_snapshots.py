@@ -154,7 +154,9 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_bal
     [3, 6, 5]
 )
 def test_total_harvest_sett_snapshot__even_balance(
-        chain, num_historical_snapshots: int, mock_fetch_sett_balances, responses_mock_token_balance):
+        chain, num_historical_snapshots: int,
+        mock_fetch_sett_balances, responses_mock_token_balance
+):
     snapshot = total_twap_sett_snapshot(
         chain, 13710328, 13710338, BBADGER,
         num_historical_snapshots=num_historical_snapshots
@@ -348,7 +350,7 @@ def test_chain_snapshot_usd__empty(chain, mock_fetch_ch_balances, mocker):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_chain_snapshot__raises(mocker, chain):
+def test_chain_snapshot_usd__raises(mocker, chain):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_chain_balances",
         side_effect=Exception,

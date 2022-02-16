@@ -59,14 +59,16 @@ BADGER_DISTRIBUTIONS_TEST_DATA = {
     ]}
 
 ACROSS_BALANCES_TEST_DATA = {
-    'tokenBalances':[
+    'tokenBalances': [
         {
-        'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6-0x1c1fd689103bbfd701b3b7d41a3807f12814033d',
-        'balance': '341229067236959371031'
+            'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6-'
+                  '0x1c1fd689103bbfd701b3b7d41a3807f12814033d',
+            'balance': '341229067236959371031'
         },
         {
-        'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6-0x0x2b5455aac8d64c14786c3a29858e43b5945819c0',
-        'balance': '1013601936174311306582'
+            'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6-'
+                  '0x0x2b5455aac8d64c14786c3a29858e43b5945819c0',
+            'balance': '1013601936174311306582'
         },
     ]
 }

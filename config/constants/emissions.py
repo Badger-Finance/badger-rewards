@@ -1,8 +1,5 @@
-from dotmap import DotMap
-from web3 import Web3
-
 import config.constants.addresses as addresses
-from helpers.enums import BalanceType, BotType, BucketType, Environment, Network
+from helpers.enums import Network
 
 
 SCHEDULE_REWARDS_BLACKLIST = {
@@ -22,6 +19,9 @@ TREE_REWARDS_BLACKLIST = {
 NATIVE_TOKEN_REWARDS = {
     Network.Ethereum: [addresses.BADGER, addresses.DIGG]
 }
+
+BVECVX_BOOST_WEIGHT = 0.5
+
 STAKE_RATIO_RANGES = list(
     [
         (0, 1),

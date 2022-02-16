@@ -1,4 +1,4 @@
-from decimal import Decimal, DecimalException
+from decimal import Decimal
 from typing import Dict
 
 from config.constants.addresses import BADGER
