@@ -73,11 +73,9 @@ def distribute_rewards_from_total_snapshot(
     if token in NATIVE_TOKEN_REWARDS[snapshot.chain]:
         for addr in SCHEDULE_REWARDS_BLACKLIST.keys():
             snapshot.zero_balance(addr)
-    
     # Blacklist all token rewards for tree rewards blacklist
     for addr in TREE_REWARDS_BLACKLIST.keys():
         snapshot.zero_balance(addr)
-            
     total = snapshot.total_balance()
     # TODO: Think about refactoring this and splitting it into two separate funcs:
     # TODO: one for normal rewards another for custom rewards

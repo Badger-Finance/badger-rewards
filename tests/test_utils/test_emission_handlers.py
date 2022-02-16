@@ -1,7 +1,5 @@
-from config.constants.addresses import BADGER
 from config.constants.addresses import XSUSHI
 from rewards.classes.RewardsList import RewardsList
-from dotmap import DotMap
 
 from rewards.emission_handlers import bvecvx_lp_handler
 

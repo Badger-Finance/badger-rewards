@@ -15,7 +15,10 @@ console = Console()
 
 
 class Snapshot:
-    def __init__(self, token, balances, ratio=1, type="none", chain: Optional[Network] = Network.Ethereum):
+    def __init__(
+        self, token, balances, ratio=1, type="none",
+        chain: Optional[Network] = Network.Ethereum
+    ):
         self.type = type
         self.ratio = Decimal(ratio)
         self.token = Web3.toChecksumAddress(token)
