@@ -5,7 +5,7 @@ import pytest
 from brownie import accounts
 from eth_account import Account
 
-from config.constants import ARB_FTM_GAS_MULTIPLIER
+from config.constants import GAS_BUFFER
 from helpers.enums import Network
 from tests.test_utils.cycle_utils import mock_tree_manager
 from tests.utils import mock_tree
@@ -64,5 +64,5 @@ def test_ftm_tx_details__gas_price(mocker):
     tree_manager.w3 = MagicMock(eth=MagicMock(gas_price=gas_price))
     assert (
         tree_manager.get_tx_options(accounts[0])['gasPrice']
-        == gas_price * ARB_FTM_GAS_MULTIPLIER
+        == gas_price * GAS_BUFFER
     )

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 import responses
 
-from config.constants import ARB_FTM_GAS_MULTIPLIER
+from config.constants import GAS_BUFFER
 from helpers.enums import Network
 from rewards.utils.tx_utils import (
     confirm_transaction,
@@ -173,4 +173,4 @@ def test_get_effective_gas_price__fantom():
         ),
     )
     gas = get_effective_gas_price(web3, Network.Fantom)
-    assert gas == gas_price * ARB_FTM_GAS_MULTIPLIER
+    assert gas == gas_price * GAS_BUFFER
