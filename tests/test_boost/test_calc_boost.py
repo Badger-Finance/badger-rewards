@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 
 from config.constants.emissions import STAKE_RATIO_RANGES
@@ -24,10 +26,10 @@ def mock_discord_send_code(mocker):
 
 
 def test_calc_stake_ratio__happy():
-    target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.1}
+    target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.1)}
     assert (
         calc_stake_ratio(TEST_USER, BoostBalances(target, target))
-        == list(target.values())[0] / list(target.values())[0]
+        == pytest.approx(list(target.values())[0] / list(target.values())[0])
     )
 
 
@@ -37,7 +39,8 @@ def test_calc_stake_ratio__zero_native():
         calc_stake_ratio(
             TEST_USER,
             BoostBalances(
-                {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0}, target
+                {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.0)},
+                target
             )
         )
         == 0
@@ -45,10 +48,12 @@ def test_calc_stake_ratio__zero_native():
 
 
 def test_calc_stake_ratio__zero_non_native():
-    target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.1}
+    target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.1)}
     assert (
         calc_stake_ratio(
-            TEST_USER, BoostBalances(target, {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0})
+            TEST_USER, BoostBalances(
+                target, {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.0)}
+            )
         )
         == 0
     )

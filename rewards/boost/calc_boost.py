@@ -25,8 +25,10 @@ def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal)
     :param bvecvx_balance: user's total bvecvx balance
     """
     if bvecvx_balance > 0 and native_balance > 0:
-        return min(Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance,
-                   Decimal(BVECVX_BOOST_WEIGHT) * native_balance)
+        return min(
+            Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance,
+            Decimal(BVECVX_BOOST_WEIGHT) * native_balance
+        )
     return Decimal(0)
 
 
@@ -34,13 +36,12 @@ def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
     """
     Calculate the stake ratio for an address
     :param address: address to find stake ratio for
-    :param native_setts: native balances
-    :param non_native_setts: non native balances
+    :param boost_bals: balances data object
     """
-    native_balance = boost_bals.native.get(address, 0)
-    non_native_balance = boost_bals.non_native.get(address, 0)
-    bvecvx_balance = boost_bals.bvecvx.get(address, 0)
-    native_balance += calc_bvecvx_native_balance(native_balance, bvecvx_balance)
+    native_balance = Decimal(boost_bals.native.get(address, 0))
+    non_native_balance = Decimal(boost_bals.non_native.get(address, 0))
+    bvecvx_balance = Decimal(boost_bals.bvecvx.get(address, 0))
+    native_balance += calc_bvecvx_native_balance(native_balance, Decimal(bvecvx_balance))
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
