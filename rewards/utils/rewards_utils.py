@@ -121,19 +121,19 @@ def get_actual_expected_totals(
     based on the rewards schedules (expected_totals).
 
     Args:
-        sett_totals (Dict[str, Dict[str, Decimal]]) 
-            { 
+        sett_totals (Dict[str, Dict[str, Decimal]])
+            {
                 "sett1": {
                     "actual": {
-                        "token1": actual_amount, 
-                        "token2": actual_amount, 
+                        "token1": actual_amount,
+                        "token2": actual_amount,
                         ...
                     },
                     "expected": {
-                        "token1": expected_amount, 
-                        "token2": expected_amount, 
+                        "token1": expected_amount,
+                        "token2": expected_amount,
                         ...,
-                    },  
+                    },
                 ...,
             }
 
