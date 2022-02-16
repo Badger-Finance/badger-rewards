@@ -2,7 +2,7 @@ from typing import Dict, Tuple
 
 from rich.console import Console
 
-from badger_api.claimable import get_claimable_metadata, get_latest_claimable_metadata
+from badger_api.claimable import get_claimable_metadata
 from rewards.classes.TreeManager import TreeManager
 from subgraph.queries.setts import last_synced_block
 
@@ -39,7 +39,7 @@ def calc_next_cycle_range(
     metadata = get_claimable_metadata(chain, synced_block)
     end_block = metadata["endBlock"]
     assert end_block <= synced_block
-    
+
     console.log(f"start block: {start_block}")
     console.log(f"end block: {end_block}")
 

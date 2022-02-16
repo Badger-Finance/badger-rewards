@@ -1,8 +1,5 @@
-from dotmap import DotMap
-from web3 import Web3
-
 import config.constants.addresses as addresses
-from helpers.enums import BalanceType, BotType, BucketType, Environment, Network
+from helpers.enums import Network
 
 EMISSIONS_BLACKLIST = {
     addresses.DEV_MULTISIG: "Badger Dev Multisig",
@@ -19,6 +16,8 @@ REWARDS_BLACKLIST = {
     addresses.BADGER_PAYMENTS: "Badger Payments",
     addresses.BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
+
+BVECVX_BOOST_WEIGHT = 0.5
 
 STAKE_RATIO_RANGES = list(
     [

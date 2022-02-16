@@ -1,15 +1,12 @@
 import json
-import os
-from decimal import Decimal
 
 import pytest
-from brownie import Contract, accounts, web3
 from eth_account import Account
-from hexbytes import HexBytes
-from web3 import contract
 
 from helpers.enums import Network
-from tests.utils import chains, mock_tree, set_env_vars, test_address, test_key
+from tests.utils import mock_tree
+from tests.utils import set_env_vars
+from tests.utils import test_key
 
 set_env_vars()
 
@@ -52,12 +49,3 @@ def test_matches_pending_hash(tree_manager):
 
     random_hash = "0xb8ed7da2062b6bdf6f20bcdb4ab35538592216ac70a4bfe986af748603debfd8"
     assert not tree_manager.matches_pending_hash(random_hash)
-
-
-@pytest.mark.parametrize(
-    "tree_manager",
-    [Network.Ethereum],
-    indirect=True,
-)
-def test_tree_manager_pending_root_false_by_default(tree_manager: TreeManager):
-    assert tree_manager.has_pending_root() is False

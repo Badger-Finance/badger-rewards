@@ -27,7 +27,6 @@ def test_fetch_across_balances(mocker):
     assert across_bals == expected_bals
 
 
-
 def test_fetch_across_balances_empty(mocker):
     mocker.patch(
         "subgraph.subgraph_utils.Client.execute",

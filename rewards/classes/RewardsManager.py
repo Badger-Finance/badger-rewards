@@ -38,6 +38,10 @@ from subgraph.queries.harvests import fetch_tree_distributions
 console = Console()
 
 
+class InvalidRewardsTotalException(Exception):
+    pass
+
+
 class RewardsManager:
     CUSTOM_BEHAVIOUR = {
         ETH_BADGER_TREE: unclaimed_rewards_handler,
@@ -127,9 +131,10 @@ class RewardsManager:
 
     def calculate_all_sett_rewards(
         self, setts: List[str], all_schedules: Dict[str, Dict[str, List[Schedule]]]
-    ) -> RewardsList:
+    ) -> Tuple[RewardsList, Dict[str, Dict]]:
         all_rewards = []
         table = []
+        rewards_analytics = {}
         rewards_per_sett = defaultdict(dict)
         for sett in setts:
             sett_token = fetch_token(self.chain, sett)
@@ -145,10 +150,15 @@ class RewardsManager:
                     flat.totals_info(self.chain),
                 ]
             )
+            rewards_analytics[sett] = {
+                'sett_name': sett_name,
+                'boosted_rewards': boosted.totals_info_raw(self.chain),
+                'flat_rewards': flat.totals_info_raw(self.chain),
+            }
             all_rewards.append(rewards)
             rewards_per_sett[sett]["actual"] = rewards.totals.toDict()
             rewards_per_sett[sett]["expected"] = expected
-        
+
         send_code_block_to_discord(
             msg=tabulate(table, headers=["vault", "boosted rewards", "flat rewards"]),
             username="Rewards Bot",
@@ -158,21 +168,25 @@ class RewardsManager:
         invalid_totals = check_token_totals_in_range(self.chain, rewards_per_sett)
         if len(invalid_totals):
             self.report_invalid_totals(invalid_totals)
-            
-        return combine_rewards(all_rewards, self.cycle)
-    
+
+        return combine_rewards(all_rewards, self.cycle), rewards_analytics
+
     def report_invalid_totals(self, invalid_totals: List[List[str]]) -> None:
         send_plain_text_to_discord(
-            msg=f"INCORRECT REWARDS DISTRIBTION {DiscordRoles.RewardsPod}",
+            message=f"INCORRECT REWARDS DISTRIBTION {DiscordRoles.RewardsPod}",
             username="Rewards Bot",
             url=self.discord_url,
         )
         send_code_block_to_discord(
-            msg=tabulate(invalid_totals, headers=["token", "min expected", "max expected", "actual"]),
+            msg=tabulate(
+                invalid_totals, headers=["token", "min expected", "max expected", "actual"]
+            ),
             username="Rewards Bot",
             url=self.discord_url,
         )
-        raise Exception(f"trying to distribute invalid reward amounts: {invalid_totals}")
+        raise InvalidRewardsTotalException(
+            f"trying to distribute invalid reward amounts: {invalid_totals}"
+        )
 
     def get_sett_multipliers(self) -> Dict[str, Dict[str, float]]:
         sett_multipliers = {}
@@ -224,7 +238,7 @@ class RewardsManager:
                             ),
                         )
                     )
-                if schedule.startTime <= end_time and schedule.endTime >= end_time:
+                if schedule.startTime <= end_time <= schedule.endTime:
                     percentage_out_of_total = (
                         (int(to_distribute) / int(schedule.initialTokensLocked) * 100)
                         if int(schedule.initialTokensLocked) > 0

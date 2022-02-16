@@ -1,10 +1,6 @@
 import json
 
-from config.constants.addresses import DIGG
-from helpers.digg_utils import digg_utils
 from helpers.enums import Network
-from rewards.snapshot.claims_snapshot import claims_snapshot
-from subgraph.queries.setts import last_synced_block
 
 if __name__ == "__main__":
     chain = Network.Ethereum
@@ -17,7 +13,6 @@ if __name__ == "__main__":
                     sum_negative[token] += amount
                 else:
                     sum_negative[token] = amount
-    
+
     with open("negative_balances.json", "w") as fp2:
         json.dump(sum_negative, fp2)
-

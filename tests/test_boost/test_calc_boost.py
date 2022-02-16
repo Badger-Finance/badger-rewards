@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 
 from config.constants.emissions import STAKE_RATIO_RANGES
@@ -12,6 +14,7 @@ from rewards.boost.calc_boost import (
     calc_stake_ratio,
     get_badger_boost_data,
 )
+from rewards.classes.Boost import BoostBalances
 
 TEST_USER = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
 
@@ -23,10 +26,10 @@ def mock_discord_send_code(mocker):
 
 
 def test_calc_stake_ratio__happy():
-    target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.1}
+    target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.1)}
     assert (
-        calc_stake_ratio(TEST_USER, target, target)
-        == list(target.values())[0] / list(target.values())[0]
+        calc_stake_ratio(TEST_USER, BoostBalances(target, target))
+        == pytest.approx(list(target.values())[0] / list(target.values())[0])
     )
 
 
@@ -35,18 +38,22 @@ def test_calc_stake_ratio__zero_native():
     assert (
         calc_stake_ratio(
             TEST_USER,
-            {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0},
-            target,
+            BoostBalances(
+                {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.0)},
+                target
+            )
         )
         == 0
     )
 
 
 def test_calc_stake_ratio__zero_non_native():
-    target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.1}
+    target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.1)}
     assert (
         calc_stake_ratio(
-            TEST_USER, target, {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0}
+            TEST_USER, BoostBalances(
+                target, {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.0)}
+            )
         )
         == 0
     )
@@ -69,7 +76,11 @@ def test_get_badger_boost_data():
     assert stake_data[1] == 2
 
 
-def test_badger_boost__happy(mock_discord_send_code, mock_snapshots):
+def test_badger_boost__happy(mock_discord_send_code, mock_snapshots, mocker):
+    mocker.patch(
+        "rewards.boost.boost_utils.claims_snapshot",
+        return_value=({}),
+    )
     result = badger_boost(123, Network.Ethereum)
     assert mock_discord_send_code.called
     # Check boosts for different data points
@@ -86,6 +97,7 @@ def test_badger_boost__happy(mock_discord_send_code, mock_snapshots):
         assert "stakeRatio" in keys
         assert "multipliers" in keys
         assert "nfts" in keys
+        assert "bveCvxBalance" in keys
 
 
 def test_allocate_nft_balances_to_users():

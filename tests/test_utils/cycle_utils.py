@@ -3,16 +3,19 @@ import logging
 from decimal import Decimal
 from typing import Dict
 
-from brownie import Contract, web3
+from brownie import Contract
+from brownie import web3
 from eth_account import Account
 
-from config.constants.chain_mappings import ABI_DIRS, EMISSIONS_CONTRACTS
+from config.constants.chain_mappings import EMISSIONS_CONTRACTS
 from helpers.enums import Network
 from rewards.classes.TreeManager import TreeManager
-from rewards.utils.tree_utils import calc_next_cycle_range, get_last_proposed_cycle
+from rewards.utils.tree_utils import calc_next_cycle_range
+from rewards.utils.tree_utils import get_last_proposed_cycle
 from scripts.rewards.utils.approve_rewards import approve_root
 from scripts.rewards.utils.propose_rewards import propose_root
-from tests.utils import mock_boosts, mock_tree
+from tests.utils import mock_boosts
+from tests.utils import mock_tree
 
 logger = logging.getLogger("cycle-utils")
 
@@ -67,7 +70,7 @@ def mock_upload_tree(
 
 
 def mock_badger_tree(chain: Network, keeper_address: str, account: Account):
-    with open(f"abis/eth/BadgerTreeV2.json") as fp:
+    with open("abis/eth/BadgerTreeV2.json") as fp:
         abi = json.load(fp)
     badger_tree = Contract.from_abi(
         "BadgerTree",
@@ -97,7 +100,7 @@ def mock_badger_tree(chain: Network, keeper_address: str, account: Account):
 
 
 def mock_tree_manager(chain, cycle_account, badger_tree):
-    with open(f"abis/eth/BadgerTreeV2.json") as fp:
+    with open("abis/eth/BadgerTreeV2.json") as fp:
         abi = json.load(fp)
     tree_manager = TreeManager(chain, cycle_account)
     tree_manager.fetch_current_tree = mock_fetch_current_tree
