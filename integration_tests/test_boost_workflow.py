@@ -52,7 +52,7 @@ def test_boost_workflow(monkeypatch):
         lambda *args, **kwargs:
         [
             {'claimableBalances': [], 'chainStartBlock': 'ethereum_14217430',
-             'expiresAt': Decimal('16  45112169.323'), 'chain': 'ethereum',
+             'expiresAt': Decimal('1645112169.323'), 'chain': 'ethereum',
              'startBlock': Decimal('14217430'),
              'address': '0x0000000000000000000000000000000000000000'},
             {'claimableBalances': [{'balance': '417843248432115',
