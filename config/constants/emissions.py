@@ -1,8 +1,5 @@
-from dotmap import DotMap
-from web3 import Web3
-
 import config.constants.addresses as addresses
-from helpers.enums import BalanceType, BotType, BucketType, Environment, Network
+from helpers.enums import Network
 
 EMISSIONS_BLACKLIST = {
     addresses.DEV_MULTISIG: "Badger Dev Multisig",

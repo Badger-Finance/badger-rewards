@@ -4,15 +4,20 @@ from decouple import config
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 
-from helpers.enums import Environment, Network
+from helpers.enums import (
+    Environment,
+    Network,
+)
 from rewards.aws.helpers import get_secret
 
 logging.getLogger("gql.transport.aiohttp").setLevel(logging.WARNING)
 
 logging.getLogger("gql.transport.aiohttp").setLevel("WARNING")
 
+
 class NoHealthyNode(Exception):
     pass
+
 
 class EnvConfig:
     rpc_logger = logging.getLogger("rpc-logger")
@@ -71,8 +76,8 @@ class EnvConfig:
         self.is_valid_config()
 
     def get_web3(self, chain: str = Network.Ethereum) -> Web3:
-        return self.get_healthy_node(chain)  
-    
+        return self.get_healthy_node(chain)
+
     def get_healthy_node(self, chain: Network) -> Web3:
         for node in self.web3[chain]:
             try:

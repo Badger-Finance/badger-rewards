@@ -1,6 +1,9 @@
 import math
 from functools import lru_cache
-from typing import Dict, List
+from typing import (
+    Dict,
+    List,
+)
 
 from gql import gql
 from graphql.language.ast import DocumentNode
@@ -44,11 +47,11 @@ def fetch_deployment_id(chain: str) -> str:
         {
           _meta{
               deployment
-                
+
           }
-    
+
         }
-        
+
         """
     )
     result = client.execute(query)
@@ -90,7 +93,7 @@ def list_setts(chain: str) -> List[str]:
     query = gql(
         """
     {
-	    setts(first:100) {
+        setts(first:100) {
             id
             name
         }

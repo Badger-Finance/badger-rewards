@@ -1,8 +1,14 @@
 import math
 from functools import lru_cache
-from typing import Dict, Optional, Tuple
+from typing import (
+    Dict,
+    Tuple,
+)
 
-from gql import Client, gql
+from gql import (
+    Client,
+    gql,
+)
 from rich.console import Console
 from web3 import Web3
 
@@ -13,7 +19,11 @@ from helpers.discord import (
     send_error_to_discord,
     send_message_to_discord,
 )
-from helpers.enums import Abi, BotType, Network
+from helpers.enums import (
+    Abi,
+    BotType,
+    Network,
+)
 from helpers.web3_utils import make_contract
 from rewards.utils.emission_utils import get_across_lp_multiplier
 from subgraph.subgraph_utils import make_gql_client
@@ -81,7 +91,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
 
 @lru_cache(maxsize=None)
 def fetch_token_balances(
-    client: Client, block_number: int, chain: str
+        client: Client, block_number: int, chain: str
 ) -> Tuple[Dict[str, int], Dict[str, int]]:
     increment = 1000
     query = token_query()
@@ -130,6 +140,7 @@ def fetch_token_balances(
     return badger_balances, digg_balances
 
 
+# flake8: noqa: E501
 def fetch_fuse_pool_balances(client, chain, block):
     if chain != Network.Ethereum:
         console.log("Fuse pools are only active on ETH")
@@ -171,17 +182,17 @@ def fetch_fuse_pool_balances(client, chain, block):
     last_token_id = "0x0000000000000000000000000000000000000000"
 
     query = gql(
-        f"""
-        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {{
-            accountCTokens(block: $block_number, where: $token_filter) {{
+        """
+        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {
+            accountCTokens(block: $block_number, where: $token_filter) {
                 id
                 symbol
-                account{{
+                account{
                     id
-                }}
+                }
                 cTokenBalance
-            }}
-        }}
+            }
+        }
         """
     )
 
@@ -230,14 +241,11 @@ def fetch_fuse_pool_balances(client, chain, block):
         discord_url = get_discord_url(chain, BotType.Boost)
         send_message_to_discord(
             "**BADGER BOOST ERROR**",
-            f":x: Error in Fetching Fuse Token Balance",
+            ":x: Error in Fetching Fuse Token Balance",
             [
                 {
                     "name": "Error Type",
                     "value": type(e),
-                    "inline": True,
-                    "name": "Error Description",
-                    "value": e.args,
                     "inline": True,
                 }
             ],

@@ -338,8 +338,7 @@ def test_calculate_sett_rewards__equal_balances_for_period(
     assert (
         rewards.claims[FIRST_USER][BADGER]
         + rewards.claims[SECOND_USER][BADGER]
-        + rewards.claims[THIRD_USER][BADGER]
-    ) / Decimal(1e18) == total_badger
+        + rewards.claims[THIRD_USER][BADGER]) / Decimal(1e18) == total_badger
 
 
 def test_calculate_sett_rewards__balances_vary_for_period(
@@ -392,8 +391,7 @@ def test_calculate_sett_rewards__balances_vary_for_period(
     assert (
         rewards.claims[FIRST_USER][BADGER]
         + rewards.claims[SECOND_USER][BADGER]
-        + rewards.claims[THIRD_USER][BADGER]
-    ) / Decimal(1e18) == total_badger
+        + rewards.claims[THIRD_USER][BADGER]) / Decimal(1e18) == total_badger
 
 
 def test_calculate_tree_distributions__totals(mocker, boosts_split):
