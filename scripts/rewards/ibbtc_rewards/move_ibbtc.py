@@ -1,7 +1,7 @@
 from eth_utils.hexadecimal import encode_hex
 from web3 import Web3
 
-from config.constants.addresses import IBBTC_MULTISIG, IBBTC_PEAK, TECH_OPS
+from config.constants.addresses import IBBTC_MULTISIG, IBBTC_PEAK
 from config.constants.chain_mappings import CHAIN_IDS, SETTS
 from helpers.enums import Network
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
@@ -24,7 +24,6 @@ def move_ibbtc(tree, tree_manager: TreeManager):
 
     bcvx_crv_rewards = bcvx_crv_cumulative_amount - bcvx_crv_claimed_for
 
-
     rewards_list.increase_user_rewards(
         IBBTC_MULTISIG, BCVXCRV, bcvx_crv_rewards
     )
@@ -41,13 +40,17 @@ def move_ibbtc(tree, tree_manager: TreeManager):
     merkle_tree = rewards_to_merkle_tree(rewards_list, start_block, end_block)
 
     try:
-        pre_ibbtc_msig_bcvxcrv = get_cumulative_claimable_for_token(tree["claims"][IBBTC_MULTISIG], BCVXCRV)
-    except:
+        pre_ibbtc_msig_bcvxcrv = get_cumulative_claimable_for_token(
+            tree["claims"][IBBTC_MULTISIG], BCVXCRV
+        )
+    except Exception:
         pre_ibbtc_msig_bcvxcrv = 0
-    post_ibbtc_msig_bcvxcrv = get_cumulative_claimable_for_token(merkle_tree["claims"][IBBTC_MULTISIG], BCVXCRV)
+    post_ibbtc_msig_bcvxcrv = get_cumulative_claimable_for_token(
+        merkle_tree["claims"][IBBTC_MULTISIG], BCVXCRV
+    )
 
     # Make sure total rewards don't change
-    #assert merkle_tree["tokenTotals"][BCVXCRV] == tree["tokenTotals"][BCVXCRV]
+    # assert merkle_tree["tokenTotals"][BCVXCRV] == tree["tokenTotals"][BCVXCRV]
     assert bcvx_crv_rewards == post_ibbtc_msig_bcvxcrv - pre_ibbtc_msig_bcvxcrv
 
     root_hash = Web3.keccak(text=merkle_tree["merkleRoot"])

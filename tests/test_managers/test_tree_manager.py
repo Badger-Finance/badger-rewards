@@ -1,15 +1,12 @@
 import json
-import os
-from decimal import Decimal
 
 import pytest
-from brownie import Contract, accounts, web3
 from eth_account import Account
-from hexbytes import HexBytes
-from web3 import contract
 
 from helpers.enums import Network
-from tests.utils import chains, mock_tree, set_env_vars, test_address, test_key
+from tests.utils import mock_tree
+from tests.utils import set_env_vars
+from tests.utils import test_key
 
 set_env_vars()
 

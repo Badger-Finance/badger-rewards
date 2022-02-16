@@ -4,16 +4,22 @@ from decouple import config
 from eth_account import Account
 
 from helpers.enums import Network
-from rewards.aws.boost import add_multipliers, download_boosts, upload_boosts
+from rewards.aws.boost import (
+    add_multipliers,
+    download_boosts,
+    upload_boosts,
+)
 from rewards.aws.helpers import get_secret
 from rewards.aws.trees import upload_tree
 from rewards.calc_rewards import generate_rewards_in_range
 from rewards.classes.TreeManager import TreeManager
-from subgraph.queries.setts import last_synced_block
+
 
 if __name__ == "__main__":
     chain = Network.Ethereum
-    tree_file_name = "rewards-1-0x83b8544a0ea1cac9747c4aec3c9e6df79611bd6c1e54333d101ac162df82cd91.json"
+    tree_file_name = (
+        "rewards-1-0x83b8544a0ea1cac9747c4aec3c9e6df79611bd6c1e54333d101ac162df82cd91.json"
+    )
     tree = json.load(open(tree_file_name))
     start_block = int(tree["endBlock"]) + 1
 

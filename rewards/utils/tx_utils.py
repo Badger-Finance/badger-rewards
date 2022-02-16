@@ -106,9 +106,12 @@ def get_priority_fee(
 
     Args:
         web3 (Web3): Web3 object
-        num_blocks (str, optional): Number of historic blocks to look at in hex form (no leading 0s). Defaults to "0x4".
-        percentiles (int, optional): Percentile of transactions in blocks to use to analyze fees. Defaults to 70.
-        default_reward (int, optional): If call fails, what default reward to use in gwei. Defaults to 10e9.
+        num_blocks (str, optional): Number of historic blocks
+            to look at in hex form (no leading 0s). Defaults to "0x4".
+        percentile (int, optional): Percentile of transactions in blocks
+            to use to analyze fees. Defaults to 70.
+        default_reward (int, optional): If call fails, what default reward
+            to use in gwei. Defaults to 10e9.
 
     Returns:
         int: [description]
@@ -163,7 +166,8 @@ def confirm_transaction(
     timeout: int = 60,
     retries_on_failure: Optional[int] = 5,
 ) -> Tuple[bool, str]:
-    """Waits for transaction to appear within a given timeframe or before a given block (if specified), and then times out.
+    """Waits for transaction to appear within a given timeframe
+    or before a given block (if specified), and then times out.
 
     Args:
         web3 (Web3): Web3 instance

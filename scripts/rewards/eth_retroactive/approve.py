@@ -1,5 +1,4 @@
 import json
-import time
 
 from decouple import config
 from eth_account import Account
@@ -10,6 +9,7 @@ from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_latest_tree, upload_tree
 from rewards.classes.TreeManager import TreeManager
 from scripts.rewards.eth_retroactive.retro import retro_cycle
+
 
 if __name__ == "__main__":
     chain = Network.Ethereum

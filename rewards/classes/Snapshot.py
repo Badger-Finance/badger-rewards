@@ -8,7 +8,6 @@ from rich.console import Console
 from web3 import Web3
 
 from badger_api.requests import fetch_token_prices
-from config.singletons import env_config
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 
@@ -50,7 +49,7 @@ class Snapshot:
 
     def __add__(self, other: Snapshot) -> Snapshot:
         new_bals = self.balances.copy()
-        if other == None:
+        if other is None:
             return self
         for addr, bal in other:
             new_bals[addr] = new_bals.get(addr, 0) + bal

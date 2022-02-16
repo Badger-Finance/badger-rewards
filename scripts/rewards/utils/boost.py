@@ -1,6 +1,5 @@
 from rich.console import Console
 
-from config.constants.emissions import BOOST_CHAINS
 from config.singletons import env_config
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType
