@@ -1,5 +1,6 @@
 import logging
 from collections import Counter
+from decimal import Decimal
 
 from config.singletons import env_config
 from helpers.enums import Network
@@ -25,7 +26,11 @@ def mock_claims_snapshot_usd(*args, **kwargs):
     return native, non_native
 
 
-def test_boost_workflow(monkeypatch):
+def raise_exc():
+    raise Exception()
+
+
+def test_boost_workflow(monkeypatch, mocker):
     monkeypatch.setattr(
         "rewards.aws.boost.send_message_to_discord", mock_send_message_to_discord_prod
     )
@@ -40,7 +45,12 @@ def test_boost_workflow(monkeypatch):
         "rewards.boost.boost_utils.claims_snapshot_usd", mock_claims_snapshot_usd
     )
     monkeypatch.setattr("rewards.aws.boost.upload_boosts", mock_upload_boosts)
-
+    monkeypatch.setattr(
+        "badger_api.claimable.get_claimable_metadata",
+        lambda *args, **kwargs:
+        {'chain': 'ethereum', 'startBlock': Decimal('14217430'), 'endBlock': Decimal('14217974'),
+         'cycle': Decimal('4348'), 'chainStartBlock': 'ethereum_14217430'}
+    )
     current_block = env_config.get_web3().eth.block_number
     user_data = badger_boost(current_block, Network.Ethereum)
     # mock upload boosts has asserts baked in to check nothing Decimal,
