@@ -85,7 +85,9 @@ def get_discord_url(chain: str, bot_type: str = BotType.Cycle) -> str:
     )
 
 
-def console_and_discord(msg: str, chain: str, bot_type: BotType = BotType.Cycle, mentions: str = ""):
+def console_and_discord(
+        msg: str, chain: str, bot_type: BotType = BotType.Cycle, mentions: str = ""
+):
     url = get_discord_url(chain, bot_type)
     console.log(msg)
     if len(mentions) > 0:

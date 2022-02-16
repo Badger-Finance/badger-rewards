@@ -1,5 +1,4 @@
 import json
-import time
 
 from decouple import config
 from eth_account import Account

@@ -8,7 +8,6 @@ from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_latest_tree, upload_tree
 from rewards.calc_rewards import propose_root
 from rewards.classes.TreeManager import TreeManager
-from rewards.utils.tree_utils import calc_next_cycle_range
 from subgraph.queries.setts import last_synced_block
 
 console = Console()

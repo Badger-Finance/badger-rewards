@@ -16,7 +16,9 @@ if __name__ == "__main__":
         for token, amount in token_data.items():
             if user in claimable[token].balances:
                 if token == DIGG:
-                    claimable_bal = digg_utils.fragments_to_shares(float(claimable[token].balances[user]) * 1e9)
+                    claimable_bal = digg_utils.fragments_to_shares(
+                        float(claimable[token].balances[user]) * 1e9
+                    )
                 else:
                     claimable_bal = float(claimable[token].balances[user]) * 1e18
             else:

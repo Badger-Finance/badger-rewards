@@ -8,9 +8,9 @@ from helpers.enums import Network
 from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import propose_root
 from rewards.classes.TreeManager import TreeManager
-from scripts.rewards.utils.propose_rewards import propose_rewards
 
 console = Console()
+
 
 if __name__ == "__main__":
     chain = Network.Arbitrum

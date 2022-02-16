@@ -168,7 +168,7 @@ class RewardsManager:
             self.report_invalid_totals(invalid_totals)
 
         return combine_rewards(all_rewards, self.cycle), rewards_analytics
-    
+
     def report_invalid_totals(self, invalid_totals: List[List[str]]) -> None:
         send_plain_text_to_discord(
             message=f"INCORRECT REWARDS DISTRIBTION {DiscordRoles.RewardsPod}",

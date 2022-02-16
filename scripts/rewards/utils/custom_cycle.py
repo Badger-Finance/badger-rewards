@@ -3,15 +3,18 @@ import json
 from config.constants.chain_mappings import CHAIN_IDS
 from eth_utils.hexadecimal import encode_hex
 from eth_account import Account
-from config.env_config import EnvConfig
 from config.singletons import env_config
 from helpers.enums import Network
 from rewards.aws.helpers import get_secret
-from rewards.aws.trees import download_latest_tree, upload_tree
+from rewards.aws.trees import (
+    download_latest_tree,
+    upload_tree,
+)
 from decouple import config
 from rewards.classes.TreeManager import TreeManager
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from typing import Callable
+
 
 def custom_propose(chain: Network, custom_calc: Callable, custom_test: Callable):
     tree = download_latest_tree(chain)
@@ -76,8 +79,8 @@ def custom_eth_approve(chain, custom_calc: Callable, custom_test: Callable):
             )
 
 
-def custom_calculation(tree, tree_manager, chain, custom_calc: Callable, custom_test: Callable = None):
-
+def custom_calculation(tree, tree_manager, chain, custom_calc: Callable,
+                       custom_test: Callable = None):
     rewards_list = custom_calc(tree, tree_manager)
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
