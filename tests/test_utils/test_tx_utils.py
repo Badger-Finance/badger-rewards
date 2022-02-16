@@ -162,3 +162,14 @@ def test_get_effective_gas_price__arb():
     )
     gas = get_effective_gas_price(web3, Network.Arbitrum)
     assert gas == gas_price * 1.1
+
+
+def test_get_effective_gas_price__fantom():
+    gas_price = 500
+    web3 = MagicMock(
+        eth=MagicMock(
+            gas_price=gas_price,
+        ),
+    )
+    gas = get_effective_gas_price(web3, Network.Fantom)
+    assert gas == gas_price * 1.1
