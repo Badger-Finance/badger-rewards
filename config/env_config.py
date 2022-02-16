@@ -48,6 +48,9 @@ class EnvConfig:
             Network.Arbitrum: get_secret(
                 "keepers/arbiscan", "ARBISCAN_TOKEN", kube=self.kube
             ),
+            Network.Fantom: get_secret(
+                "keepers/ftmscan", "FTMSCAN_TOKEN", kube=self.kube
+            )
         }
 
         polygon = [
@@ -71,8 +74,13 @@ class EnvConfig:
                 self.make_provider("alchemy/arbitrum-node-url", "ARBITRUM_NODE_URL"),
             ],
             Network.Polygon: polygon,
+            Network.Fantom: [
+                Web3(Web3.HTTPProvider("https://rpc.ftm.tools/")),
+                Web3(Web3.HTTPProvider("https://rpcapi.fantom.network")),
+                Web3(Web3.HTTPProvider("https://ftmrpc.ultimatenodes.io")),
+                Web3(Web3.HTTPProvider("https://rpc.ankr.com/fantom")),
+            ]
         }
-
         self.is_valid_config()
 
     def get_web3(self, chain: str = Network.Ethereum) -> Web3:
