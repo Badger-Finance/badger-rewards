@@ -44,7 +44,7 @@ def test_boost_workflow(monkeypatch):
     monkeypatch.setattr(
         "badger_api.claimable.get_claimable_metadata",
         lambda *args, **kwargs:
-        {'chain': 'lmao', 'startBlock': Decimal('14217430'), 'endBlock': Decimal('14217974'),
+        {'chain': 'ethereum', 'startBlock': Decimal('14217430'), 'endBlock': Decimal('14217974'),
          'cycle': Decimal('4348'), 'chainStartBlock': 'ethereum_14217430'}
     )
     monkeypatch.setattr(
