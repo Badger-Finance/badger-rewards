@@ -9,6 +9,7 @@ urls = {
     Network.Ethereum: "etherscan.io",
     Network.Polygon: "polygonscan.com",
     Network.Arbitrum: "arbiscan.io",
+    Network.Fantom: "ftmscan.com"
 }
 
 
@@ -40,6 +41,7 @@ def convert_from_eth(block) -> Dict[str, int]:
         Network.Ethereum: block,
         Network.Polygon: get_block_by_timestamp(Network.Polygon, timestamp) - 1000,
         Network.Arbitrum: get_block_by_timestamp(Network.Arbitrum, timestamp) - 1500,
+        Network.Fantom: get_block_by_timestamp(Network.Fantom, timestamp) - 1000,
     }
 
 

@@ -51,7 +51,7 @@ def get_gas_price_of_tx(
         gas_price_base = Decimal(
             tx_receipt.get("effectiveGasPrice", 0) / DECIMAL_MAPPING[chain]
         )
-    elif chain in [Network.Polygon, Network.Arbitrum]:
+    elif chain in [Network.Polygon, Network.Arbitrum, Network.Fantom]:
         gas_price_base = Decimal(tx.get("gasPrice", 0) / DECIMAL_MAPPING[chain])
     else:
         return
