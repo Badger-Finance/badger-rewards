@@ -19,13 +19,7 @@ Chain: Ethereum
 Cadence: Every 10m
 ```
 
-# Testing
-
-Badger Boost calculation: `python -m scripts.rewards.propose_boost`
-
-# Development
-
-### Rewards
+## Rewards deployment
 In order to deploy on an EVM chain, the following is required
 
 - RPC endpoint for specific chain
@@ -35,3 +29,30 @@ In order to deploy on an EVM chain, the following is required
 - Gas estimation api for that chain
 - Badger Tree + Rewards Logger contracts
 - AWS bucket for storing merkle trees and initial empty tree file
+
+
+# Development
+
+### Releasing a feature
+When not sure if feature can break something, consider using feature flags functionality
+to disable code that is causing troubles
+
+First, add new feature flag to `FeatureFlags.FLAGS` dictionary:
+```python
+class FeatureFlags:
+    FLAGS: Dict[str, bool] = {
+        NEW_FLAG: True
+    }
+```
+Then use new flag to wrap potentially dangerous code:
+```python
+from rewards.feature_flags import flags
+
+def some_func():
+    if flags.flag_enabled(NEW_FLAG):
+        new_functionality()
+    else:
+        old_functionality()
+```
+
+After succesful release consider removing `NEW_FLAG` and the code also
