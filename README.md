@@ -35,7 +35,7 @@ In order to deploy on an EVM chain, the following is required
 
 ### Releasing a feature
 When not sure if feature can break something, consider using feature flags functionality
-to disable code that is causing troubles
+to disable the code that could potentially cause issues.
 
 First, add new feature flag to `FeatureFlags.FLAGS` dictionary:
 ```python
@@ -55,4 +55,4 @@ def some_func():
         old_functionality()
 ```
 
-After succesful release consider removing `NEW_FLAG` and the code also
+After succesful release consider removing `NEW_FLAG`, as well as the wrapper and old functionality.
