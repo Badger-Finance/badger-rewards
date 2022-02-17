@@ -183,16 +183,16 @@ def fetch_fuse_pool_balances(client, chain, block):
 
     query = gql(
         """
-        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {{
-            accountCTokens(block: $block_number, where: $token_filter) {{
+        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {
+            accountCTokens(block: $block_number, where: $token_filter) {
                 id
                 symbol
-                account{{
+                account{
                     id
-                }}
+                }
                 cTokenBalance
-            }}
-        }}
+            }
+        }
         """
     )
 
