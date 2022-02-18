@@ -8,6 +8,7 @@ from subgraph.queries.tokens import fetch_token_balances
 from subgraph.subgraph_utils import make_gql_client
 from tests.test_subgraph.test_data import ACROSS_BALANCES_TEST_DATA
 from tests.test_subgraph.test_data import TOKEN_BALANCES_TEST_DATA
+from tests.test_subgraph.test_data import TOKEN_BALANCES_TEST_DATA_ZERO_BALANCES
 
 
 def test_fetch_across_balances(mocker):
@@ -60,6 +61,25 @@ def test_fetch_token_balances_happy(mocker, chain):
     badger_balances, digg_balances = fetch_token_balances(token_client, block, chain)
     assert badger_balances[tested_addr] == 21000000000000000000000000 / 1e18
     assert digg_balances[tested_addr] != 0
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Polygon, Network.Arbitrum],
+)
+def test_fetch_token_balances_zero_amounts(mocker, chain):
+    mocker.patch(
+        "subgraph.subgraph_utils.Client.execute",
+        side_effect=[
+            deepcopy(TOKEN_BALANCES_TEST_DATA_ZERO_BALANCES),
+            {'tokenBalances': []},
+        ],
+    )
+    block = 14118623
+    token_client = make_gql_client(f"tokens-{chain}")
+    badger_balances, digg_balances = fetch_token_balances(token_client, block, chain)
+    assert digg_balances == {}
+    assert badger_balances == {}
 
 
 @pytest.mark.parametrize(

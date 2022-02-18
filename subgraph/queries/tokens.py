@@ -124,13 +124,9 @@ def fetch_token_balances(
                         if entry["token"]["symbol"] == "BADGER":
                             badger_balances[address] = amount / DECIMAL_MAPPING[chain]
                         if entry["token"]["symbol"] == "DIGG":
-                            # Speed this up
-                            if entry["balance"] == 0:
-                                fragment_balance = 0
-                            else:
-                                fragment_balance = digg_utils.shares_to_fragments(
-                                    int(amount)
-                                )
+                            fragment_balance = digg_utils.shares_to_fragments(
+                                int(amount)
+                            )
                             digg_balances[address] = float(fragment_balance) / 1e9
     except Exception as e:
         send_error_to_discord(
