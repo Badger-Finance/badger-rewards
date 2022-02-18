@@ -138,7 +138,7 @@ def fetch_token_balances(
 
 
 # flake8: noqa: E501
-def fetch_fuse_pool_balances(client, chain, block) -> Dict[str, Dict]:
+def fetch_fuse_pool_balances(client: Client, chain: Network, block: int) -> Dict[str, Dict]:
     if chain != Network.Ethereum:
         console.log("Fuse pools are only active on ETH")
         return {}
