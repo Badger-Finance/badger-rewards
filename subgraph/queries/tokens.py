@@ -1,5 +1,6 @@
 import math
 from functools import lru_cache
+from numbers import Number
 from typing import (
     Dict,
     Tuple,
@@ -91,8 +92,8 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
 
 @lru_cache(maxsize=None)
 def fetch_token_balances(
-        client: Client, block_number: int, chain: str
-) -> Tuple[Dict[str, int], Dict[str, int]]:
+        client: Client, block_number: int, chain: Network
+) -> Tuple[Dict[str, Number], Dict[str, Number]]:
     increment = 1000
     query = token_query()
 

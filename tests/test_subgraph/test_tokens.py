@@ -1,7 +1,11 @@
 from copy import deepcopy
 
+import pytest
+
 from helpers.enums import Network
 from subgraph.queries.tokens import fetch_across_balances
+from subgraph.queries.tokens import fetch_token_balances
+from subgraph.subgraph_utils import make_gql_client
 from tests.test_subgraph.test_data import ACROSS_BALANCES_TEST_DATA
 
 
@@ -35,3 +39,19 @@ def test_fetch_across_balances_empty(mocker):
     )
     across_bals = fetch_across_balances(1728601720, Network.Ethereum)
     assert across_bals == {}
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Polygon, Network.Arbitrum],
+)
+def test_fetch_token_balances_empty(mocker, chain):
+    mocker.patch(
+        "subgraph.subgraph_utils.Client.execute",
+        side_effect=[
+            {'tokenBalances': []}
+        ],
+    )
+    block = 14118623
+    token_client = make_gql_client(f"tokens-{chain}")
+    assert fetch_token_balances(token_client, block, chain) == ({}, {})
