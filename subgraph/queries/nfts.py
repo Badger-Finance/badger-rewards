@@ -5,9 +5,8 @@ from gql import gql
 from rich.console import Console
 from web3.main import Web3
 
-from helpers.discord import send_error_to_discord
 from helpers.enums import Network
-from subgraph.subgraph_utils import SubgraphClient, make_gql_client
+from subgraph.subgraph_utils import SubgraphClient
 
 console = Console()
 

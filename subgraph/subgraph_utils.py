@@ -6,7 +6,7 @@ from gql.transport.requests import RequestsHTTPTransport
 from gql.transport.requests import log as requests_logger
 
 from config.singletons import env_config
-from helpers.enums import Environment, Network
+from helpers.enums import BotType, Environment, Network
 from subgraph.config import subgraph_urls
 from helpers.discord import send_error_to_discord
 
@@ -39,13 +39,12 @@ class SubgraphClient:
         self.chain = chain
 
     def execute(self, *args, **kwargs):
-        transport_url = self.client.transport.url
         try:
             return self.client.execute(*args, **kwargs)
         except Exception as error:
             send_error_to_discord(
                 error,
-                error_msg=f"Error with subgraph: {transport_url}",
+                error_msg=f"Error with subgraph: {self.client.transport.url}",
                 error_type="Subgraph Error",
                 chain=self.chain
             )
