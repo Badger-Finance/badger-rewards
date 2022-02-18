@@ -82,6 +82,21 @@ def test_fetch_token_balances_zero_amounts(mocker, chain):
     assert badger_balances == {}
 
 
+def test_fetch_token_balances_raises(mocker):
+    discord = mocker.patch(
+        "subgraph.queries.tokens.send_error_to_discord",
+    )
+    mocker.patch(
+        "subgraph.subgraph_utils.Client.execute",
+        side_effect=Exception,
+    )
+    block = 14118623
+    token_client = make_gql_client("tokens-ethereum")
+    with pytest.raises(Exception):
+        fetch_token_balances(token_client, block, Network.Ethereum)
+    assert discord.called
+
+
 @pytest.mark.parametrize(
     "chain",
     [Network.Ethereum, Network.Polygon, Network.Arbitrum],
