@@ -25,7 +25,7 @@ def test_fetch_block_by_timestamp_handled(mock_discord):
         json={},
         status=404,
     )
-    fetch_block_by_timestamp("ethereum", 123)
+    fetch_block_by_timestamp(Network.Ethereum, 123)
 
     # Make sure discord message was sent
     assert mock_discord.called
