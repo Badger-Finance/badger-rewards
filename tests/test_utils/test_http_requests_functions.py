@@ -1,3 +1,4 @@
+import pytest
 import responses
 
 from badger_api.requests import badger_api
@@ -12,6 +13,7 @@ from helpers.enums import Network
 from rewards.explorer import CHAIN_EXPLORER_URLS
 from rewards.explorer import convert_from_eth
 from rewards.explorer import fetch_block_by_timestamp
+from rewards.explorer import get_explorer_url
 
 
 @responses.activate
@@ -87,3 +89,13 @@ def test_convert_from_eth(mock_discord):
     assert data[Network.Ethereum] == block
     assert data[Network.Polygon] == block - POLYGON_BLOCK_BUFFER
     assert data[Network.Arbitrum] == block - ARBITRUM_BLOCK_BUFFER
+
+
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Ethereum, Network.Polygon, Network.Arbitrum]
+)
+def test_get_explorer_url(chain):
+    assert get_explorer_url(chain, "0x123123") == (
+        f"https://{CHAIN_EXPLORER_URLS[chain]}/tx/0x123123"
+    )
