@@ -85,8 +85,8 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     bvecvx_usd = {}
     if chain == Network.Ethereum:
         bvecvx_claimable = claims_snapshot(chain, block).get(addresses.BVECVX)
-        bvecvx_bals = sett_snapshot(chain, block, addresses.BVECVX, blacklist=True)
-        bvecvx_lp_bals = sett_snapshot(chain, block, addresses.BVECVX_CVX_LP_SETT, blacklist=True)
+        bvecvx_bals = sett_snapshot(chain, block, addresses.BVECVX)
+        bvecvx_lp_bals = sett_snapshot(chain, block, addresses.BVECVX_CVX_LP_SETT)
         ratio = get_bvecvx_lp_ratio()
         ppfs = get_bvecvx_lp_ppfs()
         for addr, value in bvecvx_lp_bals:
