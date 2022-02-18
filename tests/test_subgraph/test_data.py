@@ -94,7 +94,6 @@ TOKEN_BALANCES_TEST_DATA = {
         ]
 }
 
-
 TOKEN_BALANCES_TEST_DATA_ZERO_BALANCES = {
     'tokenBalances':
         [
@@ -110,4 +109,22 @@ TOKEN_BALANCES_TEST_DATA_ZERO_BALANCES = {
                 'token': {'symbol': 'DIGG'}
             },
         ]
+}
+
+FUSE_BALANCES_TEST_DATA = {
+    'accountCTokens': [
+        {
+            'id': '0x6780b4681aa8efe530d075897b3a4ff6ca5ed807'
+                  '-0x00c67d9d6d3d13b42a87424e145826c467cccd84',
+            'symbol': 'fBADGER-22',
+            'account': {'id': '0x15bc539b99f7019fe0d025ce26fda395b17b5f74'},
+            'cTokenBalance': '36406777910624.73873604'
+        },
+        {
+            'id': '0x792a676dd661e2c182435aaefc806f1d4abdc486'
+                  '-0x15bc539b99f7019fe0d025ce26fda395b17b5f74',
+            'symbol': 'fDIGG-22', 'account': {'id': '0x15bc539b99f7019fe0d025ce26fda395b17b5f74'},
+            'cTokenBalance': '2.98041466'
+        },
+    ]
 }
