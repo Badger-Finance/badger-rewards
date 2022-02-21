@@ -8,7 +8,9 @@ from rewards.rewards_checker import token_diff_table_item
 from rewards.rewards_checker import verify_rewards
 from rewards.utils.rewards_utils import check_token_totals_in_range
 from rewards.utils.rewards_utils import get_actual_expected_totals
+from rewards.utils.rewards_utils import get_claimed_for_token
 from rewards.utils.rewards_utils import get_cumulative_claimable_for_token
+from rewards.utils.rewards_utils import keccak
 
 BVECVX = SETTS[Network.Ethereum]["bvecvx"]
 
@@ -35,6 +37,19 @@ def test_get_cumulative_claimable__no_token():
         BVECVX
     )
     assert claimable == 0
+
+
+def tests_get_claimed_for_token():
+    user_claimed = 1000
+    claimed = get_claimed_for_token(
+        ([BADGER], [user_claimed]),
+        BADGER
+    )
+    assert claimed == user_claimed
+
+
+def test_keccak():
+    assert keccak("123") == "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0107"
 
 
 def test_token_diff_table():

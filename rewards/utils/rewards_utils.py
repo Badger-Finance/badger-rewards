@@ -8,6 +8,7 @@ from typing import (
     Tuple,
     Union,
 )
+from typing import Sequence
 
 from rich.console import Console
 from web3 import Web3
@@ -37,7 +38,7 @@ def get_cumulative_claimable_for_token(claim: Dict, token: str) -> int:
     return 0
 
 
-def get_claimed_for_token(data, token: str) -> int:
+def get_claimed_for_token(data: Sequence, token: str) -> int:
     tokens = data[0]
     amounts = data[1]
 
