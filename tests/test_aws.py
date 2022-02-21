@@ -1,10 +1,12 @@
 from unittest.mock import MagicMock
 
 import pytest
+from botocore.exceptions import ClientError
 
 from helpers.enums import Network
 from rewards.aws.trees import download_latest_tree
 from rewards.aws.trees import download_tree
+from rewards.aws.trees import upload_tree
 from tests.utils import chains
 
 
@@ -45,3 +47,32 @@ def test_download_tree(mocker, chain):
         }
     )
     assert download_tree("merkle.json", chain) == '{"some": "tree"}'
+
+
+@pytest.mark.parametrize("chain", chains)
+def test_upload_tree(mocker, chain):
+    """
+    Unit test for tree upload. Checking that all needed s3 methods are called
+    """
+    put_obj = mocker.patch(
+        "rewards.aws.trees.s3.put_object",
+    )
+    upload_tree("tree.json", {"some": "stuff"}, chain)
+    assert put_obj.called
+
+
+@pytest.mark.parametrize("chain", chains)
+def test_upload_tree_unhappy(mocker, chain):
+    """
+    Unit test for tree upload. Checking that all needed s3 methods are called
+    """
+    mocker.patch(
+        "rewards.aws.trees.s3.put_object",
+        side_effect=ClientError({'Error': {'Message': "stuff happened"}}, '')
+    )
+    console_and_discord = mocker.patch(
+        "rewards.aws.trees.console_and_discord",
+    )
+    with pytest.raises(ClientError):
+        upload_tree("tree.json", {"some": "stuff"}, chain)
+    assert console_and_discord.called

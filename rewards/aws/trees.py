@@ -52,36 +52,9 @@ def download_tree(file_name: str, chain: Network) -> str:
     return s3_clientdata
 
 
-def download_past_trees(number: int):
-    """
-    Download a number of past trees
-    :param number: number of trees to download from the latest
-    """
-    trees = []
-    key = "badger-tree.json"
-    bucket = env_config.bucket
-    response = s3.list_object_versions(Prefix=key, Bucket=bucket)
-    versions = response["Versions"][:number]
-    for version in versions:
-        console.log(version["Key"], version["VersionId"])
-        s3_client_obj = s3.get_object(
-            Bucket=bucket, Key=version["Key"], VersionId=version["VersionId"]
-        )
-        trees.append(s3_client_obj["Body"].read())
-    return trees
-
-
-def upload_tree(
-    file_name: str,
-    data: Dict,
-    chain: str,
-    bucket: str = "badger-json",
-    staging: bool = False,
-):
+def upload_tree(file_name: str, data: Dict, chain: str, staging: bool = False):
     """
     Upload the badger tree to multiple buckets
-    :param fileName: the filename of the uploaded bucket
-    :param data: the data to push
     """
     chain_id = CHAIN_IDS[chain]
 
