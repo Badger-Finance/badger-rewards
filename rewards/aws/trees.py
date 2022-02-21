@@ -12,7 +12,7 @@ from rewards.aws.helpers import get_bucket, s3
 console = Console()
 
 
-def download_latest_tree(chain: str):
+def download_latest_tree(chain: Network):
     """
     Download the latest merkle tree that was uploaded for a chain
     :param chain: the chain from which to fetch the latest tree from
@@ -31,10 +31,11 @@ def download_latest_tree(chain: str):
     return json.loads(s3_clientdata)
 
 
-def download_tree(file_name: str, chain: str):
+def download_tree(file_name: str, chain: Network):
     """
     Download a specific tree based on the merkle root of that tree
     :param file_name: fileName of tree to download
+    :param chain: target chain
     """
     if chain == Network.Ethereum:
         tree_bucket = "badger-json"
