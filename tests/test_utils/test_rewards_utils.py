@@ -1,9 +1,12 @@
 from decimal import Decimal
 
+import pytest
+
 from config.constants.addresses import BADGER
 from config.constants.chain_mappings import SETTS
 from config.constants.emissions import REWARD_ERROR_TOLERANCE
 from helpers.enums import Network
+from rewards.rewards_checker import assert_claims_increase
 from rewards.rewards_checker import token_diff_table_item
 from rewards.rewards_checker import verify_rewards
 from rewards.utils.rewards_utils import check_token_totals_in_range
@@ -50,6 +53,45 @@ def tests_get_claimed_for_token():
 
 def test_keccak():
     assert keccak("123") == "0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0107"
+
+
+def test_assert_claims_increase():
+    assert_claims_increase(
+        {
+            'claims': {
+                "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": {
+                    'tokens': [BADGER], 'cumulativeAmounts': [1000]
+                }
+            }
+        },
+        {
+            'claims': {
+                "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": {
+                    'tokens': [BADGER], 'cumulativeAmounts': [1000]
+                }
+            }
+        },
+    )
+
+
+def test_assert_claims_increase_unhappy():
+    with pytest.raises(AssertionError):
+        assert_claims_increase(
+            {
+                'claims': {
+                    "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": {
+                        'tokens': [BADGER], 'cumulativeAmounts': [1000]
+                    }
+                }
+            },
+            {
+                'claims': {
+                    "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": {
+                        'tokens': [BADGER], 'cumulativeAmounts': [100]
+                    }
+                }
+            },
+        )
 
 
 def test_token_diff_table():
