@@ -12,7 +12,7 @@ from rewards.aws.helpers import get_bucket, s3
 console = Console()
 
 
-def download_latest_tree(chain: Network):
+def download_latest_tree(chain: Network) -> Dict:
     """
     Download the latest merkle tree that was uploaded for a chain
     :param chain: the chain from which to fetch the latest tree from
@@ -31,7 +31,7 @@ def download_latest_tree(chain: Network):
     return json.loads(s3_clientdata)
 
 
-def download_tree(file_name: str, chain: Network):
+def download_tree(file_name: str, chain: Network) -> str:
     """
     Download a specific tree based on the merkle root of that tree
     :param file_name: fileName of tree to download
@@ -52,7 +52,7 @@ def download_tree(file_name: str, chain: Network):
     return s3_clientdata
 
 
-def download_past_trees(test: bool, number: int):
+def download_past_trees(number: int):
     """
     Download a number of past trees
     :param number: number of trees to download from the latest
