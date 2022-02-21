@@ -24,7 +24,7 @@ from rewards.utils.token_utils import token_amount_base_10
 console = Console()
 
 
-def get_cumulative_claimable_for_token(claim, token: str) -> int:
+def get_cumulative_claimable_for_token(claim: Dict, token: str) -> int:
     tokens = claim["tokens"]
     amounts = claim["cumulativeAmounts"]
 

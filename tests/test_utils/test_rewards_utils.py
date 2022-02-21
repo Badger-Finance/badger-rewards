@@ -4,16 +4,37 @@ from config.constants.addresses import BADGER
 from config.constants.chain_mappings import SETTS
 from config.constants.emissions import REWARD_ERROR_TOLERANCE
 from helpers.enums import Network
-from rewards.rewards_checker import (
-    token_diff_table_item,
-    verify_rewards,
-)
-from rewards.utils.rewards_utils import (
-    check_token_totals_in_range,
-    get_actual_expected_totals,
-)
+from rewards.rewards_checker import token_diff_table_item
+from rewards.rewards_checker import verify_rewards
+from rewards.utils.rewards_utils import check_token_totals_in_range
+from rewards.utils.rewards_utils import get_actual_expected_totals
+from rewards.utils.rewards_utils import get_cumulative_claimable_for_token
 
 BVECVX = SETTS[Network.Ethereum]["bvecvx"]
+
+
+def test_get_cumulative_claimable():
+    cumulative = "1000"
+    claimable = get_cumulative_claimable_for_token(
+        {
+            'tokens': [BADGER],
+            'cumulativeAmounts': [cumulative],
+        },
+        BADGER
+    )
+    assert claimable == int(cumulative)
+
+
+def test_get_cumulative_claimable__no_token():
+    cumulative = "1000"
+    claimable = get_cumulative_claimable_for_token(
+        {
+            'tokens': [BADGER],
+            'cumulativeAmounts': [cumulative],
+        },
+        BVECVX
+    )
+    assert claimable == 0
 
 
 def test_token_diff_table():
