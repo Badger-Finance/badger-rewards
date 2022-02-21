@@ -62,10 +62,11 @@ def test_upload_tree(mocker, chain):
 
 
 @pytest.mark.parametrize("chain", chains)
-def test_upload_tree_unhappy(mocker, chain):
+def test_upload_tree_unhappy(mocker, chain, monkeypatch):
     """
     Unit test for tree upload. Checking that all needed s3 methods are called
     """
+    mocker.patch("builtins.open")
     mocker.patch(
         "rewards.aws.trees.s3.put_object",
         side_effect=ClientError({'Error': {'Message': "stuff happened"}}, '')
