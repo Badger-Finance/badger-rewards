@@ -37,7 +37,6 @@ def mock_fns(monkeypatch):
         "rewards.calc_rewards.upload_proposed_boosts", mock_upload_boosts
     )
     monkeypatch.setattr("rewards.calc_rewards.upload_tree", mock_upload_tree)
-    monkeypatch.setattr("rewards.calc_rewards.cycle_logger", MockCycleLogger())
 
 
 @pytest.fixture(autouse=True)
