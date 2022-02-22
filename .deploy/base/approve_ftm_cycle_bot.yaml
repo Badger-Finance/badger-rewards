@@ -1,0 +1,28 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+    name: approve-ftm-cycle-bot
+    labels:
+        app: approve-ftm-cycle-bot
+spec:
+    schedule: '15 */2 * * *'
+    startingDeadlineSeconds: 180
+    suspend: false
+    jobTemplate:
+        spec:
+            template:
+                spec:
+                    serviceAccountName: approve-ftm-cycle-bot
+                    containers:
+                        - name: approve-ftm-cycle-bot
+                          image: IMAGE_NAME
+                          imagePullPolicy: IfNotPresent
+                          command: ['python', '-m', 'scripts.rewards.fantom.approve_fantom']
+                          env:
+                              - name: LOG_LEVEL
+                                value: 'info'
+                              - name: ENV
+                                value: 'PROD'
+                              - name: KUBE
+                                value: 'True'
+                    restartPolicy: OnFailure
