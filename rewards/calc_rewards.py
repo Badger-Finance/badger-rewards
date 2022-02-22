@@ -13,6 +13,7 @@ from config.constants.chain_mappings import (
     CHAIN_IDS,
     EMISSIONS_CONTRACTS,
 )
+from config.constants.emissions import NO_BOOST
 from config.rewards_config import rewards_config
 from config.singletons import env_config
 from helpers.discord import console_and_discord
@@ -93,7 +94,10 @@ def propose_root(
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-    boosts = download_boosts(chain)
+    if chain in NO_BOOST:
+        boosts = {"userData": {}}
+    else:
+        boosts = download_boosts(chain)
     rewards_data = generate_rewards_in_range(
         chain,
         start,
