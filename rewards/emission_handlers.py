@@ -13,7 +13,7 @@ console = Console()
 
 
 def unclaimed_rewards_handler(amount: Decimal, token: str, sett: str, block: int):
-    console.log("Distributing {} of {} to unclaimed rewards".format(amount, token))
+    console.log(f"Distributing {amount} of {token} to unclaimed rewards")
     claimable = claims_snapshot(Network.Ethereum, block)
     if sett not in claimable:
         return RewardsList()
@@ -22,14 +22,14 @@ def unclaimed_rewards_handler(amount: Decimal, token: str, sett: str, block: int
 
 
 def ibbtc_peak_handler(amount: Decimal, token: str, sett: str, block: int) -> RewardsList:
-    console.log("Distributing {} of {} to ibbtc multisig".format(amount, token))
+    console.log(f"Distributing {amount} of {token} to ibbtc multisig")
     rewards = RewardsList()
     rewards.increase_user_rewards(addresses.IBBTC_MULTISIG, token, amount)
     return rewards
 
 
 def treasury_handler(amount: Decimal, token: str, sett: str, block: int) -> RewardsList:
-    console.log("Distributing {} of {} to treasruy multisig".format(amount, token))
+    console.log(f"Distributing {amount} of {token} to treasury multisig")
     rewards = RewardsList()
     rewards.increase_user_rewards(addresses.TREASURY_OPS, token, amount)
     return rewards
