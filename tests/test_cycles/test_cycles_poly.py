@@ -14,7 +14,6 @@ from config.singletons import env_config
 from helpers.enums import Network
 from rewards.aws.helpers import get_secret
 from tests.test_utils.cycle_utils import (
-    MockCycleLogger,
     mock_badger_tree,
     mock_cycle,
     mock_download_boosts,
@@ -37,7 +36,6 @@ def mock_fns(monkeypatch):
         "rewards.calc_rewards.upload_proposed_boosts", mock_upload_boosts
     )
     monkeypatch.setattr("rewards.calc_rewards.upload_tree", mock_upload_tree)
-    monkeypatch.setattr("rewards.calc_rewards.cycle_logger", MockCycleLogger())
 
 
 @pytest.fixture(autouse=True)

@@ -13,6 +13,7 @@ from config.constants.chain_mappings import (
     CHAIN_IDS,
     EMISSIONS_CONTRACTS,
 )
+from config.constants.emissions import NO_BOOST
 from config.rewards_config import rewards_config
 from config.singletons import env_config
 from helpers.discord import console_and_discord
@@ -26,7 +27,6 @@ from rewards.aws.boost import (
     upload_proposed_boosts,
 )
 from rewards.aws.trees import upload_tree
-from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Schedule import Schedule
 from rewards.classes.TreeManager import TreeManager
@@ -93,7 +93,10 @@ def propose_root(
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-    boosts = download_boosts(chain)
+    if chain in NO_BOOST:
+        boosts = {"userData": {}}
+    else:
+        boosts = download_boosts(chain)
     rewards_data = generate_rewards_in_range(
         chain,
         start,
@@ -126,8 +129,6 @@ def approve_root(
     :param current_rewards: past rewards merkle tree
     :param tree_manager: TreeManager object
     """
-    cycle_logger.set_start_block(start)
-    cycle_logger.set_end_block(end)
     boosts = download_proposed_boosts(chain)
     rewards_data = generate_rewards_in_range(
         chain,
@@ -147,7 +148,8 @@ def approve_root(
             rewards_data["multiplierData"],
             rewards_data["userMultipliers"],
         )
-        upload_boosts(boosts, chain)
+        if chain not in NO_BOOST:
+            upload_boosts(boosts, chain)
         return rewards_data
     if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
         console.log(
@@ -155,8 +157,6 @@ def approve_root(
         )
 
         tx_hash, success = tree_manager.approve_root(rewards_data)
-        cycle_logger.set_content_hash(rewards_data["rootHash"])
-        cycle_logger.set_merkle_root(rewards_data["merkleTree"]["merkleRoot"])
         if success:
             upload_tree(
                 rewards_data["fileName"],
@@ -170,8 +170,8 @@ def approve_root(
                 rewards_data["multiplierData"],
                 rewards_data["userMultipliers"],
             )
-            upload_boosts(boosts, chain)
-            cycle_logger.save(tree_manager.next_cycle, chain)
+            if chain not in NO_BOOST:
+                upload_boosts(boosts, chain)
             put_rewards_data(
                 chain, tree_manager.next_cycle, start, end,
                 rewards_data['sett_rewards_analytics']
