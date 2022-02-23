@@ -57,7 +57,7 @@ CLAIMABLE_BALANCES_DATA_ETH = {
             },
             {
                 "address": BCVXCRV,
-                "balance": "2421328289687344724270258601055314109178877723910682205504219578892288",
+                "balance": "10000000000000",
             },
             {
                 "address": XSUSHI,
@@ -72,7 +72,7 @@ CLAIMABLE_BALANCES_DATA_ETH = {
             {"address": DIGG, "balance": "148480869281534217908"},
             {
                 "address": BCVXCRV,
-                "balance": "2656585570737360069",
+                "balance": "40000000000000",
             },
             {
                 "address": XSUSHI,
