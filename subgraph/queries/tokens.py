@@ -1,14 +1,10 @@
 import math
 from functools import lru_cache
-<<<<<<< HEAD
-from typing import Dict, Optional, Tuple
 from decimal import Decimal
-=======
 from typing import (
     Dict,
     Tuple,
 )
->>>>>>> development
 
 from gql import (
     Client,
