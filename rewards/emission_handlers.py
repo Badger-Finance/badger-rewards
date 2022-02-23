@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from rich.console import Console
 
-from config.constants.addresses import IBBTC_MULTISIG
+import config.constants.addresses as addresses
 from config.constants.chain_mappings import UNCLAIMED_REWARDS_TOKENS
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
@@ -13,7 +13,7 @@ console = Console()
 
 
 def unclaimed_rewards_handler(amount: Decimal, token: str, sett: str, block: int):
-    console.log("Distributing {} of {} to unclaimed rewards".format(amount, token))
+    console.log(f"Distributing {amount} of {token} to unclaimed rewards")
     claimable = claims_snapshot(Network.Ethereum, block)
     if sett not in claimable:
         return RewardsList()
@@ -22,7 +22,14 @@ def unclaimed_rewards_handler(amount: Decimal, token: str, sett: str, block: int
 
 
 def ibbtc_peak_handler(amount: Decimal, token: str, sett: str, block: int) -> RewardsList:
-    console.log("Distributing {} of {} to ibbtc multisig".format(amount, token))
+    console.log(f"Distributing {amount} of {token} to ibbtc multisig")
     rewards = RewardsList()
-    rewards.increase_user_rewards(IBBTC_MULTISIG, token, amount)
+    rewards.increase_user_rewards(addresses.IBBTC_MULTISIG, token, amount)
+    return rewards
+
+
+def treasury_handler(amount: Decimal, token: str, sett: str, block: int) -> RewardsList:
+    console.log(f"Distributing {amount} of {token} to treasury multisig")
+    rewards = RewardsList()
+    rewards.increase_user_rewards(addresses.TREASURY_OPS, token, amount)
     return rewards
