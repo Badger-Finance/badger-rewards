@@ -131,8 +131,8 @@ def test_fetch_fuse_balances_happy(mocker):
     fuse_client = make_gql_client("fuse")
     balances = fetch_fuse_pool_balances(fuse_client, Network.Ethereum, block)
     # Some static balances check
-    assert balances[BADGER][tested_addr] == 3640.677791062474
-    assert balances[DIGG][tested_addr] == 0.30587790239672885
+    assert balances[BADGER][tested_addr] == pytest.approx(3640.677791062474)
+    assert balances[DIGG][tested_addr] == pytest.approx(0.30587790239672885)
 
 
 def test_fetch_fuse_balances_raises(mocker):
