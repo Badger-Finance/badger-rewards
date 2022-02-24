@@ -9,6 +9,7 @@ class RewardsConfig:
             Network.Ethereum: hours_to_seconds(1.5),
             Network.Polygon: hours_to_seconds(0.05),
             Network.Arbitrum: hours_to_seconds(1.5),
+            Network.Fantom: hours_to_seconds(1.5)
         }
         self.maxStartBlockAge = 3200
         self.debug = False

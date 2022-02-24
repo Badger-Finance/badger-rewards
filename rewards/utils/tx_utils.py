@@ -6,6 +6,7 @@ from typing import Optional, Tuple
 from eth_typing import HexStr
 from web3 import Web3, exceptions
 
+from config.constants import GAS_BUFFER
 from config.constants.chain_mappings import DECIMAL_MAPPING, EMISSIONS_CONTRACTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BotType, Network
@@ -50,7 +51,7 @@ def get_gas_price_of_tx(
         gas_price_base = Decimal(
             tx_receipt.get("effectiveGasPrice", 0) / DECIMAL_MAPPING[chain]
         )
-    elif chain in [Network.Polygon, Network.Arbitrum]:
+    elif chain in [Network.Polygon, Network.Arbitrum, Network.Fantom]:
         gas_price_base = Decimal(tx.get("gasPrice", 0) / DECIMAL_MAPPING[chain])
     else:
         return
@@ -90,8 +91,8 @@ def get_effective_gas_price(web3: Web3, chain: str = Network.Ethereum) -> int:
         json = http_client.get("https://gasstation-mainnet.matic.network")
         if json:
             gas_price = web3.toWei(int(json.get("fast") * 1.1), "gwei")
-    elif chain == Network.Arbitrum:
-        gas_price = web3.eth.gas_price * 1.1
+    elif chain in [Network.Arbitrum, Network.Fantom]:
+        gas_price = web3.eth.gas_price * GAS_BUFFER
     return gas_price
 
 
