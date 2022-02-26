@@ -28,6 +28,7 @@ class EnvConfig:
         self.staging = environment == Environment.Staging
         self.production = environment == Environment.Production
         self.kube = config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]
+        self.fix_cycle = config("FIX_CYCLE", "False").lower() in ["true", "1", "t", "y", "yes"]
         self.graph_api_key = get_secret(
             "boost-bot/graph-api-key-d", "GRAPH_API_KEY", kube=self.kube
         )

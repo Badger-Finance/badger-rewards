@@ -14,7 +14,7 @@ from config.singletons import env_config
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from helpers.web3_utils import get_badger_tree
-from rewards.aws.trees import download_tree
+from rewards.aws.trees import download_latest_tree, download_tree
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.classes.RewardsList import RewardsList
 from rewards.explorer import get_explorer_url
@@ -154,6 +154,8 @@ class TreeManager:
         return tree
 
     def fetch_current_tree(self):
+        if env_config.fix_cycle:
+            return download_latest_tree(self.chain)
         current_merkle = self.fetch_current_merkle_data()
         console.log(f"Current Merkle \n {current_merkle}")
         return self.fetch_tree(current_merkle)

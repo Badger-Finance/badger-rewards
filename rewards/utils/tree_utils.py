@@ -1,7 +1,6 @@
 from typing import Dict, Tuple
-
 from rich.console import Console
-
+from config.singletons import env_config
 from badger_api.claimable import get_claimable_metadata
 from rewards.classes.TreeManager import TreeManager
 from subgraph.queries.setts import last_synced_block
@@ -34,7 +33,10 @@ def calc_next_cycle_range(
     # Fetch the appropriate file
     current_rewards = tree_manager.fetch_current_tree()
     last_claim_end = tree_manager.last_publish_end_block()
-    start_block = last_claim_end + 1
+    if env_config.fix_cycle:
+        start_block = int(current_rewards["endBlock"])
+    else:
+        start_block = last_claim_end + 1
     synced_block = last_synced_block(chain)
     metadata = get_claimable_metadata(chain, synced_block)
     end_block = metadata["endBlock"]
