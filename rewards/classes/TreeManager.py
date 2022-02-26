@@ -155,7 +155,7 @@ class TreeManager:
 
     def fetch_current_tree(self):
         if env_config.fix_cycle:
-            return json.loads(download_latest_tree(self.chain))
+            return download_latest_tree(self.chain)
         current_merkle = self.fetch_current_merkle_data()
         console.log(f"Current Merkle \n {current_merkle}")
         return self.fetch_tree(current_merkle)
