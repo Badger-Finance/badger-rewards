@@ -114,7 +114,7 @@ class RewardsManager:
                         snapshot=snapshot,
                         token=token,
                         block=self.end,
-                        custom_rewards=self.custom_behaviour,
+                        custom_rewards=self.CUSTOM_BEHAVIOUR,
                     )
                 )
             if boosted_emissions > 0:
@@ -124,7 +124,7 @@ class RewardsManager:
                         snapshot=self.boost_sett(sett, snapshot),
                         token=token,
                         block=self.end,
-                        custom_rewards=self.custom_behaviour,
+                        custom_rewards=self.CUSTOM_BEHAVIOUR,
                     )
                 )
 
@@ -325,7 +325,7 @@ class RewardsManager:
             all_dist_rewards.append(
                 distribute_rewards_from_total_snapshot(
                     amount, snapshot, token,
-                    block=self.end, custom_rewards=self.custom_behaviour,
+                    block=self.end, custom_rewards=self.CUSTOM_BEHAVIOUR
                 )
             )
         return combine_rewards(all_dist_rewards, self.cycle)

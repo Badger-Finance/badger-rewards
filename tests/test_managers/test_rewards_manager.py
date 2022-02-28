@@ -3,7 +3,8 @@ from copy import deepcopy
 from decimal import Decimal
 from math import isclose
 from unittest import TestCase
-
+from moto.core import patch_resource
+from rewards.aws.helpers import dynamodb
 import pytest
 from web3 import Web3
 
@@ -17,6 +18,7 @@ from rewards.classes.RewardsManager import InvalidRewardsTotalException
 from rewards.classes.Schedule import Schedule
 from tests.test_subgraph.test_data import BADGER_DISTRIBUTIONS_TEST_DATA
 from tests.utils import (
+    mock_get_claimable_data,
     mock_balances,
     mock_boosts,
     mock_boosts_split,
@@ -95,6 +97,9 @@ def mock_send_message_to_discord(
 def mock_fns(monkeypatch):
     monkeypatch.setattr(
         "helpers.discord.send_message_to_discord", mock_send_message_to_discord
+    )
+    monkeypatch.setattr(
+        "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
 
 
@@ -352,9 +357,11 @@ def test_calculate_sett_rewards__equal_balances_for_period(
         ("rewards.classes.RewardsManager.unclaimed_rewards_handler", ETH_BADGER_TREE),
     ]
 )
-def test_calculate_sett_rewards__call_custom_handler_bvecvx(
-        schedule, mocker, boosts_split, mock_discord, handler_path, addr
+def test_calculate_sett_rewards__call_custom_handler(
+        schedule, mocker, boosts_split, mock_discord, handler_path, addr, setup_dynamodb
 ):
+    patch_resource(dynamodb)
+
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     mocker.patch("rewards.classes.RewardsManager.check_token_totals_in_range")
     mocker.patch(

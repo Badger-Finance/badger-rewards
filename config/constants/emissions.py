@@ -13,7 +13,6 @@ TREE_REWARDS_BLACKLIST = {
     addresses.CREAM_BBADGER: "Cream bBadger",
     addresses.SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     addresses.BBADGER: "Badger Vault",
-    addresses.BADGER_PAYMENTS: "Badger Payments",
 }
 NATIVE_TOKEN_REWARDS = {
     Network.Ethereum: [addresses.BADGER, addresses.DIGG]
