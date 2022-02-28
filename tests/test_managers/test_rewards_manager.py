@@ -3,12 +3,13 @@ from copy import deepcopy
 from decimal import Decimal
 from math import isclose
 from unittest import TestCase
+from unittest.mock import MagicMock
 from moto.core import patch_resource
 from rewards.aws.helpers import dynamodb
 import pytest
 from web3 import Web3
-
-from config.constants.addresses import BADGER
+from config.constants import addresses
+from config.constants.addresses import BADGER, TECH_OPS
 from config.constants.addresses import BVECVX_CVX_LP
 from config.constants.addresses import ETH_BADGER_TREE
 from config.constants.addresses import IBBTC_PEAK
@@ -350,15 +351,16 @@ def test_calculate_sett_rewards__equal_balances_for_period(
 
 
 @pytest.mark.parametrize(
-    "handler_path, addr",
+    "addr",
     [
-        ("rewards.classes.RewardsManager.bvecvx_lp_handler", BVECVX_CVX_LP),
-        ("rewards.classes.RewardsManager.ibbtc_peak_handler", IBBTC_PEAK),
-        ("rewards.classes.RewardsManager.unclaimed_rewards_handler", ETH_BADGER_TREE),
+        BVECVX_CVX_LP,
+        IBBTC_PEAK,
+        ETH_BADGER_TREE,
+        TECH_OPS
     ]
 )
 def test_calculate_sett_rewards__call_custom_handler(
-        schedule, mocker, boosts_split, mock_discord, handler_path, addr, setup_dynamodb
+        schedule, mocker, boosts_split, mock_discord, addr, setup_dynamodb
 ):
     patch_resource(dynamodb)
 
@@ -368,7 +370,14 @@ def test_calculate_sett_rewards__call_custom_handler(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         return_value={addr: 1000}
     )
-    custom_handler = mocker.patch(handler_path)
+
+    mock_handler = MagicMock()
+    RewardsManager.CUSTOM_BEHAVIOUR = {
+        addresses.ETH_BADGER_TREE: mock_handler,
+        addresses.IBBTC_PEAK: mock_handler,
+        addresses.BVECVX_CVX_LP: mock_handler,
+        addresses.TECH_OPS: mock_handler,
+    }
     sett = SETTS[Network.Ethereum]["ibbtc_crv"]
     all_schedules = {sett: {BADGER: [schedule(sett, 100)]}}
 
@@ -379,7 +388,8 @@ def test_calculate_sett_rewards__call_custom_handler(
     rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
-    assert custom_handler.called
+    print(RewardsManager.CUSTOM_BEHAVIOUR)
+    assert mock_handler.called
 
 
 def test_calculate_sett_rewards__balances_vary_for_period(
