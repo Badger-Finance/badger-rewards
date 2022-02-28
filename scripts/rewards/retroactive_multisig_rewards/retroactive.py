@@ -19,7 +19,8 @@ def retroactive_func(tree, tree_manager):
             claimed_for = tree_manager.get_claimed_for(addr, move_claim["tokens"])
             cumulative_claimable = dict(zip(move_claim["tokens"], move_claim["cumulativeAmounts"]))
             for token in move_claim["tokens"]:
-                move_claimable = int(cumulative_claimable.get(token, 0)) - int(claimed_for.get(token, 0))
+                cumulative_claimable_amount = int(cumulative_claimable.get(token, 0))
+                move_claimable = cumulative_claimable_amount - int(claimed_for.get(token, 0))
                 rewards_list.increase_user_rewards(addresses.TREASURY_OPS, token, move_claimable)
                 rewards_list.decrease_user_rewards(addr, token, move_claimable)
 
