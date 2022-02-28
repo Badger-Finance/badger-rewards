@@ -1,6 +1,8 @@
-from rewards.utils.rewards_utils import merkle_tree_to_rewards_list
+from rewards.utils.rewards_utils import (
+    get_cumulative_claimable_for_token,
+    merkle_tree_to_rewards_list
+)
 import config.constants.addresses as addresses
-
 addresses_to_move = [
     addresses.DEV_MULTISIG,
     addresses.TECH_OPS,
@@ -28,7 +30,11 @@ def retroactive_func(tree, tree_manager):
 
 
 def test_retroactive_func(old_tree, new_tree):
-    old_tree_totals = old_tree["tokenTotals"]
-    new_tree_totals = new_tree["tokenTotals"]
-    for token, total in old_tree_totals.items():
-        assert new_tree_totals[token] == total
+    change_amount = {}
+    for addr in addresses_to_move:
+        for token in old_tree["tokenTotals"]:
+            before = get_cumulative_claimable_for_token(old_tree["claims"][addr], token)
+            after = get_cumulative_claimable_for_token(new_tree["claims"][addr], token)
+            change_amount[token] = change_amount.get(token, 0) + after - before
+    for token in change_amount.keys():
+        assert change_amount[token] <= 0
