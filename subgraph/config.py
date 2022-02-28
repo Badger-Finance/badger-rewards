@@ -12,6 +12,9 @@ subgraph_urls = {
         Network.Ethereum: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao",
         Network.Polygon: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-polygon",
         Network.Arbitrum: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-arbitrum",
+        Network.Fantom: (
+            "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-fantom"
+        ),
         Network.xDai: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-xdai",
         # Token graphs
         f"tokens-{Network.Ethereum}": (
@@ -25,6 +28,9 @@ subgraph_urls = {
         ),
         f"tokens-{Network.Arbitrum}": (
             "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-arbitrum"
+        ),
+        f"tokens-{Network.Fantom}": (
+            "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-fantom"
         ),
         "fuse": "https://api.thegraph.com/subgraphs/name/darruma/fuse-subgraph-badger",
         "thegraph": "https://api.thegraph.com/index-node/graphql",

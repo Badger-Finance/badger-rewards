@@ -7,8 +7,7 @@ from rich.console import Console
 from tabulate import tabulate
 
 from badger_api.requests import fetch_token
-from config.constants.addresses import BVECVX_CVX_LP
-from config.constants.addresses import ETH_BADGER_TREE, IBBTC_PEAK
+import config.constants.addresses as addresses
 from config.constants.chain_mappings import BOOSTED_EMISSION_TOKENS
 from config.constants.emissions import (
     NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS,
@@ -26,7 +25,10 @@ from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
 from rewards.emission_handlers import (
-    ibbtc_peak_handler, unclaimed_rewards_handler, bvecvx_lp_handler,
+    ibbtc_peak_handler,
+    bvecvx_lp_handler,
+    unclaimed_rewards_handler,
+    treasury_handler
 )
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import total_twap_sett_snapshot
@@ -46,6 +48,17 @@ class InvalidRewardsTotalException(Exception):
 
 
 class RewardsManager:
+    CUSTOM_BEHAVIOUR = {
+        addresses.ETH_BADGER_TREE: unclaimed_rewards_handler,
+        addresses.IBBTC_PEAK: ibbtc_peak_handler,
+        addresses.BVECVX_CVX_LP: bvecvx_lp_handler,
+        addresses.DEV_MULTISIG: treasury_handler,
+        addresses.TECH_OPS: treasury_handler,
+        addresses.TEST_MULTISIG: treasury_handler,
+        addresses.BADGER_PAYMENTS: treasury_handler,
+        addresses.OPS_MULTISIG_OLD: treasury_handler,
+        addresses.TREASURY_VAULT: treasury_handler
+    }
 
     def __init__(self, chain: Network, cycle: int, start: int, end: int, boosts):
         self.chain = chain
@@ -56,11 +69,6 @@ class RewardsManager:
         self.end = int(end)
         self.boosts = boosts
         self.apy_boosts = {}
-        self.custom_behaviour = {
-            ETH_BADGER_TREE: unclaimed_rewards_handler,
-            IBBTC_PEAK: ibbtc_peak_handler,
-            BVECVX_CVX_LP: bvecvx_lp_handler
-        }
 
     def fetch_sett_snapshot(
         self, start_block: int, end_block: int, sett: str

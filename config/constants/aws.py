@@ -14,6 +14,10 @@ MONITORING_SECRET_NAMES = {
             BotType.Cycle: "cycle-bot/arbitrum/prod-discord-url",
             BotType.Boost: "boost-bot/arbitrum/prod-discord-url",
         },
+        Network.Fantom: {
+            BotType.Cycle: "cycle-bot/ftm/prod-discord-url",
+            BotType.Boost: "boost-bot/ftm/prod-discord-url",
+        },
     },
     Environment.Staging: {
         Network.Ethereum: {
@@ -28,6 +32,10 @@ MONITORING_SECRET_NAMES = {
             BotType.Cycle: "cycle-bot/test-discord-url",
             BotType.Boost: "boost-bot/arbitrum/staging-discord-url",
         },
+        Network.Fantom: {
+            BotType.Cycle: "cycle-bot/ftm/staging-discord-url",
+            BotType.Boost: "boost-bot/ftm/staging-discord-url",
+        },
     },
     Environment.Test: {
         Network.Ethereum: {
@@ -39,6 +47,10 @@ MONITORING_SECRET_NAMES = {
             BotType.Boost: "boost-bot/test-discord-url",
         },
         Network.Arbitrum: {
+            BotType.Cycle: "cycle-bot/test-discord-url",
+            BotType.Boost: "boost-bot/test-discord-url",
+        },
+        Network.Fantom: {
             BotType.Cycle: "cycle-bot/test-discord-url",
             BotType.Boost: "boost-bot/test-discord-url",
         },

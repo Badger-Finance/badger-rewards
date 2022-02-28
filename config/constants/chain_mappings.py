@@ -52,6 +52,9 @@ SETTS = {
         "tricrypto": addresses.POLY_BCRV_TRICRYPTO,
         "crv_wbtc_renbtc": addresses.POLY_BCRV_RENBTC_WBTC,
     },
+    Network.Fantom: {
+        "smm_usdc_dai": addresses.FTM_BSMM_USDC_DAI
+    }
 }
 
 TOKENS_TO_CHECK = {
@@ -74,6 +77,9 @@ TOKENS_TO_CHECK = {
         "Badger": addresses.POLY_BADGER,
         "Sushi": addresses.POLY_SUSHI,
     },
+    Network.Fantom: {
+        "Solidly": addresses.FTM_SOLIDLY,
+    }
 }
 
 EMISSIONS_CONTRACTS = {
@@ -101,18 +107,27 @@ EMISSIONS_CONTRACTS = {
             "GasOracle": addresses.ARB_GAS_ORACLE,
         }
     ),
+    Network.Fantom: DotMap(
+        {
+            "BadgerTree": addresses.FTM_BADGER_TREE,
+            "RewardsLogger": addresses.FTM_REWARDS_LOGGER,
+            "GasOracle": addresses.FTM_GAS_ORACLE
+        }
+    )
 }
 
 CHAIN_IDS = {
     Network.Ethereum: 1,
     Network.Arbitrum: 42161,
     Network.Polygon: 137,
+    Network.Fantom: 250
 }
 
 NETWORK_TO_BADGER_TOKEN = {
     Network.Ethereum: addresses.BADGER,
     Network.Polygon: addresses.POLY_BADGER,
     Network.Arbitrum: addresses.ARB_BADGER,
+    Network.Fantom: addresses.FTM_BADGER
 }
 
 CLAIMABLE_TOKENS = {
@@ -122,6 +137,10 @@ CLAIMABLE_TOKENS = {
     },
     Network.Arbitrum: {BalanceType.Native: [addresses.ARB_BADGER], BalanceType.NonNative: []},
     Network.Polygon: {BalanceType.Native: [addresses.POLY_BADGER], BalanceType.NonNative: []},
+    Network.Fantom: {
+        BalanceType.Native: [],
+        BalanceType.NonNative: [addresses.FTM_SOLIDLY]
+    }
 }
 
 UNCLAIMED_REWARDS_TOKENS = {
@@ -137,10 +156,12 @@ ABI_DIRS = {
     Network.Ethereum: "eth",
     Network.Polygon: "polygon",
     Network.Arbitrum: "arbitrum",
+    Network.Fantom: "fantom"
 }
 
 DECIMAL_MAPPING = {
     Network.Ethereum: 1e18,
     Network.Polygon: 1e18,
     Network.Arbitrum: 1e18,
+    Network.Fantom: 1e18
 }

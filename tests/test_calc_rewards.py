@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 import pytest
 from brownie import accounts
 
@@ -11,7 +9,6 @@ from rewards.classes.TreeManager import TreeManager
 @pytest.fixture
 def prepare_approve_mocks(mocker):
     mocker.patch("rewards.calc_rewards.download_proposed_boosts", return_value={})
-    mocker.patch("rewards.calc_rewards.cycle_logger", MagicMock())
     mocker.patch(
         "rewards.calc_rewards.generate_rewards_in_range",
         return_value={

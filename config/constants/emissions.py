@@ -1,7 +1,6 @@
 import config.constants.addresses as addresses
 from helpers.enums import Network
 
-
 SCHEDULE_REWARDS_BLACKLIST = {
     addresses.DEV_MULTISIG: "Badger Dev Multisig",
     addresses.TECH_OPS: "Badger Tech Ops",
@@ -95,3 +94,5 @@ NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS = 2
 REWARD_ERROR_TOLERANCE = 0.01
 
 ZERO_CYCLE = 0
+
+NO_BOOST = [Network.Fantom]

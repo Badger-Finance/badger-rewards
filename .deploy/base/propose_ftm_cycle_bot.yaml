@@ -1,0 +1,28 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: propose-ftm-cycle-bot
+  labels:
+    app: propose-ftm-cycle-bot
+spec:
+  schedule: "5 */2 * * *"
+  startingDeadlineSeconds: 180
+  suspend: True
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: propose-ftm-cycle-bot
+          containers:
+          - name: propose-ftm-cycle-bot
+            image: IMAGE_NAME
+            imagePullPolicy: IfNotPresent
+            command: ["python", "-m", "scripts.rewards.fantom.propose_fantom"]
+            env:
+              - name: LOG_LEVEL
+                value: 'info'
+              - name: ENV
+                value: 'PROD'
+              - name: KUBE
+                value: 'True'
+          restartPolicy: OnFailure
