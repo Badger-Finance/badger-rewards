@@ -33,8 +33,11 @@ def test_retroactive_func(old_tree, new_tree):
     change_amount = {}
     for addr in addresses_to_move:
         for token in old_tree["tokenTotals"]:
-            before = get_cumulative_claimable_for_token(old_tree["claims"][addr], token)
-            after = get_cumulative_claimable_for_token(new_tree["claims"][addr], token)
+            if addr in old_tree["claims"]:
+                before = get_cumulative_claimable_for_token(old_tree["claims"][addr], token)
+                after = get_cumulative_claimable_for_token(new_tree["claims"][addr], token)
             change_amount[token] = change_amount.get(token, 0) + after - before
     for token in change_amount.keys():
-        assert change_amount[token] <= 0
+        if change_amount[token] > 0:
+            return False
+    return True
