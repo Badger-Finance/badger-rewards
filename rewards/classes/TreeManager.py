@@ -139,9 +139,10 @@ class TreeManager:
         return self.badger_tree.getClaimableFor(user, tokens, cumAmounts).call()
 
     def get_claimed_for(self, user: str, tokens: List[str]):
-        return self.badger_tree.getClaimedFor(
+        claimed_for_data = self.badger_tree.getClaimedFor(
             self.w3.toChecksumAddress(user), list(tokens)
         ).call()
+        return dict(zip(claimed_for_data[0], claimed_for_data[1]))
 
     def has_pending_root(self) -> bool:
         return self.badger_tree.hasPendingRoot().call()
