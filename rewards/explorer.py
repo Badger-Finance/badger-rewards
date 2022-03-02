@@ -1,9 +1,6 @@
 import time
 from typing import Dict, List, Optional, Union
 
-from config.constants import ARBITRUM_BLOCK_BUFFER
-from config.constants import FANTOM_BLOCK_BUFFER
-from config.constants import POLYGON_BLOCK_BUFFER
 from config.singletons import env_config
 from helpers.enums import Network
 from helpers.http_client import http_client
@@ -39,7 +36,7 @@ def fetch_block_by_timestamp_for_ftm(timestamp: int) -> int:
 
 def get_block_by_timestamp(chain: Network, timestamp: int) -> int:
     if chain == Network.Fantom:
-        return get_block_by_timestamp_for_ftm(timestamp)
+        return fetch_block_by_timestamp_for_ftm(timestamp)
     response = fetch_block_by_timestamp(chain, timestamp)
     while response["status"] == "0":
         time.sleep(1)
@@ -47,6 +44,7 @@ def get_block_by_timestamp(chain: Network, timestamp: int) -> int:
         response = fetch_block_by_timestamp(chain, timestamp)
 
     return int(response["result"])
+
 
 def get_explorer_url(chain: Network, tx_hash: str) -> str:
     return f"https://{CHAIN_EXPLORER_URLS[chain]}/tx/{tx_hash}"

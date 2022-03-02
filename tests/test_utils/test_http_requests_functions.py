@@ -6,14 +6,10 @@ from badger_api.requests import fetch_ppfs
 from badger_api.requests import fetch_token
 from badger_api.requests import fetch_token_names
 from badger_api.requests import fetch_token_prices
-from config.constants import ARBITRUM_BLOCK_BUFFER
-from config.constants import POLYGON_BLOCK_BUFFER
-from config.constants import FANTOM_BLOCK_BUFFER
 from config.constants.emissions import BOOST_CHAINS
-from config.constants.chain_mappings import CHAIN_IDS
 from helpers.enums import Network
 from rewards.explorer import CHAIN_EXPLORER_URLS
-from rewards.explorer import get_block_by_timestamp
+from rewards.explorer import get_block_by_timestamp, fetch_block_by_timestamp
 from rewards.explorer import get_explorer_url
 
 
@@ -68,6 +64,7 @@ def test_fetch_token_names_handled(mock_discord):
     assert mock_discord.call_count == 1
     assert not fetch_token(Network.Ethereum, "token")
 
+
 @pytest.mark.parametrize(
     "chain",
     [Network.Polygon, Network.Fantom, Network.Arbitrum]
@@ -97,14 +94,8 @@ def test_get_block_by_timestamp(mock_discord, chain):
         status=200,
     )
     data = get_block_by_timestamp(chain, block)
-    if chain == Network.Ethereum:
-        assert data == block
-    if chain == Network.Polygon:
-        assert data == block - POLYGON_BLOCK_BUFFER
-    if chain == Network.Arbitrum:
-        assert data == block - ARBITRUM_BLOCK_BUFFER
-    if chain == Network.Fantom:
-         assert data == block - FANTOM_BLOCK_BUFFER
+    assert data == block
+
 
 @pytest.mark.parametrize(
     "chain",
