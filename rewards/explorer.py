@@ -39,7 +39,7 @@ def fetch_block_by_timestamp_for_ftm(timestamp: int) -> int:
 
 def get_block_by_timestamp(chain: Network, timestamp: int) -> int:
     if chain == Network.Fantom:
-        return fetch_block_by_timestamp_for_ftm(timestamp)
+        return get_block_by_timestamp_for_ftm(timestamp)
     response = fetch_block_by_timestamp(chain, timestamp)
     while response["status"] == "0":
         time.sleep(1)
@@ -47,21 +47,6 @@ def get_block_by_timestamp(chain: Network, timestamp: int) -> int:
         response = fetch_block_by_timestamp(chain, timestamp)
 
     return int(response["result"])
-
-
-def convert_from_eth(block) -> Dict[str, int]:
-    """
-    Convert block from eth to blocks on other chains
-    """
-    timestamp = env_config.get_web3().eth.get_block(block)["timestamp"]
-    return {
-        Network.Ethereum: block,
-        Network.Fantom: fetch_block_by_timestamp_for_ftm(timestamp) - FANTOM_BLOCK_BUFFER,
-        Network.Polygon: get_block_by_timestamp(Network.Polygon, timestamp) - POLYGON_BLOCK_BUFFER,
-        Network.Arbitrum: get_block_by_timestamp(
-            Network.Arbitrum, timestamp) - ARBITRUM_BLOCK_BUFFER,
-    }
-
 
 def get_explorer_url(chain: Network, tx_hash: str) -> str:
     return f"https://{CHAIN_EXPLORER_URLS[chain]}/tx/{tx_hash}"

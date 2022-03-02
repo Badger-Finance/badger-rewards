@@ -10,10 +10,10 @@ from config.constants import ARBITRUM_BLOCK_BUFFER
 from config.constants import POLYGON_BLOCK_BUFFER
 from config.constants import FANTOM_BLOCK_BUFFER
 from config.constants.emissions import BOOST_CHAINS
+from config.constants.chain_mappings import CHAIN_IDS
 from helpers.enums import Network
 from rewards.explorer import CHAIN_EXPLORER_URLS
-from rewards.explorer import convert_from_eth
-from rewards.explorer import fetch_block_by_timestamp
+from rewards.explorer import get_block_by_timestamp
 from rewards.explorer import get_explorer_url
 
 
@@ -68,38 +68,43 @@ def test_fetch_token_names_handled(mock_discord):
     assert mock_discord.call_count == 1
     assert not fetch_token(Network.Ethereum, "token")
 
-
+@pytest.mark.parametrize(
+    "chain",
+    [Network.Polygon, Network.Fantom, Network.Arbitrum]
+)
 @responses.activate
-def test_convert_from_eth(mock_discord):
+def test_get_block_by_timestamp(mock_discord, chain):
     block = 100000
     timestamp = 1439799138
     responses.add_passthru("https://")
-    for network in [Network.Ethereum, Network.Arbitrum, Network.Polygon]:
-        # static timestamp for ETH for block 100000
-        responses.add(
-            responses.GET,
-            f"https://api.{CHAIN_EXPLORER_URLS[network]}/api?module=block&action="
-            f"getblocknobytime&timestamp={timestamp}&closest=before&apikey=",
-            json={
-                'status': "1",
-                'result': f"{block}"
-            },
-            status=200,
-        )
-        responses.add(
-            responses.POST,
-            "https://api.thegraph.com/subgraphs/name/elkfinance/ftm-blocks",
-            json={
-                'data': {'blocks': [{'timestamp': '1439799138', 'number': '100000'}]}
-            },
-            status=200,
-        )
-    data = convert_from_eth(block)
-    assert data[Network.Ethereum] == block
-    assert data[Network.Polygon] == block - POLYGON_BLOCK_BUFFER
-    assert data[Network.Arbitrum] == block - ARBITRUM_BLOCK_BUFFER
-    assert data[Network.Fantom] == block - FANTOM_BLOCK_BUFFER
-
+    # static timestamp for ETH for block 100000
+    responses.add(
+        responses.GET,
+        f"https://api.{CHAIN_EXPLORER_URLS[chain]}/api?module=block&action="
+        f"getblocknobytime&timestamp={timestamp}&closest=before&apikey=",
+        json={
+            'status': "1",
+            'result': f"{block}"
+        },
+        status=200,
+    )
+    responses.add(
+        responses.POST,
+        "https://api.thegraph.com/subgraphs/name/elkfinance/ftm-blocks",
+        json={
+            'data': {'blocks': [{'timestamp': '1439799138', 'number': '100000'}]}
+        },
+        status=200,
+    )
+    data = get_block_by_timestamp(chain, block)
+    if chain == Network.Ethereum:
+        assert data == block
+    if chain == Network.Polygon:
+        assert data == block - POLYGON_BLOCK_BUFFER
+    if chain == Network.Arbitrum:
+        assert data == block - ARBITRUM_BLOCK_BUFFER
+    if chain == Network.Fantom:
+         assert data == block - FANTOM_BLOCK_BUFFER
 
 @pytest.mark.parametrize(
     "chain",
