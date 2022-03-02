@@ -20,26 +20,6 @@ from tests.utils import mock_tree
 logger = logging.getLogger("cycle-utils")
 
 
-class MockCycleLogger:
-    def __init__(self):
-        pass
-
-    def save(self, *args, **kwargs):
-        pass
-
-    def set_start_block(self, start):
-        pass
-
-    def set_end_block(self, end):
-        pass
-
-    def set_content_hash(self, root_hash):
-        pass
-
-    def set_merkle_root(self, root):
-        pass
-
-
 def mock_fetch_current_tree(*args, **kwargs):
     return mock_tree
 

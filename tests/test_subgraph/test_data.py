@@ -71,17 +71,58 @@ ACROSS_BALANCES_TEST_DATA = {
     ]
 }
 
-FUSE_TOKEN_TEST_DATA = {
+TOKEN_BALANCES_TEST_DATA = {
+    'tokenBalances':
+        [
+            {
+                'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6'
+                      '-0x3472a5a71965499acd81997a54bba8d852c6e53d',
+                'balance': '21000000000000000000000000', 'token': {'symbol': 'BADGER'}
+            },
+            {
+                'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6'
+                      '-0x798d1be841a82a273720ce31c822c61a67a601c3',
+                'balance': '1157920892373161954235709850086879078532699846656405640394575840040',
+                'token': {'symbol': 'DIGG'}},
+            {
+                'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6'
+                      '-0xc4e15973e6ff2a35cc804c2cf9d2a1b817a8b40f',
+                'balance': '4842839650671116765534', 'token': {'symbol': 'ibBTC'}
+            }
+        ]
+}
+
+TOKEN_BALANCES_TEST_DATA_ZERO_BALANCES = {
+    'tokenBalances':
+        [
+            {
+                'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6'
+                      '-0x3472a5a71965499acd81997a54bba8d852c6e53d',
+                'balance': '0', 'token': {'symbol': 'BADGER'}
+            },
+            {
+                'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6'
+                      '-0x798d1be841a82a273720ce31c822c61a67a601c3',
+                'balance': '0',
+                'token': {'symbol': 'DIGG'}
+            },
+        ]
+}
+
+FUSE_BALANCES_TEST_DATA = {
     'accountCTokens': [
         {
-            'id': '',
-            'account': {'id':  '0xc1e3ec0fe5a77aa7a264637b86c2e25182c82daa'},
-            'cTokenBalance': '300000000000000000000'
+            'id': '0x6780b4681aa8efe530d075897b3a4ff6ca5ed807'
+                  '-0x00c67d9d6d3d13b42a87424e145826c467cccd84',
+            'symbol': 'fBADGER-22',
+            'account': {'id': '0x15bc539b99f7019fe0d025ce26fda395b17b5f74'},
+            'cTokenBalance': '36406777910624.73873604'
         },
         {
-            'id': '',
-            'account': {'id': '0x0279797ee0627d64ffa0d86f4f111f90e233b090'},
-            'cTokenBalance': '1000000000000000000000'
+            'id': '0x792a676dd661e2c182435aaefc806f1d4abdc486'
+                  '-0x15bc539b99f7019fe0d025ce26fda395b17b5f74',
+            'symbol': 'fDIGG-22', 'account': {'id': '0x15bc539b99f7019fe0d025ce26fda395b17b5f74'},
+            'cTokenBalance': '2.98041466'
         },
     ]
 }

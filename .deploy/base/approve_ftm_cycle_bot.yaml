@@ -1,23 +1,23 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-    name: approve-arb-cycle-bot
+    name: approve-ftm-cycle-bot
     labels:
-        app: approve-arb-cycle-bot
+        app: approve-ftm-cycle-bot
 spec:
     schedule: '15 */2 * * *'
     startingDeadlineSeconds: 180
-    suspend: false
+    suspend: True
     jobTemplate:
         spec:
             template:
                 spec:
-                    serviceAccountName: approve-arb-cycle-bot
+                    serviceAccountName: approve-ftm-cycle-bot
                     containers:
-                        - name: approve-arb-cycle-bot
+                        - name: approve-ftm-cycle-bot
                           image: IMAGE_NAME
                           imagePullPolicy: IfNotPresent
-                          command: ['python', '-m', 'scripts.rewards.arbitrum.approve_arbitrum']
+                          command: ['python', '-m', 'scripts.rewards.fantom.approve_fantom']
                           env:
                               - name: LOG_LEVEL
                                 value: 'info'
@@ -25,6 +25,4 @@ spec:
                                 value: 'PROD'
                               - name: KUBE
                                 value: 'True'
-                              - name: 'FIX_CYCLE'
-                                value: 'False'
                     restartPolicy: OnFailure

@@ -1,6 +1,7 @@
 import math
 from functools import lru_cache
 from decimal import Decimal
+from numbers import Number
 from typing import (
     Dict,
     Tuple,
@@ -90,8 +91,8 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
 
 @lru_cache(maxsize=None)
 def fetch_token_balances(
-        client: Client, block_number: int, chain: str
-) -> Tuple[Dict[str, int], Dict[str, int]]:
+        client: Client, block_number: int, chain: Network
+) -> Tuple[Dict[str, Number], Dict[str, Number]]:
     increment = 1000
     query = token_query()
 
@@ -122,13 +123,9 @@ def fetch_token_balances(
                         if entry["token"]["symbol"] == "BADGER":
                             badger_balances[address] = amount / DECIMAL_MAPPING[chain]
                         if entry["token"]["symbol"] == "DIGG":
-                            # Speed this up
-                            if entry["balance"] == 0:
-                                fragment_balance = 0
-                            else:
-                                fragment_balance = digg_utils.shares_to_fragments(
-                                    int(amount)
-                                )
+                            fragment_balance = digg_utils.shares_to_fragments(
+                                int(amount)
+                            )
                             digg_balances[address] = float(fragment_balance) / 1e9
     except Exception as e:
         send_error_to_discord(
@@ -155,6 +152,7 @@ def fetch_fuse_token_info(chain: Network, block: int) -> Dict:
             "contract": "0x792a676dD661E2c182435aaEfC806F1d4abdC486",
         },
     }
+
 
 def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, Decimal]:
 
@@ -282,16 +280,16 @@ def fetch_fuse_pool_balances(client, chain, block):
 
     query = gql(
         """
-        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {{
-            accountCTokens(block: $block_number, where: $token_filter) {{
+        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {
+            accountCTokens(block: $block_number, where: $token_filter) {
                 id
                 symbol
-                account{{
+                account{
                     id
-                }}
+                }
                 cTokenBalance
-            }}
-        }}
+            }
+        }
         """
     )
 

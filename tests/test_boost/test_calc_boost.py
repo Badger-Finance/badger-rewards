@@ -4,6 +4,7 @@ import pytest
 
 from config.constants.emissions import STAKE_RATIO_RANGES
 from helpers.enums import Network
+from rewards.boost.calc_boost import allocate_bvecvx_to_users
 from rewards.boost.calc_boost import (
     allocate_nft_balances_to_users,
     allocate_nft_to_users,
@@ -31,6 +32,33 @@ def test_calc_stake_ratio__happy():
         calc_stake_ratio(TEST_USER, BoostBalances(target, target))
         == pytest.approx(list(target.values())[0] / list(target.values())[0])
     )
+
+
+def test_allocate_bvecvx_to_users():
+    user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    bve_balances = {user: Decimal(100)}
+    boost_info = {
+        user: {
+            'nativeBalance': Decimal(10)
+        }
+    }
+    allocate_bvecvx_to_users(
+        boost_info,
+        bve_balances,
+    )
+    assert boost_info[user]['nativeBalance'] == Decimal(15)
+    assert boost_info[user]['bveCvxBalance'] == Decimal(5)
+
+
+def test_allocate_bvecvx_to_users__no_user_boost():
+    user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    bve_balances = {user: Decimal(100)}
+    boost_info = {}
+    allocate_bvecvx_to_users(
+        boost_info,
+        bve_balances,
+    )
+    assert boost_info.get(user) is None
 
 
 def test_calc_stake_ratio__zero_native():

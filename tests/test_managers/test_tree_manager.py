@@ -1,9 +1,13 @@
 import json
+from unittest.mock import MagicMock
 
 import pytest
+from brownie import accounts
 from eth_account import Account
 
+from config.constants import GAS_BUFFER
 from helpers.enums import Network
+from tests.test_utils.cycle_utils import mock_tree_manager
 from tests.utils import mock_tree
 from tests.utils import set_env_vars
 from tests.utils import test_key
@@ -49,3 +53,16 @@ def test_matches_pending_hash(tree_manager):
 
     random_hash = "0xb8ed7da2062b6bdf6f20bcdb4ab35538592216ac70a4bfe986af748603debfd8"
     assert not tree_manager.matches_pending_hash(random_hash)
+
+
+def test_ftm_tx_details__gas_price(mocker):
+    gas_price = 123
+    mocker.patch("rewards.classes.TreeManager.env_config.get_web3", return_value=MagicMock())
+    mocker.patch("rewards.classes.TreeManager.get_badger_tree", MagicMock())
+    mocker.patch("rewards.classes.TreeManager.get_discord_url", MagicMock())
+    tree_manager = mock_tree_manager(Network.Fantom, accounts[0], None)
+    tree_manager.w3 = MagicMock(eth=MagicMock(gas_price=gas_price))
+    assert (
+        tree_manager.get_tx_options(accounts[0])['gasPrice']
+        == gas_price * GAS_BUFFER
+    )
