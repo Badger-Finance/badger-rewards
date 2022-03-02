@@ -38,6 +38,8 @@ def fetch_block_by_timestamp_for_ftm(timestamp: int) -> int:
 
 
 def get_block_by_timestamp(chain: Network, timestamp: int) -> int:
+    if chain == Network.Fantom:
+        return fetch_block_by_timestamp_for_ftm(timestamp)
     response = fetch_block_by_timestamp(chain, timestamp)
     while response["status"] == "0":
         time.sleep(1)
