@@ -83,5 +83,5 @@ def test_ftm_tx_details__gas_price(mocker):
     tree_manager.w3 = MagicMock(eth=MagicMock(gas_price=gas_price))
     assert (
         tree_manager.get_tx_options(accounts[0])['gasPrice']
-        == gas_price * GAS_BUFFER
+        == int(gas_price * GAS_BUFFER)
     )
