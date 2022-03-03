@@ -210,9 +210,6 @@ def generate_rewards_in_range(
     """
     all_schedules, setts = fetch_all_schedules(chain, fetch_setts(chain))
 
-    if len(setts) == 0:
-        setts = fetch_setts(chain)
-
     console_and_discord(f"Generating rewards for {len(setts)} setts", chain)
 
     rewards_list = []
