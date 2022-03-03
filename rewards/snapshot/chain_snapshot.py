@@ -9,6 +9,7 @@ from config.constants.emissions import (
     DISABLED_VAULTS,
     EMISSIONS_BLACKLIST,
     NATIVE,
+    NO_BOOST,
     PRO_RATA_VAULTS,
     REWARDS_BLACKLIST,
 )
@@ -110,7 +111,10 @@ def parse_sett_balances(
     }
 
     sett_type = BalanceType.Native if sett_address in NATIVE else BalanceType.NonNative
-    sett_ratio = get_token_weight(sett_address, chain)
+    if chain in NO_BOOST:
+        sett_ratio = 1
+    else:
+        sett_ratio = get_token_weight(sett_address, chain)
 
     console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
 

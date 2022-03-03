@@ -113,7 +113,7 @@ def test_chain_snapshot__raises(mocker, chain):
 
 @pytest.mark.parametrize(
     "chain",
-    [Network.Ethereum, Network.Arbitrum]
+    [Network.Ethereum, Network.Arbitrum, Network.Fantom]
 )
 def test_parse_sett_balances(chain):
     snapshot = parse_sett_balances(
