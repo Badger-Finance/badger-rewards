@@ -82,6 +82,7 @@ def custom_eth_approve(chain, custom_calc: Callable, custom_test: Callable):
 def custom_calculation(tree, tree_manager, chain, custom_calc: Callable,
                        custom_test: Callable = None):
     rewards_list = custom_calc(tree, tree_manager)
+    rewards_list.cycle += 1
     start_block = int(tree["endBlock"]) + 1
     end_block = start_block
     merkle_tree = rewards_to_merkle_tree(rewards_list, start_block, end_block)
