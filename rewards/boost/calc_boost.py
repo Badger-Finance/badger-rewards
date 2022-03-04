@@ -1,4 +1,5 @@
 from decimal import Decimal
+import math
 from typing import Any, Dict, List, Tuple
 
 from rich.console import Console
@@ -55,9 +56,9 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
     for addr, stake_ratio in stake_ratios.items():
         user_boost = 1
         user_stake_range = 0
-        for stake_range, multiplier in STAKE_RATIO_RANGES:
+        for stake_range, _ in STAKE_RATIO_RANGES:
             if stake_ratio > stake_range:
-                user_boost = multiplier
+                user_boost = min(math.floor(stake_ratio * 2000), 2000)
                 user_stake_range = stake_range
 
         stake_data_ranges[user_stake_range] = stake_data_ranges.get(user_stake_range, 0) + 1
