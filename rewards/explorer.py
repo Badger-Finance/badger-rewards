@@ -1,18 +1,10 @@
 import time
 from typing import Dict, List, Optional, Union
 
-from config.constants import ARBITRUM_BLOCK_BUFFER
-from config.constants import FANTOM_BLOCK_BUFFER
-from config.constants import POLYGON_BLOCK_BUFFER
+from config.constants.chain_mappings import CHAIN_EXPLORER_URLS
 from config.singletons import env_config
 from helpers.enums import Network
 from helpers.http_client import http_client
-
-CHAIN_EXPLORER_URLS = {
-    Network.Ethereum: "etherscan.io",
-    Network.Polygon: "polygonscan.com",
-    Network.Arbitrum: "arbiscan.io",
-}
 
 
 def fetch_block_by_timestamp(chain: Network, timestamp: int) -> Optional[Union[Dict, List]]:
@@ -26,7 +18,7 @@ def fetch_block_by_timestamp(chain: Network, timestamp: int) -> Optional[Union[D
 
 def fetch_block_by_timestamp_for_ftm(timestamp: int) -> int:
     query = f"""{{
-      blocks(where: {{timestamp_gte: {timestamp}}},orderBy:number, orderDirection:desc, first: 1) {{
+      blocks(where: {{timestamp_lte: {timestamp}}},orderBy:number, orderDirection:desc, first: 1) {{
         timestamp
         number
       }}
@@ -38,6 +30,8 @@ def fetch_block_by_timestamp_for_ftm(timestamp: int) -> int:
 
 
 def get_block_by_timestamp(chain: Network, timestamp: int) -> int:
+    if chain == Network.Fantom:
+        return fetch_block_by_timestamp_for_ftm(timestamp)
     response = fetch_block_by_timestamp(chain, timestamp)
     while response["status"] == "0":
         time.sleep(1)
@@ -45,20 +39,6 @@ def get_block_by_timestamp(chain: Network, timestamp: int) -> int:
         response = fetch_block_by_timestamp(chain, timestamp)
 
     return int(response["result"])
-
-
-def convert_from_eth(block) -> Dict[str, int]:
-    """
-    Convert block from eth to blocks on other chains
-    """
-    timestamp = env_config.get_web3().eth.get_block(block)["timestamp"]
-    return {
-        Network.Ethereum: block,
-        Network.Fantom: fetch_block_by_timestamp_for_ftm(timestamp) - FANTOM_BLOCK_BUFFER,
-        Network.Polygon: get_block_by_timestamp(Network.Polygon, timestamp) - POLYGON_BLOCK_BUFFER,
-        Network.Arbitrum: get_block_by_timestamp(
-            Network.Arbitrum, timestamp) - ARBITRUM_BLOCK_BUFFER,
-    }
 
 
 def get_explorer_url(chain: Network, tx_hash: str) -> str:
