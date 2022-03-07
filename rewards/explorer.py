@@ -1,15 +1,10 @@
 import time
 from typing import Dict, List, Optional, Union
 
+from config.constants.chain_mappings import CHAIN_EXPLORER_URLS
 from config.singletons import env_config
 from helpers.enums import Network
 from helpers.http_client import http_client
-
-CHAIN_EXPLORER_URLS = {
-    Network.Ethereum: "etherscan.io",
-    Network.Polygon: "polygonscan.com",
-    Network.Arbitrum: "arbiscan.io",
-}
 
 
 def fetch_block_by_timestamp(chain: Network, timestamp: int) -> Optional[Union[Dict, List]]:
