@@ -5,7 +5,7 @@ metadata:
     labels:
         app: approve-ftm-cycle-bot
 spec:
-    schedule: '15 */2 * * *'
+    schedule: '15 2 * * *'
     startingDeadlineSeconds: 180
     suspend: False
     jobTemplate:
