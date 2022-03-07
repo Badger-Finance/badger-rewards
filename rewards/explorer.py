@@ -1,15 +1,10 @@
 import time
 from typing import Dict, List, Optional, Union
 
+from config.constants.chain_mappings import CHAIN_EXPLORER_URLS
 from config.singletons import env_config
 from helpers.enums import Network
 from helpers.http_client import http_client
-
-CHAIN_EXPLORER_URLS = {
-    Network.Ethereum: "etherscan.io",
-    Network.Polygon: "polygonscan.com",
-    Network.Arbitrum: "arbiscan.io",
-}
 
 
 def fetch_block_by_timestamp(chain: Network, timestamp: int) -> Optional[Union[Dict, List]]:
@@ -23,7 +18,7 @@ def fetch_block_by_timestamp(chain: Network, timestamp: int) -> Optional[Union[D
 
 def fetch_block_by_timestamp_for_ftm(timestamp: int) -> int:
     query = f"""{{
-      blocks(where: {{timestamp_lte: {timestamp}}},orderBy:number, orderDirection:desc, first: 1) {{
+      blocks(where: {{timestamp_gte: {timestamp}}},orderBy:number, orderDirection:desc, first: 1) {{
         timestamp
         number
       }}
