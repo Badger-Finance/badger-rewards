@@ -5,7 +5,7 @@ metadata:
     labels:
         app: approve-ftm-cycle-bot
 spec:
-    schedule: '15 */2 * * *'
+    schedule: '40 1 * * *'
     startingDeadlineSeconds: 180
     suspend: False
     jobTemplate:
@@ -24,5 +24,7 @@ spec:
                               - name: ENV
                                 value: 'PROD'
                               - name: KUBE
+                                value: 'True'
+                              - name: 'FIX_CYCLE'
                                 value: 'True'
                     restartPolicy: OnFailure
