@@ -16,6 +16,9 @@ from web3 import Web3
 from config.constants.emissions import (
     REWARD_ERROR_TOLERANCE,
     ZERO_CYCLE,
+    NATIVE_TOKEN_REWARDS,
+    SCHEDULE_REWARDS_BLACKLIST,
+    TREE_REWARDS_BLACKLIST
 )
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
@@ -63,12 +66,17 @@ def combine_rewards(rewards_list: List[RewardsList], cycle) -> RewardsList:
 
 def distribute_rewards_from_total_snapshot(
         amount: Union[int, Decimal], snapshot: Snapshot, token: str,
-        block: int, custom_rewards: Optional[Dict[str, Callable]] = None,
+        block: int, custom_rewards: Optional[Dict[str, Callable]] = {},
 ) -> RewardsList:
-    if not custom_rewards:
-        custom_rewards = {}
     rewards = RewardsList()
     custom_rewards_list = []
+    # Blacklist digg/badger rewards
+    if token in NATIVE_TOKEN_REWARDS[snapshot.chain]:
+        for addr in SCHEDULE_REWARDS_BLACKLIST.keys():
+            snapshot.zero_balance(addr)
+    # Blacklist all token rewards for tree rewards blacklist
+    for addr in TREE_REWARDS_BLACKLIST.keys():
+        snapshot.zero_balance(addr)
     total = snapshot.total_balance()
     # TODO: Think about refactoring this and splitting it into two separate funcs:
     # TODO: one for normal rewards another for custom rewards

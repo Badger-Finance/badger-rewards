@@ -92,7 +92,7 @@ def get_effective_gas_price(web3: Web3, chain: str = Network.Ethereum) -> int:
         if json:
             gas_price = web3.toWei(int(json.get("fast") * 1.1), "gwei")
     elif chain in [Network.Arbitrum, Network.Fantom]:
-        gas_price = web3.eth.gas_price * GAS_BUFFER
+        gas_price = int(web3.eth.gas_price * GAS_BUFFER)
     return gas_price
 
 

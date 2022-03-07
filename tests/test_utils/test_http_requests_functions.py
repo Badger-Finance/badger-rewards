@@ -6,9 +6,9 @@ from badger_api.requests import fetch_ppfs
 from badger_api.requests import fetch_token
 from badger_api.requests import fetch_token_names
 from badger_api.requests import fetch_token_prices
+from config.constants.chain_mappings import CHAIN_EXPLORER_URLS
 from config.constants.emissions import BOOST_CHAINS
 from helpers.enums import Network
-from rewards.explorer import CHAIN_EXPLORER_URLS
 from rewards.explorer import get_block_by_timestamp, fetch_block_by_timestamp
 from rewards.explorer import get_explorer_url
 
