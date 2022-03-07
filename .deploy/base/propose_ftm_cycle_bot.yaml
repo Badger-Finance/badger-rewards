@@ -5,7 +5,7 @@ metadata:
   labels:
     app: propose-ftm-cycle-bot
 spec:
-  schedule: "35 1 * * *"
+  schedule: "5 2 * * *"
   startingDeadlineSeconds: 180
   suspend: False
   jobTemplate:
