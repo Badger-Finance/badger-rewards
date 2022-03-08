@@ -19,13 +19,10 @@ class FeatureFlags:
         BOOST_STEP: True,
     }
 
-    def does_flag_exist(self, flag: str) -> bool:
-        return self.FLAGS.get(flag, None)
-
     def flag_enabled(self, flag: str) -> bool:
-        if self.does_flag_exist(flag) is None:
+        if self.FLAGS.get(flag) is None:
             raise FlagNotFoundException()
-        return bool(self.FLAGS[flag])
+        return self.FLAGS[flag]
 
 
 flags = FeatureFlags()
