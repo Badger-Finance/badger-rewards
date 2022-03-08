@@ -16,6 +16,8 @@ from rewards.boost.calc_boost import (
     get_badger_boost_data,
 )
 from rewards.classes.Boost import BoostBalances
+from rewards.feature_flags import flags
+
 
 TEST_USER = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
 
@@ -99,7 +101,8 @@ def test_get_badger_boost_data():
     )
     assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f1111"] == 1
     assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909"] == 1800
-    assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7900"] == 551
+    if flags.flag_enabled("BOOST_STEP"):
+        assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7900"] == 551
     assert data["0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"] == 2000
     assert stake_data[0] == 1
     assert stake_data[0.9] == 1
