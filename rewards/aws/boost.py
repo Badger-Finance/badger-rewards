@@ -33,7 +33,7 @@ def upload_boosts_to_aws(boost_data, chain: str, file_name: str):
     if env_config.test or env_config.staging:
         buckets.append("badger-staging-merkle-proofs")
         with open('test_boost.json', 'w') as tree_file:
-            json.dumps(boost_data, tree_file, indent=4, sort_keys=True)
+            json.dump(boost_data, tree_file, indent=4, sort_keys=True)
     elif env_config.production:
         buckets.append("badger-merkle-proofs")
 

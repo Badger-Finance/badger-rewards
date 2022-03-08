@@ -54,15 +54,14 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
     badger_boost_data = {}
     stake_data_ranges = {}
     for addr, stake_ratio in stake_ratios.items():
-        user_boost = 1
         user_stake_range = 0
+        user_boost = 1 if stake_ratio == 0 else min(math.floor(stake_ratio * 2000), 2000)
         for stake_range, _ in STAKE_RATIO_RANGES:
-            if stake_ratio > stake_range:
-                user_boost = min(math.floor(stake_ratio * 2000), 2000)
+            if stake_ratio >= stake_range:
                 user_stake_range = stake_range
 
         stake_data_ranges[user_stake_range] = stake_data_ranges.get(user_stake_range, 0) + 1
-        badger_boost_data[addr] = user_boost if stake_ratio != 0 else 1
+        badger_boost_data[addr] = user_boost
     return badger_boost_data, stake_data_ranges
 
 
