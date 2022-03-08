@@ -16,6 +16,9 @@ from rewards.boost.calc_boost import (
     get_badger_boost_data,
 )
 from rewards.classes.Boost import BoostBalances
+from rewards.feature_flags import flags
+from rewards.feature_flags.feature_flags import BOOST_STEP
+
 
 TEST_USER = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
 
@@ -90,14 +93,19 @@ def test_calc_stake_ratio__zero_non_native():
 def test_get_badger_boost_data():
     data, stake_data = get_badger_boost_data(
         {
-            "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 2000,
-            "0x0000001d2B0A08A235276e8765aa1A659Aae58bb": 2000,
-            "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909": 1,
+            "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 1.452,
+            "0x0000001d2B0A08A235276e8765aa1A659Aae58bb": 1,
+            "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909": 0.9,
+            "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7900": 0.2758,
             "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f1111": 0,
         }
     )
     assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f1111"] == 1
     assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909"] == 1800
+    if flags.flag_enabled(BOOST_STEP):
+        assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7900"] == 551
+    else:
+        assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7900"] == 500
     assert data["0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"] == 2000
     assert stake_data[0] == 1
     assert stake_data[0.9] == 1

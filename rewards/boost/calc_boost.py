@@ -1,4 +1,5 @@
 from decimal import Decimal
+import math
 from typing import Any, Dict, List, Tuple
 
 from rich.console import Console
@@ -13,6 +14,8 @@ from helpers.discord import get_discord_url, send_code_block_to_discord
 from helpers.enums import BotType
 from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses
 from rewards.classes.Boost import BoostBalances
+from rewards.feature_flags import flags
+from rewards.feature_flags.feature_flags import BOOST_STEP
 from subgraph.queries.nfts import fetch_nfts
 
 console = Console()
@@ -53,15 +56,19 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
     badger_boost_data = {}
     stake_data_ranges = {}
     for addr, stake_ratio in stake_ratios.items():
-        user_boost = 1
         user_stake_range = 0
+        if flags.flag_enabled(BOOST_STEP):
+            user_boost = 1 if stake_ratio == 0 else min(math.floor(stake_ratio * 2000), 2000)
+        else:
+            user_boost = 1
         for stake_range, multiplier in STAKE_RATIO_RANGES:
-            if stake_ratio > stake_range:
-                user_boost = multiplier
+            if stake_ratio >= stake_range:
+                if not flags.flag_enabled(BOOST_STEP):
+                    user_boost = multiplier
                 user_stake_range = stake_range
 
         stake_data_ranges[user_stake_range] = stake_data_ranges.get(user_stake_range, 0) + 1
-        badger_boost_data[addr] = user_boost if stake_ratio != 0 else 1
+        badger_boost_data[addr] = user_boost
     return badger_boost_data, stake_data_ranges
 
 
