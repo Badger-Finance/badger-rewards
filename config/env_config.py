@@ -55,6 +55,7 @@ class EnvConfig:
         }
 
         polygon = [
+            self.make_provider("pokt/poly-node-url", "POLY_NODE_URL"),
             Web3(Web3.HTTPProvider("https://polygon-rpc.com/")),
             self.make_provider("quiknode/poly-node-url", "POLY_NODE_URL"),
             self.make_provider("alchemy/poly-node-url", "POLY_NODE_URL"),
@@ -64,6 +65,7 @@ class EnvConfig:
 
         self.web3 = {
             Network.Ethereum: [
+                self.make_provider("pokt/eth-node-url", "NODE_URL"),
                 self.make_provider("quiknode/eth-node-url", "NODE_URL"),
                 self.make_provider("alchemy/eth-node-url", "NODE_URL"),
                 Web3(Web3.HTTPProvider("https://main-rpc.linkpool.io/")),
