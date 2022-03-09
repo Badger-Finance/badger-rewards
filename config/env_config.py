@@ -55,7 +55,7 @@ class EnvConfig:
         }
 
         polygon = [
-            self.make_provider("pokt/poly-node-url", "POLY_NODE_URL"),
+            self.make_provider("pokt/poly-node-url", "NODE_URL"),
             Web3(Web3.HTTPProvider("https://polygon-rpc.com/")),
             self.make_provider("quiknode/poly-node-url", "POLY_NODE_URL"),
             self.make_provider("alchemy/poly-node-url", "POLY_NODE_URL"),
