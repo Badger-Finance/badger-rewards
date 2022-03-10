@@ -1,5 +1,3 @@
-from badger_api.claimable import get_latest_claimable_snapshot
-from helpers.enums import Network
 import config.constants.addresses as addresses
 from typing import Dict
 from rewards.classes.RewardsList import RewardsList
@@ -24,9 +22,11 @@ def get_dropt_claims(all_claims) -> Dict:
 
 def clawback_func(tree, tree_manager) -> RewardsList:
     rewards_list = merkle_tree_to_rewards_list(tree)
-    extra_dropt3 = 1247015660680000000000
+    tree_dropt_balance = 34380917097829000000000
+    trops_claimable = 33133901437149000000000
+
     rewards_list.increase_user_rewards(
-        addresses.TREASURY_OPS, addresses.DROPT3, extra_dropt3
+        addresses.TREASURY_OPS, addresses.DROPT3, tree_dropt_balance - trops_claimable
     )
     return rewards_list
 
