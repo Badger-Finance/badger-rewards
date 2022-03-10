@@ -15,29 +15,23 @@ def get_dropt_claims(all_claims) -> Dict:
         cbs = user_claim["claimableBalances"]
         for cb in cbs:
             if cb["address"] == addresses.DROPT3:
-                claims[user_claim["address"]] = int(cb["balance"])
+                balance = int(cb["balance"])
+                if balance > 0:
+                    claims[user_claim["address"]] = balance
+    print(claims)
     return claims
 
 
 def clawback_func(tree, tree_manager) -> RewardsList:
-    chain = Network.Ethereum
     rewards_list = merkle_tree_to_rewards_list(tree)
-    dropt_claims = get_dropt_claims(get_latest_claimable_snapshot(chain))
-    for addr, value in dropt_claims.items():
-        rewards_list.increase_user_rewards(
-            addresses.TREASURY_OPS, addresses.DROPT3, value
-        )
-        rewards_list.decrease_user_rewards(
-            addr,
-            addresses.DROPT3,
-            value
-        )
+    extra_dropt3 = 1247015660680000000000
+    rewards_list.increase_user_rewards(
+        addresses.TREASURY_OPS, addresses.DROPT3, extra_dropt3
+    )
     return rewards_list
 
 
 def clawback_test(old_tree, new_tree) -> bool:
-    before_dropt3 = old_tree["tokenTotals"][addresses.DROPT3]
-    after_dropt3 = new_tree["tokenTotals"][addresses.DROPT3]
     before_trops = get_cumulative_claimable_for_token(
         old_tree["claims"][addresses.TREASURY_OPS],
         addresses.DROPT3
@@ -46,4 +40,4 @@ def clawback_test(old_tree, new_tree) -> bool:
         new_tree["claims"][addresses.TREASURY_OPS],
         addresses.DROPT3
     )
-    return before_dropt3 == after_dropt3 and after_trops > before_trops
+    return after_trops > before_trops
