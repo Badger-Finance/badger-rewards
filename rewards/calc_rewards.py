@@ -1,4 +1,5 @@
 import json
+import time
 from typing import (
     Dict,
     List,
@@ -57,11 +58,15 @@ def fetch_all_schedules(
     )
     all_schedules = {}
     setts_with_schedules = []
+    now = time.time()
     for sett in setts:
         schedules = logger.getAllUnlockSchedulesFor(sett).call()
-        if len(schedules) > 0:
+        for schedule in schedules:
+            if schedule.startTime < now < schedule.endTime:
+                has_active_schedule = True
+        if len(schedules) > 0 and has_active_schedule:
             setts_with_schedules.append(sett)
-        all_schedules[sett] = parse_schedules(schedules)
+            all_schedules[sett] = parse_schedules(schedules)
     console.log(f"Fetched {len(all_schedules)} schedules")
     return all_schedules, setts_with_schedules
 
