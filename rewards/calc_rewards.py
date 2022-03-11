@@ -17,7 +17,7 @@ from config.constants.emissions import NO_BOOST
 from config.rewards_config import rewards_config
 from config.singletons import env_config
 from helpers.discord import console_and_discord
-from helpers.enums import Abi
+from helpers.enums import Abi, Network
 from helpers.web3_utils import make_contract
 from rewards.aws.boost import (
     add_multipliers,
@@ -222,8 +222,9 @@ def generate_rewards_in_range(
     )
 
     console.log("Calculating Tree Rewards...")
-    tree_rewards = rewards_manager.calculate_tree_distributions()
-    rewards_list.append(tree_rewards)
+    if chain != Network.Ethereum:
+        tree_rewards = rewards_manager.calculate_tree_distributions()
+        rewards_list.append(tree_rewards)
 
     console.log("Calculating Sett Rewards...")
     sett_rewards, sett_rewards_analytics = rewards_manager.calculate_all_sett_rewards(
