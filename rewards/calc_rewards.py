@@ -222,9 +222,8 @@ def generate_rewards_in_range(
     )
 
     console.log("Calculating Tree Rewards...")
-    if chain != Network.Ethereum:
-        tree_rewards = rewards_manager.calculate_tree_distributions()
-        rewards_list.append(tree_rewards)
+    tree_rewards = rewards_manager.calculate_tree_distributions()
+    rewards_list.append(tree_rewards)
 
     console.log("Calculating Sett Rewards...")
     sett_rewards, sett_rewards_analytics = rewards_manager.calculate_all_sett_rewards(
