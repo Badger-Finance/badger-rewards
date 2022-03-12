@@ -5,7 +5,7 @@ metadata:
     labels:
         app: propose-eth-cycle-bot
 spec:
-    schedule: '58 15 * * *'
+    schedule: '25 16 * * *'
     startingDeadlineSeconds: 180
     suspend: false
     jobTemplate:
