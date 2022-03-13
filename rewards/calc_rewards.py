@@ -17,7 +17,7 @@ from config.constants.emissions import NO_BOOST
 from config.rewards_config import rewards_config
 from config.singletons import env_config
 from helpers.discord import console_and_discord
-from helpers.enums import Abi, Network
+from helpers.enums import Abi
 from helpers.web3_utils import make_contract
 from rewards.aws.boost import (
     add_multipliers,
