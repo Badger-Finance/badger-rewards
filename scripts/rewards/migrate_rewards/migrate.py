@@ -24,7 +24,7 @@ def migrate_func(tree, tree_manager) -> RewardsList:
             migration_harvest["token"],
             block
         ))
-    return combine_rewards([*migration_rewards, rewards_list], rewards_list.cycle)
+    return combine_rewards([*migration_rewards, rewards_list], 4268)
 
 
 def migrate_test(old_tree, new_tree):
