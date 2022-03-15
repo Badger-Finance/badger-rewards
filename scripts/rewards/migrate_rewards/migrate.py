@@ -1,6 +1,5 @@
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
-import json
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from scripts.rewards.migrate_rewards.calc_migration_data import harvests
 
