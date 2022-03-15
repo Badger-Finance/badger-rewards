@@ -2,6 +2,7 @@ from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
 import json
 from rewards.snapshot.chain_snapshot import sett_snapshot
+from scripts.rewards.migrate_rewards.calc_migration_data import harvests
 
 from rewards.utils.rewards_utils import (
     combine_rewards,
@@ -12,9 +13,8 @@ from rewards.utils.rewards_utils import (
 
 def migrate_func(tree, tree_manager) -> RewardsList:
     tree = merkle_tree_to_rewards_list(tree)
-    migration_data = json.load("migration_data.json")
     migration_rewards = []
-    for migration_harvest in migration_data:
+    for migration_harvest in harvests:
         vault = migration_harvest["sett"]
         block = migration_harvest["block"]
         amount = migration_harvest["amount"]
