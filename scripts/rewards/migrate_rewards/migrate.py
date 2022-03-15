@@ -30,8 +30,7 @@ def migrate_func(tree, tree_manager) -> RewardsList:
 
 def migrate_test(old_tree, new_tree):
     token_agg = {}
-    migration_data = json.load(open("migration_data.json"))
-    for migration_harvest in migration_data:
+    for migration_harvest in harvests:
         token = migration_harvest["token"]
         token_agg[token] = token_agg.get(token) + migration_harvest["amount"]
 
