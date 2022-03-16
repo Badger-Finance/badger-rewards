@@ -14,7 +14,7 @@ from config.singletons import env_config
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from helpers.web3_utils import get_badger_tree
-from rewards.aws.trees import download_tree
+from rewards.aws.trees import download_latest_tree, download_tree
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.classes.RewardsList import RewardsList
 from rewards.explorer import get_explorer_url
@@ -72,12 +72,15 @@ class TreeManager:
         tx_hash = HexBytes(0)
         try:
             tx_hash = self.build_function_and_send(self.approve_account, func=root_func)
-            # Wait 5 seconds before confirming a transaction to make sure the node can see the tx receipt
+            # Wait 5 seconds before confirming a transaction
+            # to make sure the node can see the tx receipt
             time.sleep(5)
             succeeded, msg = confirm_transaction(self.w3, tx_hash, self.chain)
             title = f"**{action} Rewards on {self.chain}**"
-            approve_info = f"TX Hash: {tx_hash} \n\n Root: {merkle_root} \n\n Content Hash: {root_hash} \n\n"
-            description = f"Calculated rewards between {start_block} and {end_block} \n\n {approve_info} "
+            approve_info = f"TX Hash: {tx_hash} \n\n " \
+                           f"Root: {merkle_root} \n\n Content Hash: {root_hash} \n\n"
+            description = f"Calculated rewards between {start_block} " \
+                          f"and {end_block} \n\n {approve_info} "
             console.log(f"Cycle {action.lower()} : {tx_hash}")
 
             if succeeded:
@@ -94,7 +97,9 @@ class TreeManager:
                         },
                         {
                             "name": "Gas Cost",
-                            "value": f"${round(get_gas_price_of_tx(self.w3, self.chain, tx_hash), 2)}",
+                            "value": (
+                                f"${round(get_gas_price_of_tx(self.w3, self.chain, tx_hash), 2)}"
+                            ),
                             "inline": True,
                         },
                     ],
@@ -134,9 +139,10 @@ class TreeManager:
         return self.badger_tree.getClaimableFor(user, tokens, cumAmounts).call()
 
     def get_claimed_for(self, user: str, tokens: List[str]):
-        return self.badger_tree.getClaimedFor(
+        claimed_for_data = self.badger_tree.getClaimedFor(
             self.w3.toChecksumAddress(user), list(tokens)
         ).call()
+        return dict(zip(claimed_for_data[0], claimed_for_data[1]))
 
     def has_pending_root(self) -> bool:
         return self.badger_tree.hasPendingRoot().call()
@@ -149,6 +155,8 @@ class TreeManager:
         return tree
 
     def fetch_current_tree(self):
+        if env_config.fix_cycle:
+            return download_latest_tree(self.chain)
         current_merkle = self.fetch_current_merkle_data()
         console.log(f"Current Merkle \n {current_merkle}")
         return self.fetch_tree(current_merkle)

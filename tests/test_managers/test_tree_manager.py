@@ -1,15 +1,16 @@
 import json
-import os
-from decimal import Decimal
+from unittest.mock import MagicMock
 
 import pytest
-from brownie import Contract, accounts, web3
+from brownie import accounts
 from eth_account import Account
-from hexbytes import HexBytes
-from web3 import contract
-
+import config.constants.addresses as addresses
+from config.constants import GAS_BUFFER
 from helpers.enums import Network
-from tests.utils import chains, mock_tree, set_env_vars, test_address, test_key
+from tests.test_utils.cycle_utils import mock_tree_manager
+from tests.utils import mock_tree
+from tests.utils import set_env_vars
+from tests.utils import test_key
 
 set_env_vars()
 
@@ -52,3 +53,35 @@ def test_matches_pending_hash(tree_manager):
 
     random_hash = "0xb8ed7da2062b6bdf6f20bcdb4ab35538592216ac70a4bfe986af748603debfd8"
     assert not tree_manager.matches_pending_hash(random_hash)
+
+
+@pytest.mark.parametrize(
+    "tree_manager",
+    [Network.Ethereum],
+    indirect=True,
+)
+def test_get_claimed_for(tree_manager):
+    user = "0xEE9F84Af6a8251Eb5ffDe38c5F056bc72d3b3DD0"
+    tokens = [
+        addresses.BADGER,
+        addresses.BVECVX
+    ]
+    claimed_for_tokens = tree_manager.get_claimed_for(
+        user,
+        tokens
+    )
+    for token in tokens:
+        assert claimed_for_tokens[token] > 0
+
+
+def test_ftm_tx_details__gas_price(mocker):
+    gas_price = 123
+    mocker.patch("rewards.classes.TreeManager.env_config.get_web3", return_value=MagicMock())
+    mocker.patch("rewards.classes.TreeManager.get_badger_tree", MagicMock())
+    mocker.patch("rewards.classes.TreeManager.get_discord_url", MagicMock())
+    tree_manager = mock_tree_manager(Network.Fantom, accounts[0], None)
+    tree_manager.w3 = MagicMock(eth=MagicMock(gas_price=gas_price))
+    assert (
+        tree_manager.get_tx_options(accounts[0])['gasPrice']
+        == int(gas_price * GAS_BUFFER)
+    )

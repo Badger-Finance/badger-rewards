@@ -1,21 +1,33 @@
 import json
-import os
 
 import pytest
 from eth_account import Account
 from moto.core import patch_resource
+from config.env_config import EnvConfig
 
 from rewards.aws.helpers import dynamodb
-from tests.utils import chains, mock_tree, set_env_vars, test_address, test_key
+from tests.utils import (
+    chains,
+    mock_tree,
+    set_env_vars,
+    test_key,
+)
 
 set_env_vars()
 
 from rewards.classes.TreeManager import TreeManager
-from rewards.utils.tree_utils import calc_next_cycle_range, get_last_proposed_cycle
+from rewards.utils.tree_utils import (
+    calc_next_cycle_range,
+    get_last_proposed_cycle,
+)
 
 
 def mock_download_tree(file_name: str, chain: str):
     return json.dumps(mock_tree)
+
+
+def mock_download_latest_tree(chain: str):
+    return mock_tree
 
 
 def mock_validate_tree(merkle, tree):
@@ -25,6 +37,10 @@ def mock_validate_tree(merkle, tree):
 @pytest.fixture(autouse=True)
 def mock_fns(monkeypatch):
     monkeypatch.setattr("rewards.classes.TreeManager.download_tree", mock_download_tree)
+    monkeypatch.setattr(
+        "rewards.classes.TreeManager.download_latest_tree",
+        mock_download_latest_tree
+    )
 
 
 @pytest.fixture
@@ -65,6 +81,22 @@ def test_get_last_proposed_cycle(tree_manager):
     indirect=True,
 )
 def test_calc_next_cycle_range(tree_manager, setup_dynamodb):
+    patch_resource(dynamodb)
+
+    result = calc_next_cycle_range(tree_manager.chain, tree_manager)
+    assert result[0] == mock_tree
+
+
+@pytest.mark.parametrize(
+    "tree_manager",
+    chains,
+    indirect=True,
+)
+def test_calc_next_cycle_range_fix_cycle(tree_manager, setup_dynamodb, monkeypatch):
+    env_config = EnvConfig()
+    env_config.fix_cycle = True
+
+    monkeypatch.setattr("rewards.utils.tree_utils.env_config", env_config)
     patch_resource(dynamodb)
 
     result = calc_next_cycle_range(tree_manager.chain, tree_manager)

@@ -7,7 +7,7 @@ from rich.console import Console
 from tabulate import tabulate
 
 from badger_api.requests import fetch_token
-from config.constants.addresses import ETH_BADGER_TREE, IBBTC_PEAK
+import config.constants.addresses as addresses
 from config.constants.chain_mappings import BOOSTED_EMISSION_TOKENS
 from config.constants.emissions import (
     NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS,
@@ -24,7 +24,12 @@ from badger_utils.time_utils import seconds_to_hours, to_utc_date
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
-from rewards.emission_handlers import ibbtc_peak_handler, unclaimed_rewards_handler
+from rewards.emission_handlers import (
+    ibbtc_peak_handler,
+    bvecvx_lp_handler,
+    unclaimed_rewards_handler,
+    treasury_handler
+)
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import total_twap_sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
@@ -44,8 +49,15 @@ class InvalidRewardsTotalException(Exception):
 
 class RewardsManager:
     CUSTOM_BEHAVIOUR = {
-        ETH_BADGER_TREE: unclaimed_rewards_handler,
-        IBBTC_PEAK: ibbtc_peak_handler,
+        addresses.ETH_BADGER_TREE: unclaimed_rewards_handler,
+        addresses.IBBTC_PEAK: ibbtc_peak_handler,
+        addresses.BVECVX_CVX_LP: bvecvx_lp_handler,
+        addresses.DEV_MULTISIG: treasury_handler,
+        addresses.TECH_OPS: treasury_handler,
+        addresses.TEST_MULTISIG: treasury_handler,
+        addresses.BADGER_PAYMENTS: treasury_handler,
+        addresses.OPS_MULTISIG_OLD: treasury_handler,
+        addresses.TREASURY_VAULT: treasury_handler
     }
 
     def __init__(self, chain: Network, cycle: int, start: int, end: int, boosts):
@@ -59,14 +71,13 @@ class RewardsManager:
         self.apy_boosts = {}
 
     def fetch_sett_snapshot(
-        self, start_block: int, end_block: int, sett: str, blacklist: bool = True
+        self, start_block: int, end_block: int, sett: str
     ) -> Snapshot:
         return total_twap_sett_snapshot(
             self.chain,
             start_block,
             end_block,
             sett,
-            blacklist=blacklist,
             num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS
         )
 
@@ -156,7 +167,7 @@ class RewardsManager:
             all_rewards.append(rewards)
             rewards_per_sett[sett]["actual"] = rewards.totals.toDict()
             rewards_per_sett[sett]["expected"] = expected
-        
+
         send_code_block_to_discord(
             msg=tabulate(table, headers=["vault", "boosted rewards", "flat rewards"]),
             username="Rewards Bot",
@@ -166,9 +177,9 @@ class RewardsManager:
         invalid_totals = check_token_totals_in_range(self.chain, rewards_per_sett)
         if len(invalid_totals):
             self.report_invalid_totals(invalid_totals)
-            
+
         return combine_rewards(all_rewards, self.cycle), rewards_analytics
-    
+
     def report_invalid_totals(self, invalid_totals: List[List[str]]) -> None:
         send_plain_text_to_discord(
             message=f"INCORRECT REWARDS DISTRIBTION {DiscordRoles.RewardsPod}",
@@ -236,7 +247,7 @@ class RewardsManager:
                             ),
                         )
                     )
-                if schedule.startTime <= end_time and schedule.endTime >= end_time:
+                if schedule.startTime <= end_time <= schedule.endTime:
                     percentage_out_of_total = (
                         (int(to_distribute) / int(schedule.initialTokensLocked) * 100)
                         if int(schedule.initialTokensLocked) > 0
@@ -296,7 +307,6 @@ class RewardsManager:
             f"tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
-
         for dist in tree_distributions:
             start_block = get_block_by_timestamp(
                 self.chain, int(dist["end_of_previous_dist_timestamp"])
@@ -309,14 +319,13 @@ class RewardsManager:
                 start_block,
                 end_block,
                 sett,
-                blacklist=False,
                 num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS
             )
             amount = int(dist["amount"])
             all_dist_rewards.append(
                 distribute_rewards_from_total_snapshot(
                     amount, snapshot, token,
-                    block=self.end, custom_rewards=self.CUSTOM_BEHAVIOUR,
+                    block=self.end, custom_rewards=self.CUSTOM_BEHAVIOUR
                 )
             )
         return combine_rewards(all_dist_rewards, self.cycle)

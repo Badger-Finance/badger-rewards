@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 from typing import List, Optional, Tuple
 
 from rich.console import Console
@@ -18,7 +19,7 @@ from rewards.snapshot.claims_snapshot import claims_snapshot
 console = Console()
 
 
-def assert_claims_increase(past_tree, new_tree):
+def assert_claims_increase(past_tree: Dict, new_tree: Dict):
     # Each users cumulative claims must only increase
     past_claims = past_tree["claims"]
     new_claims = new_tree["claims"]

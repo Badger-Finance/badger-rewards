@@ -1,15 +1,23 @@
 import json
-from typing import Dict, List, Tuple
+from typing import (
+    Dict,
+    List,
+    Tuple,
+)
 
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
 from rich.console import Console
 
-from config.constants.chain_mappings import CHAIN_IDS, EMISSIONS_CONTRACTS
+from config.constants.chain_mappings import (
+    CHAIN_IDS,
+    EMISSIONS_CONTRACTS,
+)
+from config.constants.emissions import NO_BOOST
 from config.rewards_config import rewards_config
 from config.singletons import env_config
 from helpers.discord import console_and_discord
-from helpers.enums import Abi, BotType, Network
+from helpers.enums import Abi
 from helpers.web3_utils import make_contract
 from rewards.aws.boost import (
     add_multipliers,
@@ -19,21 +27,25 @@ from rewards.aws.boost import (
     upload_proposed_boosts,
 )
 from rewards.aws.trees import upload_tree
-from rewards.classes.CycleLogger import cycle_logger
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Schedule import Schedule
 from rewards.classes.TreeManager import TreeManager
 from rewards.dynamo_handlers import put_rewards_data
 from rewards.rewards_checker import verify_rewards
-from rewards.utils.emission_utils import fetch_setts, parse_schedules
-from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewards
-from subgraph.queries.setts import list_setts
+from rewards.utils.emission_utils import (
+    fetch_setts,
+    parse_schedules,
+)
+from rewards.utils.rewards_utils import (
+    combine_rewards,
+    process_cumulative_rewards,
+)
 
 console = Console()
 
 
 def fetch_all_schedules(
-    chain: str, setts: List[str]
+        chain: str, setts: List[str]
 ) -> Tuple[Dict[str, Dict[str, List[Schedule]]], List[str]]:
     """
     Fetch all schedules on a particular chain
@@ -55,12 +67,12 @@ def fetch_all_schedules(
 
 
 def propose_root(
-    chain: str,
-    start: int,
-    end: int,
-    past_rewards: Dict,
-    tree_manager: TreeManager,
-    save=False,
+        chain: str,
+        start: int,
+        end: int,
+        past_rewards: Dict,
+        tree_manager: TreeManager,
+        save=False,
 ) -> None:
     """
     Propose a root on a chain
@@ -81,7 +93,10 @@ def propose_root(
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-    boosts = download_boosts(chain)
+    if chain in NO_BOOST:
+        boosts = {"userData": {}}
+    else:
+        boosts = download_boosts(chain)
     rewards_data = generate_rewards_in_range(
         chain,
         start,
@@ -104,7 +119,7 @@ def propose_root(
 
 
 def approve_root(
-    chain: str, start: int, end: int, current_rewards: Dict, tree_manager: TreeManager
+        chain: str, start: int, end: int, current_rewards: Dict, tree_manager: TreeManager
 ):
     """Approve latest root on a chain
 
@@ -114,9 +129,11 @@ def approve_root(
     :param current_rewards: past rewards merkle tree
     :param tree_manager: TreeManager object
     """
-    cycle_logger.set_start_block(start)
-    cycle_logger.set_end_block(end)
-    boosts = download_proposed_boosts(chain)
+    if chain in NO_BOOST:
+        boosts = {"userData": {}}
+    else:
+        boosts = download_proposed_boosts(chain)
+
     rewards_data = generate_rewards_in_range(
         chain,
         start,
@@ -135,7 +152,8 @@ def approve_root(
             rewards_data["multiplierData"],
             rewards_data["userMultipliers"],
         )
-        upload_boosts(boosts, chain)
+        if chain not in NO_BOOST:
+            upload_boosts(boosts, chain)
         return rewards_data
     if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
         console.log(
@@ -143,8 +161,6 @@ def approve_root(
         )
 
         tx_hash, success = tree_manager.approve_root(rewards_data)
-        cycle_logger.set_content_hash(rewards_data["rootHash"])
-        cycle_logger.set_merkle_root(rewards_data["merkleTree"]["merkleRoot"])
         if success:
             upload_tree(
                 rewards_data["fileName"],
@@ -158,8 +174,8 @@ def approve_root(
                 rewards_data["multiplierData"],
                 rewards_data["userMultipliers"],
             )
-            upload_boosts(boosts, chain)
-            cycle_logger.save(tree_manager.next_cycle, chain)
+            if chain not in NO_BOOST:
+                upload_boosts(boosts, chain)
             put_rewards_data(
                 chain, tree_manager.next_cycle, start, end,
                 rewards_data['sett_rewards_analytics']
@@ -170,20 +186,21 @@ def approve_root(
             tree_manager.badger_tree.pendingMerkleContentHash().call()
         )
         console_and_discord(
-            f"Approve hash {rewards_data['rootHash']} doesn't match pending hash {pending_hash.hex()}",
+            f"Approve hash {rewards_data['rootHash']} "
+            f"doesn't match pending hash {pending_hash.hex()}",
             chain,
         )
         return rewards_data
 
 
 def generate_rewards_in_range(
-    chain: str,
-    start: int,
-    end: int,
-    save: bool,
-    past_tree: Dict,
-    tree_manager: TreeManager,
-    boosts: Dict,
+        chain: str,
+        start: int,
+        end: int,
+        save: bool,
+        past_tree: Dict,
+        tree_manager: TreeManager,
+        boosts: Dict,
 ):
     """Generate chain rewards for a chain within two blocks
 

@@ -1,11 +1,11 @@
 from discord import Embed, RequestsWebhookAdapter, Webhook
-from rich import console
 from rich.console import Console
 
 from config.constants.aws import MONITORING_SECRET_NAMES
 from config.singletons import env_config
 from helpers.enums import BotType
 from rewards.aws.helpers import get_secret
+
 
 console = Console()
 
@@ -83,7 +83,10 @@ def get_discord_url(chain: str, bot_type: str = BotType.Cycle) -> str:
         kube=env_config.kube,
     )
 
-def console_and_discord(msg: str, chain: str, bot_type: BotType = BotType.Cycle, mentions: str = ""):
+
+def console_and_discord(
+        msg: str, chain: str, bot_type: BotType = BotType.Cycle, mentions: str = ""
+):
     url = get_discord_url(chain, bot_type)
     console.log(msg)
     if len(mentions) > 0:

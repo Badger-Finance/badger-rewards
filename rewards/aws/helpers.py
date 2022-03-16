@@ -41,10 +41,12 @@ def get_secret(
         secret_key (str): Dict key value to use to access secret value
         region_name (str, optional): AWS region name for secret. Defaults to "us-west-1".
     Raises:
-        e: DecryptionFailureException - Secrets Manager can't decrypt the protected secret text using the provided KMS key.
+        e: DecryptionFailureException - Secrets Manager can't
+            decrypt the protected secret text using the provided KMS key.
         e: InternalServiceErrorException - An error occurred on the server side.
         e: InvalidParameterException - You provided an invalid value for a parameter.
-        e: InvalidRequestException - You provided a parameter value that is not valid for the current state of the resource.
+        e: InvalidRequestException - You provided a parameter value
+            that is not valid for the current state of the resource.
         e: ResourceNotFoundException - We can't find the resource that you asked for.
     Returns:
         str: secret value
@@ -97,13 +99,12 @@ def get_secret(
             raise e
     else:
         # Decrypts secret using the associated KMS CMK.
-        # Depending on whether the secret is a string or binary, one of these fields will be populated.
+        # Depending on whether the secret is a string or binary,
+        # one of these fields will be populated.
         if "SecretString" in get_secret_value_response:
             return json.loads(get_secret_value_response["SecretString"])[secret_key]
         else:
-            return base64.b64decode(get_secret_value_response["SecretBinary"])[
-                secret_key
-            ]
+            return base64.b64decode(get_secret_value_response["SecretBinary"])[secret_key]
 
     return None
 

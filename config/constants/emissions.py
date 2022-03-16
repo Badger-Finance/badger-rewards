@@ -1,10 +1,7 @@
-from dotmap import DotMap
-from web3 import Web3
-
 import config.constants.addresses as addresses
-from helpers.enums import BalanceType, BotType, BucketType, Environment, Network
+from helpers.enums import Network
 
-EMISSIONS_BLACKLIST = {
+SCHEDULE_REWARDS_BLACKLIST = {
     addresses.DEV_MULTISIG: "Badger Dev Multisig",
     addresses.TECH_OPS: "Badger Tech Ops",
     addresses.TREASURY_OPS: "Badger Treasury Ops",
@@ -12,13 +9,16 @@ EMISSIONS_BLACKLIST = {
     addresses.IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
 }
 
-REWARDS_BLACKLIST = {
+TREE_REWARDS_BLACKLIST = {
     addresses.CREAM_BBADGER: "Cream bBadger",
     addresses.SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     addresses.BBADGER: "Badger Vault",
-    addresses.BADGER_PAYMENTS: "Badger Payments",
-    addresses.BVECVX_CVX_LP: "Curve bveCVX/CVX",
 }
+NATIVE_TOKEN_REWARDS = {
+    Network.Ethereum: [addresses.BADGER, addresses.DIGG]
+}
+
+BVECVX_BOOST_WEIGHT = 0.5
 
 STAKE_RATIO_RANGES = list(
     [
@@ -93,3 +93,5 @@ NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS = 2
 REWARD_ERROR_TOLERANCE = 0.01
 
 ZERO_CYCLE = 0
+
+NO_BOOST = [Network.Fantom]

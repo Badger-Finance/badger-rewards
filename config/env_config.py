@@ -4,15 +4,20 @@ from decouple import config
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 
-from helpers.enums import Environment, Network
+from helpers.enums import (
+    Environment,
+    Network,
+)
 from rewards.aws.helpers import get_secret
 
 logging.getLogger("gql.transport.aiohttp").setLevel(logging.WARNING)
 
 logging.getLogger("gql.transport.aiohttp").setLevel("WARNING")
 
+
 class NoHealthyNode(Exception):
     pass
+
 
 class EnvConfig:
     rpc_logger = logging.getLogger("rpc-logger")
@@ -23,6 +28,7 @@ class EnvConfig:
         self.staging = environment == Environment.Staging
         self.production = environment == Environment.Production
         self.kube = config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]
+        self.fix_cycle = config("FIX_CYCLE", "False").lower() in ["true", "1", "t", "y", "yes"]
         self.graph_api_key = get_secret(
             "boost-bot/graph-api-key-d", "GRAPH_API_KEY", kube=self.kube
         )
@@ -43,6 +49,9 @@ class EnvConfig:
             Network.Arbitrum: get_secret(
                 "keepers/arbiscan", "ARBISCAN_TOKEN", kube=self.kube
             ),
+            Network.Fantom: get_secret(
+                "keepers/ftmscan", "FTMSCAN_TOKEN", kube=self.kube
+            )
         }
 
         polygon = [
@@ -66,13 +75,18 @@ class EnvConfig:
                 self.make_provider("alchemy/arbitrum-node-url", "ARBITRUM_NODE_URL"),
             ],
             Network.Polygon: polygon,
+            Network.Fantom: [
+                Web3(Web3.HTTPProvider("https://rpc.ftm.tools/")),
+                Web3(Web3.HTTPProvider("https://rpcapi.fantom.network")),
+                Web3(Web3.HTTPProvider("https://ftmrpc.ultimatenodes.io")),
+                Web3(Web3.HTTPProvider("https://rpc.ankr.com/fantom")),
+            ]
         }
-
         self.is_valid_config()
 
     def get_web3(self, chain: str = Network.Ethereum) -> Web3:
-        return self.get_healthy_node(chain)  
-    
+        return self.get_healthy_node(chain)
+
     def get_healthy_node(self, chain: Network) -> Web3:
         for node in self.web3[chain]:
             try:

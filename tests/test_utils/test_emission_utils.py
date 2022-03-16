@@ -80,9 +80,9 @@ def test_get_token_weight():
         for token, weight in cases.items():
             assert get_token_weight(token, network) == weight
 
+
 def test_get_across_lp_multiplier():
     assert get_across_lp_multiplier() > 1
-
 
 
 def test_fetch_unboosted_vaults(monkeypatch):

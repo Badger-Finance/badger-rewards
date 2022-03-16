@@ -31,4 +31,3 @@ def fix(tree, tree_manager):
         "multiplierData": {},
         "userMultipliers": {},
     }
-

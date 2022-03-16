@@ -1,11 +1,25 @@
 from collections import defaultdict
 from decimal import Decimal
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import (
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
+from typing import Sequence
 
 from rich.console import Console
 from web3 import Web3
 
-from config.constants.emissions import REWARD_ERROR_TOLERANCE, ZERO_CYCLE
+from config.constants.emissions import (
+    REWARD_ERROR_TOLERANCE,
+    ZERO_CYCLE,
+    NATIVE_TOKEN_REWARDS,
+    SCHEDULE_REWARDS_BLACKLIST,
+    TREE_REWARDS_BLACKLIST
+)
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
@@ -14,11 +28,9 @@ from rewards.utils.token_utils import token_amount_base_10
 console = Console()
 
 
-def get_cumulative_claimable_for_token(claim, token: str) -> int:
+def get_cumulative_claimable_for_token(claim: Dict, token: str) -> int:
     tokens = claim["tokens"]
     amounts = claim["cumulativeAmounts"]
-
-    console.log(tokens, amounts)
 
     for i in range(len(tokens)):
         address = tokens[i]
@@ -29,7 +41,7 @@ def get_cumulative_claimable_for_token(claim, token: str) -> int:
     return 0
 
 
-def get_claimed_for_token(data, token: str) -> int:
+def get_claimed_for_token(data: Sequence, token: str) -> int:
     tokens = data[0]
     amounts = data[1]
 
@@ -54,12 +66,17 @@ def combine_rewards(rewards_list: List[RewardsList], cycle) -> RewardsList:
 
 def distribute_rewards_from_total_snapshot(
         amount: Union[int, Decimal], snapshot: Snapshot, token: str,
-        block: int, custom_rewards: Optional[Dict[str, Callable]] = None,
+        block: int, custom_rewards: Optional[Dict[str, Callable]] = {},
 ) -> RewardsList:
-    if not custom_rewards:
-        custom_rewards = {}
     rewards = RewardsList()
     custom_rewards_list = []
+    # Blacklist digg/badger rewards
+    if token in NATIVE_TOKEN_REWARDS[snapshot.chain]:
+        for addr in SCHEDULE_REWARDS_BLACKLIST.keys():
+            snapshot.zero_balance(addr)
+    # Blacklist all token rewards for tree rewards blacklist
+    for addr in TREE_REWARDS_BLACKLIST.keys():
+        snapshot.zero_balance(addr)
     total = snapshot.total_balance()
     # TODO: Think about refactoring this and splitting it into two separate funcs:
     # TODO: one for normal rewards another for custom rewards
@@ -103,25 +120,29 @@ def process_cumulative_rewards(current, new: RewardsList) -> RewardsList:
 def merkle_tree_to_rewards_list(tree) -> RewardsList:
     return process_cumulative_rewards(tree, RewardsList(int(tree["cycle"])))
 
-def get_actual_expected_totals(sett_totals: Dict[str, Dict[str, Decimal]]) -> Tuple[Dict[str, Decimal], Dict[str, Decimal]]:
+
+def get_actual_expected_totals(
+        sett_totals: Dict[str, Dict[str, Decimal]]
+) -> Tuple[Dict[str, Decimal], Dict[str, Decimal]]:
     """Takes dictionary of tokens to be distributed to each sett and returns two dictionaries
-    containing the total amount of each token that has been calculated to be distributed (actual_totals)
-    and is expected to be distributed based on the rewards schedules (expected_totals).
+    containing the total amount of each token that has been calculated
+    to be distributed (actual_totals) and is expected to be distributed
+    based on the rewards schedules (expected_totals).
 
     Args:
-        sett_totals (Dict[str, Dict[str, Decimal]]) 
-            { 
+        sett_totals (Dict[str, Dict[str, Decimal]])
+            {
                 "sett1": {
                     "actual": {
-                        "token1": actual_amount, 
-                        "token2": actual_amount, 
+                        "token1": actual_amount,
+                        "token2": actual_amount,
                         ...
                     },
                     "expected": {
-                        "token1": expected_amount, 
-                        "token2": expected_amount, 
+                        "token1": expected_amount,
+                        "token2": expected_amount,
                         ...,
-                    },  
+                    },
                 ...,
             }
 
@@ -149,10 +170,14 @@ def get_actual_expected_totals(sett_totals: Dict[str, Dict[str, Decimal]]) -> Tu
                     actual_totals[token] += amount
                 elif dist_type == "expected":
                     expected_totals[token] += amount
+
     return actual_totals, expected_totals
 
 
-def check_token_totals_in_range(chain: Network, rewards_per_sett: Dict[str, Dict[str, Dict[str, Decimal]]]) -> List[Optional[List[str]]]:
+def check_token_totals_in_range(
+        chain: Network,
+        rewards_per_sett: Dict[str, Dict[str, Dict[str, Decimal]]]
+) -> List[Optional[List[str]]]:
     """Check that the total amount of tokens to be distributed falls within the expected range
     based on the rewards schedules.
 

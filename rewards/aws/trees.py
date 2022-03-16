@@ -12,7 +12,7 @@ from rewards.aws.helpers import get_bucket, s3
 console = Console()
 
 
-def download_latest_tree(chain: str):
+def download_latest_tree(chain: Network) -> Dict:
     """
     Download the latest merkle tree that was uploaded for a chain
     :param chain: the chain from which to fetch the latest tree from
@@ -31,10 +31,11 @@ def download_latest_tree(chain: str):
     return json.loads(s3_clientdata)
 
 
-def download_tree(file_name: str, chain: str):
+def download_tree(file_name: str, chain: Network) -> str:
     """
     Download a specific tree based on the merkle root of that tree
     :param file_name: fileName of tree to download
+    :param chain: target chain
     """
     if chain == Network.Ethereum:
         tree_bucket = "badger-json"
@@ -51,36 +52,9 @@ def download_tree(file_name: str, chain: str):
     return s3_clientdata
 
 
-def download_past_trees(test: bool, number: int):
-    """
-    Download a number of past trees
-    :param number: number of trees to download from the latest
-    """
-    trees = []
-    key = "badger-tree.json"
-    bucket = env_config.bucket
-    response = s3.list_object_versions(Prefix=key, Bucket=bucket)
-    versions = response["Versions"][:number]
-    for version in versions:
-        console.log(version["Key"], version["VersionId"])
-        s3_client_obj = s3.get_object(
-            Bucket=bucket, Key=version["Key"], VersionId=version["VersionId"]
-        )
-        trees.append(s3_client_obj["Body"].read())
-    return trees
-
-
-def upload_tree(
-    file_name: str,
-    data: Dict,
-    chain: str,
-    bucket: str = "badger-json",
-    staging: bool = False,
-):
+def upload_tree(file_name: str, data: Dict, chain: str, staging: bool = False):
     """
     Upload the badger tree to multiple buckets
-    :param fileName: the filename of the uploaded bucket
-    :param data: the data to push
     """
     chain_id = CHAIN_IDS[chain]
 
@@ -128,7 +102,8 @@ def upload_tree(
                 "✅ Uploaded file to s3://" + target["bucket"] + "/" + target["key"]
             )
         except Exception as e:
-            console_and_discord(f'Error uploading approval file to bucket {target["bucket"]}, temp file saved: {e}', chain, mentions=DiscordRoles.RewardsPod)
+            console_and_discord(f'Error uploading approval file to bucket {target["bucket"]}, '
+                                f'temp file saved: {e}', chain, mentions=DiscordRoles.RewardsPod)
             with open('./temp_data/temp_tree.json', 'w') as outfile:
                 outfile.write(str(json.dumps(data)))
             raise e

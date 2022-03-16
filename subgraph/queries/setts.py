@@ -1,6 +1,9 @@
 import math
 from functools import lru_cache
-from typing import Dict, List
+from typing import (
+    Dict,
+    List,
+)
 
 from gql import gql
 from graphql.language.ast import DocumentNode
