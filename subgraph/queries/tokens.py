@@ -179,8 +179,8 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
     last_token_id = "0x0000000000000000000000000000000000000000"
 
     query = gql(
-        f"""
-        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {{
+        """
+        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {{ # noqa
             accountCTokens(block: $block_number, where: $token_filter) {{
                 id
                 symbol
@@ -222,14 +222,11 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
         discord_url = get_discord_url(chain, BotType.Boost)
         send_message_to_discord(
             "**BADGER BOOST ERROR**",
-            f":x: Error in Fetching Fuse Token Balance",
+            ":x: Error in Fetching Fuse Token Balance",
             [
                 {
                     "name": "Error Type",
                     "value": type(e),
-                    "inline": True,
-                    "name": "Error Description",
-                    "value": e.args,
                     "inline": True,
                 }
             ],
@@ -237,7 +234,7 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
             url=discord_url,
         )
         raise e
-    
+
 
 def fetch_fuse_pool_balances(client, chain, block):
     if chain != Network.Ethereum:
@@ -280,7 +277,7 @@ def fetch_fuse_pool_balances(client, chain, block):
 
     query = gql(
         """
-        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {
+        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) { # noqa
             accountCTokens(block: $block_number, where: $token_filter) {
                 id
                 symbol

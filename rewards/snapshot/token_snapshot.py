@@ -30,6 +30,7 @@ def fuse_snapshot_of_token(chain: Network, block: int, token: str) -> Snapshot:
     bals = fetch_fuse_pool_token(chain, block, token)
     return Snapshot(token, bals)
 
+
 def token_snapshot_usd(
     chain: str, block: int
 ) -> Tuple[Dict[str, float], Dict[str, float]]:

@@ -36,7 +36,7 @@ def treasury_handler(amount: Decimal, token: str, sett: str, block: int) -> Rewa
 
 
 def fuse_pool_handler(amount: Decimal, token: str, sett: str, block: int) -> RewardsList:
-    """ 
+    """
     Redirect rewards from rari pool contract to token holders in pool
     """
     snapshot = fuse_snapshot_of_token(Network.Ethereum, block, sett)
