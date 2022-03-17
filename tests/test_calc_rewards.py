@@ -68,27 +68,26 @@ def test_approve_root__unhappy(mocker, prepare_approve_mocks):
 def test_fetch_all_schedules(mocker):
     setts = [
         addresses.BCRV_IBBTC,
-        addresses.BCVXCRV
     ]
     mocker.patch('time.time', MagicMock(return_value=200))
 
     SCHEDULES = [
-        Schedule(
+        [
             addresses.BCRV_IBBTC,
             addresses.BADGER,
             1e18,
             0,
             100,
             100
-        ),
-        Schedule(
+        ],
+        [
             addresses.BCRV_IBBTC,
             addresses.BADGER,
             1e18,
             150,
             250,
             100
-        )
+        ]
     ]
 
     mocker.patch(

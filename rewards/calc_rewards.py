@@ -35,6 +35,7 @@ from rewards.dynamo_handlers import put_rewards_data
 from rewards.rewards_checker import verify_rewards
 from rewards.utils.emission_utils import (
     fetch_setts,
+    get_schedules_by_token,
     parse_schedules,
 )
 from rewards.utils.rewards_utils import (
@@ -60,13 +61,13 @@ def fetch_all_schedules(
     setts_with_schedules = []
     now = time.time()
     for sett in setts:
-        schedules = logger.getAllUnlockSchedulesFor(sett).call()
+        schedules = parse_schedules(logger.getAllUnlockSchedulesFor(sett).call())
         for schedule in schedules:
             if schedule.startTime < now < schedule.endTime:
                 has_active_schedule = True
         if len(schedules) > 0 and has_active_schedule:
             setts_with_schedules.append(sett)
-            all_schedules[sett] = parse_schedules(schedules)
+            all_schedules[sett] = get_schedules_by_token(schedules)
     console.log(f"Fetched {len(all_schedules)} schedules")
     return all_schedules, setts_with_schedules
 
