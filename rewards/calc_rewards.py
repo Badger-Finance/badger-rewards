@@ -62,9 +62,11 @@ def fetch_all_schedules(
     now = time.time()
     for sett in setts:
         schedules = parse_schedules(logger.getAllUnlockSchedulesFor(sett).call())
-        for schedule in schedules:
+        for schedule in list(schedules):
             if schedule.startTime < now < schedule.endTime:
                 has_active_schedule = True
+            else:
+                schedules.remove(schedule)
         if len(schedules) > 0 and has_active_schedule:
             setts_with_schedules.append(sett)
             all_schedules[sett] = get_schedules_by_token(schedules)
