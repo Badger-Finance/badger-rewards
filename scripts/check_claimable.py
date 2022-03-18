@@ -1,6 +1,6 @@
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from subgraph.queries.setts import last_synced_block
-from config.constants.addresses import ETH_BADGER_TREE
+from config.constants.addresses import ETH_BADGER_TREE, BADGER
 from helpers.web3_utils import make_token
 import json
 from rich.console import Console
@@ -29,4 +29,9 @@ if __name__ == "__main__":
         console.log("Deficit: {}".format(tree_balance - total))
         console.log("\n")
 
+    bbals = snapshots[BADGER].balances
+    sorted_badger_claimable = sorted(bbals, key=bbals.get, reverse=True)
+    
     print(json.dumps(deficit, indent=4, sort_keys=True))
+    print("Top 10 badger claimable")
+    print(sorted_badger_claimable[:10])
