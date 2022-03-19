@@ -165,3 +165,10 @@ DECIMAL_MAPPING = {
     Network.Arbitrum: 1e18,
     Network.Fantom: 1e18
 }
+
+CHAIN_EXPLORER_URLS = {
+    Network.Ethereum: "etherscan.io",
+    Network.Polygon: "polygonscan.com",
+    Network.Arbitrum: "arbiscan.io",
+    Network.Fantom: "ftmscan.com"
+}

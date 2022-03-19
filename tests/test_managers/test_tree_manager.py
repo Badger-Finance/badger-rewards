@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 from brownie import accounts
 from eth_account import Account
-
+import config.constants.addresses as addresses
 from config.constants import GAS_BUFFER
 from helpers.enums import Network
 from tests.test_utils.cycle_utils import mock_tree_manager
@@ -55,6 +55,25 @@ def test_matches_pending_hash(tree_manager):
     assert not tree_manager.matches_pending_hash(random_hash)
 
 
+@pytest.mark.parametrize(
+    "tree_manager",
+    [Network.Ethereum],
+    indirect=True,
+)
+def test_get_claimed_for(tree_manager):
+    user = "0xEE9F84Af6a8251Eb5ffDe38c5F056bc72d3b3DD0"
+    tokens = [
+        addresses.BADGER,
+        addresses.BVECVX
+    ]
+    claimed_for_tokens = tree_manager.get_claimed_for(
+        user,
+        tokens
+    )
+    for token in tokens:
+        assert claimed_for_tokens[token] > 0
+
+
 def test_ftm_tx_details__gas_price(mocker):
     gas_price = 123
     mocker.patch("rewards.classes.TreeManager.env_config.get_web3", return_value=MagicMock())
@@ -64,5 +83,5 @@ def test_ftm_tx_details__gas_price(mocker):
     tree_manager.w3 = MagicMock(eth=MagicMock(gas_price=gas_price))
     assert (
         tree_manager.get_tx_options(accounts[0])['gasPrice']
-        == gas_price * GAS_BUFFER
+        == int(gas_price * GAS_BUFFER)
     )

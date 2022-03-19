@@ -129,7 +129,11 @@ def approve_root(
     :param current_rewards: past rewards merkle tree
     :param tree_manager: TreeManager object
     """
-    boosts = download_proposed_boosts(chain)
+    if chain in NO_BOOST:
+        boosts = {"userData": {}}
+    else:
+        boosts = download_proposed_boosts(chain)
+
     rewards_data = generate_rewards_in_range(
         chain,
         start,

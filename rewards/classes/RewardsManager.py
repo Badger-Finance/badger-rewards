@@ -26,6 +26,7 @@ from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
 from rewards.emission_handlers import (
     ibbtc_peak_handler,
+    bvecvx_lp_handler,
     unclaimed_rewards_handler,
     treasury_handler,
     fuse_pool_handler
@@ -53,6 +54,7 @@ class RewardsManager:
         addresses.FBVECVX: fuse_pool_handler,
         addresses.ETH_BADGER_TREE: unclaimed_rewards_handler,
         addresses.IBBTC_PEAK: ibbtc_peak_handler,
+        addresses.BVECVX_CVX_LP: bvecvx_lp_handler,
         addresses.DEV_MULTISIG: treasury_handler,
         addresses.TECH_OPS: treasury_handler,
         addresses.TEST_MULTISIG: treasury_handler,
@@ -72,14 +74,13 @@ class RewardsManager:
         self.apy_boosts = {}
 
     def fetch_sett_snapshot(
-        self, start_block: int, end_block: int, sett: str, blacklist: bool = True
+        self, start_block: int, end_block: int, sett: str
     ) -> Snapshot:
         return total_twap_sett_snapshot(
             self.chain,
             start_block,
             end_block,
             sett,
-            blacklist=blacklist,
             num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS
         )
 
@@ -309,7 +310,6 @@ class RewardsManager:
             f"tree distributions between {self.start} and {self.end}"
         )
         all_dist_rewards = []
-
         for dist in tree_distributions:
             start_block = get_block_by_timestamp(
                 self.chain, int(dist["end_of_previous_dist_timestamp"])
@@ -322,14 +322,13 @@ class RewardsManager:
                 start_block,
                 end_block,
                 sett,
-                blacklist=False,
                 num_historical_snapshots=NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS
             )
             amount = int(dist["amount"])
             all_dist_rewards.append(
                 distribute_rewards_from_total_snapshot(
                     amount, snapshot, token,
-                    block=self.end, custom_rewards=self.CUSTOM_BEHAVIOUR,
+                    block=self.end, custom_rewards=self.CUSTOM_BEHAVIOUR
                 )
             )
         return combine_rewards(all_dist_rewards, self.cycle)

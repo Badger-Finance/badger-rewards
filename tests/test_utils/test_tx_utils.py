@@ -162,7 +162,7 @@ def test_get_effective_gas_price__arb():
         ),
     )
     gas = get_effective_gas_price(web3, Network.Arbitrum)
-    assert gas == gas_price * 1.1
+    assert gas == int(gas_price * 1.1)
 
 
 def test_get_effective_gas_price__fantom():
