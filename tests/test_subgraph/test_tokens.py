@@ -1,19 +1,28 @@
 from copy import deepcopy
+from unittest.mock import MagicMock
 
 import pytest
 from eth_utils import to_checksum_address
 
-from config.constants.addresses import BADGER
-from config.constants.addresses import DIGG
+from config.constants.addresses import (
+    BADGER,
+    DIGG
+)
 from helpers.enums import Network
-from subgraph.queries.tokens import fetch_across_balances
-from subgraph.queries.tokens import fetch_fuse_pool_balances
-from subgraph.queries.tokens import fetch_token_balances
+from subgraph.queries.tokens import (
+    fetch_across_balances,
+    fetch_fuse_pool_token,
+    fetch_token_balances,
+    fetch_fuse_pool_balances,
+)
 from subgraph.subgraph_utils import make_gql_client
-from tests.test_subgraph.test_data import ACROSS_BALANCES_TEST_DATA
-from tests.test_subgraph.test_data import FUSE_BALANCES_TEST_DATA
-from tests.test_subgraph.test_data import TOKEN_BALANCES_TEST_DATA
-from tests.test_subgraph.test_data import TOKEN_BALANCES_TEST_DATA_ZERO_BALANCES
+from tests.test_subgraph.test_data import (
+    FUSE_BALANCES_TEST_DATA,
+    ACROSS_BALANCES_TEST_DATA,
+    TOKEN_BALANCES_TEST_DATA,
+    TOKEN_BALANCES_TEST_DATA_ZERO_BALANCES,
+    FUSE_TOKEN_TEST_DATA
+)
 
 
 def test_fetch_across_balances(mocker):
@@ -157,3 +166,31 @@ def test_fetch_fuse_balances_incompatible_chain():
     block = 14118623
     fuse_client = make_gql_client("fuse")
     assert fetch_fuse_pool_balances(fuse_client, Network.Polygon, block) == {}
+
+
+def test_fetch_fuse_pool_token(mocker):
+    mocker.patch(
+        "subgraph.subgraph_utils.Client.execute",
+        side_effect=[
+            deepcopy(FUSE_TOKEN_TEST_DATA),
+            {'accountCTokens': []}
+        ],
+    )
+    multiplier = 1.1
+    mocker.patch(
+        "subgraph.queries.tokens.make_contract",
+        return_value=MagicMock(
+            exchangeRateStored=MagicMock(
+                return_value=MagicMock(call=MagicMock(return_value=multiplier)),
+            ),
+            decimals=MagicMock(
+                return_value=MagicMock(call=MagicMock(return_value=18)),
+            )
+        )
+    )
+    expected_bals = {
+        "0xC1e3EC0fE5A77aA7a264637B86C2E25182c82Daa": 300 * multiplier,
+        "0x0279797ee0627d64FFa0D86f4f111F90E233B090": 1000 * multiplier
+    }
+    badger_fuse_balances = fetch_fuse_pool_token(Network.Ethereum, 1728601720, BADGER)
+    assert badger_fuse_balances == expected_bals

@@ -125,3 +125,18 @@ FUSE_BALANCES_TEST_DATA = {
         },
     ]
 }
+
+FUSE_TOKEN_TEST_DATA = {
+    'accountCTokens': [
+        {
+            'id': '',
+            'account': {'id': '0xc1e3ec0fe5a77aa7a264637b86c2e25182c82daa'},
+            'cTokenBalance': '300000000000000000000'
+        },
+        {
+            'id': '',
+            'account': {'id': '0x0279797ee0627d64ffa0d86f4f111f90e233b090'},
+            'cTokenBalance': '1000000000000000000000'
+        },
+    ]
+}
