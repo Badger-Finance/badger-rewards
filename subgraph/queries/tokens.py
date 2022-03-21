@@ -180,7 +180,9 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
 
     query = gql(
         """
-        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {
+        query fetch_fuse_pool_balances(
+            $block_number: Block_height, $token_filter: AccountCToken_filter
+            ) {
             accountCTokens(block: $block_number, where: $token_filter) {
                 id
                 symbol
@@ -236,7 +238,7 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
         raise e
 
 
-def fetch_fuse_pool_balances(client, chain, block):
+def fetch_fuse_pool_balances(client, chain, block):  # noqa: E501
     if chain != Network.Ethereum:
         console.log("Fuse pools are only active on ETH")
         return {}
@@ -277,7 +279,9 @@ def fetch_fuse_pool_balances(client, chain, block):
 
     query = gql(
         """
-        query fetch_fuse_pool_balances($block_number: Block_height, $token_filter: AccountCToken_filter) {
+        query fetch_fuse_pool_balances(
+            $block_number: Block_height, $token_filter: AccountCToken_filter
+            ) {
             accountCTokens(block: $block_number, where: $token_filter) {
                 id
                 symbol

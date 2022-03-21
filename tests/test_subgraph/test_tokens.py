@@ -193,4 +193,5 @@ def test_fetch_fuse_pool_token(mocker):
         "0x0279797ee0627d64FFa0D86f4f111F90E233B090": 1000 * multiplier
     }
     badger_fuse_balances = fetch_fuse_pool_token(Network.Ethereum, 1728601720, BADGER)
-    assert badger_fuse_balances == expected_bals
+    for addr, val in badger_fuse_balances.items():
+        assert val == pytest.approx(expected_bals[addr])
