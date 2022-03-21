@@ -256,3 +256,7 @@ def fetch_token_mock(mocker):
         "rewards.snapshot.chain_snapshot.fetch_token",
         return_value=value
     )
+    mocker.patch(
+        "badger_api.requests.fetch_token",
+        return_value=value
+    )
