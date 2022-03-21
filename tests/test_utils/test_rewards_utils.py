@@ -215,6 +215,10 @@ def test_check_token_totals_in_range(mocker):
             }
         ),
     )
+    mocker.patch(
+        "rewards.utils.token_utils.fetch_token",
+        return_value={'decimals': 18}
+    )
     invalid_totals = check_token_totals_in_range(Network.Ethereum, {})
     actual = str(round(Decimal(2e18) / 10 ** 18, 5))
     token = BVECVX
