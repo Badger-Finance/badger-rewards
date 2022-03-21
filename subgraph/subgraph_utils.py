@@ -6,7 +6,7 @@ from gql.transport.requests import RequestsHTTPTransport
 from gql.transport.requests import log as requests_logger
 
 from config.singletons import env_config
-from helpers.enums import BotType, Environment, Network
+from helpers.enums import Environment, Network
 from subgraph.config import subgraph_urls
 from helpers.discord import send_error_to_discord
 
