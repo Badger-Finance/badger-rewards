@@ -238,3 +238,11 @@ def clear_cache():
     fetch_token_names.cache_clear()
     fetch_token_prices.cache_clear()
     claims_snapshot.cache_clear()
+
+
+@pytest.fixture
+def fetch_token_mock(mocker):
+    mocker.patch(
+        "rewards.utils.token_utils.fetch_token",
+        return_value={'decimals': 18}
+    )
