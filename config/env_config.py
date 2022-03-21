@@ -51,6 +51,9 @@ class EnvConfig:
             ),
             Network.Fantom: get_secret(
                 "keepers/ftmscan", "FTMSCAN_TOKEN", kube=self.kube
+            ),
+            Network.Avalanche: get_secret(
+                "keepers/snowtrace", "SNOWTRACE_TOKEN", kube=self.kube
             )
         }
 
@@ -80,6 +83,11 @@ class EnvConfig:
                 Web3(Web3.HTTPProvider("https://rpcapi.fantom.network")),
                 Web3(Web3.HTTPProvider("https://ftmrpc.ultimatenodes.io")),
                 Web3(Web3.HTTPProvider("https://rpc.ankr.com/fantom")),
+            ],
+            Network.Avalanche: [
+                Web3(Web3.HTTPProvider("https://api.avax.network/ext/bc/C/rpc")),
+                Web3(Web3.HTTPProvider("https://rpc.ankr.com/avalanche")),
+                Web3(Web3.HTTPProvider("https://avax.rpcgator.com/ "))
             ]
         }
         self.is_valid_config()

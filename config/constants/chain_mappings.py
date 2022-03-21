@@ -113,6 +113,13 @@ EMISSIONS_CONTRACTS = {
             "RewardsLogger": addresses.FTM_REWARDS_LOGGER,
             "GasOracle": addresses.FTM_GAS_ORACLE
         }
+    ),
+    Network.Avalanche: DotMap(
+        {
+            "BadgerTree": addresses.AVAX_BADGER_TREE,
+            "RewardsLogger": addresses.AVAX_REWARDS_LOGGER,
+            "GasOracle": addresses.AVAX_GAS_ORACLE
+        }
     )
 }
 
@@ -120,7 +127,8 @@ CHAIN_IDS = {
     Network.Ethereum: 1,
     Network.Arbitrum: 42161,
     Network.Polygon: 137,
-    Network.Fantom: 250
+    Network.Fantom: 250,
+    Network.Avalanche: 43114
 }
 
 NETWORK_TO_BADGER_TOKEN = {
@@ -140,7 +148,8 @@ CLAIMABLE_TOKENS = {
     Network.Fantom: {
         BalanceType.Native: [],
         BalanceType.NonNative: [addresses.FTM_SOLIDLY]
-    }
+    },
+    Network.Avalanche: {}
 }
 
 UNCLAIMED_REWARDS_TOKENS = {
@@ -156,19 +165,22 @@ ABI_DIRS = {
     Network.Ethereum: "eth",
     Network.Polygon: "polygon",
     Network.Arbitrum: "arbitrum",
-    Network.Fantom: "fantom"
+    Network.Fantom: "fantom",
+    Network.Avalanche: "avax"
 }
 
 DECIMAL_MAPPING = {
     Network.Ethereum: 1e18,
     Network.Polygon: 1e18,
     Network.Arbitrum: 1e18,
-    Network.Fantom: 1e18
+    Network.Fantom: 1e18,
+    Network.Avalanche: 1e18
 }
 
 CHAIN_EXPLORER_URLS = {
     Network.Ethereum: "etherscan.io",
     Network.Polygon: "polygonscan.com",
     Network.Arbitrum: "arbiscan.io",
-    Network.Fantom: "ftmscan.com"
+    Network.Fantom: "ftmscan.com",
+    Network.Avalanche: "snowtrace.io"
 }
