@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - approve_arb_cycle_bot.yaml
   - approve_ftm_cycle_bot.yaml
+  - approve_avax_cycle_bot.yaml
   - approve_poly_cycle_bot.yaml
   - arb_boost_bot.yaml
   - eth_boost_bot.yaml
@@ -10,6 +11,7 @@ resources:
   - propose_arb_cycle_bot.yaml
   - propose_eth_cycle_bot.yaml
   - propose_ftm_cycle_bot.yaml
+  - propose_avax_cycle_bot.yaml
   - propose_poly_cycle_bot.yaml
   - service.yaml
   - service_account.yaml

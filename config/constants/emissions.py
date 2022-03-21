@@ -94,4 +94,4 @@ REWARD_ERROR_TOLERANCE = 0.01
 
 ZERO_CYCLE = 0
 
-NO_BOOST = [Network.Fantom]
+NO_BOOST = [Network.Fantom, Network.Avalanche]
