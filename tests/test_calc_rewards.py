@@ -2,10 +2,10 @@ from unittest.mock import MagicMock
 import pytest
 from brownie import accounts
 from config.constants import addresses
+from config.singletons import env_config
 from helpers.enums import Network
 from rewards.calc_rewards import approve_root, fetch_all_schedules
 from rewards.classes.TreeManager import TreeManager
-
 
 @pytest.fixture
 def prepare_approve_mocks(mocker):
@@ -68,7 +68,6 @@ def test_fetch_all_schedules(mocker):
     setts = [
         addresses.BCRV_IBBTC,
     ]
-    mocker.patch('time.time', MagicMock(return_value=200))
 
     SCHEDULES = [
         [
@@ -98,9 +97,31 @@ def test_fetch_all_schedules(mocker):
         )
     )
 
+    def mock_ts(timestamp):
+        return {"timestamp": timestamp}
+    env_config.get_web3 = MagicMock(
+        return_value=MagicMock(
+            eth=MagicMock(
+                get_block=MagicMock(
+                    side_effect=[mock_ts(i) for i in [101, 200, 175, 225]]
+                )
+            )
+        )
+    )
+    mocker.patch(
+        "rewards.calc_rewards.env_config",
+        env_config
+    )
+
+    mocker.patch(
+        "rewards.calc_rewards.fetch_setts",
+        return_value=setts
+    )
+
     all_schedules, setts_with_schedules = fetch_all_schedules(
         Network.Ethereum,
-        setts
+        10,
+        20
     )
     assert setts_with_schedules == [addresses.BCRV_IBBTC]
     assert len(all_schedules[addresses.BCRV_IBBTC]) == 1
