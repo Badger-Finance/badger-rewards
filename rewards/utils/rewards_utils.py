@@ -182,6 +182,7 @@ def check_token_totals_in_range(
     based on the rewards schedules.
 
     Args:
+        chain: network
         rewards_per_sett (Dict[str, Dict[str, Dict[str, Decimal]]]): actual and expected reward
             amounts for each token to be distributed to each sett
 
