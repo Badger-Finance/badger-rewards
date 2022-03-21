@@ -4,7 +4,10 @@ import boto3
 import pytest
 from moto import mock_dynamodb2
 
-from badger_api.requests import fetch_token_names, fetch_token_prices
+from badger_api.requests import (
+    fetch_token_names,
+    fetch_token_prices,
+)
 from rewards.snapshot.claims_snapshot import claims_snapshot
 
 TOKEN_SNAPSHOT_DATA = (
@@ -35,7 +38,6 @@ NFT_SNAPSHOT_DATA = {
     "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 3446.0,
     "0x0000001d2B0A08A235276e8765aa1A659Aae58bb": 3536.0,
 }
-
 
 CHAIN_CLAIMS_SNAPSHOT_DATA = (
     {
@@ -242,7 +244,15 @@ def clear_cache():
 
 @pytest.fixture
 def fetch_token_mock(mocker):
+    value = {
+        'decimals': 18,
+        'name': "BADGER",
+    }
     mocker.patch(
         "rewards.utils.token_utils.fetch_token",
-        return_value={'decimals': 18}
+        return_value=value
+    )
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_token",
+        return_value=value
     )
