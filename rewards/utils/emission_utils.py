@@ -113,10 +113,6 @@ def get_schedules_by_token(schedules: List[Schedule]) -> Dict[str, List[Schedule
     return schedules_by_token
 
 
-def parse_schedules(schedules) -> List[Schedule]:
-    return [parse_schedule(s) for s in schedules]
-
-
 def parse_schedule(schedule) -> Schedule:
     return Schedule(
         Web3.toChecksumAddress(schedule[0]),  # sett

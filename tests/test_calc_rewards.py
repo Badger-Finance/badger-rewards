@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 import pytest
 from brownie import accounts
-import config.constants.addresses as addresses
+from config.constants import addresses
 from helpers.enums import Network
 from rewards.calc_rewards import approve_root, fetch_all_schedules
 from rewards.classes.TreeManager import TreeManager

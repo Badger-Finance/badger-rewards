@@ -36,7 +36,7 @@ from rewards.rewards_checker import verify_rewards
 from rewards.utils.emission_utils import (
     fetch_setts,
     get_schedules_by_token,
-    parse_schedules,
+    parse_schedule,
 )
 from rewards.utils.rewards_utils import (
     combine_rewards,
@@ -61,7 +61,7 @@ def fetch_all_schedules(
     setts_with_schedules = []
     now = time.time()
     for sett in setts:
-        schedules = parse_schedules(logger.getAllUnlockSchedulesFor(sett).call())
+        schedules = [parse_schedule(e) for e in logger.getAllUnlockSchedulesFor(sett).call()]
         for schedule in list(schedules):
             if schedule.startTime < now < schedule.endTime:
                 has_active_schedule = True
