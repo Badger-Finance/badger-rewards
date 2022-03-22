@@ -7,6 +7,7 @@ from helpers.enums import Network
 from rewards.calc_rewards import approve_root, fetch_all_schedules
 from rewards.classes.TreeManager import TreeManager
 
+
 @pytest.fixture
 def prepare_approve_mocks(mocker):
     mocker.patch("rewards.calc_rewards.download_proposed_boosts",
