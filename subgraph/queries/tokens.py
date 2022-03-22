@@ -13,6 +13,7 @@ from gql import (
 )
 from rich.console import Console
 from web3 import Web3
+from config.constants.addresses import BADGER, BVECVX, DIGG, FBADGER, FBVECVX, FDIGG
 
 from config.constants.chain_mappings import DECIMAL_MAPPING
 from helpers.digg_utils import digg_utils
@@ -141,16 +142,21 @@ def fetch_fuse_token_info(chain: Network, block: int) -> Dict:
         return {}
 
     return {
-        "0x3472A5A71965499acd81997a54BBA8D852C6E53d": {
-            "underlying": "0x3472A5A71965499acd81997a54BBA8D852C6E53d",
+        BADGER: {
+            "underlying": BADGER,
             "symbol": "fBADGER-22",
-            "contract": "0x6780B4681aa8efE530d075897B3a4ff6cA5ed807",
+            "contract": FBADGER,
         },
-        "0x798D1bE841a82a273720CE31c822C61a67a601C3": {
-            "underlying": "0x798D1bE841a82a273720CE31c822C61a67a601C3",
+        DIGG: {
+            "underlying": DIGG,
             "symbol": "fDIGG-22",
-            "contract": "0x792a676dD661E2c182435aaEfC806F1d4abdC486",
+            "contract": FDIGG
         },
+        BVECVX: {
+            "underlying": BVECVX,
+            "symbol": "fBVECVX-22",
+            "contract": FBVECVX
+        }
     }
 
 
