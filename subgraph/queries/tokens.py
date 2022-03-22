@@ -137,10 +137,7 @@ def fetch_token_balances(
     return badger_balances, digg_balances
 
 
-def fetch_fuse_token_info(chain: Network, block: int) -> Dict:
-    if chain != Network.Ethereum:
-        return {}
-
+def fetch_fuse_token_info() -> Dict:
     return {
         BADGER: {
             "underlying": BADGER,
@@ -166,7 +163,7 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
         return {}
 
     fuse_client = make_gql_client("fuse")
-    token_info = fetch_fuse_token_info(chain, block).get(token)
+    token_info = fetch_fuse_token_info()[token]
     console.log(f"Fetching {token_info['symbol']} token from fuse pool")
     ftoken = make_contract(
         Web3.toChecksumAddress(token_info["contract"]),

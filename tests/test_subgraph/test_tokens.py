@@ -168,6 +168,13 @@ def test_fetch_fuse_balances_incompatible_chain():
     assert fetch_fuse_pool_balances(fuse_client, Network.Polygon, block) == {}
 
 
+def fetch_fuse_pool_token_incompatible_chain():
+    """
+    Fuse token are available only on Ethereum
+    """
+    assert fetch_fuse_pool_token(Network.Polygon, 100, BADGER) == {}
+
+
 def test_fetch_fuse_pool_token(mocker):
     mocker.patch(
         "subgraph.subgraph_utils.Client.execute",
