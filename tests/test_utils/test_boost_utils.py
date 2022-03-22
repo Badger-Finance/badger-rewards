@@ -22,7 +22,7 @@ def mock_claims_snapshot(mocker):
     )
 
 
-def test_calc_boost_balances(chain, mock_snapshots, mock_claims_snapshot):
+def test_calc_boost_balances(chain, mock_snapshots, mock_claims_snapshot, fetch_token_mock):
 
     boost_balances = calc_boost_balances(
         123, Network.Ethereum
@@ -52,7 +52,7 @@ def test_calc_boost_balances(chain, mock_snapshots, mock_claims_snapshot):
         assert boost_balances.nfts[addr] == balance
 
 
-def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_snapshot):
+def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_snapshot, fetch_token_mock):
     mocker.patch(
         "rewards.boost.boost_utils.token_snapshot_usd",
         return_value=(
