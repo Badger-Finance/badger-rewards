@@ -3,6 +3,7 @@ from helpers.enums import Network
 from rewards.snapshot.token_snapshot import token_snapshot
 from tests.utils import TEST_WALLET, TEST_WALLET_ANOTHER
 
+
 @pytest.fixture
 def mock_fns(mocker):
     mocker.patch(
