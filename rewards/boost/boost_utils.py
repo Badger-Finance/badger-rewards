@@ -79,8 +79,6 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     non_native += Counter(non_native_setts)
     native += Counter(native_setts)
 
-    native = filter_dust(dict(native), 1)
-    non_native = filter_dust(dict(non_native), 1)
     bvecvx_usd = {}
     if chain == Network.Ethereum:
         bvecvx_claimable = claims_snapshot(chain, block).get(addresses.BVECVX)
@@ -94,5 +92,10 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
             bvecvx_lp_bals.boost_balance(addr, ppfs)
         bvecvx = (bvecvx_bals + bvecvx_claimable + bvecvx_lp_bals + fuse_bvecvx)
         bvecvx_usd = bvecvx.convert_to_usd(chain).balances
+
+    native = filter_dust(dict(native), 1)
+    non_native = filter_dust(dict(non_native), 1)
+    bvecvx_usd = filter_dust(dict(bvecvx_usd), 1)
+
 
     return BoostBalances(native, non_native, bvecvx_usd, nft_balances)
