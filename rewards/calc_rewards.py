@@ -34,7 +34,8 @@ from rewards.dynamo_handlers import put_rewards_data
 from rewards.rewards_checker import verify_rewards
 from rewards.utils.emission_utils import (
     fetch_setts,
-    parse_schedules,
+    get_schedules_by_token,
+    parse_schedule,
 )
 from rewards.utils.rewards_utils import (
     combine_rewards,
@@ -45,23 +46,34 @@ console = Console()
 
 
 def fetch_all_schedules(
-        chain: str, setts: List[str]
+        chain: str, start: int, end: int
 ) -> Tuple[Dict[str, Dict[str, List[Schedule]]], List[str]]:
     """
-    Fetch all schedules on a particular chain
+    Fetch active schedules between start and end block
     :param chain: chain to fetch from
-    :param setts: setts from which schedule to pull
     """
+    setts = fetch_setts(chain)
     logger = make_contract(
         EMISSIONS_CONTRACTS[chain]["RewardsLogger"], Abi.RewardsLogger, chain
     )
+    w3 = env_config.get_web3(chain)
+    start_timestamp = w3.eth.get_block(start)["timestamp"]
+    end_timestamp = w3.eth.get_block(end)["timestamp"]
     all_schedules = {}
     setts_with_schedules = []
+    w3 = env_config.get_web3(chain)
     for sett in setts:
-        schedules = logger.getAllUnlockSchedulesFor(sett).call()
-        if len(schedules) > 0:
+        schedules = [parse_schedule(e) for e in logger.getAllUnlockSchedulesFor(sett).call()]
+        for schedule in list(schedules):
+            start_in_range = start_timestamp < schedule.startTime < end_timestamp
+            end_in_range = start_timestamp < schedule.endTime < end_timestamp
+            if start_in_range or end_in_range:
+                has_active_schedule = True
+            else:
+                schedules.remove(schedule)
+        if len(schedules) > 0 and has_active_schedule:
             setts_with_schedules.append(sett)
-        all_schedules[sett] = parse_schedules(schedules)
+            all_schedules[sett] = get_schedules_by_token(schedules)
     console.log(f"Fetched {len(all_schedules)} schedules")
     return all_schedules, setts_with_schedules
 
@@ -212,7 +224,7 @@ def generate_rewards_in_range(
     :param tree_manager: TreeManager object
     :param boosts: Boost object
     """
-    all_schedules, setts = fetch_all_schedules(chain, fetch_setts(chain))
+    all_schedules, setts = fetch_all_schedules(chain)
 
     console_and_discord(f"Generating rewards for {len(setts)} setts", chain)
 
