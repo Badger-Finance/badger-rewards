@@ -137,7 +137,7 @@ def test_fetch_fuse_balances_happy(mocker):
 
 def test_fetch_fuse_balances_raises(mocker):
     discord = mocker.patch(
-        "subgraph.queries.tokens.send_error_to_discord",
+        "subgraph.subgraph_utils.send_error_to_discord",
     )
     mocker.patch(
         "subgraph.subgraph_utils.Client.execute",
