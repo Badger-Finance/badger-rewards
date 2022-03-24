@@ -3,7 +3,7 @@ import os
 import boto3
 import pytest
 from moto import mock_dynamodb2
-
+from decimal import Decimal
 from badger_api.requests import (
     fetch_token_names,
     fetch_token_prices,
@@ -14,12 +14,12 @@ from config.constants import addresses
 
 TOKEN_SNAPSHOT_DATA = (
     {
-        "0x01fb5de8847e570899d3e00029Ae9cD9cB40E5d7": 44557.11578,
-        "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909": 4354.388194,
+        "0x01fb5de8847e570899d3e00029Ae9cD9cB40E5d7": Decimal(44557.11578),
+        "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909": Decimal(354.388194),
     },
     {
-        "0x017b3763b8a034F8655D46345e3EB42555E39064": 0.000091143809567686612959,
-        "0x01ebce016681D076667BDb823EBE1f76830DA6Fa": 0.000055073869881086331795,
+        "0x017b3763b8a034F8655D46345e3EB42555E39064": Decimal(0.000091143809567686612959),
+        "0x01ebce016681D076667BDb823EBE1f76830DA6Fa": Decimal(0.000055073869881086331795)
     },
 )
 
@@ -78,8 +78,8 @@ def mock_snapshots(mocker):
     mocker.patch(
         "rewards.boost.boost_utils.fuse_snapshot_of_token",
         return_value=Snapshot(addresses.BVECVX, {
-            "0x01fb5de8847e570899d3e00029Ae9cD9cB40E5d7": 100,
-            "0x017b3763b8a034F8655D46345e3EB42555E39064": 50,
+            "0x01fb5de8847e570899d3e00029Ae9cD9cB40E5d7": Decimal(100),
+            "0x017b3763b8a034F8655D46345e3EB42555E39064": Decimal(50),
         })
     )
 
