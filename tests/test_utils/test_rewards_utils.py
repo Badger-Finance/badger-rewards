@@ -109,7 +109,7 @@ def test_token_diff_table():
     ])
 
 
-def test_verify_rewards__discord_get_called(mocker):
+def test_verify_rewards__discord_get_called(mocker, fetch_token_mock):
     discord = mocker.patch("rewards.rewards_checker.send_code_block_to_discord")
     mocker.patch(
         "rewards.rewards_checker.claims_snapshot",
@@ -134,10 +134,10 @@ def test_verify_rewards__discord_get_called(mocker):
 
 
 def test_get_actual_expected_totals():
-    IBBTC_SETT = SETTS[Network.Ethereum]["ibbtc_crv"]
-    CVXCRV_SETT = SETTS[Network.Ethereum]["cvx_crv"]
+    ibbtc_sett = SETTS[Network.Ethereum]["ibbtc_crv"]
+    cvxcrv_sett = SETTS[Network.Ethereum]["cvx_crv"]
     sett_totals = {
-        IBBTC_SETT: {
+        ibbtc_sett: {
             "actual": {
                 BADGER: Decimal(2e18),
                 BVECVX: Decimal(1e18),
@@ -147,7 +147,7 @@ def test_get_actual_expected_totals():
                 BVECVX: Decimal(1e18),
             },
         },
-        CVXCRV_SETT: {
+        cvxcrv_sett: {
             "actual": {
                 BADGER: Decimal(2e18),
                 BVECVX: Decimal(1e18),
@@ -170,7 +170,7 @@ def test_get_actual_expected_totals():
         BVECVX: Decimal(2e18)
     }
 
-    sett_totals[IBBTC_SETT]["expected"][BADGER] = Decimal(10e18)
+    sett_totals[ibbtc_sett]["expected"][BADGER] = Decimal(10e18)
 
     actual, expected = get_actual_expected_totals(sett_totals)
 
@@ -184,7 +184,7 @@ def test_get_actual_expected_totals():
     }
 
 
-def test_check_token_totals_in_range(mocker):
+def test_check_token_totals_in_range(mocker, fetch_token_mock):
     mocker.patch(
         "rewards.utils.rewards_utils.get_actual_expected_totals",
         return_value=(
