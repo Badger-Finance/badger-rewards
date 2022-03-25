@@ -104,7 +104,6 @@ def parse_sett_balances(
 
     return Snapshot(sett_address, balances, sett_ratio, sett_type)
 
-
 def chain_snapshot_usd(chain: Network, block: int) -> Tuple[Counter, Counter]:
     """Take a snapshot of a chains native/non native balances in usd"""
     total_snapshot = chain_snapshot(chain, block)
