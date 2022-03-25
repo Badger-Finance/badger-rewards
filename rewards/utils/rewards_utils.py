@@ -14,8 +14,6 @@ from rich.console import Console
 from web3 import Web3
 
 from config.constants.emissions import (
-    BVECVX_VOTER_BLACKLIST,
-    BVECVX_VOTER_BLACKLIST_TOKENS,
     REWARD_ERROR_TOLERANCE,
     ZERO_CYCLE,
     NATIVE_TOKEN_REWARDS,
@@ -75,10 +73,6 @@ def distribute_rewards_from_total_snapshot(
     # Blacklist digg/badger rewards
     if token in NATIVE_TOKEN_REWARDS[snapshot.chain]:
         for addr in SCHEDULE_REWARDS_BLACKLIST.keys():
-            snapshot.zero_balance(addr)
-    # Blacklist bveCVX Voter from receiving bribes
-    if token in BVECVX_VOTER_BLACKLIST_TOKENS[snapshot.chain]:
-        for addr in BVECVX_VOTER_BLACKLIST.keys():
             snapshot.zero_balance(addr)
     # Blacklist all token rewards for tree rewards blacklist
     for addr in TREE_REWARDS_BLACKLIST.keys():
