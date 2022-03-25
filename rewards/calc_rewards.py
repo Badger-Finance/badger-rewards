@@ -57,8 +57,8 @@ def fetch_all_schedules(
         EMISSIONS_CONTRACTS[chain]["RewardsLogger"], Abi.RewardsLogger, chain
     )
     w3 = env_config.get_web3(chain)
-    start_timestamp = w3.eth.get_block(start)["timestamp"]
-    end_timestamp = w3.eth.get_block(end)["timestamp"]
+    start_timestamp = w3.eth.get_block(int(start))["timestamp"]
+    end_timestamp = w3.eth.get_block(int(end))["timestamp"]
     all_schedules = {}
     setts_with_schedules = []
     w3 = env_config.get_web3(chain)
@@ -67,6 +67,7 @@ def fetch_all_schedules(
         for schedule in list(schedules):
             start_in_range = start_timestamp < schedule.startTime < end_timestamp
             end_in_range = start_timestamp < schedule.endTime < end_timestamp
+            covers_range = schedule.startTime < start_timestamp and schedule.endTime > end_timestamp
             if start_in_range or end_in_range:
                 has_active_schedule = True
             else:
