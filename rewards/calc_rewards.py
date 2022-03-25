@@ -224,7 +224,7 @@ def generate_rewards_in_range(
     :param tree_manager: TreeManager object
     :param boosts: Boost object
     """
-    all_schedules, setts = fetch_all_schedules(chain)
+    all_schedules, setts = fetch_all_schedules(chain, start, end)
 
     console_and_discord(f"Generating rewards for {len(setts)} setts", chain)
 
