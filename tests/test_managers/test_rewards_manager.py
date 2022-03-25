@@ -220,6 +220,7 @@ def test_splits(
     boosts_split,
     monkeypatch,
     mocker,
+    fetch_token_mock,
 ):
     rates = [Decimal(0), Decimal(0.5), Decimal(1)]
     user_data = {}
@@ -280,7 +281,7 @@ def test_splits(
 
 
 def test_calculate_sett_rewards__check_analytics(
-        schedule, mocker, boosts_split, mock_discord
+        schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     mocker.patch(
@@ -309,7 +310,7 @@ def test_calculate_sett_rewards__check_analytics(
 
 
 def test_calculate_sett_rewards__equal_balances_for_period(
-        schedule, mocker, boosts_split, mock_discord
+        schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     mocker.patch(
@@ -360,7 +361,8 @@ def test_calculate_sett_rewards__equal_balances_for_period(
     ]
 )
 def test_calculate_sett_rewards__call_custom_handler(
-        schedule, mocker, boosts_split, mock_discord, addr, setup_dynamodb
+        schedule, mocker, boosts_split, mock_discord, addr, setup_dynamodb,
+        fetch_token_mock,
 ):
     patch_resource(dynamodb)
 
@@ -393,7 +395,7 @@ def test_calculate_sett_rewards__call_custom_handler(
 
 
 def test_calculate_sett_rewards__balances_vary_for_period(
-        schedule, mocker, boosts_split, mock_discord
+        schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
 
@@ -445,7 +447,7 @@ def test_calculate_sett_rewards__balances_vary_for_period(
         + rewards.claims[THIRD_USER][BADGER]) / Decimal(1e18) == total_badger
 
 
-def test_calculate_tree_distributions__totals(mocker, boosts_split):
+def test_calculate_tree_distributions__totals(mocker, boosts_split, fetch_token_mock):
     first_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f56")
     second_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f57")
     token = Web3.toChecksumAddress('0x2B5455aac8d64C14786c3a29858E43b5945819C0')

@@ -47,7 +47,7 @@ def claimable_block():
         (Network.Arbitrum, CLAIMABLE_BALANCES_DATA_ARB),
     ],
 )
-def test_claims_snapshot__happy(chain, data, claimable_block, monkeypatch):
+def test_claims_snapshot__happy(chain, data, claimable_block, monkeypatch, fetch_token_mock):
     monkeypatch.setattr(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
@@ -87,7 +87,7 @@ def test_claims_snapshot__happy(chain, data, claimable_block, monkeypatch):
             )
 
 
-def test_claims_snapshot_digg(claimable_block, monkeypatch):
+def test_claims_snapshot_digg(claimable_block, monkeypatch, fetch_token_mock):
     # Digg has different calculation algorithm hence separate test
     balance = "148480869281534217908"
     monkeypatch.setattr(
@@ -107,7 +107,7 @@ def test_claims_snapshot_digg(claimable_block, monkeypatch):
 
 
 @responses.activate
-def test_claims_snapshot_usd__happy(claimable_block, monkeypatch):
+def test_claims_snapshot_usd__happy(claimable_block, monkeypatch, fetch_token_mock):
     monkeypatch.setattr(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
