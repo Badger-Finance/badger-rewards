@@ -50,7 +50,6 @@ class InvalidRewardsTotalException(Exception):
 
 class RewardsManager:
     CUSTOM_BEHAVIOUR = {
-        addresses.FBBVECVXLP: fuse_pool_handler,
         addresses.FBVECVX: fuse_pool_handler,
         addresses.ETH_BADGER_TREE: unclaimed_rewards_handler,
         addresses.IBBTC_PEAK: ibbtc_peak_handler,
