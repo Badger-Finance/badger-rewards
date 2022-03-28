@@ -4,8 +4,7 @@ from typing import Dict, List
 from gql import gql
 from rich.console import Console
 from web3 import Web3
-
-from subgraph.subgraph_utils import make_gql_client
+from subgraph.subgraph_utils import SubgraphClient
 
 console = Console()
 
@@ -35,7 +34,7 @@ def _populate_end_of_previous_harvest(tree_distributions: List[Dict]) -> Dict[st
 
 
 def fetch_tree_distributions(start_timestamp, end_timestamp, chain) -> List[Dict]:
-    tree_client = make_gql_client(chain)
+    tree_client = SubgraphClient(chain, chain)
     query = gql(
         """
         query tree_distributions(

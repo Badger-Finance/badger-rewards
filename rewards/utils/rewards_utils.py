@@ -207,5 +207,4 @@ def check_token_totals_in_range(
             max_expected = token_amount_base_10(chain, token, max_expected)
             actual = token_amount_base_10(chain, token, actual)
             invalid_totals.append([token, min_expected, max_expected, actual])
-
     return invalid_totals

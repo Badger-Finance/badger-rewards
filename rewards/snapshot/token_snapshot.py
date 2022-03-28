@@ -7,20 +7,17 @@ from subgraph.queries.tokens import (
     fetch_fuse_pool_balances,
     fetch_token_balances,
 )
-from subgraph.subgraph_utils import make_gql_client
 
 
 def token_snapshot(chain: str, block: int) -> Tuple[Snapshot, Snapshot]:
-    token_client = make_gql_client(f"tokens-{chain}")
-    badger_bals, digg_bals = fetch_token_balances(token_client, block, chain)
+    badger_bals, digg_bals = fetch_token_balances(block, chain)
     across_bals = fetch_across_balances(block, chain)
     cumulative_badger_bals = Counter(badger_bals) + Counter(across_bals)
     return Snapshot(BADGER, cumulative_badger_bals), Snapshot(DIGG, digg_bals)
 
 
 def fuse_snapshot(chain: str, block: int) -> Dict[str, Snapshot]:
-    fuse_client = make_gql_client("fuse")
-    fuse_bals = fetch_fuse_pool_balances(fuse_client, chain, block)
+    fuse_bals = fetch_fuse_pool_balances(chain, block)
     fuse_snapshots = {}
     for token, bals in fuse_bals.items():
         fuse_snapshots[token] = Snapshot(token, bals)
