@@ -14,8 +14,17 @@ TREE_REWARDS_BLACKLIST = {
     addresses.SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     addresses.BBADGER: "Badger Vault",
 }
+
+BVECVX_VOTER_BLACKLIST = {
+    addresses.BVECVX_VOTER: "Badger bveCVX Voter"
+}
+
 NATIVE_TOKEN_REWARDS = {
     Network.Ethereum: [addresses.BADGER, addresses.DIGG]
+}
+
+BVECVX_VOTER_BLACKLIST_TOKENS = {
+    Network.Ethereum: [addresses.BVECVX, addresses.BADGER]
 }
 
 BVECVX_BOOST_WEIGHT = 0.5
