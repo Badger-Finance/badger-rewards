@@ -11,7 +11,7 @@ from subgraph.subgraph_utils import make_gql_client
 
 
 def token_snapshot(chain: str, block: int) -> Tuple[Snapshot, Snapshot]:
-    client = make_gql_client(f"tokens-chain")
+    client = make_gql_client(f"tokens-{chain}")
     badger_bals, digg_bals = fetch_token_balances(client, block, chain)
     across_bals = fetch_across_balances(block, chain)
     cumulative_badger_bals = Counter(badger_bals) + Counter(across_bals)
