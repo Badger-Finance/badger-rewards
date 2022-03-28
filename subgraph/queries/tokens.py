@@ -26,13 +26,16 @@ from helpers.enums import (
     Network,
 )
 from helpers.web3_utils import make_contract
+from subgraph.subgraph_utils import SubgraphClient
 from rewards.utils.emission_utils import get_across_lp_multiplier
-from subgraph.subgraph_utils import make_gql_client
 
 console = Console()
 
 
 def token_query():
+    """
+    Graphql query for fetching tokens on a subgraph
+    """
     return gql(
         """
         query fetchWalletBalance($firstAmount: Int, $lastID: ID,$blockNumber:Block_height) {
@@ -49,6 +52,9 @@ def token_query():
 
 
 def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
+    """
+    Fetch lp balances from across protocol and convert to badger tokens
+    """
     if chain != Network.Ethereum:
         return {}
     increment = 1000
@@ -58,35 +64,27 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
     multiplier = get_across_lp_multiplier()
     console.log(f"Across lp multiplier {multiplier}")
     across_balances = {}
-    client = make_gql_client("across")
-    try:
-        while continue_fetching:
-            variables = {
-                "firstAmount": increment,
-                "lastID": last_id,
-                "blockNumber": {"number": block_number},
-            }
-            next_page = client.execute(query, variable_values=variables)
-            print(next_page)
-            if len(next_page["tokenBalances"]) == 0:
-                continue_fetching = False
-            else:
-                last_id = next_page["tokenBalances"][-1]["id"]
-                console.log(
-                    f"Fetching {len(next_page['tokenBalances'])} across balances"
-                )
-                for entry in next_page["tokenBalances"]:
-                    address = entry["id"].split("-")[1]
-                    amount = int(entry["balance"])
-                    if amount > 0:
-                        across_balances[address] = multiplier * amount / DECIMAL_MAPPING[chain]
-
-    except Exception as e:
-        send_error_to_discord(
-            e, "Error in Fetching Across Balance", "Subgraph Error", chain
-        )
-        raise e
-    print(across_balances)
+    client = SubgraphClient("across", chain)
+    while continue_fetching:
+        variables = {
+            "firstAmount": increment,
+            "lastID": last_id,
+            "blockNumber": {"number": block_number},
+        }
+        next_page = client.execute(query, variable_values=variables)
+        print(next_page)
+        if len(next_page["tokenBalances"]) == 0:
+            continue_fetching = False
+        else:
+            last_id = next_page["tokenBalances"][-1]["id"]
+            console.log(
+                f"Fetching {len(next_page['tokenBalances'])} across balances"
+            )
+            for entry in next_page["tokenBalances"]:
+                address = entry["id"].split("-")[1]
+                amount = int(entry["balance"])
+                if amount > 0:
+                    across_balances[address] = multiplier * amount / DECIMAL_MAPPING[chain]
     return across_balances
 
 
@@ -96,6 +94,7 @@ def fetch_token_balances(
 ) -> Tuple[Dict[str, Number], Dict[str, Number]]:
     increment = 1000
     query = token_query()
+    client = SubgraphClient(f"tokens-{chain}", chain)
 
     continue_fetching = True
     last_id = "0x0000000000000000000000000000000000000000"
@@ -143,6 +142,7 @@ def fetch_fuse_pool_balances(client: Client, chain: Network, block: int) -> Dict
         console.log("Fuse pools are only active on ETH")
         return {}
 
+    client = SubgraphClient("fuse", chain)
     ctoken_data = {
         "fBADGER-22": {
             "underlying_contract": "0x3472A5A71965499acd81997a54BBA8D852C6E53d",
@@ -198,55 +198,32 @@ def fetch_fuse_pool_balances(client: Client, chain: Network, block: int) -> Dict
         "block_number": {"number": block},
         "token_filter": {"id_gt": last_token_id, "symbol_in": list(ctoken_data.keys())},
     }
-    try:
-        while True:
-            variables["token_filter"]["id_gt"] = last_token_id
-            results = client.execute(query, variable_values=variables)
+    while True:
+        variables["token_filter"]["id_gt"] = last_token_id
+        results = client.execute(query, variable_values=variables)
 
-            for result in results["accountCTokens"]:
+        for result in results["accountCTokens"]:
 
-                last_token_id = result["id"]
-                symbol = result["symbol"]
-                ctoken_balance = float(result["cTokenBalance"])
-                balance = ctoken_balance * ctoken_data[symbol]["exchange_rate"]
-                account = Web3.toChecksumAddress(result["account"]["id"])
+            last_token_id = result["id"]
+            symbol = result["symbol"]
+            ctoken_balance = float(result["cTokenBalance"])
+            balance = ctoken_balance * ctoken_data[symbol]["exchange_rate"]
+            account = Web3.toChecksumAddress(result["account"]["id"])
 
-                if balance <= 0:
-                    continue
+            if balance <= 0:
+                continue
 
-                sett = Web3.toChecksumAddress(
-                    ctoken_data[symbol]["underlying_contract"]
-                )
+            sett = Web3.toChecksumAddress(
+                ctoken_data[symbol]["underlying_contract"]
+            )
 
-                if sett not in balances:
-                    balances[sett] = {}
+            if sett not in balances:
+                balances[sett] = {}
 
-                if account not in balances[sett]:
-                    balances[sett][account] = balance
-                else:
-                    balances[sett][account] += balance
-
-            if len(results["accountCTokens"]) == 0:
-                break
+            if account not in balances[sett]:
+                balances[sett][account] = balance
             else:
                 console.log(f"Fetching {len(results['accountCTokens'])} fuse balances")
 
         console.log(f"Fetched {len(balances)} total fuse balances")
         return balances
-
-    except Exception as e:
-        discord_url = get_discord_url(chain, BotType.Boost)
-        send_message_to_discord(
-            "**BADGER BOOST ERROR**",
-            ":x: Error in Fetching Fuse Token Balance",
-            [
-                {
-                    "name": "Error Type",
-                    "value": type(e),
-                    "inline": True,
-                }
-            ],
-            "Boost Bot",
-            url=discord_url,
-        )
-        raise e
