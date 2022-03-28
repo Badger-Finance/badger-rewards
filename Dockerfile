@@ -7,6 +7,7 @@ RUN apt-get remove libsasl2-2 libsasl2-modules-db -y
 RUN apt-get remove linux-libc-dev -y
 RUN apt-get remove libtiff5 -y
 RUN apt-get update -y
+RUN apt-get install libc-bin>=2.31-13+deb11u3 libmariadb3>=1:10.5.15-0+deb11u1 libxml2>=2.9.10+dfsg-6.7+deb11u1 mariadb-common>=1:10.5.15-0+deb11u1
 RUN apt-get install libexpat1>=2.2.10-2+deb11u1 -y
 RUN apt-get install libsasl2-2>=2.1.27+dfsg-2.1+deb11u1 -y
 RUN apt-get install linux-libc-dev>=5.10.92-2 libc6-dev -y
