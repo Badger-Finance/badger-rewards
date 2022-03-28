@@ -180,3 +180,8 @@ CHAIN_BALANCES_TEST_DATA = {
         }
     ]
 }
+NFT_TEST_DATA = {
+    'nftbalances': [
+        {'id': f'0x101B3fAc7d37a48E7C3A140f0Ce95eb6b234f8bf-100-{TEST_WALLET}'},
+    ]
+}
