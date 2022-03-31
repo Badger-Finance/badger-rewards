@@ -43,3 +43,14 @@ def treasury_handler(amount: Decimal, token: str, sett: str, block: int) -> Rewa
     rewards = RewardsList()
     rewards.increase_user_rewards(addresses.TREASURY_OPS, token, amount)
     return rewards
+
+
+def bveoxd_lp_handler(amount: Decimal, token: str, sett: str, block: int) -> RewardsList:
+    console.log(f"Distributing {amount} of {token} to bveoxd lp holders ")
+    snapshot = sett_snapshot(Network.Fantom, addresses.FTM_BSMM_BVEOXD_OXD)
+    return distribute_rewards_from_total_snapshot(
+        amount,
+        snapshot,
+        token,
+        block
+    )

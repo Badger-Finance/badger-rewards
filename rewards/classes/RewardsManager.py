@@ -25,6 +25,7 @@ from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
 from rewards.emission_handlers import (
+    bveoxd_lp_handler,
     ibbtc_peak_handler,
     bvecvx_lp_handler,
     unclaimed_rewards_handler,
@@ -57,7 +58,8 @@ class RewardsManager:
         addresses.TEST_MULTISIG: treasury_handler,
         addresses.BADGER_PAYMENTS: treasury_handler,
         addresses.OPS_MULTISIG_OLD: treasury_handler,
-        addresses.TREASURY_VAULT: treasury_handler
+        addresses.TREASURY_VAULT: treasury_handler,
+        addresses.FTM_SMM_BVEOXD_OXD: bveoxd_lp_handler
     }
 
     def __init__(self, chain: Network, cycle: int, start: int, end: int, boosts):
