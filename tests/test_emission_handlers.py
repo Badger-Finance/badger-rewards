@@ -1,6 +1,7 @@
 from rewards.classes.Snapshot import Snapshot
 from rewards.emission_handlers import (
     bvecvx_lp_handler,
+    bveoxd_lp_handler,
     ibbtc_peak_handler,
     treasury_handler,
     unclaimed_rewards_handler
@@ -87,10 +88,25 @@ def test_bveoxd_lp_handler(mocker):
         return_value=Snapshot(addresses.FTM_BSMM_BVEOXD_OXD, {TEST_WALLET: 100})
     )
     bOxSolid = "0xa8bD8655A0dCABE76913D821Ab437562276b3B59"
-    rewards_list = bvecvx_lp_handler(
+    rewards_list = bveoxd_lp_handler(
         1e18,
         bOxSolid,
         addresses.FTM_BSMM_BVEOXD_OXD,
         100
     )
     assert rewards_list.claims[TEST_WALLET][bOxSolid] == 1e18
+
+
+def test_bvecvx_lp_handler(mocker):
+    mocker.patch(
+        "rewards.emission_handlers.sett_snapshot",
+        return_value=Snapshot(addresses.BVECVX, {TEST_WALLET: 100})
+    )
+    token = addresses.BCVXCRV,
+    rewards_list = bvecvx_lp_handler(
+        1e18,
+        token,
+        addresses.BVECVX,
+        100
+    )
+    assert rewards_list.claims[TEST_WALLET][token] == 1e18
