@@ -194,3 +194,26 @@ def confirm_transaction(
         msg = f"Error waiting for {tx_hash}. Error: {e}."
         logger.error(msg)
         return False, msg
+
+
+def create_tx_options(address, w3, chain):
+    options = {
+        "nonce": w3.eth.get_transaction_count(address),
+        "from": address,
+    }
+    if chain == Network.Ethereum:
+        options["maxPriorityFeePerGas"] = get_priority_fee(w3)
+        options["maxFeePerGas"] = get_effective_gas_price(w3, chain)
+        options["gas"] = 200000
+    elif chain == Network.Arbitrum:
+        options["gas"] = 3000000
+    else:
+        options["gasPrice"] = get_effective_gas_price(w3, chain)
+    return options
+
+
+def build_and_send(func, options, w3, pkey):
+    tx = func.buildTransaction(options)
+    signed_tx = w3.eth.account.sign_transaction(tx, private_key=pkey)
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
+    return tx_hash

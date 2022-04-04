@@ -5,8 +5,7 @@ import pytest
 from brownie import accounts
 from eth_account import Account
 
-from tests.utils import set_env_vars, test_address, test_key
-
+from tests.utils import mock_get_claimable_data, set_env_vars, test_address, test_key
 set_env_vars()
 os.environ["private"] = test_key
 
@@ -74,11 +73,13 @@ def badger_tree(chain, keeper_address):
 
 @pytest.fixture
 def tree_manager(chain, cycle_account, badger_tree):
-    tree_manager = mock_tree_manager(chain, cycle_account, badger_tree)
+    tree_manager = mock_tree_manager(chain, cycle_account)
     return tree_manager
 
 
-@pytest.mark.require_network("hardhat-fork")
-def test_cycle(tree_manager, badger_tree, keeper_address):
+def test_cycle(tree_manager, badger_tree, keeper_address, mocker):
+    mocker.patch(
+        "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
+    )
     accounts[0].transfer(keeper_address, "10 ether", priority_fee="2 gwei")
     mock_cycle(tree_manager, badger_tree, keeper_address)

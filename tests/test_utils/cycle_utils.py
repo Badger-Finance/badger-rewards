@@ -6,11 +6,10 @@ from typing import Dict
 from brownie import Contract
 from brownie import web3
 from eth_account import Account
-
 from config.constants.chain_mappings import EMISSIONS_CONTRACTS
-from helpers.enums import Network
+from helpers.enums import Network, Abi
+from helpers.web3_utils import load_abi, make_contract
 from rewards.classes.TreeManager import TreeManager
-from rewards.utils.tree_utils import calc_next_cycle_range
 from rewards.utils.tree_utils import get_last_proposed_cycle
 from scripts.rewards.utils.approve_rewards import approve_root
 from scripts.rewards.utils.propose_rewards import propose_root
@@ -50,12 +49,10 @@ def mock_upload_tree(
 
 
 def mock_badger_tree(chain: Network, keeper_address: str, account: Account):
-    with open("abis/eth/BadgerTreeV2.json") as fp:
-        abi = json.load(fp)
     badger_tree = Contract.from_abi(
         "BadgerTree",
         EMISSIONS_CONTRACTS[chain]["BadgerTree"],
-        abi,
+        abi=load_abi(Abi.BadgerTree)
     )
     proposer_role = badger_tree.ROOT_PROPOSER_ROLE()
     approver_role = badger_tree.ROOT_VALIDATOR_ROLE()
@@ -64,7 +61,6 @@ def mock_badger_tree(chain: Network, keeper_address: str, account: Account):
 
     if chain == Network.Ethereum:
         account.transfer(admin, "10 ether", priority_fee="2 gwei")
-
         badger_tree.grantRole(
             proposer_role, keeper_address, {"from": admin, "priority_fee": "2 gwei"}
         )
@@ -79,27 +75,25 @@ def mock_badger_tree(chain: Network, keeper_address: str, account: Account):
     return badger_tree
 
 
-def mock_tree_manager(chain, cycle_account, badger_tree):
-    with open("abis/eth/BadgerTreeV2.json") as fp:
-        abi = json.load(fp)
+def mock_tree_manager(chain, cycle_account):
     tree_manager = TreeManager(chain, cycle_account)
     tree_manager.fetch_current_tree = mock_fetch_current_tree
     tree_manager.w3 = web3
-    tree_manager.badger_tree = web3.eth.contract(
-        address=EMISSIONS_CONTRACTS[chain]["BadgerTree"], abi=abi
-    ).functions
+    tree_manager.badger_tree = make_contract(
+        EMISSIONS_CONTRACTS[chain]["BadgerTree"],
+        Abi.BadgerTree,
+        chain
+    )
     return tree_manager
 
 
-def mock_cycle(tree_manager, badger_tree, keeper_address):
+def mock_cycle(tree_manager, badger_tree, keeper_address,):
     pending_hash_before = badger_tree.pendingMerkleContentHash()
     pending_root_before = badger_tree.pendingMerkleRoot()
     timestamp_before = badger_tree.lastProposeTimestamp()
 
-    past_rewards, start_block, end_block = calc_next_cycle_range(
-        tree_manager.chain, tree_manager
-    )
-
+    start_block = int(mock_tree["startBlock"])
+    end_block = start_block + 500
     logger.info(
         f"Generating rewards between {start_block} and {end_block} on {tree_manager.chain} chain"
     )
@@ -109,7 +103,7 @@ def mock_cycle(tree_manager, badger_tree, keeper_address):
         tree_manager.chain,
         start_block,
         end_block,
-        past_rewards,
+        mock_tree,
         tree_manager,
         save=False,
     )
