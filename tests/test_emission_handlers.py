@@ -102,7 +102,7 @@ def test_bvecvx_lp_handler(mocker):
         "rewards.emission_handlers.sett_snapshot",
         return_value=Snapshot(addresses.BVECVX, {TEST_WALLET: 100})
     )
-    token = addresses.BCVXCRV,
+    token = addresses.BCVXCRV
     rewards_list = bvecvx_lp_handler(
         1e18,
         token,
