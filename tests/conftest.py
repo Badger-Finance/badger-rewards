@@ -8,6 +8,7 @@ from badger_api.requests import (
     fetch_token_names,
     fetch_token_prices,
 )
+from subgraph.queries.tokens import fetch_token_balances
 from rewards.classes.Snapshot import Snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from config.constants import addresses
@@ -249,6 +250,7 @@ def clear_cache():
     fetch_token_names.cache_clear()
     fetch_token_prices.cache_clear()
     claims_snapshot.cache_clear()
+    fetch_token_balances.cache_clear()
 
 
 @pytest.fixture
