@@ -49,8 +49,9 @@ def fetch_all_schedules(
         chain: str, start: int, end: int
 ) -> Tuple[Dict[str, Dict[str, List[Schedule]]], List[str]]:
     """
-    Fetch active schedules between start and end block
+    Fetch all schedules on a particular chain
     :param chain: chain to fetch from
+    :param setts: setts from which schedule to pull
     """
     setts = fetch_setts(chain)
     logger = make_contract(
@@ -61,19 +62,19 @@ def fetch_all_schedules(
     end_timestamp = w3.eth.get_block(end)["timestamp"]
     all_schedules = {}
     setts_with_schedules = []
-    w3 = env_config.get_web3(chain)
     for sett in setts:
         schedules = [parse_schedule(e) for e in logger.getAllUnlockSchedulesFor(sett).call()]
         for schedule in list(schedules):
             start_in_range = start_timestamp < schedule.startTime < end_timestamp
             end_in_range = start_timestamp < schedule.endTime < end_timestamp
-            if start_in_range or end_in_range:
+            covers_range = schedule.startTime < start_timestamp and schedule.endTime > end_timestamp
+            if start_in_range or end_in_range or covers_range:
                 has_active_schedule = True
             else:
                 schedules.remove(schedule)
         if len(schedules) > 0 and has_active_schedule:
             setts_with_schedules.append(sett)
-            all_schedules[sett] = get_schedules_by_token(schedules)
+        all_schedules[sett] = get_schedules_by_token(schedules)
     console.log(f"Fetched {len(all_schedules)} schedules")
     return all_schedules, setts_with_schedules
 
@@ -224,7 +225,7 @@ def generate_rewards_in_range(
     :param tree_manager: TreeManager object
     :param boosts: Boost object
     """
-    all_schedules, setts = fetch_all_schedules(chain)
+    all_schedules, setts = fetch_all_schedules(chain, int(start), int(end))
 
     console_and_discord(f"Generating rewards for {len(setts)} setts", chain)
 

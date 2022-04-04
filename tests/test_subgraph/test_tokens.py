@@ -71,8 +71,7 @@ def test_fetch_token_balances_happy(mocker, chain):
     )
     tested_addr = "0x43298F9f91a4545dF64748e78a2c777c580573d6"
     block = 14118623
-    token_client = make_gql_client(f"tokens-{chain}")
-    badger_balances, digg_balances = fetch_token_balances(token_client, block, chain)
+    badger_balances, digg_balances = fetch_token_balances(block, chain)
     assert badger_balances[tested_addr] == 21000000000000000000000000 / 1e18
     assert digg_balances[tested_addr] != 0
 
@@ -90,24 +89,22 @@ def test_fetch_token_balances_zero_amounts(mocker, chain):
         ],
     )
     block = 14118623
-    token_client = make_gql_client(f"tokens-{chain}")
-    badger_balances, digg_balances = fetch_token_balances(token_client, block, chain)
+    badger_balances, digg_balances = fetch_token_balances(block, chain)
     assert digg_balances == {}
     assert badger_balances == {}
 
 
 def test_fetch_token_balances_raises(mocker):
     discord = mocker.patch(
-        "subgraph.queries.tokens.send_error_to_discord",
+        "subgraph.subgraph_utils.send_error_to_discord"
     )
     mocker.patch(
         "subgraph.subgraph_utils.Client.execute",
         side_effect=Exception,
     )
     block = 14118623
-    token_client = make_gql_client("tokens-ethereum")
     with pytest.raises(Exception):
-        fetch_token_balances(token_client, block, Network.Ethereum)
+        fetch_token_balances(block, Network.Ethereum)
     assert discord.called
 
 
@@ -123,8 +120,7 @@ def test_fetch_token_balances_empty(mocker, chain):
         ],
     )
     block = 14118623
-    token_client = make_gql_client(f"tokens-{chain}")
-    assert fetch_token_balances(token_client, block, chain) == ({}, {})
+    assert fetch_token_balances(block, chain) == ({}, {})
 
 
 def test_fetch_fuse_balances_happy(mocker):
@@ -146,7 +142,7 @@ def test_fetch_fuse_balances_happy(mocker):
 
 def test_fetch_fuse_balances_raises(mocker):
     discord = mocker.patch(
-        "subgraph.queries.tokens.send_message_to_discord",
+        "subgraph.subgraph_utils.send_error_to_discord",
     )
     mocker.patch(
         "subgraph.subgraph_utils.Client.execute",

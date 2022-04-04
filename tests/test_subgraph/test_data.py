@@ -1,3 +1,7 @@
+from tests.utils import TEST_WALLET
+from config.constants import addresses
+
+
 BADGER_DISTRIBUTIONS_TEST_DATA = {
     'badgerTreeDistributions': [
         {'amount': '1198684123822457380799', 'blockNumber': '12997654',
@@ -138,5 +142,43 @@ FUSE_TOKEN_TEST_DATA = {
             'account': {'id': '0x0279797ee0627d64ffa0d86f4f111f90e233b090'},
             'cTokenBalance': '1000000000000000000000'
         },
+    ]
+}
+
+CHAIN_BALANCES_TEST_DATA = {
+    'userSettBalances': [
+        {
+
+            'id': '',
+            'user': {
+                'id': TEST_WALLET
+            },
+            'sett': {
+                'id': addresses.BCVXCRV,
+                'token': {
+                    'decimals': 18
+                }
+            },
+            'netShareDeposit': 100000000000
+        },
+        {
+
+            'id': '',
+            'user': {
+                'id': TEST_WALLET
+            },
+            'sett': {
+                'id': addresses.BCRV_IBBTC,
+                'token': {
+                    'decimals': 18
+                }
+            },
+            'netShareDeposit': 2000000000000
+        }
+    ]
+}
+NFT_TEST_DATA = {
+    'nftbalances': [
+        {'id': f'0x101B3fAc7d37a48E7C3A140f0Ce95eb6b234f8bf-100-{TEST_WALLET}'},
     ]
 }
