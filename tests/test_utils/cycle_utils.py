@@ -8,7 +8,7 @@ from brownie import web3
 from eth_account import Account
 from config.constants.chain_mappings import EMISSIONS_CONTRACTS
 from helpers.enums import Network, Abi
-from helpers.web3_utils import load_abi, make_contract, make_contract_w3
+from helpers.web3_utils import load_abi, make_contract_w3
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.tree_utils import get_last_proposed_cycle
 from scripts.rewards.utils.approve_rewards import approve_root

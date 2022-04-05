@@ -22,6 +22,7 @@ def make_contract_w3(address: str, abi_name: Abi, w3: Web3):
     abi = load_abi(abi_name)
     return w3.eth.contract(address=w3.toChecksumAddress(address), abi=abi).functions
 
+
 def get_badger_tree(chain: str) -> ContractFunctions:
     return make_contract(
         EMISSIONS_CONTRACTS[chain]["BadgerTree"], abi_name=Abi.BadgerTree, chain=chain
