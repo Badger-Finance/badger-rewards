@@ -8,7 +8,7 @@ from brownie import web3
 from eth_account import Account
 from config.constants.chain_mappings import EMISSIONS_CONTRACTS
 from helpers.enums import Network, Abi
-from helpers.web3_utils import load_abi, make_contract
+from helpers.web3_utils import load_abi, make_contract, make_contract_w3
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.tree_utils import get_last_proposed_cycle
 from scripts.rewards.utils.approve_rewards import approve_root
@@ -79,15 +79,15 @@ def mock_tree_manager(chain, cycle_account):
     tree_manager = TreeManager(chain, cycle_account)
     tree_manager.fetch_current_tree = mock_fetch_current_tree
     tree_manager.w3 = web3
-    tree_manager.badger_tree = make_contract(
+    tree_manager.badger_tree = make_contract_w3(
         EMISSIONS_CONTRACTS[chain]["BadgerTree"],
         Abi.BadgerTree,
-        chain
+        web3
     )
     return tree_manager
 
 
-def mock_cycle(tree_manager, badger_tree, keeper_address,):
+def mock_cycle(tree_manager, badger_tree, keeper_address):
     pending_hash_before = badger_tree.pendingMerkleContentHash()
     pending_root_before = badger_tree.pendingMerkleRoot()
     timestamp_before = badger_tree.lastProposeTimestamp()
@@ -111,8 +111,11 @@ def mock_cycle(tree_manager, badger_tree, keeper_address,):
     proposed_hash = badger_tree.pendingMerkleContentHash()
     proposed_root = badger_tree.pendingMerkleRoot()
     timestamp_after = badger_tree.lastProposeTimestamp()
-    logger.info(f"proposed hash: {proposed_hash}")
-    logger.info(f"proposed root: {proposed_root}")
+    last_propose_start = badger_tree.lastProposeStartBlock()
+    last_propose_end = badger_tree.lastProposeEndBlock()
+    print(last_propose_start)
+    print(last_propose_end)
+    print(timestamp_after)
 
     assert pending_hash_before != proposed_hash
     assert pending_root_before != proposed_root

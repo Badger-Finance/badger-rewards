@@ -1,5 +1,5 @@
 import json
-
+from web3 import Web3
 from web3.contract import ContractFunctions
 
 from config.constants.chain_mappings import EMISSIONS_CONTRACTS
@@ -14,10 +14,13 @@ def load_abi(abi: Abi):
 
 
 def make_contract(address: str, abi_name: Abi, chain: str) -> ContractFunctions:
-    abi = load_abi(abi_name)
     w3 = env_config.get_web3(chain)
-    return w3.eth.contract(address=w3.toChecksumAddress(address), abi=abi).functions
+    return make_contract_w3(address, abi_name, w3)
 
+
+def make_contract_w3(address: str, abi_name: Abi, w3: Web3):
+    abi = load_abi(abi_name)
+    return w3.eth.contract(address=w3.toChecksumAddress(address), abi=abi).functions
 
 def get_badger_tree(chain: str) -> ContractFunctions:
     return make_contract(
