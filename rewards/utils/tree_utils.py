@@ -21,9 +21,7 @@ def get_last_proposed_cycle(
     current_rewards = tree_manager.fetch_current_tree()
 
     last_claim_end = tree_manager.last_propose_end_block()
-    print(last_claim_end)
     last_claim_start = tree_manager.last_propose_start_block()
-    print(last_claim_start)
 
     # Sanity check: Ensure start block is not too close to end block
     return current_rewards, last_claim_start, last_claim_end
