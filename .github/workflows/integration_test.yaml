@@ -38,7 +38,7 @@ jobs:
               run: npm install -g ganache-cli@6.10.2
             
             - name: Install Hardhat
-              run: npm install hardhat
+              run: npm install -g hardhat
           
             - name: Setup Python 3.9
               uses: actions/setup-python@v2
