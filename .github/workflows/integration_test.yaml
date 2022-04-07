@@ -36,7 +36,10 @@ jobs:
 
             - name: Install Ganache
               run: npm install -g ganache-cli@6.10.2
-
+            
+            - name: Install Hardhat
+              run: npm install hardhat
+          
             - name: Setup Python 3.9
               uses: actions/setup-python@v2
               with:
@@ -46,4 +49,4 @@ jobs:
               run: pip install -r requirements.txt && pip install -r requirements-dev.txt
 
             - name: Run Tests
-              run: brownie test integration_tests
+              run: brownie test integration_tests --network hardhat-fork
