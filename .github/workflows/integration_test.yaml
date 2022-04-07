@@ -33,9 +33,6 @@ jobs:
 
             - name: npm install
               run: npm install
-
-            - name: Install Ganache
-              run: npm install -g ganache-cli@6.10.2
             
             - name: Install Hardhat
               run: npm install -g hardhat
