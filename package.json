@@ -2,6 +2,7 @@
   "name": "badger-contracts",
   "dependencies": {
     "ganache-cli": "^6.10.2",
-    "hardhat": "^2.9.2"
+    "hardhat": "^2.9.2",
+    "npx": "^10.2.2"
   }
 }
