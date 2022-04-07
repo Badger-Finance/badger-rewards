@@ -29,6 +29,9 @@ jobs:
 
             - name: npm install
               run: npm install
+              
+            - name: Install hardhat
+              run: npm install --save-dev hardhat
 
             - name: Setup Python 3.9
               uses: actions/setup-python@v2
