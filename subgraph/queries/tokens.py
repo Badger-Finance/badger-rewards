@@ -197,7 +197,7 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
         results = fuse_client.execute(query, variable_values=variables)
         for result in results["accountCTokens"]:
             last_token_id = result["id"]
-            ctoken_balance = int(result["cTokenBalance"])
+            ctoken_balance = float(result["cTokenBalance"])
             balance = ctoken_balance * exchange_rate
             account = Web3.toChecksumAddress(result["account"]["id"])
             if balance <= 0:
