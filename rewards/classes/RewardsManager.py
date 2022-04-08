@@ -28,7 +28,8 @@ from rewards.emission_handlers import (
     ibbtc_peak_handler,
     bvecvx_lp_handler,
     unclaimed_rewards_handler,
-    treasury_handler
+    treasury_handler,
+    fuse_pool_handler
 )
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import total_twap_sett_snapshot
@@ -49,6 +50,7 @@ class InvalidRewardsTotalException(Exception):
 
 class RewardsManager:
     CUSTOM_BEHAVIOUR = {
+        addresses.FBVECVX: fuse_pool_handler,
         addresses.ETH_BADGER_TREE: unclaimed_rewards_handler,
         addresses.IBBTC_PEAK: ibbtc_peak_handler,
         addresses.BVECVX_CVX_LP: bvecvx_lp_handler,
