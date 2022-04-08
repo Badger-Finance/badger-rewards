@@ -12,9 +12,8 @@ from gql import (
 )
 from rich.console import Console
 from web3 import Web3
-from config.constants.addresses import BADGER, BVECVX, DIGG, FBADGER, FBVECVX, FDIGG
-
 from config.constants.chain_mappings import DECIMAL_MAPPING
+from config.constants.emissions import FUSE_MANTISSA, FUSE_TOKEN_BASE, FUSE_TOKEN_INFO
 from helpers.digg_utils import digg_utils
 from helpers.enums import (
     Abi,
@@ -117,30 +116,10 @@ def fetch_token_balances(
                         badger_balances[address] = amount / DECIMAL_MAPPING[chain]
                     if entry["token"]["symbol"] == "DIGG":
                         fragment_balance = digg_utils.shares_to_fragments(
-                            int(amount)
+                            amount
                         )
                         digg_balances[address] = float(fragment_balance) / 1e9
     return badger_balances, digg_balances
-
-
-def fetch_fuse_token_info() -> Dict:
-    return {
-        BADGER: {
-            "underlying": BADGER,
-            "symbol": "fBADGER-22",
-            "contract": FBADGER,
-        },
-        DIGG: {
-            "underlying": DIGG,
-            "symbol": "fDIGG-22",
-            "contract": FDIGG
-        },
-        BVECVX: {
-            "underlying": BVECVX,
-            "symbol": "fBVECVX-22",
-            "contract": FBVECVX
-        }
-    }
 
 
 def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, Decimal]:
@@ -149,10 +128,9 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
         return {}
 
     fuse_client = SubgraphClient("fuse", chain)
-    fuse_token_info = fetch_fuse_token_info()
-    if token not in fuse_token_info:
+    if token not in FUSE_TOKEN_INFO:
         return {}
-    token_info = fuse_token_info[token]
+    token_info = FUSE_TOKEN_INFO[token]
     console.log(f"Fetching {token_info['symbol']} token from fuse pool")
     ftoken = make_contract(
         Web3.toChecksumAddress(token_info["contract"]),
@@ -166,8 +144,8 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
     )
     decimals = int(ftoken.decimals().call())
     underlying_decimals = int(underlying.decimals().call())
-    mantissa = 18 + underlying_decimals - decimals
-    exchange_rate = float(ftoken.exchangeRateStored().call()) / math.pow(10, mantissa)
+    mantissa = FUSE_MANTISSA + underlying_decimals - decimals
+    exchange_rate = float(ftoken.exchangeRateStored().call()) / math.pow(FUSE_TOKEN_BASE, mantissa)
     last_token_id = "0x0000000000000000000000000000000000000000"
 
     query = gql(
