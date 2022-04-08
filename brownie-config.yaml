@@ -4,7 +4,7 @@ live:
       - name: Mainnet (Infura)
         chainid: 1
         id: mainnet
-        host: https://spring-delicate-paper.quiknode.pro/$QUIKNODE_ID/
+        host: https://mainnet.infura.io/v3/$WEB3_INFURA_PROJECT_ID
         explorer: https://api.etherscan.io/api
         multicall2: "0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696"
       - name: Ropsten (Infura)
@@ -88,6 +88,7 @@ live:
         id: xdai-main
         host: https://xdai.poanetwork.dev
         explorer: https://blockscout.com/xdai/mainnet/api
+
       - name: Testnet
         chainid: 77
         id: xdai-test
