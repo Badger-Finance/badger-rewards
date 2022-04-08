@@ -150,7 +150,7 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
 
     fuse_client = SubgraphClient("fuse", chain)
     fuse_token_info = fetch_fuse_token_info()
-    if token not in fetch_fuse_token_info:
+    if token not in fuse_token_info:
         return {}
     token_info = fuse_token_info[token]
     console.log(f"Fetching {token_info['symbol']} token from fuse pool")
