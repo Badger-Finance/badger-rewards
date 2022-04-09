@@ -2,22 +2,17 @@ from copy import deepcopy
 from unittest.mock import MagicMock
 
 import pytest
-from eth_utils import to_checksum_address
 
 from config.constants.addresses import (
-    BADGER,
-    DIGG
+    BADGER, FTM_BSMM_USDC_DAI
 )
 from helpers.enums import Network
 from subgraph.queries.tokens import (
     fetch_across_balances,
     fetch_fuse_pool_token,
     fetch_token_balances,
-    fetch_fuse_pool_balances,
 )
-from subgraph.subgraph_utils import make_gql_client
 from tests.test_subgraph.test_data import (
-    FUSE_BALANCES_TEST_DATA,
     ACROSS_BALANCES_TEST_DATA,
     TOKEN_BALANCES_TEST_DATA,
     TOKEN_BALANCES_TEST_DATA_ZERO_BALANCES,
@@ -123,52 +118,15 @@ def test_fetch_token_balances_empty(mocker, chain):
     assert fetch_token_balances(block, chain) == ({}, {})
 
 
-def test_fetch_fuse_balances_happy(mocker):
-    mocker.patch(
-        "subgraph.subgraph_utils.Client.execute",
-        side_effect=[
-            deepcopy(FUSE_BALANCES_TEST_DATA),
-            {'accountCTokens': []},
-        ],
-    )
-    tested_addr = to_checksum_address("0x15bc539b99f7019fe0d025ce26fda395b17b5f74")
-    block = 14118623
-    fuse_client = make_gql_client("fuse")
-    balances = fetch_fuse_pool_balances(fuse_client, Network.Ethereum, block)
-    # Some static balances check
-    assert balances[BADGER][tested_addr] == pytest.approx(3640.677791062474)
-    assert balances[DIGG][tested_addr] == pytest.approx(0.30587790239672885)
-
-
-def test_fetch_fuse_balances_raises(mocker):
-    discord = mocker.patch(
-        "subgraph.subgraph_utils.send_error_to_discord",
-    )
-    mocker.patch(
-        "subgraph.subgraph_utils.Client.execute",
-        side_effect=Exception,
-    )
-    block = 14118623
-    fuse_client = make_gql_client("fuse")
-    with pytest.raises(Exception):
-        fetch_fuse_pool_balances(fuse_client, Network.Ethereum, block)
-    assert discord.called
-
-
-def test_fetch_fuse_balances_incompatible_chain():
-    """
-    Fuse balances are available only on Ethereum
-    """
-    block = 14118623
-    fuse_client = make_gql_client("fuse")
-    assert fetch_fuse_pool_balances(fuse_client, Network.Polygon, block) == {}
-
-
 def fetch_fuse_pool_token_incompatible_chain():
     """
     Fuse token are available only on Ethereum
     """
     assert fetch_fuse_pool_token(Network.Polygon, 100, BADGER) == {}
+
+
+def fetch_fuse_pool_token_no_token():
+    assert fetch_fuse_pool_token(Network.Ethereum, 100, FTM_BSMM_USDC_DAI) == {}
 
 
 def test_fetch_fuse_pool_token(mocker):

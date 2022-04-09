@@ -105,3 +105,23 @@ REWARD_ERROR_TOLERANCE = 0.01
 ZERO_CYCLE = 0
 
 NO_BOOST = [Network.Fantom]
+
+FUSE_TOKEN_INFO = {
+    addresses.BADGER: {
+        "underlying": addresses.BADGER,
+        "symbol": "fBADGER-22",
+        "contract": addresses.FBADGER,
+    },
+    addresses.DIGG: {
+        "underlying": addresses.DIGG,
+        "symbol": "fDIGG-22",
+        "contract": addresses.FDIGG
+    },
+    addresses.BVECVX: {
+        "underlying": addresses.BVECVX,
+        "symbol": "fbveCVX-22",
+        "contract": addresses.FBVECVX
+    }
+}
+FUSE_MANTISSA = 18
+FUSE_TOKEN_BASE = 10

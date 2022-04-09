@@ -32,15 +32,12 @@ jobs:
         run: |
           docker build -t ${{ steps.login-ecr.outputs.registry }}${{ env.IMAGE_NAME }} .
           docker push ${{ steps.login-ecr.outputs.registry }}${{ env.IMAGE_NAME }}
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+      - name: Trigger Trivy
+        uses: peter-evans/repository-dispatch@v2
         with:
-          image-ref: '${{ steps.login-ecr.outputs.registry }}${{ env.IMAGE_NAME }}'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          token: ${{ secrets.GH_TOKEN }}
+          event-type: new-image
+          client-payload: '{"image_ref": "${{ steps.login-ecr.outputs.registry }}${{ env.IMAGE_NAME }}"}'
 
   validate_manifest:
     name: Run Manifest Validation
