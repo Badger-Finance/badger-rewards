@@ -119,7 +119,7 @@ FUSE_TOKEN_INFO = {
     },
     addresses.BVECVX: {
         "underlying": addresses.BVECVX,
-        "symbol": "fBVECVX-22",
+        "symbol": "fbveCVX-22",
         "contract": addresses.FBVECVX
     }
 }
