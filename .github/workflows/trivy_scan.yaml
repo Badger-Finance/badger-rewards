@@ -1,4 +1,4 @@
-name: Repository Dispatch
+name: Trivy Scan
 on:
   repository_dispatch:
     types: [new-image]
