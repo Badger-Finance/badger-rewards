@@ -145,7 +145,7 @@ def test_fetch_fuse_pool_token(mocker):
                 return_value=MagicMock(call=MagicMock(return_value=multiplier)),
             ),
             decimals=MagicMock(
-                return_value=MagicMock(call=MagicMock(return_value=18)),
+                return_value=MagicMock(call=MagicMock(return_value=8)),
             )
         )
     )
