@@ -13,7 +13,12 @@ from gql import (
 from rich.console import Console
 from web3 import Web3
 from config.constants.chain_mappings import DECIMAL_MAPPING
-from config.constants.emissions import FUSE_MANTISSA, FUSE_TOKEN_BASE, FUSE_TOKEN_INFO
+from config.constants.emissions import (
+    FTOKEN_DECIMALS,
+    FUSE_MANTISSA,
+    FUSE_TOKEN_BASE,
+    FUSE_TOKEN_INFO
+)
 from helpers.digg_utils import digg_utils
 from helpers.enums import (
     Abi,
@@ -142,7 +147,7 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
         abi_name=Abi.ERC20,
         chain=chain
     )
-    decimals = int(ftoken.decimals().call())
+    decimals = FTOKEN_DECIMALS
     underlying_decimals = int(underlying.decimals().call())
     mantissa = FUSE_MANTISSA + underlying_decimals - decimals
     exchange_rate = float(ftoken.exchangeRateStored().call()) / math.pow(FUSE_TOKEN_BASE, mantissa)
