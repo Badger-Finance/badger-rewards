@@ -13,7 +13,12 @@ from gql import (
 from rich.console import Console
 from web3 import Web3
 from config.constants.chain_mappings import DECIMAL_MAPPING
-from config.constants.emissions import FTOKEN_DECIMALS, FUSE_MANTISSA, FUSE_TOKEN_BASE, FUSE_TOKEN_INFO
+from config.constants.emissions import (
+    FTOKEN_DECIMALS,
+    FUSE_MANTISSA,
+    FUSE_TOKEN_BASE,
+    FUSE_TOKEN_INFO
+)
 from helpers.digg_utils import digg_utils
 from helpers.enums import (
     Abi,
