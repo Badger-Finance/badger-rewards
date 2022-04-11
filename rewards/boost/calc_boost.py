@@ -58,7 +58,16 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
     for addr, stake_ratio in stake_ratios.items():
         user_stake_range = 0
         if flags.flag_enabled(BOOST_STEP):
-            user_boost = 1 if stake_ratio == 0 else min(math.floor(stake_ratio * 2000), 2000)
+            if stake_ratio == 0:
+                user_boost = 1
+            elif stake_ratio < 1:
+                user_boost = min(math.floor(stake_ratio * 2000), 2000)
+            if 1.5 < stake_ratio > 1.0:
+                user_boost = 2000 + (stake_ratio - 1) * 1000
+            elif 1.5 < stake_ratio < 2:
+                user_boost = 2500 + (stake_ratio - 1.5) * 500
+            elif 2 < stake_ratio < 3:
+                user_boost = 2750 + (stake_ratio - 2) * 250
         else:
             user_boost = 1
         for stake_range, multiplier in STAKE_RATIO_RANGES:
@@ -66,8 +75,7 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
                 if not flags.flag_enabled(BOOST_STEP):
                     user_boost = multiplier
                 user_stake_range = stake_range
-
-        stake_data_ranges[user_stake_range] = stake_data_ranges.get(user_stake_range, 0) + 1
+                stake_data_ranges[user_stake_range] = stake_data_ranges.get(user_stake_range, 0) + 1
         badger_boost_data[addr] = user_boost
     return badger_boost_data, stake_data_ranges
 
