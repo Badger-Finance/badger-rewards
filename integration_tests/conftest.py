@@ -89,7 +89,6 @@ def mock_snapshots(mocker):
 @pytest.fixture(scope="function")
 def aws_credentials():
     """Mocked AWS Credentials for moto."""
-    test_token = "testing"
     os.environ["AWS_ACCESS_KEY_ID"] = config("MOCK_AWS_CREDENTIAL")
     os.environ["AWS_SECRET_ACCESS_KEY"] = config("MOCK_AWS_CREDENTIAL")
     os.environ["AWS_SECURITY_TOKEN"] = config("MOCK_AWS_CREDENTIAL")
