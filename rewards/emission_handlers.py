@@ -17,8 +17,11 @@ def unclaimed_rewards_handler(amount: Decimal, token: str, sett: str, block: int
     console.log(f"Distributing {amount} of {token} to unclaimed rewards")
     claimable = claims_snapshot(Network.Ethereum, block)
     if sett not in claimable:
+        console.log("Sett not in claimable")
         return RewardsList()
     if sett in UNCLAIMED_REWARDS_TOKENS[Network.Ethereum]:
+        console.log("Sett in claimable")
+        console.log(claimable[sett].balances)
         return distribute_rewards_from_total_snapshot(amount, claimable[sett], token, block)
 
 

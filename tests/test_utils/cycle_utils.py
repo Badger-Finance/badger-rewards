@@ -8,7 +8,7 @@ from brownie import web3
 from eth_account import Account
 from config.constants.chain_mappings import EMISSIONS_CONTRACTS
 from helpers.enums import Network, Abi
-from helpers.web3_utils import load_abi, make_contract, make_contract_w3
+from helpers.web3_utils import load_abi, make_contract_w3
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.tree_utils import get_last_proposed_cycle
 from scripts.rewards.utils.approve_rewards import approve_root
@@ -92,7 +92,7 @@ def mock_cycle(tree_manager, badger_tree, keeper_address):
     pending_root_before = badger_tree.pendingMerkleRoot()
     timestamp_before = badger_tree.lastProposeTimestamp()
 
-    start_block = int(mock_tree["startBlock"])
+    start_block = int(mock_tree["endBlock"])
     end_block = start_block + 500
     logger.info(
         f"Generating rewards between {start_block} and {end_block} on {tree_manager.chain} chain"
@@ -111,11 +111,6 @@ def mock_cycle(tree_manager, badger_tree, keeper_address):
     proposed_hash = badger_tree.pendingMerkleContentHash()
     proposed_root = badger_tree.pendingMerkleRoot()
     timestamp_after = badger_tree.lastProposeTimestamp()
-    last_propose_start = badger_tree.lastProposeStartBlock()
-    last_propose_end = badger_tree.lastProposeEndBlock()
-    print(last_propose_start)
-    print(last_propose_end)
-    print(timestamp_after)
 
     assert pending_hash_before != proposed_hash
     assert pending_root_before != proposed_root

@@ -2,7 +2,7 @@
   "merkleRoot": "0x6f98c3a7dde738e9826bd772e9fb5f43f38bdbc02a7e4040189aa2ba1003a4e2",
   "cycle": 127,
   "startBlock": "1731434",
-  "endBlock": "1732852",
+  "endBlock": "14576828",
   "tokenTotals": {
     "0xBfa641051Ba0a0Ad1b0AcF549a89536A0D76472E": 50238524487523880,
     "0x11cDb42B0EB46D95f990BeDD4695A6e3fA034978": 45627033524707570000
