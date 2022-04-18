@@ -2,7 +2,8 @@ import os
 
 import boto3
 import pytest
-from moto import mock_dynamodb2
+from decouple import config
+from moto import mock_dynamodb2, mock_s3
 from decimal import Decimal
 from badger_api.requests import (
     fetch_token_names,
@@ -88,11 +89,12 @@ def mock_snapshots(mocker):
 @pytest.fixture(scope="function")
 def aws_credentials():
     """Mocked AWS Credentials for moto."""
-    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
-    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
-    os.environ["AWS_SECURITY_TOKEN"] = "testing"
-    os.environ["AWS_SESSION_TOKEN"] = "testing"
-    os.environ["AWS_DEFAULT_REGION"] = "us-west-1"
+    test_token = "testing"
+    os.environ["AWS_ACCESS_KEY_ID"] = config("MOCK_AWS_CREDENTIAL")
+    os.environ["AWS_SECRET_ACCESS_KEY"] = config("MOCK_AWS_CREDENTIAL")
+    os.environ["AWS_SECURITY_TOKEN"] = config("MOCK_AWS_CREDENTIAL")
+    os.environ["AWS_SESSION_TOKEN"] = config("MOCK_AWS_CREDENTIAL")
+    os.environ["AWS_DEFAULT_REGION"] = config("MOCK_AWS_CREDENTIAL")
 
 
 @pytest.fixture
@@ -181,7 +183,7 @@ def setup_dynamodb():
             },
             ExpressionAttributeValues={
                 ":ch": "arbitrum",
-                ":eb": 14576829,
+                ":eb": 1457682,
                 ":sb": 3902125,
             },
             UpdateExpression="SET #CH=:ch, #EB=:eb, #SB=:sb",
@@ -243,6 +245,18 @@ def setup_dynamodb():
         )
 
         yield dynamodb_client, dynamodb_resource
+
+
+@pytest.fixture
+def setup_s3():
+    with mock_s3():
+        s3_client = boto3.client(
+            "s3",
+            region_name="us-west-1",
+            aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+            aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+        )
+        yield s3_client
 
 
 @pytest.fixture(autouse=True)
