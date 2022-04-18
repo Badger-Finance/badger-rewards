@@ -85,10 +85,10 @@ def test_get_across_lp_multiplier():
     assert get_across_lp_multiplier() > 1
 
 
-def test_fetch_unboosted_vaults(monkeypatch):
-    monkeypatch.setattr("rewards.utils.emission_utils.fetch_setts", mock_fetch_setts)
+def test_fetch_unboosted_vaults(mocker):
+    mocker.patch("rewards.utils.emission_utils.fetch_setts", mock_fetch_setts)
     mock_time = MockTime()
-    monkeypatch.setattr("rewards.utils.emission_utils.time", mock_time)
+    mocker.patch("rewards.utils.emission_utils.time", mock_time)
     unboosted_vaults = [SETTS[Network.Ethereum]["cvx"]]
     vaults = fetch_unboosted_vaults(Network.Ethereum)
     assert vaults == unboosted_vaults

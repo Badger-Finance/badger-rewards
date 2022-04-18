@@ -19,8 +19,8 @@ def mock_download_tree(file_name: str, chain: str):
 
 
 @pytest.fixture(autouse=True)
-def mock_fns(monkeypatch):
-    monkeypatch.setattr("rewards.classes.TreeManager.download_tree", mock_download_tree)
+def mock_fns(mocker):
+    mocker.patch("rewards.classes.TreeManager.download_tree", mock_download_tree)
 
 
 @pytest.fixture

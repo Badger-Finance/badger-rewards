@@ -41,7 +41,9 @@ def calc_next_cycle_range(
         start_block = last_claim_end + 1
     synced_block = last_synced_block(chain)
     metadata = get_claimable_metadata(chain, synced_block)
+    print(metadata)
     end_block = metadata["endBlock"]
+    print(start_block)
     assert end_block <= synced_block
     # Sanity check: Ensure start block is behind end block
     assert start_block < end_block

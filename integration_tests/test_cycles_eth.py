@@ -4,7 +4,7 @@ import os
 import pytest
 from brownie import accounts
 from eth_account import Account
-from rewards.aws.helpers import dynamodb
+from rewards.aws.helpers import dynamodb, s3
 from moto.core import patch_resource
 
 from tests.utils import mock_get_claimable_data, set_env_vars, test_address, test_key
@@ -27,20 +27,23 @@ logger = logging.getLogger("test-cycles-eth")
 
 
 @pytest.fixture(autouse=True)
-def mock_fns(monkeypatch):
-    monkeypatch.setattr("rewards.calc_rewards.download_boosts", mock_download_boosts)
-    monkeypatch.setattr(
+def mock_fns(mocker):
+    mocker.patch("rewards.calc_rewards.download_boosts", mock_download_boosts)
+    mocker.patch(
         "rewards.calc_rewards.download_proposed_boosts", mock_download_boosts
     )
-    monkeypatch.setattr("rewards.calc_rewards.upload_boosts", mock_upload_boosts)
-    monkeypatch.setattr(
+    mocker.patch("rewards.calc_rewards.upload_boosts", mock_upload_boosts)
+    mocker.patch(
         "rewards.calc_rewards.upload_proposed_boosts", mock_upload_boosts
     )
-    monkeypatch.setattr("rewards.calc_rewards.upload_tree", mock_upload_tree)
+    mocker.patch("rewards.calc_rewards.upload_tree", mock_upload_tree)
+    mocker.patch(
+        "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
+    )
 
 
 @pytest.fixture(autouse=True)
-def set_env_config(monkeypatch):
+def set_env_config(mocker):
     env_config.test = False
     env_config.staging = False
     env_config.production = True
@@ -79,10 +82,8 @@ def tree_manager(chain, cycle_account, badger_tree):
     return tree_manager
 
 
-def test_cycle(tree_manager, badger_tree, keeper_address, mocker, setup_dynamodb):
+def test_cycle(tree_manager, badger_tree, keeper_address, mocker, setup_dynamodb, setup_s3):
     patch_resource(dynamodb)
-    mocker.patch(
-        "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
-    )
+    patch_resource(s3)
     accounts[0].transfer(keeper_address, "10 ether", priority_fee="2 gwei")
     mock_cycle(tree_manager, badger_tree, keeper_address)

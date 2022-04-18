@@ -2,7 +2,7 @@ import os
 
 import boto3
 import pytest
-from moto import mock_dynamodb2
+from moto import mock_dynamodb2, mock_s3
 from decimal import Decimal
 from badger_api.requests import (
     fetch_token_names,
@@ -153,7 +153,7 @@ def setup_dynamodb():
             },
             ExpressionAttributeValues={
                 ":ch": "ethereum",
-                ":eb": 13958081,
+                ":eb": 14576829,
                 ":sb": 13957559,
             },
             UpdateExpression="SET #CH=:ch, #EB=:eb, #SB=:sb",
@@ -181,7 +181,7 @@ def setup_dynamodb():
             },
             ExpressionAttributeValues={
                 ":ch": "arbitrum",
-                ":eb": 3903105,
+                ":eb": 14576829,
                 ":sb": 3902125,
             },
             UpdateExpression="SET #CH=:ch, #EB=:eb, #SB=:sb",
@@ -243,6 +243,18 @@ def setup_dynamodb():
         )
 
         yield dynamodb_client, dynamodb_resource
+
+
+@pytest.fixture
+def setup_s3():
+    with mock_s3():
+        s3_client = boto3.client(
+            "s3",
+            region_name="us-west-1",
+            aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+            aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+        )
+        yield s3_client
 
 
 @pytest.fixture(autouse=True)

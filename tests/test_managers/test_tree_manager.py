@@ -26,8 +26,8 @@ def mock_validate_tree(merkle, tree):
 
 
 @pytest.fixture(autouse=True)
-def mock_fns(monkeypatch):
-    monkeypatch.setattr("rewards.classes.TreeManager.download_tree", mock_download_tree)
+def mock_fns(mocker):
+    mocker.patch("rewards.classes.TreeManager.download_tree", mock_download_tree)
 
 
 @pytest.fixture
@@ -79,7 +79,7 @@ def test_ftm_tx_details__gas_price(mocker):
     mocker.patch("rewards.classes.TreeManager.env_config.get_web3", return_value=MagicMock())
     mocker.patch("rewards.classes.TreeManager.get_badger_tree", MagicMock())
     mocker.patch("rewards.classes.TreeManager.get_discord_url", MagicMock())
-    tree_manager = mock_tree_manager(Network.Fantom, accounts[0], None)
+    tree_manager = mock_tree_manager(Network.Fantom, accounts[0])
     tree_manager.w3 = MagicMock(eth=MagicMock(gas_price=gas_price))
     assert (
         tree_manager.get_tx_options(accounts[0])['gasPrice']
