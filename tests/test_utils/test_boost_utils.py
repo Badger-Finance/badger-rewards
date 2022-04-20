@@ -9,7 +9,7 @@ from rewards.boost.boost_utils import (
     filter_dust,
     get_bvecvx_lp_ratio,
 )
-from tests.conftest import (
+from conftest import (
     CHAIN_CLAIMS_SNAPSHOT_DATA,
     CHAIN_SETT_SNAPSHOT_DATA,
     NFT_SNAPSHOT_DATA,
