@@ -25,19 +25,6 @@ from tests.test_utils.cycle_utils import (
 logger = logging.getLogger("test-cycles-eth")
 
 
-def mock_env_config():
-    class MockEnvConfig:
-        def __init__(self):
-            self.test = True
-            self.staging = False
-            self.production = False
-
-        def get_web3(self, chain: str):
-            return web3
-
-    return MockEnvConfig()
-
-
 @pytest.fixture(autouse=True)
 def mock_fns(mocker):
     mocker.patch("rewards.calc_rewards.download_boosts", mock_download_boosts)
@@ -52,7 +39,6 @@ def mock_fns(mocker):
     mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
-    mocker.patch("config.singletons.env_config", mock_env_config())
 
 
 @pytest.fixture(autouse=True)
@@ -60,6 +46,7 @@ def set_env_config(mocker):
     env_config.test = False
     env_config.staging = False
     env_config.production = True
+    env_config.get_web3 = lambda chain: web3
 
 
 @pytest.fixture
