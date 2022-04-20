@@ -1,7 +1,7 @@
 import logging
 from collections import Counter
 from decimal import Decimal
-
+from brownie import web3
 from config.singletons import env_config
 from helpers.enums import Network
 from rewards.aws.boost import add_user_data
@@ -17,6 +17,19 @@ from tests.utils import (
 logger = logging.getLogger("test-boost")
 
 set_env_vars()
+
+
+def mock_env_config():
+    class MockEnvConfig:
+        def __init__(self):
+            self.test = True
+            self.staging = False
+            self.production = False
+
+        def get_web3(self, chain: str):
+            return web3
+
+    return MockEnvConfig()
 
 
 def mock_claims_snapshot_usd(*args, **kwargs):
@@ -41,6 +54,8 @@ def test_boost_workflow(mocker):
         "rewards.boost.boost_utils.claims_snapshot_usd", mock_claims_snapshot_usd
     )
     mocker.patch("rewards.aws.boost.upload_boosts", mock_upload_boosts)
+    mocker.patch("config.singletons.env_config", mock_env_config())
+
     mocker.patch(
         "badger_api.claimable.get_claimable_metadata",
         lambda *args, **kwargs:
