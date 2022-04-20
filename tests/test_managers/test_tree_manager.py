@@ -67,7 +67,7 @@ def test_matches_pending_hash(tree_manager):
 def test_build_function_and_send(tree_manager, mocker):
     mocker.patch("rewards.classes.TreeManager.build_and_send")
     tree_manager.get_tx_options = mock_get_tx_options
-    tree_manager.build_function_and_send()
+    tree_manager.build_function_and_send(account=None, func=None)
 
 
 @pytest.mark.parametrize(
