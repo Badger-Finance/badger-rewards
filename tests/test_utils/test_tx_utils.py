@@ -139,7 +139,8 @@ def test_create_tx_options(mocker, chain):
         assert options["gas"] == 200000
     elif chain == Network.Arbitrum:
         assert options["gas"] == 3000000
-    assert options["gasPrice"] == effective_gas_price
+    else:
+        assert options["gasPrice"] == effective_gas_price
 
 
 def test_get_effective_gas_price__eth():

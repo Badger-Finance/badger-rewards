@@ -35,7 +35,7 @@ def cycle_key() -> str:
     return test_key
 
 
-def mock_get_tx_options():
+def mock_get_tx_options(account):
     return {}
 
 

@@ -207,7 +207,8 @@ def create_tx_options(address, w3, chain):
         options["gas"] = 200000
     elif chain == Network.Arbitrum:
         options["gas"] = 3000000
-    options["gasPrice"] = get_effective_gas_price(w3, chain)
+    else:
+        options["gasPrice"] = get_effective_gas_price(w3, chain)
     return options
 
 
