@@ -75,7 +75,7 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
                 if not flags.flag_enabled(BOOST_STEP):
                     user_boost = multiplier
                 user_stake_range = stake_range
-                stake_data_ranges[user_stake_range] = stake_data_ranges.get(user_stake_range, 0) + 1
+        stake_data_ranges[user_stake_range] = stake_data_ranges.get(user_stake_range, 0) + 1
         badger_boost_data[addr] = user_boost
     return badger_boost_data, stake_data_ranges
 
