@@ -1,7 +1,7 @@
 import logging
 import os
 import pytest
-from brownie import accounts
+from brownie import accounts, web3
 from eth_account import Account
 from rewards.aws.helpers import dynamodb, s3
 from moto.core import patch_resource, patch_client
@@ -25,6 +25,19 @@ from tests.test_utils.cycle_utils import (
 logger = logging.getLogger("test-cycles-eth")
 
 
+def mock_env_config():
+    class MockEnvConfig:
+        def __init__(self):
+            self.test = True
+            self.staging = False
+            self.production = False
+
+        def get_web3(self, chain: str):
+            return web3
+
+    return MockEnvConfig()
+
+
 @pytest.fixture(autouse=True)
 def mock_fns(mocker):
     mocker.patch("rewards.calc_rewards.download_boosts", mock_download_boosts)
@@ -39,6 +52,7 @@ def mock_fns(mocker):
     mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
+    mocker.patch("config.singletons.env_config", mock_env_config())
 
 
 @pytest.fixture(autouse=True)
