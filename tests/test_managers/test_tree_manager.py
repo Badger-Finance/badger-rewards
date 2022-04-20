@@ -35,6 +35,10 @@ def cycle_key() -> str:
     return test_key
 
 
+def mock_get_tx_options():
+    return {}
+
+
 @pytest.fixture
 def tree_manager(cycle_key, request) -> TreeManager:
     tree_manager = TreeManager(request.param, Account.from_key(cycle_key))
@@ -53,6 +57,17 @@ def test_matches_pending_hash(tree_manager):
 
     random_hash = "0xb8ed7da2062b6bdf6f20bcdb4ab35538592216ac70a4bfe986af748603debfd8"
     assert not tree_manager.matches_pending_hash(random_hash)
+
+
+@pytest.mark.parametrize(
+    "tree_manager",
+    [Network.Ethereum],
+    indirect=True,
+)
+def test_build_function_and_send(tree_manager, mocker):
+    mocker.patch("rewards.classes.TreeManager.build_and_send")
+    tree_manager.get_tx_options = mock_get_tx_options
+    tree_manager.build_function_and_send()
 
 
 @pytest.mark.parametrize(

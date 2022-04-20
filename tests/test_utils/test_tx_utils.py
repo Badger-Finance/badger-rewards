@@ -1,5 +1,6 @@
 from decimal import Decimal
 from unittest.mock import MagicMock
+from hexbytes import HexBytes
 
 import pytest
 import responses
@@ -7,6 +8,7 @@ import responses
 from config.constants import GAS_BUFFER
 from helpers.enums import Network
 from rewards.utils.tx_utils import (
+    build_and_send,
     confirm_transaction,
     create_tx_options,
     get_effective_gas_price,
@@ -196,3 +198,29 @@ def test_get_effective_gas_price__fantom():
     )
     gas = get_effective_gas_price(web3, Network.Fantom)
     assert gas == gas_price * GAS_BUFFER
+
+
+def test_build_and_send():
+    mock_hash = HexBytes("0x55b73632c365e52cf7757320472572c2885ddb2c34dbd62958a55b7d9ec945a3")
+
+    class MockTx:
+        def __init__(self, raw_tx):
+            self.rawTransaction = raw_tx
+    mock_tx = MockTx("")
+    web3 = MagicMock(
+        eth=MagicMock(
+            account=MagicMock(
+                sign_transaction=MagicMock(
+                    return_value=mock_tx
+                )
+            ),
+            send_raw_transaction=MagicMock(
+                return_value=mock_hash
+            )
+        )
+    )
+    func = MagicMock(buildTransaction=MagicMock())
+    options = {}
+    pkey = ""
+    tx_hash = build_and_send(func, options, web3, pkey)
+    assert tx_hash == mock_hash.hex()
