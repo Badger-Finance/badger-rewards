@@ -1,7 +1,6 @@
 from decimal import Decimal
-
 import pytest
-
+import math
 from config.constants.emissions import STAKE_RATIO_RANGES
 from helpers.enums import Network
 from rewards.boost.calc_boost import allocate_bvecvx_to_users
@@ -104,6 +103,9 @@ def test_get_badger_boost_data():
     assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909"] == 1800
     if flags.flag_enabled(BOOST_STEP):
         assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7900"] == 551
+        assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f1111"] == 1
+        assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909"] == math.floor(0.9 * 2000)
+
     else:
         assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7900"] == 500
     assert data["0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"] == 2000
