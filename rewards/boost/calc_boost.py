@@ -60,13 +60,13 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
         if flags.flag_enabled(BOOST_STEP):
             if stake_ratio == 0:
                 user_boost = 1
-            elif stake_ratio < 1:
+            elif stake_ratio <= 1:
                 user_boost = min(math.floor(stake_ratio * 2000), 2000)
-            if 1.5 < stake_ratio > 1.0:
+            if 1.0 < stake_ratio <= 1.5:
                 user_boost = 2000 + (stake_ratio - 1) * 1000
-            elif 1.5 < stake_ratio < 2:
+            elif 1.5 < stake_ratio <= 2:
                 user_boost = 2500 + (stake_ratio - 1.5) * 500
-            elif 2 < stake_ratio < 3:
+            elif 2 < stake_ratio <= 3:
                 user_boost = 2750 + (stake_ratio - 2) * 250
         else:
             user_boost = 1
