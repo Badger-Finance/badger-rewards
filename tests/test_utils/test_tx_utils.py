@@ -8,12 +8,13 @@ from config.constants import GAS_BUFFER
 from helpers.enums import Network
 from rewards.utils.tx_utils import (
     confirm_transaction,
+    create_tx_options,
     get_effective_gas_price,
     get_gas_price_of_tx,
     get_latest_base_fee,
     get_priority_fee,
 )
-from tests.utils import set_env_vars
+from tests.utils import TEST_WALLET, set_env_vars
 
 set_env_vars()
 
@@ -116,6 +117,27 @@ def test_get_latest_base_fee(fee):
     if type(fee) == str and fee.startswith("0x"):
         fee = int(fee, 0)
     assert get_latest_base_fee(web3) == int(fee)
+
+
+@pytest.mark.parametrize("chain", [Network.Ethereum, Network.Arbitrum, Network.Fantom])
+def test_create_tx_options(mocker, chain):
+
+    effective_gas_price = 100
+    fee_history = [[1, 2, 3]]
+    web3 = MagicMock(
+        eth=MagicMock(
+            get_transaction_count=MagicMock(return_value=10),
+            fee_history=MagicMock(return_value={"reward": fee_history})
+        )
+    )
+
+    mocker.patch("rewards.utils.tx_utils.get_effective_gas_price", return_value=effective_gas_price)
+    options = create_tx_options(TEST_WALLET, web3, chain)
+    if chain == Network.Ethereum:
+        assert options["gas"] == 200000
+    elif chain == Network.Arbitrum:
+        assert options["gas"] == 3000000
+    assert options["gasPrice"] == effective_gas_price
 
 
 def test_get_effective_gas_price__eth():
