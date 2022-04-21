@@ -1,7 +1,6 @@
 from decimal import Decimal
 import pytest
 import math
-from config.constants.emissions import STAKE_RATIO_RANGES
 from helpers.enums import Network
 from rewards.boost.calc_boost import allocate_bvecvx_to_users
 from rewards.boost.calc_boost import (
