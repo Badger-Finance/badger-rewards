@@ -35,7 +35,7 @@ def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal)
     return Decimal(0)
 
 
-def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> int:
+def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> Decimal:
     """
     Calculate the stake ratio for an address
     :param address: address to find stake ratio for
@@ -63,11 +63,11 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
             elif stake_ratio <= 1:
                 user_boost = min(math.floor(stake_ratio * 2000), 2000)
             elif 1.0 < stake_ratio <= 1.5:
-                user_boost = 2000 + math.floor((stake_ratio - 1) * 1000)
+                user_boost = 2000 + math.floor((stake_ratio - Decimal(1)) * 1000)
             elif 1.5 < stake_ratio <= 2:
-                user_boost = 2500 + math.floor((stake_ratio - 1.5) * 500)
+                user_boost = 2500 + math.floor((stake_ratio - Decimal(1.5)) * 500)
             elif 2.0 < stake_ratio <= 3:
-                user_boost = min(2750 + math.floor((stake_ratio - 2) * 250), 3000)
+                user_boost = min(2750 + math.floor((stake_ratio - Decimal(2)) * 250), 3000)
         else:
             user_boost = 1
         for stake_range, multiplier in STAKE_RATIO_RANGES:

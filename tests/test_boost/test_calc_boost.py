@@ -92,14 +92,14 @@ def test_calc_stake_ratio__zero_non_native():
 def test_get_badger_boost_data():
     data, stake_data = get_badger_boost_data(
         {
-            "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 1.452,
-            "0x0000001d2B0A08A235276e8765aa1A659Aae58bb": 1,
-            "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909": 0.9,
-            "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7900": 0.2758,
-            "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f1111": 0,
-            "0x285C39e344179C253a75761C6737dE92183fA1F2": 1.25,
-            "0x0069f94C6Ef196cf54b2f0746dE92D40a83D41A5": 1.75,
-            "0x5E9F7E92e742F73b990dCa63c88325eD24666E84": 2.5
+            "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(1.452),
+            "0x0000001d2B0A08A235276e8765aa1A659Aae58bb": Decimal(1),
+            "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909": Decimal(0.9),
+            "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7900": Decimal(0.2758),
+            "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f1111": Decimal(0),
+            "0x285C39e344179C253a75761C6737dE92183fA1F2": Decimal(1.25),
+            "0x0069f94C6Ef196cf54b2f0746dE92D40a83D41A5": Decimal(1.75),
+            "0x5E9F7E92e742F73b990dCa63c88325eD24666E84": Decimal(2.5)
         }
     )
     assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f1111"] == 1
@@ -131,8 +131,6 @@ def test_badger_boost__happy(mock_discord_send_code, mock_snapshots, mocker, fet
     for addr, boost_data in result.items():
         if boost_data["stakeRatio"] == 0:
             assert boost_data["boost"] == 1
-        elif boost_data["stakeRatio"] > 1:
-            assert boost_data["boost"] == STAKE_RATIO_RANGES[-1][1]
         keys = list(boost_data.keys())
         assert "boost" in keys
         assert "nativeBalance" in keys
