@@ -90,9 +90,7 @@ def test_get_last_proposed_cycle(tree_manager):
 )
 def test_calc_next_cycle_range(tree_manager, setup_dynamodb):
     patch_resource(dynamodb)
-
     result = calc_next_cycle_range(tree_manager.chain, tree_manager)
-    print(result)
     assert result[0] == mock_tree
 
 

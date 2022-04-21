@@ -21,9 +21,7 @@ def get_last_proposed_cycle(
     current_rewards = tree_manager.fetch_current_tree()
 
     last_claim_end = tree_manager.last_propose_end_block()
-    print(last_claim_end)
     last_claim_start = tree_manager.last_propose_start_block()
-    print(last_claim_start)
 
     # Sanity check: Ensure start block is not too close to end block
     return current_rewards, last_claim_start, last_claim_end
@@ -41,9 +39,7 @@ def calc_next_cycle_range(
         start_block = last_claim_end + 1
     synced_block = last_synced_block(chain)
     metadata = get_claimable_metadata(chain, synced_block)
-    print(metadata)
     end_block = metadata["endBlock"]
-    print(start_block)
     assert end_block <= synced_block
     # Sanity check: Ensure start block is behind end block
     assert start_block < end_block
