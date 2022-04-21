@@ -3,8 +3,8 @@ import os
 import pytest
 from brownie import accounts, web3
 from eth_account import Account
-from rewards.aws.helpers import dynamodb, s3
-from moto.core import patch_resource, patch_client
+from rewards.aws.helpers import dynamodb
+from moto.core import patch_resource
 
 from tests.utils import mock_get_claimable_data, set_env_vars, test_address, test_key
 set_env_vars()
@@ -82,8 +82,7 @@ def tree_manager(chain, cycle_account, badger_tree):
     return tree_manager
 
 
-def test_cycle(tree_manager, badger_tree, keeper_address, mocker, setup_dynamodb, setup_s3):
+def test_cycle(tree_manager, badger_tree, keeper_address, mocker, setup_dynamodb):
     patch_resource(dynamodb)
-    patch_client(s3)
     accounts[0].transfer(keeper_address, "10 ether", priority_fee="2 gwei")
     mock_cycle(tree_manager, badger_tree, keeper_address)
