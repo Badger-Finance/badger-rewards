@@ -18,7 +18,7 @@ class FeatureFlags:
     FLAGS: Dict[str, bool] = {
         TEST_FLAG_ENABLED: True,
         TEST_FLAG_DISABLED: False,
-        BOOST_STEP: False,
+        BOOST_STEP: True,
     }
 
     def flag_enabled(self, flag: str) -> bool:
