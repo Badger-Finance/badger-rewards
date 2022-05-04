@@ -8,6 +8,8 @@ from rich.console import Console
 from web3 import Web3
 
 from badger_api.requests import fetch_token_prices
+from config.constants.addresses import WBTC
+from config.constants.emissions import DIGG_BOOST_VAULTS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 
@@ -64,6 +66,12 @@ class Snapshot:
 
         return Snapshot(self.token, new_bals, self.ratio, self.type)
 
+    def __radd__(self, other):
+        if other == 0:
+            return self
+        else:
+            return self.__add__(other)
+
     def convert_to_usd(
         self, chain: Network, bot_type: BotType = BotType.Boost
     ) -> Snapshot:
@@ -79,6 +87,8 @@ class Snapshot:
                 "Boost Bot",
                 url=discord_url,
             )
+        elif self.token in DIGG_BOOST_VAULTS:
+            price = prices[WBTC] * self.ratio
         else:
             price = Decimal(prices[self.token]) * self.ratio
 

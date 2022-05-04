@@ -9,12 +9,14 @@ from helpers.enums import Abi
 from helpers.enums import Network
 from helpers.web3_utils import make_contract
 from rewards.classes.Boost import BoostBalances
+from rewards.classes.Snapshot import Snapshot
 from rewards.snapshot.chain_snapshot import chain_snapshot_usd
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot_usd
 from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 from rewards.snapshot.token_snapshot import token_snapshot_usd, fuse_snapshot_of_token
+from rewards.utils.snapshot_utils import digg_snapshot_usd
 
 console = Console()
 
@@ -73,7 +75,7 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     console.log(f"\n === Taking token snapshot on {chain} === \n")
     badger_tokens, digg_tokens = token_snapshot_usd(chain, block)
 
-    native += Counter(badger_tokens) + Counter(digg_tokens) + Counter(nft_balances)
+    native += Counter(badger_tokens) + Counter(nft_balances)
 
     console.log(f"\n === Taking chain snapshot on {chain} === \n")
     native_setts, non_native_setts = chain_snapshot_usd(chain, block)
@@ -81,8 +83,12 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     native += Counter(native_setts)
 
     bvecvx_usd = {}
+    digg_usd = {}
+    digg_claimable = Snapshot(addresses.DIGG, {})
     if chain == Network.Ethereum:
-        bvecvx_claimable = claims_snapshot(chain, block).get(addresses.BVECVX)
+        all_claims = claims_snapshot(chain, block)
+        bvecvx_claimable = all_claims.get(addresses.BVECVX)
+        digg_claimable = all_claims.get(addresses.DIGG)
         bvecvx_bals = sett_snapshot(chain, block, addresses.BVECVX)
         fuse_bvecvx = fuse_snapshot_of_token(chain, block, token=addresses.BVECVX)
         bvecvx_lp_bals = sett_snapshot(chain, block, addresses.BVECVX_CVX_LP_SETT)
@@ -94,8 +100,12 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
         bvecvx = (bvecvx_bals + bvecvx_claimable + bvecvx_lp_bals + fuse_bvecvx)
         bvecvx_usd = bvecvx.convert_to_usd(chain).balances
 
+    digg = (digg_claimable + digg_tokens)
+    digg_usd = digg.convert_to_usd(chain).balances + digg_snapshot_usd(chain, block)
+
     native = filter_dust(dict(native), 1)
     non_native = filter_dust(dict(non_native), 1)
     bvecvx_usd = filter_dust(dict(bvecvx_usd), 1)
+    digg_usd = filter_dust(dict(bvecvx_usd), 1)
 
-    return BoostBalances(native, non_native, bvecvx_usd, nft_balances)
+    return BoostBalances(native, non_native, bvecvx_usd, nft_balances, digg_usd)

@@ -18,6 +18,11 @@ TREE_REWARDS_BLACKLIST = {
 BVECVX_VOTER_BLACKLIST = {
     addresses.BVECVX_VOTER: "Badger bveCVX Voter"
 }
+DIGG_BOOST_VAULTS = [
+    addresses.DIGG,
+    addresses.BSLP_DIGG_WBTC,
+    addresses.BUNI_DIGG_WBTC
+]
 
 NATIVE_TOKEN_REWARDS = {
     Network.Ethereum: [addresses.BADGER, addresses.DIGG]
@@ -28,6 +33,7 @@ BVECVX_VOTER_BLACKLIST_TOKENS = {
 }
 
 BVECVX_BOOST_WEIGHT = 0.5
+DIGG_BOOST_WEIGHT = 0.5
 
 STAKE_RATIO_RANGES = list(
     [
@@ -82,6 +88,10 @@ DISABLED_VAULTS = [
     # ethereum
     addresses.BCRV_TRICRYPTO_1,
     addresses.BHARVEST_REN_WBTC,
+    addresses.BDIGG,
+    addresses.BSLP_DIGG_WBTC,
+    addresses.BUNI_BADGER_WBTC,
+    addresses.REM_DIGG
 ]
 
 PRO_RATA_VAULTS = [
