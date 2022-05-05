@@ -44,7 +44,8 @@ def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> Decimal:
     native_balance = Decimal(boost_bals.native.get(address, 0))
     non_native_balance = Decimal(boost_bals.non_native.get(address, 0))
     bvecvx_balance = Decimal(boost_bals.bvecvx.get(address, 0))
-    native_balance += calc_bvecvx_native_balance(native_balance, bvecvx_balance)
+    native_balance += calc_bvecvx_native_balance(
+        native_balance, bvecvx_balance)
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
@@ -63,11 +64,14 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
             elif stake_ratio <= 1:
                 user_boost = min(math.floor(stake_ratio * 2000), 2000)
             elif 1.0 < stake_ratio <= 1.5:
-                user_boost = 2000 + math.floor((stake_ratio - Decimal(1)) * 1000)
+                user_boost = 2000 + \
+                    math.floor((stake_ratio - Decimal(1)) * 1000)
             elif 1.5 < stake_ratio <= 2:
-                user_boost = 2500 + math.floor((stake_ratio - Decimal(1.5)) * 500)
-            elif 2.0 < stake_ratio <= 3:
-                user_boost = min(2750 + math.floor((stake_ratio - Decimal(2)) * 250), 3000)
+                user_boost = 2500 + \
+                    math.floor((stake_ratio - Decimal(1.5)) * 500)
+            elif stake_ratio > 2:
+                user_boost = min(
+                    2750 + math.floor((stake_ratio - Decimal(2)) * 250), 3000)
         else:
             user_boost = 1
         for stake_range, multiplier in STAKE_RATIO_RANGES:
@@ -75,7 +79,8 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
                 if not flags.flag_enabled(BOOST_STEP):
                     user_boost = multiplier
                 user_stake_range = stake_range
-        stake_data_ranges[user_stake_range] = stake_data_ranges.get(user_stake_range, 0) + 1
+        stake_data_ranges[user_stake_range] = stake_data_ranges.get(
+            user_stake_range, 0) + 1
         badger_boost_data[addr] = user_boost
     return badger_boost_data, stake_data_ranges
 
@@ -101,11 +106,14 @@ def allocate_nft_balances_to_users(boost_info: Dict, nft_balances: Dict) -> None
 
 def allocate_bvecvx_to_users(boost_info: Dict, bvecvx_balances: Dict):
     for user, bvecvx_balance in bvecvx_balances.items():
-        native_balance = boost_info.get(user, {}).get("nativeBalance", Decimal(0))
-        calculated_bvecvx_balance = calc_bvecvx_native_balance(native_balance, bvecvx_balance)
+        native_balance = boost_info.get(
+            user, {}).get("nativeBalance", Decimal(0))
+        calculated_bvecvx_balance = calc_bvecvx_native_balance(
+            native_balance, bvecvx_balance)
         if user in boost_info:
             boost_info[user]["bveCvxBalance"] = calculated_bvecvx_balance
-            boost_info[user]["nativeBalance"] = native_balance + calculated_bvecvx_balance
+            boost_info[user]["nativeBalance"] = native_balance + \
+                calculated_bvecvx_balance
 
 
 def allocate_nft_to_users(boost_info: Dict, addresses: List[str], nfts: Dict):
@@ -139,11 +147,13 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     console.log(f"Calculating boost at block {current_block} ...")
     boost_bals = calc_boost_balances(current_block - BOOST_BLOCK_DELAY, chain)
 
-    all_addresses = calc_union_addresses(boost_bals.native, boost_bals.non_native)
+    all_addresses = calc_union_addresses(
+        boost_bals.native, boost_bals.non_native)
     console.log(f"{len(all_addresses)} addresses fetched")
     boost_data = {}
 
-    stake_ratios_list = [calc_stake_ratio(addr, boost_bals) for addr in all_addresses]
+    stake_ratios_list = [calc_stake_ratio(
+        addr, boost_bals) for addr in all_addresses]
     stake_ratios = dict(zip(all_addresses, stake_ratios_list))
     badger_boost_data, stake_data = get_badger_boost_data(stake_ratios)
     nfts = fetch_nfts(chain, current_block)
@@ -176,6 +186,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
         headers=["range", "amount of users"],
     )
     print(stake_data_table)
-    send_code_block_to_discord(stake_data_table, username="Boost Bot", url=discord_url)
+    send_code_block_to_discord(
+        stake_data_table, username="Boost Bot", url=discord_url)
 
     return boost_data
