@@ -7,6 +7,7 @@ from eth_account import Account
 import config.constants.addresses as addresses
 from config.constants import GAS_BUFFER
 from helpers.enums import Network
+from rewards.utils.tx_utils import create_tx_options
 from tests.test_utils.cycle_utils import mock_tree_manager
 from tests.utils import mock_tree
 from tests.utils import set_env_vars
@@ -64,17 +65,6 @@ def test_matches_pending_hash(tree_manager):
     [Network.Ethereum],
     indirect=True,
 )
-def test_build_function_and_send(tree_manager, mocker):
-    mocker.patch("rewards.classes.TreeManager.build_and_send")
-    tree_manager.get_tx_options = mock_get_tx_options
-    tree_manager.build_function_and_send(account=MagicMock(key=""), func=None)
-
-
-@pytest.mark.parametrize(
-    "tree_manager",
-    [Network.Ethereum],
-    indirect=True,
-)
 def test_get_claimed_for(tree_manager):
     user = "0xEE9F84Af6a8251Eb5ffDe38c5F056bc72d3b3DD0"
     tokens = [
@@ -97,6 +87,6 @@ def test_ftm_tx_details__gas_price(mocker):
     tree_manager = mock_tree_manager(Network.Fantom, accounts[0])
     tree_manager.w3 = MagicMock(eth=MagicMock(gas_price=gas_price))
     assert (
-        tree_manager.get_tx_options(accounts[0])['gasPrice']
+        create_tx_options(accounts[0], tree_manager.w3, Network.Fantom)(accounts[0])['gasPrice']
         == int(gas_price * GAS_BUFFER)
     )
