@@ -82,6 +82,13 @@ def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_snapshot,
             "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.000001241234
         })
     )
+    mocker.patch(
+        "rewards.utils.snapshot_utils.digg_snapshot_usd",
+        return_value={
+            "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.000001241234
+        }
+    )
+
     boost_balances = calc_boost_balances(
         123, Network.Ethereum
     )
@@ -90,6 +97,7 @@ def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_snapshot,
     assert boost_balances.non_native == {}
     assert boost_balances.nfts == {}
     assert boost_balances.bvecvx == {}
+    assert boost_balances.digg == {}
 
 
 def test_filter_dust():

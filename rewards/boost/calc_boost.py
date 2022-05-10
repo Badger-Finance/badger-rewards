@@ -69,6 +69,7 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
     stake_data_ranges = {}
     for addr, stake_ratio in stake_ratios.items():
         user_stake_range = 0
+        user_boost = 1
         if flags.flag_enabled(BOOST_STEP):
             if stake_ratio == 0:
                 user_boost = 1
