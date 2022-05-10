@@ -93,9 +93,9 @@ class Snapshot:
         elif self.token == BDIGG:
             price = Decimal(wbtc_price * digg_ppfs)
         elif self.token == BUNI_DIGG_WBTC:
-            price = Decimal(digg_utils.sushi_digg_balance * wbtc_price)
+            price = Decimal(digg_utils.sushi_digg_ratio * wbtc_price)
         elif self.token == BSLP_DIGG_WBTC:
-            price = Decimal(digg_utils.uni_digg_balance * wbtc_price)
+            price = Decimal(digg_utils.uni_digg_ratio * wbtc_price)
         else:
             price = Decimal(prices[self.token]) * self.ratio
 
