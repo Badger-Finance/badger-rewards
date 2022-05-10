@@ -89,6 +89,54 @@ def test_allocate_digg_to_users__no_user_boost():
     assert boost_info.get(user) is None
 
 
+def test_allocate_digg_to_users_equal_balance():
+    user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    digg_balances = {user: Decimal(100)}
+    boost_info = {
+        user: {
+            'nativeBalance': Decimal(100)
+        }
+    }
+    allocate_digg_to_users(
+        boost_info,
+        digg_balances,
+    )
+    assert boost_info[user]['nativeBalance'] == Decimal(200)
+    assert boost_info[user]['diggBalance'] == Decimal(100)
+
+
+def test_allocate_digg_to_users_no_digg():
+    user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    digg_balances = {}
+    boost_info = {
+        user: {
+            'nativeBalance': Decimal(100)
+        }
+    }
+    allocate_digg_to_users(
+        boost_info,
+        digg_balances,
+    )
+    assert boost_info[user]['nativeBalance'] == Decimal(100)
+    assert 'diggBalance' not in boost_info[user]
+
+
+def test_allocate_digg_to_users_less_digg():
+    user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    digg_balances = {user: Decimal(50)}
+    boost_info = {
+        user: {
+            'nativeBalance': Decimal(100)
+        }
+    }
+    allocate_digg_to_users(
+        boost_info,
+        digg_balances,
+    )
+    assert boost_info[user]['nativeBalance'] == Decimal(150)
+    assert boost_info[user]['diggBalance'] == Decimal(50)
+
+
 def test_calc_stake_ratio__zero_native():
     target = {TEST_USER: 0.1}
     assert (
