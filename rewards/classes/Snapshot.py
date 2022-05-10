@@ -75,7 +75,6 @@ class Snapshot:
     ) -> Snapshot:
         discord_url = get_discord_url(chain, bot_type)
         prices = fetch_token_prices()
-        _, digg_ppfs = fetch_ppfs()
         wbtc_price = prices[WBTC]
         digg_price = prices[DIGG]
         if self.token not in prices:
@@ -91,6 +90,7 @@ class Snapshot:
         elif self.token == DIGG:
             price = Decimal(wbtc_price)
         elif self.token == BDIGG:
+            _, digg_ppfs = fetch_ppfs()
             price = Decimal(wbtc_price * digg_ppfs)
         elif self.token in [BUNI_DIGG_WBTC, BSLP_DIGG_WBTC]:
             digg_lp_price = prices[self.token]
