@@ -19,7 +19,7 @@ BVECVX_VOTER_BLACKLIST = {
     addresses.BVECVX_VOTER: "Badger bveCVX Voter"
 }
 DIGG_BOOST_VAULTS = [
-    addresses.DIGG,
+    addresses.BDIGG,
     addresses.BSLP_DIGG_WBTC,
     addresses.BUNI_DIGG_WBTC
 ]

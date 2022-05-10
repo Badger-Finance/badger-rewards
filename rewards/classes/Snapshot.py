@@ -6,12 +6,11 @@ from typing import Dict, Tuple, Optional
 
 from rich.console import Console
 from web3 import Web3
-
-from badger_api.requests import fetch_token_prices
-from config.constants.addresses import WBTC
-from config.constants.emissions import DIGG_BOOST_VAULTS
+from badger_api.requests import fetch_ppfs, fetch_token_prices
+from config.constants.addresses import BDIGG, BSLP_DIGG_WBTC, BUNI_DIGG_WBTC, DIGG, WBTC
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
+from helpers.digg_utils import digg_utils
 
 console = Console()
 
@@ -77,6 +76,8 @@ class Snapshot:
     ) -> Snapshot:
         discord_url = get_discord_url(chain, bot_type)
         prices = fetch_token_prices()
+        _, digg_ppfs = fetch_ppfs()
+        wbtc_price = prices[WBTC]
         if self.token not in prices:
             price = Decimal(0)
             console.log(f"CANT FIND PRICING FOR {self.token}")
@@ -87,8 +88,14 @@ class Snapshot:
                 "Boost Bot",
                 url=discord_url,
             )
-        elif self.token in DIGG_BOOST_VAULTS:
-            price = prices[WBTC] * self.ratio
+        elif self.token == DIGG:
+            price = Decimal(wbtc_price)
+        elif self.token == BDIGG:
+            price = Decimal(wbtc_price * digg_ppfs)
+        elif self.token == BUNI_DIGG_WBTC:
+            price = Decimal(digg_utils.sushi_digg_balance * wbtc_price)
+        elif self.token == BSLP_DIGG_WBTC:
+            price = Decimal(digg_utils.uni_digg_balance * wbtc_price)
         else:
             price = Decimal(prices[self.token]) * self.ratio
 
