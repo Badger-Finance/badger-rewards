@@ -125,7 +125,8 @@ def test_get_badger_boost_data():
             "0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f1111": Decimal(0),
             "0x285C39e344179C253a75761C6737dE92183fA1F2": Decimal(1.25),
             "0x0069f94C6Ef196cf54b2f0746dE92D40a83D41A5": Decimal(1.75),
-            "0x5E9F7E92e742F73b990dCa63c88325eD24666E84": Decimal(2.5)
+            "0x5E9F7E92e742F73b990dCa63c88325eD24666E84": Decimal(2.5),
+            "0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8": Decimal(3.5)
         }
     )
     assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f1111"] == 1
@@ -137,6 +138,7 @@ def test_get_badger_boost_data():
         assert data["0x285C39e344179C253a75761C6737dE92183fA1F2"] == 2250
         assert data["0x0069f94C6Ef196cf54b2f0746dE92D40a83D41A5"] == 2625
         assert data["0x5E9F7E92e742F73b990dCa63c88325eD24666E84"] == 2875
+        assert data["0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8"] == 3000
 
     else:
         assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7900"] == 500
