@@ -99,6 +99,8 @@ def init_boost_data(addresses: List[str]) -> Dict[str, Any]:
             "nativeBalance": 0,
             "nonNativeBalance": 0,
             "stakeRatio": 0,
+            "bveCvxBalance": 0,
+            "diggBalance": 0,
             "nftBalance": 0,
             "nfts": [],
         }

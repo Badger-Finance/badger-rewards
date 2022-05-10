@@ -77,6 +77,7 @@ def sett_snapshot(chain: Network, block: int, sett: str) -> Snapshot:
     :param sett:
     """
     token = fetch_token(chain, sett)
+    print(sett)
     name = token.get("name", "")
     console.log(f"Taking snapshot on {chain} of {name} ({sett}) at {block}\n")
     sett_balances = fetch_sett_balances(chain, block, sett)

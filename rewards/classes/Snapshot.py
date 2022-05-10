@@ -77,7 +77,6 @@ class Snapshot:
     ) -> Snapshot:
         discord_url = get_discord_url(chain, bot_type)
         prices = fetch_token_prices()
-        print(prices)
         if self.token not in prices:
             price = Decimal(0)
             console.log(f"CANT FIND PRICING FOR {self.token}")

@@ -85,10 +85,11 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     bvecvx_usd = {}
     digg_usd = {}
     digg_claimable = Snapshot(addresses.DIGG, {})
+    bvecvx_claimable = Snapshot(addresses.BVECVX, {})
     if chain == Network.Ethereum:
         all_claims = claims_snapshot(chain, block)
-        bvecvx_claimable = all_claims.get(addresses.BVECVX)
-        digg_claimable = all_claims.get(addresses.DIGG)
+        bvecvx_claimable = all_claims.get(addresses.BVECVX, bvecvx_claimable)
+        digg_claimable = all_claims.get(addresses.DIGG, digg_claimable)
         bvecvx_bals = sett_snapshot(chain, block, addresses.BVECVX)
         fuse_bvecvx = fuse_snapshot_of_token(chain, block, token=addresses.BVECVX)
         bvecvx_lp_bals = sett_snapshot(chain, block, addresses.BVECVX_CVX_LP_SETT)
@@ -100,8 +101,8 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
         bvecvx = (bvecvx_bals + bvecvx_claimable + bvecvx_lp_bals + fuse_bvecvx)
         bvecvx_usd = bvecvx.convert_to_usd(chain).balances
 
-    digg = (digg_claimable + digg_tokens)
-    digg_usd = digg.convert_to_usd(chain).balances + digg_snapshot_usd(chain, block)
+    digg_claimable_usd = Counter(digg_claimable.convert_to_usd(chain).balances)
+    digg_usd = digg_claimable_usd + Counter(digg_tokens) + Counter(digg_snapshot_usd(chain, block))
 
     native = filter_dust(dict(native), 1)
     non_native = filter_dust(dict(non_native), 1)
