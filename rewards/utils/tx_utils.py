@@ -196,7 +196,7 @@ def confirm_transaction(
         return False, msg
 
 
-def create_tx_options(address: str, w3: Web3, chain: Network):
+def create_tx_options(address: str, w3: Web3, chain: Network) -> Dict:
     options = {
         "nonce": w3.eth.get_transaction_count(address),
         "from": address,
@@ -212,7 +212,7 @@ def create_tx_options(address: str, w3: Web3, chain: Network):
     return options
 
 
-def build_and_send(func: contract.ContractFunctions, options: Dict, w3: Web3, pkey: str):
+def build_and_send(func: contract.ContractFunctions, options: Dict, w3: Web3, pkey: str) -> str:
     tx = func.buildTransaction(options)
     signed_tx = w3.eth.account.sign_transaction(tx, private_key=pkey)
     tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
