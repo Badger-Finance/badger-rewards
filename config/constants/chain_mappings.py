@@ -167,6 +167,11 @@ DECIMAL_MAPPING = {
     Network.Fantom: 1e18
 }
 
+TREE_ACTION_GAS = {
+    Network.Ethereum: 200000,
+    Network.Arbitrum: 3000000
+}
+
 CHAIN_EXPLORER_URLS = {
     Network.Ethereum: "etherscan.io",
     Network.Polygon: "polygonscan.com",

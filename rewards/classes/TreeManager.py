@@ -42,7 +42,7 @@ class TreeManager:
         return rewards_to_merkle_tree(rewardsList, start, end)
 
     def build_function_and_send(self, account, func) -> str:
-        options = self.get_tx_options(account)
+        options = create_tx_options(account.address, self.w3, self.chain)
         return build_and_send(func, options, self.w3, account.key)
 
     def approve_root(self, rewards) -> Tuple[str, bool]:
@@ -199,9 +199,6 @@ class TreeManager:
 
     def last_propose_start_block(self) -> int:
         return self.badger_tree.lastProposeStartBlock().call()
-
-    def get_tx_options(self, account: Account) -> dict:
-        return create_tx_options(account.address, self.w3, self.chain)
 
     def matches_pending_hash(self, new_hash: bytes) -> bool:
         new_hash = HexBytes(new_hash)

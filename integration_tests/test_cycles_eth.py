@@ -42,7 +42,7 @@ def mock_fns(mocker):
 
 
 @pytest.fixture(autouse=True)
-def set_env_config(mocker):
+def set_env_config():
     env_config.test = False
     env_config.staging = False
     env_config.production = True

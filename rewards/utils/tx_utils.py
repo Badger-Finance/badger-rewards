@@ -1,13 +1,13 @@
 import logging
 import time
 from decimal import Decimal
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict
 
 from eth_typing import HexStr
-from web3 import Web3, exceptions
+from web3 import Web3, exceptions, contract
 
 from config.constants import GAS_BUFFER
-from config.constants.chain_mappings import DECIMAL_MAPPING, EMISSIONS_CONTRACTS
+from config.constants.chain_mappings import DECIMAL_MAPPING, EMISSIONS_CONTRACTS, TREE_ACTION_GAS
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Abi, BotType, Network
 from helpers.http_client import http_client
@@ -196,7 +196,7 @@ def confirm_transaction(
         return False, msg
 
 
-def create_tx_options(address, w3, chain):
+def create_tx_options(address: str, w3: Web3, chain: Network):
     options = {
         "nonce": w3.eth.get_transaction_count(address),
         "from": address,
@@ -204,15 +204,15 @@ def create_tx_options(address, w3, chain):
     if chain == Network.Ethereum:
         options["maxPriorityFeePerGas"] = get_priority_fee(w3)
         options["maxFeePerGas"] = get_effective_gas_price(w3, chain)
-        options["gas"] = 200000
+        options["gas"] = TREE_ACTION_GAS[chain]
     elif chain == Network.Arbitrum:
-        options["gas"] = 3000000
+        options["gas"] = TREE_ACTION_GAS[chain]
     else:
         options["gasPrice"] = get_effective_gas_price(w3, chain)
     return options
 
 
-def build_and_send(func, options, w3, pkey):
+def build_and_send(func: contract.ContractFunctions, options: Dict, w3: Web3, pkey: str):
     tx = func.buildTransaction(options)
     signed_tx = w3.eth.account.sign_transaction(tx, private_key=pkey)
     tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
