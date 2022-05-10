@@ -6,7 +6,7 @@ import responses
 from pytest import approx
 
 from badger_api.requests import badger_api
-from config.constants.addresses import BBADGER, BYWBTC
+from config.constants.addresses import BBADGER, BYWBTC, WBTC, DIGG
 from config.constants.emissions import BOOST_CHAINS
 from helpers.enums import BalanceType, Network
 from rewards.snapshot.chain_snapshot import (
@@ -296,6 +296,8 @@ def test_chain_snapshot_usd__happy(
             json={
                 BBADGER: BADGER_PRICE,
                 BYWBTC: YEARN_WBTC_PRICE,
+                DIGG: 0,
+                WBTC: 0
             },
             status=200
         )

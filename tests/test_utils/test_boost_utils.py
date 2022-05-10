@@ -17,14 +17,18 @@ from tests.conftest import (
 
 
 @pytest.fixture
-def mock_claims_snapshot(mocker):
+def mock_claims_and_ppfs(mocker):
     mocker.patch(
         "rewards.boost.boost_utils.claims_snapshot",
         return_value=({}),
     )
+    mocker.patch(
+        "rewards.classes.Snapshot.fetch_ppfs",
+        return_value=(1.5, 1.5)
+    )
 
 
-def test_calc_boost_balances(chain, mock_snapshots, mock_claims_snapshot, fetch_token_mock):
+def test_calc_boost_balances(chain, mock_snapshots, mock_claims_and_ppfs, fetch_token_mock):
 
     boost_balances = calc_boost_balances(
         123, Network.Ethereum
@@ -54,7 +58,7 @@ def test_calc_boost_balances(chain, mock_snapshots, mock_claims_snapshot, fetch_
         assert boost_balances.nfts[addr] == balance
 
 
-def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_snapshot, fetch_token_mock):
+def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_and_ppfs, fetch_token_mock):
     mocker.patch(
         "rewards.boost.boost_utils.token_snapshot_usd",
         return_value=(
