@@ -11,6 +11,7 @@ from config.constants.addresses import (
     BADGER,
     BCVXCRV,
     DIGG,
+    WBTC,
     POLY_SUSHI,
     XSUSHI,
 )
@@ -32,6 +33,7 @@ XSUSHI_PRICE = 1.201460272851376
 CVX_CRV_PRICE = 12.411460272851376
 SWAPR_WETH_SWAPR_PRICE = 12312.201460272851376
 DIGG_PRICE = 50000
+WBTC_PRICE = 30000
 
 
 @pytest.fixture()
@@ -95,7 +97,7 @@ def test_claims_snapshot_digg(claimable_block, monkeypatch, fetch_token_mock):
     )
     snapshots = claims_snapshot(Network.Ethereum, claimable_block)
     digg_snapshot = snapshots[DIGG]
-    assert digg_snapshot.type == BalanceType.Native
+    assert digg_snapshot.type == BalanceType.Excluded
     assert digg_snapshot.ratio == 1
     assert digg_snapshot.token == DIGG
     expected_digg_balance = digg_utils.shares_to_fragments(int(balance)) / math.pow(
@@ -121,6 +123,7 @@ def test_claims_snapshot_usd__happy(claimable_block, monkeypatch, fetch_token_mo
                 BCVXCRV: CVX_CRV_PRICE,
                 XSUSHI: XSUSHI_PRICE,
                 DIGG: DIGG_PRICE,
+                WBTC: WBTC_PRICE,
                 ARB_BSWAPR_WETH_SWAPR: SWAPR_WETH_SWAPR_PRICE,
             },
             status=200,
