@@ -1,15 +1,11 @@
-from config.constants.addresses import DIGG, SLP_DIGG_WBTC, UNI_DIGG_WBTC
+from config.constants.addresses import DIGG
 from helpers.enums import Abi, Network
-from helpers.web3_utils import make_contract, make_token
+from helpers.web3_utils import make_contract
 
 
 class DiggUtils:
     def __init__(self):
         self.digg = make_contract(DIGG, abi_name=Abi.Digg, chain=Network.Ethereum)
-        uni_digg = make_token(UNI_DIGG_WBTC, Network.Ethereum)
-        sushi_digg = make_token(SLP_DIGG_WBTC, Network.Ethereum)
-        self.uni_digg_ratio = self.get_shares(UNI_DIGG_WBTC) / uni_digg.totalSupply().call()
-        self.sushi_digg_ratio = self.get_shares(SLP_DIGG_WBTC) / sushi_digg.totalSupply().call()
         self.shares_per_fragment = self.digg._sharesPerFragment().call()
         self.initial_shares = self.digg._initialSharesPerFragment().call()
 
