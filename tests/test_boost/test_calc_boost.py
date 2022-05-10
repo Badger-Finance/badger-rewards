@@ -74,8 +74,8 @@ def test_allocate_digg_to_users():
         boost_info,
         digg_balances,
     )
-    assert boost_info[user]['nativeBalance'] == Decimal(15)
-    assert boost_info[user]['diggBalance'] == Decimal(5)
+    assert boost_info[user]['nativeBalance'] == Decimal(20)
+    assert boost_info[user]['diggBalance'] == Decimal(10)
 
 
 def test_allocate_digg_to_users__no_user_boost():
