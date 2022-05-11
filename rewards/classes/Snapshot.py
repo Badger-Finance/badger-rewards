@@ -10,7 +10,7 @@ from badger_api.requests import fetch_ppfs, fetch_token_prices
 from config.constants.addresses import BDIGG, BSLP_DIGG_WBTC, BUNI_DIGG_WBTC, DIGG, WBTC
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
-
+from config.constants.emissions import DIGG_LP_PRICE_RATIO
 console = Console()
 
 
@@ -94,7 +94,8 @@ class Snapshot:
             price = Decimal(wbtc_price * digg_ppfs)
         elif self.token in [BUNI_DIGG_WBTC, BSLP_DIGG_WBTC]:
             digg_lp_price = prices[self.token]
-            price = 0.5 * digg_lp_price + (digg_lp_price * 0.5 * (wbtc_price / digg_price))
+            price = DIGG_LP_PRICE_RATIO * digg_lp_price \
+                + (digg_lp_price * DIGG_LP_PRICE_RATIO * (wbtc_price / digg_price))
         else:
             price = Decimal(prices[self.token]) * self.ratio
 
