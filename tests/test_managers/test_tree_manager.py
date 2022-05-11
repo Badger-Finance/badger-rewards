@@ -87,6 +87,6 @@ def test_ftm_tx_details__gas_price(mocker):
     tree_manager = mock_tree_manager(Network.Fantom, accounts[0])
     tree_manager.w3 = MagicMock(eth=MagicMock(gas_price=gas_price))
     assert (
-        create_tx_options(accounts[0], tree_manager.w3, Network.Fantom)(accounts[0])['gasPrice']
+        create_tx_options(accounts[0], tree_manager.w3, Network.Fantom)['gasPrice']
         == int(gas_price * GAS_BUFFER)
     )
