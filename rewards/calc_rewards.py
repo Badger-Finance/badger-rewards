@@ -124,7 +124,7 @@ def propose_root(
     console.log(
         f"\n==== Proposing root with rootHash {rewards_data['rootHash']} ====\n"
     )
-    if env_config.production:
+    if env_config.production or env_config.test:
         tx_hash, success = tree_manager.propose_root(rewards_data)
         if success:
             upload_proposed_boosts(boosts, chain)

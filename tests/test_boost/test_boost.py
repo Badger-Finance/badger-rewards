@@ -36,27 +36,27 @@ def mock_put_object(*args, **kwargs):
 
 
 @pytest.fixture(autouse=True)
-def mock_fns(monkeypatch):
-    monkeypatch.setattr("rewards.aws.boost.s3.put_object", mock_put_object)
+def mock_fns(mocker):
+    mocker.patch("rewards.aws.boost.s3.put_object", mock_put_object)
 
 
-def test_upload_boost_staging(monkeypatch):
+def test_upload_boost_staging(mocker):
     mock_env_config_obj = mock_env_config()
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.aws.boost.send_message_to_discord", mock_send_message_to_discord_stg
     )
-    monkeypatch.setattr("rewards.aws.boost.env_config", mock_env_config_obj)
+    mocker.patch("rewards.aws.boost.env_config", mock_env_config_obj)
 
     upload_boosts(mock_boosts, Network.Ethereum)
 
 
-def test_upload_boost_prod(monkeypatch):
+def test_upload_boost_prod(mocker):
     mock_env_config_obj = mock_env_config()
     mock_env_config_obj.test = False
     mock_env_config_obj.production = True
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.aws.boost.send_message_to_discord", mock_send_message_to_discord_prod
     )
-    monkeypatch.setattr("rewards.aws.boost.env_config", mock_env_config_obj)
+    mocker.patch("rewards.aws.boost.env_config", mock_env_config_obj)
 
     upload_boosts(mock_boosts, Network.Ethereum)
