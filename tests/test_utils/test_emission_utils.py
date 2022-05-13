@@ -1,13 +1,3 @@
-from decimal import Decimal
-
-import pytest
-
-from config.constants.chain_mappings import SETTS
-from helpers.enums import Network
-from tests.utils import set_env_vars
-
-set_env_vars()
-
 from rewards.utils.emission_utils import (
     fetch_unboosted_vaults,
     get_across_lp_multiplier,
@@ -15,6 +5,16 @@ from rewards.utils.emission_utils import (
     get_nft_weight,
     get_token_weight,
 )
+from decimal import Decimal
+from unittest.mock import MagicMock
+
+import pytest
+from config.constants import addresses
+from config.constants.chain_mappings import SETTS
+from helpers.enums import Network
+from tests.utils import set_env_vars
+
+set_env_vars()
 
 
 class MockTime:
@@ -44,7 +44,8 @@ def test_get_flat_emission_rate():
     for sett in happy_cases:
         assert type(get_flat_emission_rate(sett, chain)) == Decimal
     with pytest.raises(Exception):
-        get_flat_emission_rate(SETTS[Network.Ethereum]["sbtc_crv"].lower(), chain)
+        get_flat_emission_rate(
+            SETTS[Network.Ethereum]["sbtc_crv"].lower(), chain)
 
 
 def test_get_nft_weight():
@@ -85,10 +86,40 @@ def test_get_across_lp_multiplier():
     assert get_across_lp_multiplier() > 1
 
 
-def test_fetch_unboosted_vaults(monkeypatch):
-    monkeypatch.setattr("rewards.utils.emission_utils.fetch_setts", mock_fetch_setts)
-    mock_time = MockTime()
-    monkeypatch.setattr("rewards.utils.emission_utils.time", mock_time)
-    unboosted_vaults = [SETTS[Network.Ethereum]["cvx"]]
-    vaults = fetch_unboosted_vaults(Network.Ethereum)
+def test_fetch_unboosted_vaults(mocker):
+    mocker.patch("rewards.utils.emission_utils.fetch_setts", mock_fetch_setts)
+    mocker.patch(
+        "rewards.utils.emission_utils.env_config.get_web3",
+        MagicMock(
+            return_value=MagicMock(
+                eth=MagicMock(
+                    get_block=MagicMock(
+                        return_value={"timestamp": 100}
+                    )
+                )
+            )
+        )
+    )
+    mocker.patch("rewards.utils.emission_utils.make_contract", MagicMock(
+        return_value=MagicMock(
+            getAllUnlockSchedulesFor=MagicMock(
+                return_value=MagicMock(call=MagicMock(side_effect=[[], [], [
+                    [
+                        SETTS[Network.Ethereum]["cvx"],
+                        addresses.BADGER,
+                        1e18,
+                        0,
+                        200,
+                        200
+                    ]
+                ]])),
+            )
+        )
+    ))
+    unboosted_vaults = [
+        SETTS[Network.Ethereum]["ren_crv"],
+        SETTS[Network.Ethereum]["sbtc_crv"]
+    ]
+    vaults = fetch_unboosted_vaults(Network.Ethereum, 0)
+
     assert vaults == unboosted_vaults
