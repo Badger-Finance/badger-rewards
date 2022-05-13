@@ -153,7 +153,7 @@ def setup_dynamodb():
             },
             ExpressionAttributeValues={
                 ":ch": "ethereum",
-                ":eb": 13958081,
+                ":eb": 14576829,
                 ":sb": 13957559,
             },
             UpdateExpression="SET #CH=:ch, #EB=:eb, #SB=:sb",
@@ -181,7 +181,7 @@ def setup_dynamodb():
             },
             ExpressionAttributeValues={
                 ":ch": "arbitrum",
-                ":eb": 3903105,
+                ":eb": 14576829,
                 ":sb": 3902125,
             },
             UpdateExpression="SET #CH=:ch, #EB=:eb, #SB=:sb",

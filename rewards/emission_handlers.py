@@ -50,5 +50,6 @@ def fuse_pool_handler(amount: Decimal, token: str, sett: str, block: int) -> Rew
     """
     Redirect rewards from rari pool contract to token holders in pool
     """
+    console.log(f"Distributing {amount} of {token} to fuse token holders")
     snapshot = fuse_snapshot_of_token(Network.Ethereum, block, sett)
     return distribute_rewards_from_total_snapshot(amount, snapshot, token, block)

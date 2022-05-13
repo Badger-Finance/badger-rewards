@@ -1,7 +1,6 @@
 import logging
 from collections import Counter
 from decimal import Decimal
-
 from config.singletons import env_config
 from helpers.enums import Network
 from rewards.aws.boost import add_user_data
@@ -26,28 +25,29 @@ def mock_claims_snapshot_usd(*args, **kwargs):
     return native, non_native
 
 
-def test_boost_workflow(monkeypatch):
-    monkeypatch.setattr(
+def test_boost_workflow(mocker):
+    mocker.patch(
         "rewards.aws.boost.send_message_to_discord", mock_send_message_to_discord_prod
     )
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.boost.calc_boost.send_code_block_to_discord",
         mock_send_code_block_to_discord,
     )
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.aws.boost.download_boosts", lambda *args, **kwargs: mock_boosts
     )
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.boost.boost_utils.claims_snapshot_usd", mock_claims_snapshot_usd
     )
-    monkeypatch.setattr("rewards.aws.boost.upload_boosts", mock_upload_boosts)
-    monkeypatch.setattr(
+    mocker.patch("rewards.aws.boost.upload_boosts", mock_upload_boosts)
+
+    mocker.patch(
         "badger_api.claimable.get_claimable_metadata",
         lambda *args, **kwargs:
         {'chain': 'ethereum', 'startBlock': Decimal('14217430'), 'endBlock': Decimal('14217974'),
          'cycle': Decimal('4348'), 'chainStartBlock': 'ethereum_14217430'}
     )
-    monkeypatch.setattr(
+    mocker.patch(
         "badger_api.claimable.get_claimable_balances",
         lambda *args, **kwargs:
         [
