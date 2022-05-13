@@ -110,7 +110,7 @@ def chain_snapshot_usd(chain: Network, block: int) -> Tuple[Counter, Counter]:
     total_snapshot = chain_snapshot(chain, block)
     native = Counter()
     non_native = Counter()
-    no_boost = DISABLED_VAULTS + fetch_unboosted_vaults(chain) + PRO_RATA_VAULTS
+    no_boost = DISABLED_VAULTS + fetch_unboosted_vaults(chain, block) + PRO_RATA_VAULTS
     for sett, snapshot in total_snapshot.items():
         if sett in no_boost:
             console.log(f"{sett} is disabled")
