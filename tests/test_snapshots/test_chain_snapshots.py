@@ -155,7 +155,8 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_bal
 )
 def test_total_harvest_sett_snapshot__even_balance(
         chain, num_historical_snapshots: int,
-        mock_fetch_sett_balances, responses_mock_token_balance
+        mock_fetch_sett_balances, responses_mock_token_balance,
+        mock_get_token_weight
 ):
     snapshot = total_twap_sett_snapshot(
         chain, 13710328, 13710338, BBADGER,
@@ -175,7 +176,7 @@ def test_total_harvest_sett_snapshot__even_balance(
     [Network.Ethereum, Network.Arbitrum]
 )
 def test_total_harvest_sett_snapshot__even_balance_single_snap(
-        chain, mock_fetch_sett_balances, responses_mock_token_balance):
+        chain, mock_fetch_sett_balances, responses_mock_token_balance, mock_get_token_weight):
     """
     If num_historical_snapshots is 1, we should only take 2 snapshots for first and last blocks
     """
@@ -192,7 +193,7 @@ def test_total_harvest_sett_snapshot__even_balance_single_snap(
     [Network.Ethereum, Network.Arbitrum]
 )
 def test_total_harvest_sett_snapshot__even_balance_no_snapshots(
-        chain, mock_fetch_sett_balances, responses_mock_token_balance):
+        chain, mock_fetch_sett_balances, responses_mock_token_balance, mock_get_token_weight):
     """
     If num_historical_snapshots is 0, we should only take end block snapshot
     """
@@ -209,7 +210,8 @@ def test_total_harvest_sett_snapshot__even_balance_no_snapshots(
     [14, 20, 100]
 )
 def test_total_harvest_sett_snapshot__invalid_rate(
-        num_historical_snapshots: int, mock_fetch_sett_balances, responses_mock_token_balance):
+        num_historical_snapshots: int, mock_fetch_sett_balances, responses_mock_token_balance,
+        mock_get_token_weight):
     snapshot = total_twap_sett_snapshot(
         Network.Ethereum, 13710328, 13710338, BBADGER,
         num_historical_snapshots=num_historical_snapshots

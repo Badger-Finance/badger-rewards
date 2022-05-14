@@ -85,6 +85,14 @@ def mock_snapshots(mocker):
     )
 
 
+@pytest.fixture
+def mock_get_token_weight(mocker):
+    mocker.patch(
+        "rewards.utils.emission_utils.get_token_weight",
+        return_value=1
+    )
+
+
 @pytest.fixture(scope="function")
 def aws_credentials():
     """Mocked AWS Credentials for moto."""
