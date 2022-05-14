@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+from helpers.enums import Environment
 
 import boto3
 from botocore.exceptions import ClientError
@@ -134,6 +135,18 @@ if config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]:
     )
     s3 = boto3.client("s3")
     dynamodb = session.resource("dynamodb", region_name="us-west-1")
+elif config("ENV", "") == Environment.Test:
+    s3 = boto3.client(
+        "s3",
+        aws_access_key_id='',
+        aws_secret_access_key=''
+    )
+    dynamodb = boto3.resource(
+        "dynamodb",
+        region_name="us-west-1",
+        aws_access_key_id='',
+        aws_secret_access_key=''
+    )
 else:
     s3 = boto3.client(
         "s3",

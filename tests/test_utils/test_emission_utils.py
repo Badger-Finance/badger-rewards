@@ -121,5 +121,5 @@ def test_fetch_unboosted_vaults(mocker):
         SETTS[Network.Ethereum]["sbtc_crv"]
     ]
     vaults = fetch_unboosted_vaults(Network.Ethereum, 0)
-
+    
     assert vaults == unboosted_vaults

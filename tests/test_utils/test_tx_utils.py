@@ -1,5 +1,6 @@
 from decimal import Decimal
 from unittest.mock import MagicMock
+from hexbytes import HexBytes
 
 import pytest
 import responses
@@ -7,13 +8,15 @@ import responses
 from config.constants import GAS_BUFFER
 from helpers.enums import Network
 from rewards.utils.tx_utils import (
+    build_and_send,
     confirm_transaction,
+    create_tx_options,
     get_effective_gas_price,
     get_gas_price_of_tx,
     get_latest_base_fee,
     get_priority_fee,
 )
-from tests.utils import set_env_vars
+from tests.utils import TEST_WALLET, set_env_vars
 
 set_env_vars()
 
@@ -118,6 +121,28 @@ def test_get_latest_base_fee(fee):
     assert get_latest_base_fee(web3) == int(fee)
 
 
+@pytest.mark.parametrize("chain", [Network.Ethereum, Network.Arbitrum, Network.Fantom])
+def test_create_tx_options(mocker, chain):
+
+    effective_gas_price = 100
+    fee_history = [[1, 2, 3]]
+    web3 = MagicMock(
+        eth=MagicMock(
+            get_transaction_count=MagicMock(return_value=10),
+            fee_history=MagicMock(return_value={"reward": fee_history})
+        )
+    )
+
+    mocker.patch("rewards.utils.tx_utils.get_effective_gas_price", return_value=effective_gas_price)
+    options = create_tx_options(TEST_WALLET, web3, chain)
+    if chain == Network.Ethereum:
+        assert options["gas"] == 200000
+    elif chain == Network.Arbitrum:
+        assert options["gas"] == 3000000
+    else:
+        assert options["gasPrice"] == effective_gas_price
+
+
 def test_get_effective_gas_price__eth():
     reward = 11e9
     base_fee = 1000000
@@ -174,3 +199,29 @@ def test_get_effective_gas_price__fantom():
     )
     gas = get_effective_gas_price(web3, Network.Fantom)
     assert gas == gas_price * GAS_BUFFER
+
+
+def test_build_and_send():
+    mock_hash = HexBytes("0x55b73632c365e52cf7757320472572c2885ddb2c34dbd62958a55b7d9ec945a3")
+
+    class MockTx:
+        def __init__(self, raw_tx):
+            self.rawTransaction = raw_tx
+    mock_tx = MockTx("")
+    web3 = MagicMock(
+        eth=MagicMock(
+            account=MagicMock(
+                sign_transaction=MagicMock(
+                    return_value=mock_tx
+                )
+            ),
+            send_raw_transaction=MagicMock(
+                return_value=mock_hash
+            )
+        )
+    )
+    func = MagicMock(buildTransaction=MagicMock())
+    options = {}
+    pkey = ""
+    tx_hash = build_and_send(func, options, web3, pkey)
+    assert tx_hash == mock_hash.hex()

@@ -62,7 +62,7 @@ def test_upload_tree(mocker, chain):
 
 
 @pytest.mark.parametrize("chain", chains)
-def test_upload_tree_unhappy(mocker, chain, monkeypatch):
+def test_upload_tree_unhappy(mocker, chain):
     """
     Unit test for tree upload. Checking that all needed s3 methods are called
     """

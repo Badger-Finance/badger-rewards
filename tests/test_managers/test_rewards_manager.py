@@ -36,7 +36,7 @@ set_env_vars()
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Snapshot import Snapshot
 from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewards
-from tests.test_utils.cycle_utils import mock_badger_tree, mock_tree_manager
+from tests.test_utils.cycle_utils import mock_tree_manager
 
 logger = logging.getLogger("test-rewards-manager")
 
@@ -95,11 +95,11 @@ def mock_send_message_to_discord(
 
 
 @pytest.fixture(autouse=True)
-def mock_fns(monkeypatch):
-    monkeypatch.setattr(
+def mock_fns(mocker):
+    mocker.patch(
         "helpers.discord.send_message_to_discord", mock_send_message_to_discord
     )
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
 
@@ -129,7 +129,7 @@ def rewards_manager_split(cycle, start, end, boosts_split, request) -> RewardsMa
 
 @pytest.fixture
 def tree_manager():
-    tree_manager = mock_tree_manager(Network.Ethereum, test_account, mock_badger_tree)
+    tree_manager = mock_tree_manager(Network.Ethereum, test_account)
     return tree_manager
 
 
@@ -218,7 +218,6 @@ def test_splits(
     schedule,
     tree_manager,
     boosts_split,
-    monkeypatch,
     mocker,
     fetch_token_mock,
 ):
@@ -226,7 +225,7 @@ def test_splits(
     user_data = {}
     discord = mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     for rate in rates:
-        monkeypatch.setattr(
+        mocker.patch(
             "rewards.classes.RewardsManager.get_flat_emission_rate",
             lambda s, c: rate,
         )
