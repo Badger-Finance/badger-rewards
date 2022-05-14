@@ -362,7 +362,7 @@ def test_calculate_sett_rewards__equal_balances_for_period(
 )
 def test_calculate_sett_rewards__call_custom_handler(
         schedule, mocker, boosts_split, mock_discord, addr, setup_dynamodb,
-        fetch_token_mock,
+        fetch_token_mock, mock_get_token_weight
 ):
     patch_resource(dynamodb)
 
