@@ -34,6 +34,8 @@ def _populate_end_of_previous_harvest(tree_distributions: List[Dict]) -> Dict[st
 
 
 def fetch_tree_distributions(start_timestamp, end_timestamp, chain) -> List[Dict]:
+    print(start_timestamp)
+    print(end_timestamp)
     tree_client = SubgraphClient(chain, chain)
     query = gql(
         """

@@ -293,15 +293,30 @@ def test_calculate_sett_rewards__check_analytics(
     )
     sett = SETTS[Network.Ethereum]["ibbtc_crv"]
     total_badger = 100
-    all_schedules = {sett: {BADGER: [schedule(sett, total_badger)]}}
+    badger_schedule = schedule(
+        sett, total_badger
+    )
+    print(badger_schedule)
+    print(badger_schedule.startTime)
+    print(badger_schedule.endTime)
+
+    all_schedules = {sett: {BADGER: [badger_schedule]}}
 
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
+    )
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 1636827265}, {"timestamp": 1636828771}]
+            )
+        )
     )
 
     __, analytics = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
+    print(analytics)
     for sett, data in analytics.items():
         assert data['sett_name'] is not None
         assert data['boosted_rewards'][BADGER] is not None
@@ -384,6 +399,13 @@ def test_calculate_sett_rewards__call_custom_handler(
 
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
+    )
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 100}, {"timestamp": 100000000}]
+            )
+        )
     )
 
     rewards_manager.calculate_all_sett_rewards(
@@ -471,6 +493,14 @@ def test_calculate_tree_distributions__totals(mocker, boosts_split, fetch_token_
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 12997653, 13331083, boosts_split["userData"]
     )
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 100}, {"timestamp": 100000000}]
+            )
+        )
+    )
+
     with mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         return_value={

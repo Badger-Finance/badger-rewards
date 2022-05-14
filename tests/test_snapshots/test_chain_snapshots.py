@@ -135,7 +135,12 @@ def test_parse_sett_balances(chain):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_balance):
+def test_sett_snapshot(
+    chain,
+    mock_fetch_sett_balances,
+    responses_mock_token_balance,
+    mock_get_token_weight
+):
     snapshot = sett_snapshot(chain, 13710328, BBADGER)
     assert snapshot.type == BalanceType.Native
     assert snapshot.ratio == 1
@@ -226,7 +231,12 @@ def test_total_harvest_sett_snapshot__invalid_rate(
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
-def test_total_harvest_sett_snapshot__uneven_balance(chain, mocker, responses_mock_token_balance):
+def test_total_harvest_sett_snapshot__uneven_balance(
+    chain,
+    mocker,
+    responses_mock_token_balance,
+    mock_get_token_weight
+):
     initial_balance = 0.045336
     with mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
@@ -247,7 +257,7 @@ def test_total_harvest_sett_snapshot__uneven_balance(chain, mocker, responses_mo
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
-def test_total_harvest_sett_snapshot__invalid_blocks():
+def test_total_harvest_sett_snapshot__invalid_blocks(mock_get_token_weight):
     with pytest.raises(AssertionError):
         total_twap_sett_snapshot(
             Network.Ethereum, 13710338, 13710328, BBADGER,
@@ -259,7 +269,7 @@ def test_total_harvest_sett_snapshot__invalid_blocks():
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_sett_snapshot__empty(mocker, chain):
+def test_sett_snapshot__empty(mocker, chain, mock_get_token_weight):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         return_value={}
@@ -272,7 +282,7 @@ def test_sett_snapshot__empty(mocker, chain):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_sett_snapshot__raises(mocker, chain):
+def test_sett_snapshot__raises(mocker, chain, mock_get_token_weight):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         side_effect=Exception,
