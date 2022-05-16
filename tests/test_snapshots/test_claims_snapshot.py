@@ -47,8 +47,8 @@ def claimable_block():
         (Network.Arbitrum, CLAIMABLE_BALANCES_DATA_ARB),
     ],
 )
-def test_claims_snapshot__happy(chain, data, claimable_block, monkeypatch, fetch_token_mock):
-    monkeypatch.setattr(
+def test_claims_snapshot__happy(chain, data, claimable_block, mocker, fetch_token_mock):
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     snapshots = claims_snapshot(chain, claimable_block)
@@ -87,10 +87,10 @@ def test_claims_snapshot__happy(chain, data, claimable_block, monkeypatch, fetch
             )
 
 
-def test_claims_snapshot_digg(claimable_block, monkeypatch, fetch_token_mock):
+def test_claims_snapshot_digg(claimable_block, mocker, fetch_token_mock):
     # Digg has different calculation algorithm hence separate test
     balance = "148480869281534217908"
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     snapshots = claims_snapshot(Network.Ethereum, claimable_block)
@@ -107,8 +107,8 @@ def test_claims_snapshot_digg(claimable_block, monkeypatch, fetch_token_mock):
 
 
 @responses.activate
-def test_claims_snapshot_usd__happy(claimable_block, monkeypatch, fetch_token_mock):
-    monkeypatch.setattr(
+def test_claims_snapshot_usd__happy(claimable_block, mocker, fetch_token_mock):
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     # Make sure native and non-native balances are correcly calculated to usd

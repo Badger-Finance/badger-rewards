@@ -6,6 +6,7 @@ from moto.core import patch_resource
 from config.env_config import EnvConfig
 
 from rewards.aws.helpers import dynamodb
+from tests.test_utils.cycle_utils import mock_fetch_current_tree
 from tests.utils import (
     chains,
     mock_tree,
@@ -35,12 +36,18 @@ def mock_validate_tree(merkle, tree):
 
 
 @pytest.fixture(autouse=True)
-def mock_fns(monkeypatch):
-    monkeypatch.setattr("rewards.classes.TreeManager.download_tree", mock_download_tree)
-    monkeypatch.setattr(
+def mock_fns(mocker):
+    env_config = EnvConfig()
+    env_config.fix_cycle = True
+    mocker.patch("rewards.classes.TreeManager.download_tree", mock_download_tree)
+    mocker.patch(
         "rewards.classes.TreeManager.download_latest_tree",
         mock_download_latest_tree
     )
+    mocker.patch(
+        "rewards.utils.tree_utils.last_synced_block", return_value=100000000
+    )
+    mocker.patch("rewards.utils.tree_utils.env_config", env_config)
 
 
 @pytest.fixture
@@ -52,6 +59,7 @@ def cycle_key() -> str:
 def tree_manager(cycle_key, request) -> TreeManager:
     tree_manager = TreeManager(request.param, Account.from_key(cycle_key))
     tree_manager.validate_tree = mock_validate_tree
+    tree_manager.fetch_current_tree = mock_fetch_current_tree
     tree_manager.last_publish_end_block = lambda: 0
     return tree_manager
 
@@ -82,7 +90,6 @@ def test_get_last_proposed_cycle(tree_manager):
 )
 def test_calc_next_cycle_range(tree_manager, setup_dynamodb):
     patch_resource(dynamodb)
-
     result = calc_next_cycle_range(tree_manager.chain, tree_manager)
     assert result[0] == mock_tree
 
@@ -92,12 +99,7 @@ def test_calc_next_cycle_range(tree_manager, setup_dynamodb):
     chains,
     indirect=True,
 )
-def test_calc_next_cycle_range_fix_cycle(tree_manager, setup_dynamodb, monkeypatch):
-    env_config = EnvConfig()
-    env_config.fix_cycle = True
-
-    monkeypatch.setattr("rewards.utils.tree_utils.env_config", env_config)
+def test_calc_next_cycle_range_fix_cycle(tree_manager, setup_dynamodb, mocker):
     patch_resource(dynamodb)
-
     result = calc_next_cycle_range(tree_manager.chain, tree_manager)
     assert result[0] == mock_tree

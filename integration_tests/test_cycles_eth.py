@@ -1,12 +1,12 @@
 import logging
 import os
-
 import pytest
-from brownie import accounts
+from brownie import accounts, web3
 from eth_account import Account
+from rewards.aws.helpers import dynamodb
+from moto.core import patch_resource
 
-from tests.utils import set_env_vars, test_address, test_key
-
+from tests.utils import mock_get_claimable_data, set_env_vars, test_address, test_key
 set_env_vars()
 os.environ["private"] = test_key
 
@@ -26,23 +26,27 @@ logger = logging.getLogger("test-cycles-eth")
 
 
 @pytest.fixture(autouse=True)
-def mock_fns(monkeypatch):
-    monkeypatch.setattr("rewards.calc_rewards.download_boosts", mock_download_boosts)
-    monkeypatch.setattr(
+def mock_fns(mocker):
+    mocker.patch("rewards.calc_rewards.download_boosts", mock_download_boosts)
+    mocker.patch(
         "rewards.calc_rewards.download_proposed_boosts", mock_download_boosts
     )
-    monkeypatch.setattr("rewards.calc_rewards.upload_boosts", mock_upload_boosts)
-    monkeypatch.setattr(
+    mocker.patch("rewards.calc_rewards.upload_boosts", mock_upload_boosts)
+    mocker.patch(
         "rewards.calc_rewards.upload_proposed_boosts", mock_upload_boosts
     )
-    monkeypatch.setattr("rewards.calc_rewards.upload_tree", mock_upload_tree)
+    mocker.patch("rewards.calc_rewards.upload_tree", mock_upload_tree)
+    mocker.patch(
+        "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
+    )
 
 
 @pytest.fixture(autouse=True)
-def set_env_config(monkeypatch):
+def set_env_config():
     env_config.test = False
     env_config.staging = False
     env_config.production = True
+    env_config.get_web3 = lambda chain: web3
 
 
 @pytest.fixture
@@ -74,11 +78,11 @@ def badger_tree(chain, keeper_address):
 
 @pytest.fixture
 def tree_manager(chain, cycle_account, badger_tree):
-    tree_manager = mock_tree_manager(chain, cycle_account, badger_tree)
+    tree_manager = mock_tree_manager(chain, cycle_account)
     return tree_manager
 
 
-@pytest.mark.require_network("hardhat-fork")
-def test_cycle(tree_manager, badger_tree, keeper_address):
+def test_cycle(tree_manager, badger_tree, keeper_address, mocker, setup_dynamodb):
+    patch_resource(dynamodb)
     accounts[0].transfer(keeper_address, "10 ether", priority_fee="2 gwei")
     mock_cycle(tree_manager, badger_tree, keeper_address)
