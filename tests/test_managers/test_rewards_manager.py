@@ -346,6 +346,15 @@ def test_calculate_sett_rewards__equal_balances_for_period(
     rewards, __ = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
+
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 1636827265}, {"timestamp": 1636828771}]
+            )
+        )
+    )
+    
     # First user has boost = 1, so they get smallest amount of rewards because of unboosted balance
     assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(0.033322225924691)
@@ -403,7 +412,7 @@ def test_calculate_sett_rewards__call_custom_handler(
     rewards_manager.web3 = MagicMock(
         eth=MagicMock(
             get_block=MagicMock(
-                side_effect=[{"timestamp": 100}, {"timestamp": 100000000}]
+                side_effect=[{"timestamp": 1636827265}, {"timestamp": 1636828771}]
             )
         )
     )
@@ -447,10 +456,18 @@ def test_calculate_sett_rewards__balances_vary_for_period(
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
     )
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 1636827265}, {"timestamp": 1636828771}]
+            )
+        )
+    )
 
     rewards, __ = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
+    
     assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(0.00264963832)
     )
@@ -496,7 +513,7 @@ def test_calculate_tree_distributions__totals(mocker, boosts_split, fetch_token_
     rewards_manager.web3 = MagicMock(
         eth=MagicMock(
             get_block=MagicMock(
-                side_effect=[{"timestamp": 100}, {"timestamp": 100000000}]
+                side_effect=[{"timestamp": 0}, {"timestamp": 1633059635}]
             )
         )
     )
