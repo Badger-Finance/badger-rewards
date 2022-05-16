@@ -354,7 +354,7 @@ def test_calculate_sett_rewards__equal_balances_for_period(
             )
         )
     )
-    
+
     # First user has boost = 1, so they get smallest amount of rewards because of unboosted balance
     assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(0.033322225924691)
@@ -467,7 +467,7 @@ def test_calculate_sett_rewards__balances_vary_for_period(
     rewards, __ = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
-    
+
     assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(0.00264963832)
     )
