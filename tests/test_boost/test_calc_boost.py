@@ -132,6 +132,7 @@ def test_badger_boost__happy(
         "rewards.boost.boost_utils.claims_snapshot",
         return_value=({}),
     )
+    mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ratio", return_value=1)
     result = badger_boost(123, Network.Ethereum)
     assert mock_discord_send_code.called
     # Check boosts for different data points

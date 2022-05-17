@@ -1,9 +1,9 @@
-from decimal import Decimal
 from unittest.mock import MagicMock
 from hexbytes import HexBytes
 
 import pytest
 import responses
+from web3 import Web3
 
 from config.constants import GAS_BUFFER
 from helpers.enums import Network
@@ -21,7 +21,6 @@ from tests.utils import TEST_WALLET, set_env_vars
 set_env_vars()
 
 from config.singletons import env_config
-from rewards.utils.tx_utils import get_transaction
 
 
 @pytest.fixture
@@ -49,24 +48,6 @@ TEST_NETWORK_INFO = [
 
 
 @pytest.mark.parametrize("network_info", TEST_NETWORK_INFO)
-def test_check_tx_receipt(discord_mocker, network_info):
-    web3 = env_config.get_web3(network_info["network"])
-    assert get_transaction(web3, network_info["valid_tx"], 2, network_info["network"])
-    with pytest.raises(Exception):
-        get_transaction(
-            web3, network_info["invalid_tx"], 2, network_info["network"], tries=0
-        )
-    assert discord_mocker.called
-
-
-@pytest.mark.parametrize("network_info", TEST_NETWORK_INFO)
-def test_get_gas_price_of_tx(discord_mocker, network_info):
-    web3 = env_config.get_web3(network_info["network"])
-    price = get_gas_price_of_tx(web3, network_info["network"], network_info["valid_tx"])
-    assert price != Decimal(0.0)
-
-
-@pytest.mark.parametrize("network_info", TEST_NETWORK_INFO)
 def test_get_gas_price_of_tx__invalid_tx(discord_mocker, network_info):
     web3 = MagicMock(
         eth=MagicMock(wait_for_transaction_receipt=MagicMock(side_effect=Exception))
@@ -78,15 +59,6 @@ def test_get_gas_price_of_tx__invalid_tx(discord_mocker, network_info):
             network_info["invalid_tx"],
             retries_on_failure=1,
         )
-
-
-@pytest.mark.parametrize("network_info", TEST_NETWORK_INFO)
-def test_confirm_transaction__happy_path(discord_mocker, network_info):
-    web3 = env_config.get_web3(network_info["network"])
-    success, __ = confirm_transaction(
-        web3, network_info["valid_tx"], network_info["network"]
-    )
-    assert success
 
 
 @pytest.mark.parametrize("network_info", TEST_NETWORK_INFO)
@@ -158,7 +130,6 @@ def test_get_effective_gas_price__eth():
 
 @responses.activate
 def test_get_effective_gas_price__polygon_happy(mock_discord):
-    web3 = env_config.get_web3(Network.Polygon)
     fast_gas = 125
     responses.add(
         responses.GET,
@@ -166,8 +137,8 @@ def test_get_effective_gas_price__polygon_happy(mock_discord):
         json={"fast": fast_gas},
         status=200,
     )
-    gas = get_effective_gas_price(web3, Network.Polygon)
-    assert gas == web3.toWei(int(fast_gas * 1.1), "gwei")
+    gas = get_effective_gas_price(Web3, Network.Polygon)
+    assert gas == Web3.toWei(int(fast_gas * 1.1), "gwei")
 
 
 @responses.activate
