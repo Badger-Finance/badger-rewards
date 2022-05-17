@@ -61,19 +61,19 @@ def mock_discord(mocker):
 
 
 class MockDiggUtils:
-        def __init__(self) -> None:
-            self.digg = None
-            self.shares_per_fragment = 1000
+    def __init__(self) -> None:
+        self.digg = None
+        self.shares_per_fragment = 1000
 
-        def shares_to_fragments(self, shares: int) -> float:
-            if shares == 0:
-                return 0
-            return shares / self.shares_per_fragment
+    def shares_to_fragments(self, shares: int) -> float:
+        if shares == 0:
+            return 0
+        return shares / self.shares_per_fragment
 
-        def fragments_to_shares(self, fragments: int) -> float:
-            if fragments == 0:
-                return 0
-            return fragments * self.shares_per_fragment
+    def fragments_to_shares(self, fragments: int) -> float:
+        if fragments == 0:
+            return 0
+        return fragments * self.shares_per_fragment
 
 
 @pytest.fixture(autouse=True)
