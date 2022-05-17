@@ -110,8 +110,6 @@ def rewards_manager(cycle, start, end, boosts, request) -> RewardsManager:
     rewards_manager = RewardsManager(
         request.param, cycle, start, end, boosts["userData"]
     )
-    rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
-
     return rewards_manager
 
 
@@ -208,6 +206,7 @@ def test_boost_sett(rewards_manager: RewardsManager, balances):
     indirect=True,
 )
 def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
+    rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
     user_multipliers = rewards_manager.get_user_multipliers()
     for user, data in user_multipliers.items():
         for sett, mult in data.items():

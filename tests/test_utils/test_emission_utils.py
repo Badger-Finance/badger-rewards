@@ -1,11 +1,8 @@
 from rewards.utils.emission_utils import (
     fetch_unboosted_vaults,
-    get_flat_emission_rate,
 )
-from decimal import Decimal
 from unittest.mock import MagicMock
 
-import pytest
 from config.constants import addresses
 from config.constants.chain_mappings import SETTS
 from helpers.enums import Network
