@@ -1,12 +1,13 @@
 import json
 
 from config.constants.addresses import DIGG
-from helpers.digg_utils import digg_utils
+from helpers.digg_utils import DiggUtils
 from helpers.enums import Network
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from subgraph.queries.setts import last_synced_block
 
 if __name__ == "__main__":
+    digg_utils = DiggUtils()
     chain = Network.Ethereum
     claimable = claims_snapshot(chain, last_synced_block(chain))
     diff_data = json.load(open("diff_data.json"))

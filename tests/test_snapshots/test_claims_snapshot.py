@@ -16,7 +16,6 @@ from config.constants.addresses import (
 )
 from config.constants.chain_mappings import NETWORK_TO_BADGER_TOKEN
 from config.constants.emissions import BOOST_CHAINS
-from helpers.digg_utils import digg_utils
 from helpers.enums import BalanceType, Network
 from rewards.snapshot.claims_snapshot import claims_snapshot, claims_snapshot_usd
 from tests.utils import (
@@ -47,7 +46,15 @@ def claimable_block():
         (Network.Arbitrum, CLAIMABLE_BALANCES_DATA_ARB),
     ],
 )
-def test_claims_snapshot__happy(chain, data, claimable_block, mocker, fetch_token_mock):
+def test_claims_snapshot__happy(
+    chain,
+    data,
+    claimable_block,
+    mocker,
+    fetch_token_mock,
+    mock_digg_utils
+):
+    mocker.patch("rewards.snapshot.claims_snapshot.DiggUtils", mock_digg_utils)
     mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
@@ -87,12 +94,13 @@ def test_claims_snapshot__happy(chain, data, claimable_block, mocker, fetch_toke
             )
 
 
-def test_claims_snapshot_digg(claimable_block, mocker, fetch_token_mock):
+def test_claims_snapshot_digg(claimable_block, mocker, fetch_token_mock, mock_digg_utils):
     # Digg has different calculation algorithm hence separate test
     balance = "148480869281534217908"
     mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
+    digg_utils = mock_digg_utils()
     snapshots = claims_snapshot(Network.Ethereum, claimable_block)
     digg_snapshot = snapshots[DIGG]
     assert digg_snapshot.type == BalanceType.Native

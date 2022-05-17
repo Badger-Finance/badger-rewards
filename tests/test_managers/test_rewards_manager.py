@@ -281,6 +281,7 @@ def test_splits(
 
 def test_calculate_sett_rewards__check_analytics(
         schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
+        mock_get_token_weight
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     mocker.patch(
@@ -296,9 +297,6 @@ def test_calculate_sett_rewards__check_analytics(
     badger_schedule = schedule(
         sett, total_badger
     )
-    print(badger_schedule)
-    print(badger_schedule.startTime)
-    print(badger_schedule.endTime)
 
     all_schedules = {sett: {BADGER: [badger_schedule]}}
 
@@ -354,7 +352,7 @@ def test_calculate_sett_rewards__equal_balances_for_period(
             )
         )
     )
-    
+
     # First user has boost = 1, so they get smallest amount of rewards because of unboosted balance
     assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(0.033322225924691)
@@ -426,6 +424,7 @@ def test_calculate_sett_rewards__call_custom_handler(
 
 def test_calculate_sett_rewards__balances_vary_for_period(
         schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
+        mock_get_token_weight
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
 
@@ -467,7 +466,7 @@ def test_calculate_sett_rewards__balances_vary_for_period(
     rewards, __ = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
-    
+
     assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(0.00264963832)
     )

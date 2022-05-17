@@ -109,7 +109,8 @@ def test_token_diff_table():
     ])
 
 
-def test_verify_rewards__discord_get_called(mocker, fetch_token_mock):
+def test_verify_rewards__discord_get_called(mocker, fetch_token_mock, mock_digg_utils):
+    mocker.patch("rewards.rewards_checker.DiggUtils", mock_digg_utils)
     discord = mocker.patch("rewards.rewards_checker.send_code_block_to_discord")
     mocker.patch(
         "rewards.rewards_checker.claims_snapshot",

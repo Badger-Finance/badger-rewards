@@ -121,7 +121,13 @@ def test_get_badger_boost_data():
         assert stake_data[1] == 5
 
 
-def test_badger_boost__happy(mock_discord_send_code, mock_snapshots, mocker, fetch_token_mock):
+def test_badger_boost__happy(
+    mock_discord_send_code,
+    mock_snapshots,
+    mocker,
+    fetch_token_mock,
+    mock_get_token_weight
+):
     mocker.patch(
         "rewards.boost.boost_utils.claims_snapshot",
         return_value=({}),
