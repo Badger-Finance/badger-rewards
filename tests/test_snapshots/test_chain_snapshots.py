@@ -95,8 +95,7 @@ def test_chain_snapshot__happy(
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_chain_snapshot__empty(mocker, chain, mock_digg_utils):
-    mocker.patch("rewards.snapshot.claims_snapshot.DiggUtils", mock_digg_utils)
+def test_chain_snapshot__empty(mocker, chain):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_chain_balances",
         return_value={}

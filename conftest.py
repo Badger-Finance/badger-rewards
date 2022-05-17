@@ -60,9 +60,7 @@ def mock_discord(mocker):
     return mocker.patch("helpers.http_session.send_message_to_discord")
 
 
-@pytest.fixture(autouse=True)
-def mock_digg_utils(mocker):
-    class MockDiggUtils:
+class MockDiggUtils:
         def __init__(self) -> None:
             self.digg = None
             self.shares_per_fragment = 1000
@@ -76,6 +74,10 @@ def mock_digg_utils(mocker):
             if fragments == 0:
                 return 0
             return fragments * self.shares_per_fragment
+
+
+@pytest.fixture(autouse=True)
+def mock_digg_utils(mocker):
     mocker.patch("rewards.rewards_checker.DiggUtils", MockDiggUtils)
     mocker.patch("rewards.snapshot.claims_snapshot.DiggUtils", MockDiggUtils)
     mocker.patch("rewards.utils.token_utils.DiggUtils", MockDiggUtils)

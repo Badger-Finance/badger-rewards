@@ -15,9 +15,7 @@ from tests.utils import (
 from decimal import Decimal
 
 
-def test_unclaimed_rewards_handler(mocker, fetch_token_mock, mock_digg_utils):
-    mocker.patch("rewards.snapshot.claims_snapshot.DiggUtils", mock_digg_utils)
-
+def test_unclaimed_rewards_handler(mocker, fetch_token_mock):
     mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
@@ -48,8 +46,7 @@ def test_unclaimed_rewards_handler(mocker, fetch_token_mock, mock_digg_utils):
     )
 
 
-def test_unclaimed_rewards_handler_no_claimable(mocker, fetch_token_mock, mock_digg_utils):
-    mocker.patch("rewards.snapshot.claims_snapshot.DiggUtils", mock_digg_utils)
+def test_unclaimed_rewards_handler_no_claimable(mocker, fetch_token_mock):
     mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
