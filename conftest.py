@@ -60,7 +60,7 @@ def mock_discord(mocker):
     return mocker.patch("helpers.http_session.send_message_to_discord")
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def mock_digg_utils(mocker):
     class MockDiggUtils:
         def __init__(self) -> None:
@@ -76,7 +76,10 @@ def mock_digg_utils(mocker):
             if fragments == 0:
                 return 0
             return fragments * self.shares_per_fragment
-    return MockDiggUtils
+    mocker.patch("rewards.rewards_checker.DiggUtils", MockDiggUtils)
+    mocker.patch("rewards.snapshot.claims_snapshot.DiggUtils", MockDiggUtils)
+    mocker.patch("rewards.utils.token_utils.DiggUtils", MockDiggUtils)
+    mocker.patch("subgraph.queries.tokens.DiggUtils", MockDiggUtils)
 
 
 @pytest.fixture
@@ -105,11 +108,19 @@ def mock_snapshots(mocker):
     )
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def mock_get_token_weight(mocker):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.get_token_weight",
         return_value=1
+    )
+
+
+@pytest.fixture(autouse=True)
+def mock_get_flat_emssion_rate(mocker):
+    mocker.patch(
+        "rewards.classes.RewardsManager.get_flat_emission_rate",
+        return_value=0
     )
 
 

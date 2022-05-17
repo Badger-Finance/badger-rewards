@@ -2,8 +2,7 @@ from itertools import zip_longest
 
 from eth_utils import encode_hex
 from rich.console import Console
-
-from config.singletons import env_config
+from web3 import Web3
 from rewards.classes.RewardsList import RewardsList
 
 console = Console()
@@ -12,12 +11,10 @@ console = Console()
 Convert merkle_tree
 """
 
-web3 = env_config.get_web3()
-
 
 class MerkleTree:
     def __init__(self, elements):
-        self.elements = sorted(set(web3.keccak(hexstr=el) for el in elements))
+        self.elements = sorted(set(Web3.keccak(hexstr=el) for el in elements))
         self.layers = MerkleTree.get_layers(self.elements)
 
     @property
@@ -25,7 +22,7 @@ class MerkleTree:
         return self.layers[-1][0]
 
     def get_proof(self, el):
-        el = web3.keccak(hexstr=el)
+        el = Web3.keccak(hexstr=el)
         idx = self.elements.index(el)
         proof = []
         for layer in self.layers:
@@ -55,7 +52,7 @@ class MerkleTree:
             return b
         if b is None:
             return a
-        return web3.keccak(b"".join(sorted([a, b])))
+        return Web3.keccak(b"".join(sorted([a, b])))
 
 
 def rewards_to_merkle_tree(rewards: RewardsList, startBlock, endBlock):

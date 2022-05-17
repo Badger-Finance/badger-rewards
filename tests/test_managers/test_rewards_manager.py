@@ -17,6 +17,7 @@ from config.constants.chain_mappings import DECIMAL_MAPPING, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.RewardsManager import InvalidRewardsTotalException
 from rewards.classes.Schedule import Schedule
+from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from tests.test_subgraph.test_data import BADGER_DISTRIBUTIONS_TEST_DATA
 from tests.utils import (
     mock_get_claimable_data,
@@ -119,8 +120,18 @@ def rewards_manager_split(cycle, start, end, boosts_split, request) -> RewardsMa
     rewards_manager_split = RewardsManager(
         request.param, cycle, start, end, boosts_split["userData"]
     )
+
     rewards_manager_split.fetch_sett_snapshot = mock_fetch_snapshot
     rewards_manager_split.get_sett_multipliers = mock_get_sett_multipliers_split
+    blocks = [*(12 * [{"timestamp": 1636827266}, {"timestamp": 1636828770}])]
+    print(blocks)
+    rewards_manager_split.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=blocks
+            )
+        )
+    )
     rewards_manager_split.start = 13609200
     rewards_manager_split.end = 13609300
 
@@ -216,10 +227,10 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
 def test_splits(
     rewards_manager_split,
     schedule,
-    tree_manager,
     boosts_split,
     mocker,
     fetch_token_mock,
+    mock_get_token_weight
 ):
     rates = [Decimal(0), Decimal(0.5), Decimal(1)]
     user_data = {}
@@ -246,7 +257,7 @@ def test_splits(
 
         new_rewards = combine_rewards(rewards_list, rewards_manager_split.cycle)
         cumulative_rewards = process_cumulative_rewards(mock_tree, new_rewards)
-        merkle_tree = tree_manager.convert_to_merkle_tree(
+        merkle_tree = rewards_to_merkle_tree(
             cumulative_rewards, rewards_manager_split.start, rewards_manager_split.end
         )
 
@@ -281,9 +292,12 @@ def test_splits(
 
 def test_calculate_sett_rewards__check_analytics(
         schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
-        mock_get_token_weight
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
+    mocker.patch(
+        "rewards.classes.RewardsManager.get_flat_emission_rate",
+        return_value=Decimal(0.5)
+    )
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         return_value={
@@ -314,7 +328,6 @@ def test_calculate_sett_rewards__check_analytics(
     __, analytics = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
-    print(analytics)
     for sett, data in analytics.items():
         assert data['sett_name'] is not None
         assert data['boosted_rewards'][BADGER] is not None
@@ -340,11 +353,6 @@ def test_calculate_sett_rewards__equal_balances_for_period(
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
     )
-
-    rewards, __ = rewards_manager.calculate_all_sett_rewards(
-        [sett], all_schedules,
-    )
-
     rewards_manager.web3 = MagicMock(
         eth=MagicMock(
             get_block=MagicMock(
@@ -352,7 +360,9 @@ def test_calculate_sett_rewards__equal_balances_for_period(
             )
         )
     )
-
+    rewards, __ = rewards_manager.calculate_all_sett_rewards(
+        [sett], all_schedules,
+    )
     # First user has boost = 1, so they get smallest amount of rewards because of unboosted balance
     assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(0.033322225924691)
@@ -383,7 +393,7 @@ def test_calculate_sett_rewards__equal_balances_for_period(
 )
 def test_calculate_sett_rewards__call_custom_handler(
         schedule, mocker, boosts_split, mock_discord, addr, setup_dynamodb,
-        fetch_token_mock, mock_get_token_weight
+        fetch_token_mock
 ):
     patch_resource(dynamodb)
 
@@ -424,7 +434,6 @@ def test_calculate_sett_rewards__call_custom_handler(
 
 def test_calculate_sett_rewards__balances_vary_for_period(
         schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
-        mock_get_token_weight
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
 
@@ -484,7 +493,11 @@ def test_calculate_sett_rewards__balances_vary_for_period(
         + rewards.claims[THIRD_USER][BADGER]) / Decimal(1e18) == total_badger
 
 
-def test_calculate_tree_distributions__totals(mocker, boosts_split, fetch_token_mock):
+def test_calculate_tree_distributions__totals(
+    mocker,
+    boosts_split,
+    fetch_token_mock,
+):
     first_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f56")
     second_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f57")
     token = Web3.toChecksumAddress('0x2B5455aac8d64C14786c3a29858E43b5945819C0')
