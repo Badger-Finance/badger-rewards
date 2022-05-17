@@ -104,15 +104,9 @@ def fetch_setts(chain: str) -> List[str]:
     return list(filter(lambda x: x not in DISABLED_VAULTS, setts))
 
 
-def parse_schedules(schedules) -> Dict[str, List[Schedule]]:
-    """
-    Parse unlock shcedules
-    :param schedules: schedules to parse
-    """
+def get_schedules_by_token(schedules: List[Schedule]) -> Dict[str, List[Schedule]]:
     schedules_by_token = {}
-    console.log("Fetching schedules...")
     for schedule in schedules:
-        schedule = parse_schedule(schedule)
         if schedule.token not in schedules_by_token:
             schedules_by_token[schedule.token] = []
         schedules_by_token[schedule.token].append(schedule)
@@ -145,7 +139,6 @@ def parse_nft_weight_schedules(weight_schedules: List) -> List[NFTWeightSchedule
 
 def get_across_lp_multiplier() -> float:
     bridge = make_contract(ACROSS_BRIDGE, abi_name=Abi.BridgePoolProd, chain=Network.Ethereum)
-
     liquid_reserves = bridge.liquidReserves().call()
     utilized_reserves = max(bridge.utilizedReserves().call(), 0)
     undistributed_lp_fees = bridge.undistributedLpFees().call()

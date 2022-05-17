@@ -15,6 +15,7 @@ from config.constants.addresses import (
     POLY_BADGER,
     POLY_SUSHI,
     XSUSHI,
+    BVECVX
 )
 
 
@@ -58,6 +59,10 @@ CLAIMABLE_BALANCES_DATA_ETH = {
             {
                 "address": BCVXCRV,
                 "balance": "10000000000000",
+            },
+            {
+                "address": BVECVX,
+                "balance": "100000000000000"
             },
             {
                 "address": XSUSHI,

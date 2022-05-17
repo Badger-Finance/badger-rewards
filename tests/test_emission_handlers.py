@@ -1,4 +1,6 @@
+from rewards.classes.Snapshot import Snapshot
 from rewards.emission_handlers import (
+    fuse_pool_handler,
     ibbtc_peak_handler,
     treasury_handler,
     unclaimed_rewards_handler
@@ -13,8 +15,8 @@ from tests.utils import (
 from decimal import Decimal
 
 
-def test_unclaimed_rewards_handler(monkeypatch):
-    monkeypatch.setattr(
+def test_unclaimed_rewards_handler(mocker, fetch_token_mock):
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     token = addresses.BCVXCRV
@@ -44,8 +46,8 @@ def test_unclaimed_rewards_handler(monkeypatch):
     )
 
 
-def test_unclaimed_rewards_handler_no_claimable(monkeypatch):
-    monkeypatch.setattr(
+def test_unclaimed_rewards_handler_no_claimable(mocker, fetch_token_mock):
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     rewards_list = unclaimed_rewards_handler(
@@ -77,3 +79,31 @@ def test_treasury_handler():
         100
     )
     assert rewards_list.claims[addresses.TREASURY_OPS][token] == 1e18
+
+
+def test_fuse_pool_handler(mocker):
+    sett = addresses.BVECVX
+    token = addresses.BCVXCRV
+    snapshot = Snapshot(
+        sett,
+        balances={
+            TEST_WALLET: 5000,
+            TEST_WALLET_ANOTHER: 5000
+        }
+    )
+
+    mocker.patch(
+        "rewards.emission_handlers.fuse_snapshot_of_token",
+        return_value=snapshot
+    )
+    amount = 1e18
+    rewards_list = fuse_pool_handler(
+        amount,
+        token,
+        sett,
+        100
+    )
+    test_percentage = snapshot.percentage_of_total(TEST_WALLET)
+    test_ano_percentage = snapshot.percentage_of_total(TEST_WALLET_ANOTHER)
+    assert rewards_list.claims[TEST_WALLET][token] == test_percentage * Decimal(amount)
+    assert rewards_list.claims[TEST_WALLET_ANOTHER][token] == test_ano_percentage * Decimal(amount)

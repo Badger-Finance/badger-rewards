@@ -14,8 +14,17 @@ TREE_REWARDS_BLACKLIST = {
     addresses.SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     addresses.BBADGER: "Badger Vault",
 }
+
+BVECVX_VOTER_BLACKLIST = {
+    addresses.BVECVX_VOTER: "Badger bveCVX Voter"
+}
+
 NATIVE_TOKEN_REWARDS = {
     Network.Ethereum: [addresses.BADGER, addresses.DIGG]
+}
+
+BVECVX_VOTER_BLACKLIST_TOKENS = {
+    Network.Ethereum: [addresses.BVECVX, addresses.BADGER]
 }
 
 BVECVX_BOOST_WEIGHT = 0.5
@@ -58,6 +67,7 @@ NATIVE = [
     addresses.BSLP_DIGG_WBTC,
     addresses.REM_BADGER,
     addresses.REM_DIGG,
+    addresses.BCRV_BADGER_WBTC,
     # arbitrum
     addresses.ARB_BSWAPR_WETH_BADGER,
 ]
@@ -83,6 +93,8 @@ DIGG_SETTS = [addresses.BDIGG, addresses.REM_DIGG]
 
 BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]
 
+MAX_BOOST = 3000
+
 SANITY_TOKEN_AMOUNT = 4000 * 1e18
 BOOST_BLOCK_DELAY = 10
 
@@ -95,3 +107,24 @@ REWARD_ERROR_TOLERANCE = 0.01
 ZERO_CYCLE = 0
 
 NO_BOOST = [Network.Fantom]
+
+FUSE_TOKEN_INFO = {
+    addresses.BADGER: {
+        "underlying": addresses.BADGER,
+        "symbol": "fBADGER-22",
+        "contract": addresses.FBADGER,
+    },
+    addresses.DIGG: {
+        "underlying": addresses.DIGG,
+        "symbol": "fDIGG-22",
+        "contract": addresses.FDIGG
+    },
+    addresses.BVECVX: {
+        "underlying": addresses.BVECVX,
+        "symbol": "fbveCVX-22",
+        "contract": addresses.FBVECVX
+    }
+}
+FUSE_MANTISSA = 18
+FUSE_TOKEN_BASE = 10
+FTOKEN_DECIMALS = 8

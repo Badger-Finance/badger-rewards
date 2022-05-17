@@ -36,7 +36,7 @@ set_env_vars()
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Snapshot import Snapshot
 from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewards
-from tests.test_utils.cycle_utils import mock_badger_tree, mock_tree_manager
+from tests.test_utils.cycle_utils import mock_tree_manager
 
 logger = logging.getLogger("test-rewards-manager")
 
@@ -95,11 +95,11 @@ def mock_send_message_to_discord(
 
 
 @pytest.fixture(autouse=True)
-def mock_fns(monkeypatch):
-    monkeypatch.setattr(
+def mock_fns(mocker):
+    mocker.patch(
         "helpers.discord.send_message_to_discord", mock_send_message_to_discord
     )
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
 
@@ -129,7 +129,7 @@ def rewards_manager_split(cycle, start, end, boosts_split, request) -> RewardsMa
 
 @pytest.fixture
 def tree_manager():
-    tree_manager = mock_tree_manager(Network.Ethereum, test_account, mock_badger_tree)
+    tree_manager = mock_tree_manager(Network.Ethereum, test_account)
     return tree_manager
 
 
@@ -218,14 +218,14 @@ def test_splits(
     schedule,
     tree_manager,
     boosts_split,
-    monkeypatch,
     mocker,
+    fetch_token_mock,
 ):
     rates = [Decimal(0), Decimal(0.5), Decimal(1)]
     user_data = {}
     discord = mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     for rate in rates:
-        monkeypatch.setattr(
+        mocker.patch(
             "rewards.classes.RewardsManager.get_flat_emission_rate",
             lambda s, c: rate,
         )
@@ -280,7 +280,7 @@ def test_splits(
 
 
 def test_calculate_sett_rewards__check_analytics(
-        schedule, mocker, boosts_split, mock_discord
+        schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     mocker.patch(
@@ -309,7 +309,7 @@ def test_calculate_sett_rewards__check_analytics(
 
 
 def test_calculate_sett_rewards__equal_balances_for_period(
-        schedule, mocker, boosts_split, mock_discord
+        schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     mocker.patch(
@@ -360,7 +360,8 @@ def test_calculate_sett_rewards__equal_balances_for_period(
     ]
 )
 def test_calculate_sett_rewards__call_custom_handler(
-        schedule, mocker, boosts_split, mock_discord, addr, setup_dynamodb
+        schedule, mocker, boosts_split, mock_discord, addr, setup_dynamodb,
+        fetch_token_mock,
 ):
     patch_resource(dynamodb)
 
@@ -393,7 +394,7 @@ def test_calculate_sett_rewards__call_custom_handler(
 
 
 def test_calculate_sett_rewards__balances_vary_for_period(
-        schedule, mocker, boosts_split, mock_discord
+        schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
 
@@ -445,7 +446,7 @@ def test_calculate_sett_rewards__balances_vary_for_period(
         + rewards.claims[THIRD_USER][BADGER]) / Decimal(1e18) == total_badger
 
 
-def test_calculate_tree_distributions__totals(mocker, boosts_split):
+def test_calculate_tree_distributions__totals(mocker, boosts_split, fetch_token_mock):
     first_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f56")
     second_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f57")
     token = Web3.toChecksumAddress('0x2B5455aac8d64C14786c3a29858E43b5945819C0')
