@@ -63,6 +63,9 @@ def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_snapshot,
             {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.1},
         ),
     )
+    mocker.patch(
+        "rewards.boost.boost_utils.nft_snapshot_usd", return_value={}
+    )
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ratio", return_value=1)
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ppfs", return_value=1)
 

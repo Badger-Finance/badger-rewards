@@ -1,3 +1,4 @@
+from copy import deepcopy
 from decimal import Decimal
 import pytest
 import math
@@ -16,7 +17,7 @@ from rewards.boost.calc_boost import (
 from rewards.classes.Boost import BoostBalances
 from rewards.feature_flags import flags
 from rewards.feature_flags.feature_flags import BOOST_STEP
-
+from tests.test_subgraph.test_data import NFT_TEST_DATA
 
 TEST_USER = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
 
@@ -132,6 +133,7 @@ def test_badger_boost__happy(
         "rewards.boost.boost_utils.claims_snapshot",
         return_value=({}),
     )
+    mocker.patch("rewards.boost.calc_boost.fetch_nfts", return_value={})
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ratio", return_value=1)
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ppfs", return_value=1)
     result = badger_boost(123, Network.Ethereum)
