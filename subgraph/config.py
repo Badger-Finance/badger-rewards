@@ -7,35 +7,41 @@ subgraph_urls = {
     Environment.Production: {
         # Chain graphs
         Network.BinanceSmartChain: (
-            "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-bsc"
+            "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-bsc"
         ),
-        Network.Ethereum: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao",
-        Network.Polygon: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-polygon",
-        Network.Arbitrum: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-arbitrum",
+        Network.Ethereum: "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts",
+        Network.Polygon: (
+            "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-polygon"
+        ),
+        Network.Arbitrum: (
+            "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-arbitrum"
+        ),
         Network.Fantom: (
             "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-fantom"
         ),
-        Network.xDai: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-xdai",
+        Network.xDai: (
+            "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-xdai"
+        ),
         # Token graphs
         f"tokens-{Network.Ethereum}": (
-            "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens"
+            "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens"
         ),
         f"tokens-{Network.BinanceSmartChain}": (
-            "https://bgraph-bsc.badger.guru/subgraphs/name/swole/badger-subgraph"
+            "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-bsc"
         ),
         f"tokens-{Network.Polygon}": (
-            "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-polygon"
+            "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-polygon"
         ),
         f"tokens-{Network.Arbitrum}": (
-            "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens-arbitrum"
+            "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-arbitrum"
         ),
         f"tokens-{Network.Fantom}": (
             "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-fantom"
         ),
-        "fuse": "https://api.thegraph.com/subgraphs/name/darruma/fuse-subgraph-badger",
+        "fuse": "https://api.thegraph.com/subgraphs/name/badger-finance/fuse-subgraph",
         "thegraph": "https://api.thegraph.com/index-node/graphql",
-        "nfts": "https://api.thegraph.com/subgraphs/name/darruma/badger-nfts",
-        "across": "https://api.thegraph.com/subgraphs/name/darruma/badger-across"
+        "nfts": "https://api.thegraph.com/subgraphs/name/badger-finance/badger-nfts",
+        "across": "https://api.thegraph.com/subgraphs/name/badger-finance/badger-across"
     },
     Environment.Staging: {
     }
