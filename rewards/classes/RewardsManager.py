@@ -211,7 +211,6 @@ class RewardsManager:
     def get_user_multipliers(self) -> Dict[str, Dict[str, float]]:
         user_multipliers = {}
         for sett, multipliers in self.get_sett_multipliers().items():
-            print(f"DEBUG INFO: ----- {sett}, {multipliers}")
             min_mult = multipliers["min"]
             max_mult = multipliers["max"]
             diff = float(max_mult - min_mult)
