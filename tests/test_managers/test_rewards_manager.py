@@ -204,6 +204,7 @@ def test_get_user_multipliers(cycle, start, end, boosts):
     rewards_manager = RewardsManager(
         Network.Ethereum, cycle, start, end, boosts["userData"]
     )
+    print(f"DEBUG INFO: -----  {boosts}")
     rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
     user_multipliers = rewards_manager.get_user_multipliers()
     for user, data in user_multipliers.items():
