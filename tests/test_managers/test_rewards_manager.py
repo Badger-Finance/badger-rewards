@@ -207,6 +207,7 @@ def test_get_user_multipliers(cycle, start, end, boosts):
     rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
     user_multipliers = rewards_manager.get_user_multipliers()
     for user, data in user_multipliers.items():
+
         for sett, mult in data.items():
             if sett in boosts["userData"][user]["multipliers"]:
                 assert isclose(
