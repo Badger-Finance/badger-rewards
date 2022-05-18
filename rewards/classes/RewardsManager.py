@@ -221,7 +221,7 @@ class RewardsManager:
                 if boost == 1:
                     user_sett_multiplier = min_mult
                 else:
-                    user_sett_multiplier = min_mult + (boost / 2000) * diff
+                    user_sett_multiplier = min_mult + ((boost / 2000) * diff)
                 print(
                     f"----- DEBUG: user {user} sett {sett} diff {diff} mul: {user_sett_multiplier}"
                 )
