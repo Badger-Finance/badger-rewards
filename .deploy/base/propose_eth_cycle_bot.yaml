@@ -25,6 +25,8 @@ spec:
                                 value: 'PROD'
                               - name: KUBE
                                 value: 'True'
+                              - name: 'FIX_CYCLE'
+                                value: 'False'
                           resources:
                               requests:
                                   memory: '2000m'

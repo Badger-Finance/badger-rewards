@@ -14,6 +14,7 @@ SETTS = {
         "harvest_ren_crv": addresses.BHARVEST_REN_WBTC,
         "sushi_wbtc_eth": addresses.BSLP_WBTC_ETH,
         "sushi_badger_wbtc": addresses.BSLP_BADGER_WBTC,
+        "badger_wbtc_crv": addresses.BCRV_BADGER_WBTC,
         "digg": addresses.BDIGG,
         "uni_digg_wbtc": addresses.BUNI_DIGG_WBTC,
         "sushi_digg_wbtc": addresses.BSLP_DIGG_WBTC,
@@ -164,4 +165,11 @@ DECIMAL_MAPPING = {
     Network.Polygon: 1e18,
     Network.Arbitrum: 1e18,
     Network.Fantom: 1e18
+}
+
+CHAIN_EXPLORER_URLS = {
+    Network.Ethereum: "etherscan.io",
+    Network.Polygon: "polygonscan.com",
+    Network.Arbitrum: "arbiscan.io",
+    Network.Fantom: "ftmscan.com"
 }

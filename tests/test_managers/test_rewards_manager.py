@@ -3,17 +3,23 @@ from copy import deepcopy
 from decimal import Decimal
 from math import isclose
 from unittest import TestCase
-
+from unittest.mock import MagicMock
+from moto.core import patch_resource
+from rewards.aws.helpers import dynamodb
 import pytest
 from web3 import Web3
-
-from config.constants.addresses import BADGER
+from config.constants import addresses
+from config.constants.addresses import BADGER, TECH_OPS
+from config.constants.addresses import BVECVX_CVX_LP
+from config.constants.addresses import ETH_BADGER_TREE
+from config.constants.addresses import IBBTC_PEAK
 from config.constants.chain_mappings import DECIMAL_MAPPING, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.RewardsManager import InvalidRewardsTotalException
 from rewards.classes.Schedule import Schedule
 from tests.test_subgraph.test_data import BADGER_DISTRIBUTIONS_TEST_DATA
 from tests.utils import (
+    mock_get_claimable_data,
     mock_balances,
     mock_boosts,
     mock_boosts_split,
@@ -92,6 +98,9 @@ def mock_send_message_to_discord(
 def mock_fns(monkeypatch):
     monkeypatch.setattr(
         "helpers.discord.send_message_to_discord", mock_send_message_to_discord
+    )
+    monkeypatch.setattr(
+        "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
 
 
@@ -211,6 +220,7 @@ def test_splits(
     boosts_split,
     monkeypatch,
     mocker,
+    fetch_token_mock,
 ):
     rates = [Decimal(0), Decimal(0.5), Decimal(1)]
     user_data = {}
@@ -271,7 +281,7 @@ def test_splits(
 
 
 def test_calculate_sett_rewards__check_analytics(
-        schedule, mocker, boosts_split, mock_discord
+        schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     mocker.patch(
@@ -300,7 +310,7 @@ def test_calculate_sett_rewards__check_analytics(
 
 
 def test_calculate_sett_rewards__equal_balances_for_period(
-        schedule, mocker, boosts_split, mock_discord
+        schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     mocker.patch(
@@ -341,8 +351,51 @@ def test_calculate_sett_rewards__equal_balances_for_period(
         + rewards.claims[THIRD_USER][BADGER]) / Decimal(1e18) == total_badger
 
 
+@pytest.mark.parametrize(
+    "addr",
+    [
+        BVECVX_CVX_LP,
+        IBBTC_PEAK,
+        ETH_BADGER_TREE,
+        TECH_OPS
+    ]
+)
+def test_calculate_sett_rewards__call_custom_handler(
+        schedule, mocker, boosts_split, mock_discord, addr, setup_dynamodb,
+        fetch_token_mock,
+):
+    patch_resource(dynamodb)
+
+    mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
+    mocker.patch("rewards.classes.RewardsManager.check_token_totals_in_range")
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.fetch_sett_balances",
+        return_value={addr: 1000}
+    )
+
+    mock_handler = MagicMock()
+    RewardsManager.CUSTOM_BEHAVIOUR = {
+        addresses.ETH_BADGER_TREE: mock_handler,
+        addresses.IBBTC_PEAK: mock_handler,
+        addresses.BVECVX_CVX_LP: mock_handler,
+        addresses.TECH_OPS: mock_handler,
+    }
+    sett = SETTS[Network.Ethereum]["ibbtc_crv"]
+    all_schedules = {sett: {BADGER: [schedule(sett, 100)]}}
+
+    rewards_manager = RewardsManager(
+        Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
+    )
+
+    rewards_manager.calculate_all_sett_rewards(
+        [sett], all_schedules,
+    )
+    print(RewardsManager.CUSTOM_BEHAVIOUR)
+    assert mock_handler.called
+
+
 def test_calculate_sett_rewards__balances_vary_for_period(
-        schedule, mocker, boosts_split, mock_discord
+        schedule, mocker, boosts_split, mock_discord, fetch_token_mock,
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
 
@@ -394,7 +447,7 @@ def test_calculate_sett_rewards__balances_vary_for_period(
         + rewards.claims[THIRD_USER][BADGER]) / Decimal(1e18) == total_badger
 
 
-def test_calculate_tree_distributions__totals(mocker, boosts_split):
+def test_calculate_tree_distributions__totals(mocker, boosts_split, fetch_token_mock):
     first_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f56")
     second_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f57")
     token = Web3.toChecksumAddress('0x2B5455aac8d64C14786c3a29858E43b5945819C0')

@@ -3,14 +3,20 @@ from rich.console import Console
 
 from config.constants.aws import MONITORING_SECRET_NAMES
 from config.singletons import env_config
-from helpers.enums import BotType
+from helpers.enums import BotType, Network
 from rewards.aws.helpers import get_secret
 
 
 console = Console()
 
 
-def send_error_to_discord(e: Exception, error_msg: str, error_type: str, chain: str):
+def send_error_to_discord(
+    e: Exception,
+    error_msg: str,
+    error_type: str,
+    chain: Network,
+    bot_type: BotType = BotType.Cycle
+):
     send_message_to_discord(
         f"**{error_type}**",
         f":x: {error_msg}",
@@ -27,7 +33,7 @@ def send_error_to_discord(e: Exception, error_msg: str, error_type: str, chain: 
             },
         ],
         "Error Bot",
-        get_discord_url(chain, bot_type=BotType.Boost),
+        get_discord_url(chain, bot_type),
     )
 
 

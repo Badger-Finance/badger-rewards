@@ -6,6 +6,8 @@ class FlagNotFoundException(Exception):
 
 
 TEST_FLAG_ENABLED = "TEST_FLAG_ENABLED"
+TEST_FLAG_DISABLED = "TEST_FLAG_DISABLED"
+BOOST_STEP = "BOOST_STEP"
 
 
 class FeatureFlags:
@@ -14,14 +16,13 @@ class FeatureFlags:
     Flag format should be {str: bool}
     """
     FLAGS: Dict[str, bool] = {
-        TEST_FLAG_ENABLED: True
+        TEST_FLAG_ENABLED: True,
+        TEST_FLAG_DISABLED: False,
+        BOOST_STEP: True,
     }
 
-    def does_flag_exist(self, flag: str) -> bool:
-        return bool(self.FLAGS.get(flag))
-
     def flag_enabled(self, flag: str) -> bool:
-        if not self.does_flag_exist(flag):
+        if self.FLAGS.get(flag) is None:
             raise FlagNotFoundException()
         return self.FLAGS[flag]
 

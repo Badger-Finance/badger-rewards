@@ -4,8 +4,7 @@ from typing import Dict
 from typing import List
 
 from rich.console import Console
-
-import config.constants.addresses as addresses
+from config.constants import addresses
 from helpers.enums import Abi
 from helpers.enums import Network
 from helpers.web3_utils import make_contract
@@ -15,7 +14,7 @@ from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot_usd
 from rewards.snapshot.nft_snapshot import nft_snapshot_usd
-from rewards.snapshot.token_snapshot import token_snapshot_usd
+from rewards.snapshot.token_snapshot import token_snapshot_usd, fuse_snapshot_of_token
 
 console = Console()
 
@@ -63,12 +62,13 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
 
     native = Counter()
     non_native = Counter()
+
+    console.log(f"\n === Taking nft snapshot on {chain} === \n")
+    nft_balances = nft_snapshot_usd(chain, block)
     console.log(f"\n === Taking claims snapshot on {chain} === \n")
     native_claimable, non_native_claimable = claims_snapshot_usd(chain, block)
     native += Counter(native_claimable)
     non_native += Counter(non_native_claimable)
-    console.log(f"\n === Taking nft snapshot on {chain} === \n")
-    nft_balances = nft_snapshot_usd(chain, block)
 
     console.log(f"\n === Taking token snapshot on {chain} === \n")
     badger_tokens, digg_tokens = token_snapshot_usd(chain, block)
@@ -80,19 +80,22 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     non_native += Counter(non_native_setts)
     native += Counter(native_setts)
 
-    native = filter_dust(dict(native), 1)
-    non_native = filter_dust(dict(non_native), 1)
     bvecvx_usd = {}
     if chain == Network.Ethereum:
         bvecvx_claimable = claims_snapshot(chain, block).get(addresses.BVECVX)
-        bvecvx_bals = sett_snapshot(chain, block, addresses.BVECVX, blacklist=True)
-        bvecvx_lp_bals = sett_snapshot(chain, block, addresses.BVECVX_CVX_LP_SETT, blacklist=True)
+        bvecvx_bals = sett_snapshot(chain, block, addresses.BVECVX)
+        fuse_bvecvx = fuse_snapshot_of_token(chain, block, token=addresses.BVECVX)
+        bvecvx_lp_bals = sett_snapshot(chain, block, addresses.BVECVX_CVX_LP_SETT)
         ratio = get_bvecvx_lp_ratio()
         ppfs = get_bvecvx_lp_ppfs()
         for addr, value in bvecvx_lp_bals:
             bvecvx_lp_bals.boost_balance(addr, ratio)
             bvecvx_lp_bals.boost_balance(addr, ppfs)
-        bvecvx_usd = (bvecvx_bals + bvecvx_claimable + bvecvx_lp_bals).convert_to_usd(
-            chain).balances
+        bvecvx = (bvecvx_bals + bvecvx_claimable + bvecvx_lp_bals + fuse_bvecvx)
+        bvecvx_usd = bvecvx.convert_to_usd(chain).balances
+
+    native = filter_dust(dict(native), 1)
+    non_native = filter_dust(dict(non_native), 1)
+    bvecvx_usd = filter_dust(dict(bvecvx_usd), 1)
 
     return BoostBalances(native, non_native, bvecvx_usd, nft_balances)

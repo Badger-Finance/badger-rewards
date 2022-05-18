@@ -7,7 +7,7 @@ metadata:
 spec:
   schedule: "5 */2 * * *"
   startingDeadlineSeconds: 180
-  suspend: True
+  suspend: False
   jobTemplate:
     spec:
       template:
@@ -25,4 +25,6 @@ spec:
                 value: 'PROD'
               - name: KUBE
                 value: 'True'
+              - name: 'FIX_CYCLE'
+                value: 'False'
           restartPolicy: OnFailure

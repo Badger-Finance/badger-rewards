@@ -1,6 +1,8 @@
 import pytest
 
+from rewards.classes.Snapshot import Snapshot
 from helpers.enums import Network
+from config.constants import addresses
 from rewards.boost.boost_utils import (
     calc_boost_balances,
     calc_union_addresses,
@@ -22,7 +24,7 @@ def mock_claims_snapshot(mocker):
     )
 
 
-def test_calc_boost_balances(chain, mock_snapshots, mock_claims_snapshot):
+def test_calc_boost_balances(chain, mock_snapshots, mock_claims_snapshot, fetch_token_mock):
 
     boost_balances = calc_boost_balances(
         123, Network.Ethereum
@@ -52,7 +54,7 @@ def test_calc_boost_balances(chain, mock_snapshots, mock_claims_snapshot):
         assert boost_balances.nfts[addr] == balance
 
 
-def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_snapshot):
+def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_snapshot, fetch_token_mock):
     mocker.patch(
         "rewards.boost.boost_utils.token_snapshot_usd",
         return_value=(
@@ -74,9 +76,16 @@ def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_snapshot)
             {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.000001241234},
         ),
     )
+    mocker.patch(
+        "rewards.boost.boost_utils.fuse_snapshot_of_token",
+        return_value=Snapshot(addresses.BVECVX, {
+            "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.000001241234
+        })
+    )
     boost_balances = calc_boost_balances(
         123, Network.Ethereum
     )
+
     assert boost_balances.native == {}
     assert boost_balances.non_native == {}
     assert boost_balances.nfts == {}
