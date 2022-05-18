@@ -200,15 +200,12 @@ def test_boost_sett(rewards_manager: RewardsManager, balances):
     TestCase().assertDictEqual(d1=boosted.balances, d2=boosted_bals)
 
 
-@pytest.mark.parametrize(
-    "rewards_manager",
-    [Network.Ethereum],
-    indirect=True,
-)
-def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
+def test_get_user_multipliers(cycle, start, end, boosts):
+    rewards_manager = RewardsManager(
+        Network.Ethereum, cycle, start, end, boosts["userData"]
+    )
     rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
     user_multipliers = rewards_manager.get_user_multipliers()
-    print(user_multipliers)
     for user, data in user_multipliers.items():
         for sett, mult in data.items():
             if sett in boosts["userData"][user]["multipliers"]:
