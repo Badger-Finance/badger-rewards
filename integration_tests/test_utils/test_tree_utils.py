@@ -6,7 +6,7 @@ from moto.core import patch_resource
 from config.env_config import EnvConfig
 
 from rewards.aws.helpers import dynamodb
-from tests.test_utils.cycle_utils import mock_fetch_current_tree
+from tests.test_utils.cycle_utils import mock_fetch_current_tree, mock_tree_manager
 from tests.utils import (
     chains,
     mock_tree,
@@ -57,7 +57,7 @@ def cycle_key() -> str:
 
 @pytest.fixture
 def tree_manager(cycle_key, request) -> TreeManager:
-    tree_manager = TreeManager(request.param, Account.from_key(cycle_key))
+    tree_manager = mock_tree_manager(request.param, Account.from_key(cycle_key))
     tree_manager.validate_tree = mock_validate_tree
     tree_manager.fetch_current_tree = mock_fetch_current_tree
     tree_manager.last_publish_end_block = lambda: 0

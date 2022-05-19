@@ -7,7 +7,6 @@ from rewards.boost.boost_utils import (
     calc_boost_balances,
     calc_union_addresses,
     filter_dust,
-    get_bvecvx_lp_ratio,
 )
 from conftest import (
     CHAIN_CLAIMS_SNAPSHOT_DATA,
@@ -24,7 +23,9 @@ def mock_claims_snapshot(mocker):
     )
 
 
-def test_calc_boost_balances(chain, mock_snapshots, mock_claims_snapshot, fetch_token_mock):
+def test_calc_boost_balances(mocker, chain, mock_snapshots, mock_claims_snapshot, fetch_token_mock):
+    mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ratio", return_value=1)
+    mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ppfs", return_value=1)
 
     boost_balances = calc_boost_balances(
         123, Network.Ethereum
@@ -62,6 +63,12 @@ def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_snapshot,
             {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.1},
         ),
     )
+    mocker.patch(
+        "rewards.boost.boost_utils.nft_snapshot_usd", return_value={}
+    )
+    mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ratio", return_value=1)
+    mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ppfs", return_value=1)
+
     mocker.patch(
         "rewards.boost.boost_utils.chain_snapshot_usd",
         return_value=(
@@ -114,8 +121,3 @@ def test_calc_union_addresses():
         "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56",
         "0x0000000000007F150Bd6f54c40A34d7C3d5e9f561",
     }
-
-
-def test_get_bvecvx_lp_ratio():
-    ratio = get_bvecvx_lp_ratio()
-    assert 0 < ratio < 1

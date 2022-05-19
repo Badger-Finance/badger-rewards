@@ -13,6 +13,7 @@ from rewards.classes.Snapshot import Snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from config.constants import addresses
 
+
 TOKEN_SNAPSHOT_DATA = (
     {
         "0x01fb5de8847e570899d3e00029Ae9cD9cB40E5d7": Decimal(44557.11578),
@@ -59,6 +60,30 @@ def mock_discord(mocker):
     return mocker.patch("helpers.http_session.send_message_to_discord")
 
 
+class MockDiggUtils:
+    def __init__(self) -> None:
+        self.digg = None
+        self.shares_per_fragment = 1000
+
+    def shares_to_fragments(self, shares: int) -> float:
+        if shares == 0:
+            return 0
+        return shares / self.shares_per_fragment
+
+    def fragments_to_shares(self, fragments: int) -> float:
+        if fragments == 0:
+            return 0
+        return fragments * self.shares_per_fragment
+
+
+@pytest.fixture(autouse=True)
+def mock_digg_utils(mocker):
+    mocker.patch("rewards.rewards_checker.DiggUtils", MockDiggUtils)
+    mocker.patch("rewards.snapshot.claims_snapshot.DiggUtils", MockDiggUtils)
+    mocker.patch("rewards.utils.token_utils.DiggUtils", MockDiggUtils)
+    mocker.patch("subgraph.queries.tokens.DiggUtils", MockDiggUtils)
+
+
 @pytest.fixture
 def mock_snapshots(mocker):
     mocker.patch(
@@ -82,6 +107,22 @@ def mock_snapshots(mocker):
             "0x01fb5de8847e570899d3e00029Ae9cD9cB40E5d7": Decimal(100),
             "0x017b3763b8a034F8655D46345e3EB42555E39064": Decimal(50),
         })
+    )
+
+
+@pytest.fixture(autouse=True)
+def mock_get_token_weight(mocker):
+    mocker.patch(
+        "rewards.snapshot.chain_snapshot.get_token_weight",
+        return_value=1
+    )
+
+
+@pytest.fixture(autouse=True)
+def mock_get_flat_emssion_rate(mocker):
+    mocker.patch(
+        "rewards.classes.RewardsManager.get_flat_emission_rate",
+        return_value=0
     )
 
 

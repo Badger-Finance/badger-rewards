@@ -67,7 +67,13 @@ def mock_fetch_sett_balances(mocker):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_chain_snapshot__happy(mock_fetch_ch_balances, chain, responses_mock_token_balance):
+def test_chain_snapshot__happy(
+    mock_fetch_ch_balances,
+    chain,
+    mocker,
+    responses_mock_token_balance,
+    mock_get_token_weight,
+):
     snapshot = chain_snapshot(chain, 123123)
     native = snapshot[BBADGER]
     assert native.type == BalanceType.Native
@@ -115,7 +121,7 @@ def test_chain_snapshot__raises(mocker, chain):
     "chain",
     [Network.Ethereum, Network.Arbitrum, Network.Fantom]
 )
-def test_parse_sett_balances(chain):
+def test_parse_sett_balances(chain, mock_get_token_weight):
     snapshot = parse_sett_balances(
         BBADGER,
         balances={
@@ -135,7 +141,12 @@ def test_parse_sett_balances(chain):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_balance):
+def test_sett_snapshot(
+    chain,
+    mock_fetch_sett_balances,
+    responses_mock_token_balance,
+    mock_get_token_weight
+):
     snapshot = sett_snapshot(chain, 13710328, BBADGER)
     assert snapshot.type == BalanceType.Native
     assert snapshot.ratio == 1
@@ -155,7 +166,8 @@ def test_sett_snapshot(chain, mock_fetch_sett_balances, responses_mock_token_bal
 )
 def test_total_harvest_sett_snapshot__even_balance(
         chain, num_historical_snapshots: int,
-        mock_fetch_sett_balances, responses_mock_token_balance
+        mock_fetch_sett_balances, responses_mock_token_balance,
+        mock_get_token_weight
 ):
     snapshot = total_twap_sett_snapshot(
         chain, 13710328, 13710338, BBADGER,
@@ -175,7 +187,7 @@ def test_total_harvest_sett_snapshot__even_balance(
     [Network.Ethereum, Network.Arbitrum]
 )
 def test_total_harvest_sett_snapshot__even_balance_single_snap(
-        chain, mock_fetch_sett_balances, responses_mock_token_balance):
+        chain, mock_fetch_sett_balances, responses_mock_token_balance, mock_get_token_weight):
     """
     If num_historical_snapshots is 1, we should only take 2 snapshots for first and last blocks
     """
@@ -192,7 +204,7 @@ def test_total_harvest_sett_snapshot__even_balance_single_snap(
     [Network.Ethereum, Network.Arbitrum]
 )
 def test_total_harvest_sett_snapshot__even_balance_no_snapshots(
-        chain, mock_fetch_sett_balances, responses_mock_token_balance):
+        chain, mock_fetch_sett_balances, responses_mock_token_balance, mock_get_token_weight):
     """
     If num_historical_snapshots is 0, we should only take end block snapshot
     """
@@ -209,7 +221,8 @@ def test_total_harvest_sett_snapshot__even_balance_no_snapshots(
     [14, 20, 100]
 )
 def test_total_harvest_sett_snapshot__invalid_rate(
-        num_historical_snapshots: int, mock_fetch_sett_balances, responses_mock_token_balance):
+        num_historical_snapshots: int, mock_fetch_sett_balances, responses_mock_token_balance,
+        mock_get_token_weight):
     snapshot = total_twap_sett_snapshot(
         Network.Ethereum, 13710328, 13710338, BBADGER,
         num_historical_snapshots=num_historical_snapshots
@@ -224,7 +237,12 @@ def test_total_harvest_sett_snapshot__invalid_rate(
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
-def test_total_harvest_sett_snapshot__uneven_balance(chain, mocker, responses_mock_token_balance):
+def test_total_harvest_sett_snapshot__uneven_balance(
+    chain,
+    mocker,
+    responses_mock_token_balance,
+    mock_get_token_weight
+):
     initial_balance = 0.045336
     with mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
@@ -245,7 +263,7 @@ def test_total_harvest_sett_snapshot__uneven_balance(chain, mocker, responses_mo
     assert list(snapshot.balances.values())[0] == approx(expected_amount)
 
 
-def test_total_harvest_sett_snapshot__invalid_blocks():
+def test_total_harvest_sett_snapshot__invalid_blocks(mock_get_token_weight):
     with pytest.raises(AssertionError):
         total_twap_sett_snapshot(
             Network.Ethereum, 13710338, 13710328, BBADGER,
@@ -257,7 +275,7 @@ def test_total_harvest_sett_snapshot__invalid_blocks():
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_sett_snapshot__empty(mocker, chain):
+def test_sett_snapshot__empty(mocker, chain, mock_get_token_weight):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         return_value={}
@@ -270,7 +288,7 @@ def test_sett_snapshot__empty(mocker, chain):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_sett_snapshot__raises(mocker, chain):
+def test_sett_snapshot__raises(mocker, chain, mock_get_token_weight):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         side_effect=Exception,
@@ -284,7 +302,7 @@ def test_sett_snapshot__raises(mocker, chain):
     [Network.Ethereum, Network.Arbitrum]
 )
 def test_chain_snapshot_usd__happy(
-        chain, mock_fetch_ch_balances, mocker, responses_mock_token_balance
+        chain, mock_fetch_ch_balances, mocker, responses_mock_token_balance,
 ):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_unboosted_vaults",
@@ -321,7 +339,7 @@ def test_chain_snapshot_usd__happy(
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_chain_snapshot_usd__no_boost(chain, mock_fetch_ch_balances, mocker):
+def test_chain_snapshot_usd__no_boost(chain, mock_fetch_ch_balances, mocker, mock_get_token_weight):
     # Make sure setts are excluded in case 'no_boost' variable contains them
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_unboosted_vaults",
@@ -334,7 +352,7 @@ def test_chain_snapshot_usd__no_boost(chain, mock_fetch_ch_balances, mocker):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_chain_snapshot_usd__empty(chain, mock_fetch_ch_balances, mocker):
+def test_chain_snapshot_usd__empty(chain, mock_fetch_ch_balances, mocker, mock_get_token_weight):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_chain_balances",
         return_value={}
@@ -350,7 +368,7 @@ def test_chain_snapshot_usd__empty(chain, mock_fetch_ch_balances, mocker):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_chain_snapshot_usd__raises(mocker, chain):
+def test_chain_snapshot_usd__raises(mocker, chain, mock_get_token_weight):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_chain_balances",
         side_effect=Exception,
