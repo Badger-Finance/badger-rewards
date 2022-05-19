@@ -122,7 +122,6 @@ def rewards_manager_split(cycle, start, end, boosts_split, request) -> RewardsMa
     rewards_manager_split.fetch_sett_snapshot = mock_fetch_snapshot
     rewards_manager_split.get_sett_multipliers = mock_get_sett_multipliers_split
     blocks = [*(12 * [{"timestamp": 1636827266}, {"timestamp": 1636828770}])]
-    print(blocks)
     rewards_manager_split.web3 = MagicMock(
         eth=MagicMock(
             get_block=MagicMock(

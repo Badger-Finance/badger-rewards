@@ -50,4 +50,3 @@ if __name__ == "__main__":
                 sum_token_debt[token] = 0
             sum_token_debt[token] += amount
 
-    print(sum_token_debt)

@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from decouple import config
 from web3 import Web3
@@ -84,7 +85,7 @@ class EnvConfig:
         }
         self.is_valid_config()
 
-    def get_web3(self, chain: str = Network.Ethereum) -> Web3:
+    def get_web3(self, chain: str = Network.Ethereum) -> Optional[Web3]:
         if not self.test:
             return self.get_healthy_node(chain)
 

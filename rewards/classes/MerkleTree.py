@@ -89,6 +89,6 @@ def rewards_to_merkle_tree(rewards: RewardsList, startBlock, endBlock):
             "proof": tree.get_proof(encodedNodes[node["index"]]),
             "node": encoded,
         }
-    print(f"merkle root: {encode_hex(tree.root)}")
+    console.print(f"merkle root: {encode_hex(tree.root)}")
 
     return distribution

@@ -91,7 +91,6 @@ class RewardsList:
 
     def increase_user_rewards(self, user, token, to_add: Decimal):
         if to_add < 0:
-            print("NEGATIVE to ADD")
             to_add = 0
 
         """

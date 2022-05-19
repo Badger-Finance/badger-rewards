@@ -147,13 +147,12 @@ def mock_send_discord(
     chain: str = "ETH",
     url: str = None,
 ):
-    print("sent")
+    pass
 
 
 def mock_send_message_to_discord_stg(
     title: str, description: str, fields: list, username: str, url: str = ""
 ):
-    print(description)
     assert "s3://badger-staging-merkle-proofs/" in description
     assert "s3://badger-merkle-proofs/" not in description
 
@@ -161,17 +160,15 @@ def mock_send_message_to_discord_stg(
 def mock_send_message_to_discord_prod(
     title: str, description: str, fields: list, username: str, url: str = ""
 ):
-    print(description)
     assert "s3://badger-staging-merkle-proofs/" not in description
     assert "s3://badger-merkle-proofs/" in description
 
 
 def mock_send_code_block_to_discord(msg: str, username: str, url: str = None):
-    print(msg)
+    pass
 
 
 def mock_get_claimable_data(chain, block):
-    print(block, chain)
     if chain == Network.Ethereum:
         return balances_to_data(CLAIMABLE_BALANCES_DATA_ETH)
     elif chain == Network.Arbitrum:
