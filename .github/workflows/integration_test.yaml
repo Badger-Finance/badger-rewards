@@ -1,50 +1,50 @@
-on:
-    # Trigger the workflow on pull request,
-    # but only for the main branch
-    pull_request:
-        branches:
-            - main
+# on:
+#     # Trigger the workflow on pull request,
+#     # but only for the main branch
+#     pull_request:
+#         branches:
+#             - main
 
-name: integration test
+# name: integration test
 
-env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    DISCORD_WEBHOOK_URL: ${{ secrets.TEST_DISCORD_WEBHOOK }}
-    NODE_URL: ${{ secrets.NODE_URL }}
-    POLYGON_NODE_URL: ${{ secrets.POLYGON_NODE_URL }}
-    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    WEB3_INFURA_PROJECT_ID: ${{ secrets.WEB3_INFURA_PROJECT_ID }}
-    MOCK_AWS_CREDENTIAL: ${{ secrets.MOCK_AWS_CREDENTIAL }}
-    ENV: TEST
-    KUBE: 'False'
-    NODE_OPTIONS: --max_old_space_size=4096
+# env:
+#     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#     DISCORD_WEBHOOK_URL: ${{ secrets.TEST_DISCORD_WEBHOOK }}
+#     NODE_URL: ${{ secrets.NODE_URL }}
+#     POLYGON_NODE_URL: ${{ secrets.POLYGON_NODE_URL }}
+#     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#     WEB3_INFURA_PROJECT_ID: ${{ secrets.WEB3_INFURA_PROJECT_ID }}
+#     MOCK_AWS_CREDENTIAL: ${{ secrets.MOCK_AWS_CREDENTIAL }}
+#     ENV: TEST
+#     KUBE: 'False'
+#     NODE_OPTIONS: --max_old_space_size=4096
 
-jobs:
-    integration-tests:
-        runs-on: ubuntu-latest
+# jobs:
+#     integration-tests:
+#         runs-on: ubuntu-latest
 
-        steps:
-            - uses: actions/checkout@v2
+#         steps:
+#             - uses: actions/checkout@v2
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v1
-              with:
-                  node-version: '14'
+#             - name: Setup Node.js
+#               uses: actions/setup-node@v1
+#               with:
+#                   node-version: '14'
 
-            - name: npm install
-              run: npm install
+#             - name: npm install
+#               run: npm install
               
-            - name: Install hardhat
-              run: npm install --save-dev hardhat
+#             - name: Install hardhat
+#               run: npm install --save-dev hardhat
 
-            - name: Setup Python 3.9
-              uses: actions/setup-python@v2
-              with:
-                  python-version: 3.9.5
+#             - name: Setup Python 3.9
+#               uses: actions/setup-python@v2
+#               with:
+#                   python-version: 3.9.5
 
-            - name: Install Requirements
-              run: pip install -r requirements.txt && pip install -r requirements-dev.txt
+#             - name: Install Requirements
+#               run: pip install -r requirements.txt && pip install -r requirements-dev.txt
 
-            - name: Run Tests
-              run: brownie test integration_tests --network hardhat-fork
+#             - name: Run Tests
+#               run: brownie test integration_tests --network hardhat-fork
