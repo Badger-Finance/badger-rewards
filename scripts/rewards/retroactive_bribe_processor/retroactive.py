@@ -32,7 +32,7 @@ distributions = [
 ]
 
 
-def retroactive_func(tree) -> RewardsList:
+def retroactive_func(tree, tree_manager) -> RewardsList:
     rewards_list = merkle_tree_to_rewards_list(tree)
 
     retro_rewards = []
