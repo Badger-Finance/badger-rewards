@@ -2,7 +2,6 @@ from decimal import Decimal
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
 from rewards.snapshot.chain_snapshot import sett_snapshot
-from scripts.rewards.migrate_rewards.calc_migration_data import harvests
 import config.constants.addresses as addresses
 from rewards.utils.rewards_utils import (
     combine_rewards,
@@ -32,7 +31,7 @@ distributions = [
     }
 ]
 
-def retroactive_func(tree, tree_manager) -> RewardsList:
+def retroactive_func(tree) -> RewardsList:
     rewards_list = merkle_tree_to_rewards_list(tree)
 
     retro_rewards = []
