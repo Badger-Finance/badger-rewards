@@ -25,7 +25,7 @@ distributions = [
         "token": addresses.BVECVX
     },
     {
-        "sett": addresses.BVECVX,
+        "sett": addresses.BVECVX_CVX_LP_SETT,
         "block": 14806809,
         "amount": Decimal("2009150864678652273513"),
         "token": addresses.BADGER
