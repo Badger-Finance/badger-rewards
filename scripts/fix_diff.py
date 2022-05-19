@@ -49,4 +49,3 @@ if __name__ == "__main__":
             if token not in sum_token_debt:
                 sum_token_debt[token] = 0
             sum_token_debt[token] += amount
-
