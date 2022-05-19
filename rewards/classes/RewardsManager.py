@@ -222,7 +222,7 @@ class RewardsManager:
                 if boost == 1:
                     user_sett_multiplier = min_mult
                 else:
-                    user_sett_multiplier = min_mult + ((boost / MAX_BOOST) * diff)
+                    user_sett_multiplier = min_mult + (boost / MAX_BOOST) * diff
                 user_multipliers[user][sett] = user_sett_multiplier
 
         return user_multipliers
