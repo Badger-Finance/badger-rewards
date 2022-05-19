@@ -10,7 +10,7 @@ from badger_api.claimable import get_claimable_data
 from badger_api.requests import fetch_token_decimals
 from config.constants.addresses import DIGG
 from config.constants.chain_mappings import CLAIMABLE_TOKENS
-from helpers.digg_utils import digg_utils
+from helpers.digg_utils import DiggUtils
 from helpers.discord import console_and_discord
 from helpers.enums import (
     BalanceType,
@@ -22,6 +22,7 @@ from rewards.classes.Snapshot import Snapshot
 
 @lru_cache
 def claims_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
+    digg_utils = DiggUtils()
     all_claims = get_claimable_data(chain, block)
     chain_claimable_tokens = CLAIMABLE_TOKENS[chain]
     native_tokens = chain_claimable_tokens[BalanceType.Native]

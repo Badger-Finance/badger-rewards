@@ -12,17 +12,17 @@ from web3.contract import ContractFunction
 from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import BotType, Network
+from helpers.enums import BotType
 from helpers.web3_utils import get_badger_tree
 from rewards.aws.trees import download_latest_tree, download_tree
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.classes.RewardsList import RewardsList
 from rewards.explorer import get_explorer_url
 from rewards.utils.tx_utils import (
+    build_and_send,
     confirm_transaction,
-    get_effective_gas_price,
+    create_tx_options,
     get_gas_price_of_tx,
-    get_priority_fee,
 )
 
 console = Console()
@@ -42,11 +42,8 @@ class TreeManager:
         return rewards_to_merkle_tree(rewardsList, start, end)
 
     def build_function_and_send(self, account, func) -> str:
-        options = self.get_tx_options(account)
-        tx = func.buildTransaction(options)
-        signed_tx = self.w3.eth.account.sign_transaction(tx, private_key=account.key)
-        tx_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
-        return tx_hash
+        options = create_tx_options(account.address, self.w3, self.chain)
+        return build_and_send(func, options, self.w3, account.key)
 
     def approve_root(self, rewards) -> Tuple[str, bool]:
         console.log("Approving root")
@@ -202,21 +199,6 @@ class TreeManager:
 
     def last_propose_start_block(self) -> int:
         return self.badger_tree.lastProposeStartBlock().call()
-
-    def get_tx_options(self, account: Account) -> dict:
-        options = {
-            "nonce": self.w3.eth.get_transaction_count(account.address),
-            "from": account.address,
-        }
-        if self.chain == Network.Ethereum:
-            options["maxPriorityFeePerGas"] = get_priority_fee(self.w3)
-            options["maxFeePerGas"] = get_effective_gas_price(self.w3, self.chain)
-            options["gas"] = 200000
-        elif self.chain == Network.Arbitrum:
-            options["gas"] = 3000000
-        else:
-            options["gasPrice"] = get_effective_gas_price(self.w3, self.chain)
-        return options
 
     def matches_pending_hash(self, new_hash: bytes) -> bool:
         new_hash = HexBytes(new_hash)

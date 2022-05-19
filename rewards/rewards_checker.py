@@ -7,7 +7,7 @@ from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.constants.chain_mappings import TOKENS_TO_CHECK
-from helpers.digg_utils import digg_utils
+from helpers.digg_utils import DiggUtils
 from helpers.discord import (
     get_discord_url,
     send_code_block_to_discord,
@@ -59,6 +59,7 @@ def token_diff_table_item(
 
 
 def verify_rewards(past_tree, new_tree, chain: Network):
+    digg_utils = DiggUtils()
     console.log("Verifying Rewards ... \n")
     claim_snapshot = claims_snapshot(chain, block=int(new_tree["endBlock"]))
     negative_claimable = []

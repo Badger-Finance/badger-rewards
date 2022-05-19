@@ -16,7 +16,7 @@ from config.constants.addresses import (
 )
 from config.constants.chain_mappings import NETWORK_TO_BADGER_TOKEN
 from config.constants.emissions import BOOST_CHAINS
-from helpers.digg_utils import digg_utils
+from conftest import MockDiggUtils
 from helpers.enums import BalanceType, Network
 from rewards.snapshot.claims_snapshot import claims_snapshot, claims_snapshot_usd
 from tests.utils import (
@@ -47,8 +47,14 @@ def claimable_block():
         (Network.Arbitrum, CLAIMABLE_BALANCES_DATA_ARB),
     ],
 )
-def test_claims_snapshot__happy(chain, data, claimable_block, monkeypatch, fetch_token_mock):
-    monkeypatch.setattr(
+def test_claims_snapshot__happy(
+    chain,
+    data,
+    claimable_block,
+    mocker,
+    fetch_token_mock,
+):
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     snapshots = claims_snapshot(chain, claimable_block)
@@ -87,12 +93,13 @@ def test_claims_snapshot__happy(chain, data, claimable_block, monkeypatch, fetch
             )
 
 
-def test_claims_snapshot_digg(claimable_block, monkeypatch, fetch_token_mock):
+def test_claims_snapshot_digg(claimable_block, mocker, fetch_token_mock):
     # Digg has different calculation algorithm hence separate test
     balance = "148480869281534217908"
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
+    digg_utils = MockDiggUtils()
     snapshots = claims_snapshot(Network.Ethereum, claimable_block)
     digg_snapshot = snapshots[DIGG]
     assert digg_snapshot.type == BalanceType.Native
@@ -107,8 +114,8 @@ def test_claims_snapshot_digg(claimable_block, monkeypatch, fetch_token_mock):
 
 
 @responses.activate
-def test_claims_snapshot_usd__happy(claimable_block, monkeypatch, fetch_token_mock):
-    monkeypatch.setattr(
+def test_claims_snapshot_usd__happy(claimable_block, mocker, fetch_token_mock):
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     # Make sure native and non-native balances are correcly calculated to usd

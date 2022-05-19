@@ -37,6 +37,12 @@ def test_approve_root__calls_analytics_store(mocker, prepare_approve_mocks):
     dynamo_put_reward = mocker.patch(
         "rewards.calc_rewards.put_rewards_data",
     )
+    mocker.patch(
+        "rewards.classes.TreeManager.env_config.get_web3",
+    )
+    mocker.patch(
+        "rewards.classes.TreeManager.get_badger_tree",
+    )
     tree_manager = TreeManager(Network.Ethereum, accounts[0])
     tree_manager.matches_pending_hash = lambda _: True
     tree_manager.approve_root = lambda _: ("some_hash", True)
@@ -53,6 +59,12 @@ def test_approve_root__unhappy(mocker, prepare_approve_mocks):
     """
     dynamo_put_reward = mocker.patch(
         "rewards.calc_rewards.put_rewards_data",
+    )
+    mocker.patch(
+        "rewards.classes.TreeManager.env_config.get_web3",
+    )
+    mocker.patch(
+        "rewards.classes.TreeManager.get_badger_tree",
     )
     tree_manager = TreeManager(Network.Ethereum, accounts[0])
     tree_manager.matches_pending_hash = lambda _: True
