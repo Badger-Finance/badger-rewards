@@ -31,6 +31,7 @@ distributions = [
     }
 ]
 
+
 def retroactive_func(tree) -> RewardsList:
     rewards_list = merkle_tree_to_rewards_list(tree)
 
