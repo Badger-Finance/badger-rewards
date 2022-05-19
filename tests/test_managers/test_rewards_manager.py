@@ -190,9 +190,9 @@ THIRD_USER = "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0"
 def test_boost_sett(rewards_manager: RewardsManager, balances):
     sett = "0xd04c48A53c111300aD41190D63681ed3dAd998eC"
     boosted_bals = {
-        "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": 200000,
-        "0xbC641f6C6957096857358Cc70df3623715A2ae45": 50000,
-        "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0": 1600000,
+        "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": 14000,
+        "0xbC641f6C6957096857358Cc70df3623715A2ae45": 3000000,
+        "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0": 1833000,
     }
     boosted = rewards_manager.boost_sett(
         sett, Snapshot(sett, balances, ratio=1, type=BalanceType.NonNative)

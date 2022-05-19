@@ -1,6 +1,6 @@
 {
     "userData": {
-        "0x7e9e4c0876B2102F33A1d82117Cc73B7FddD0032": {
+        "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": {
             "boost": 14,
             "nativeBalance": "9542.683676807883571266711966",
             "nonNativeBalance": "1311043.646726124744915136050",
@@ -13,7 +13,7 @@
             },
             "nfts": []
         },
-        "0x33Bb1249bEf09418d96E1545DeDa06E9b2D0449b": {
+        "0xbC641f6C6957096857358Cc70df3623715A2ae45": {
             "boost": 3000,
             "nativeBalance": "8872.844685265983042777518083",
             "nonNativeBalance": "153.7723556315953034503495255",
@@ -26,7 +26,7 @@
             },
             "nfts": []
         },
-        "0xfA88c88F68fc7A66CcD512a34F7686FDeD60CAF4": {
+        "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0": {
             "boost": 1833,
             "nativeBalance": "616.6451859820537135683562692",
             "nonNativeBalance": "672.7167724560087219997849796",
