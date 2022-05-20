@@ -16,7 +16,6 @@ def get_dropt_claims(all_claims) -> Dict:
                 balance = int(cb["balance"])
                 if balance > 0:
                     claims[user_claim["address"]] = balance
-    print(claims)
     return claims
 
 

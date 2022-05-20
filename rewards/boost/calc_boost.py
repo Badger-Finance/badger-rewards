@@ -209,7 +209,6 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
         [[rng, amount] for rng, amount in stake_data.items()],
         headers=["range", "amount of users"],
     )
-    print(stake_data_table)
     send_code_block_to_discord(
         stake_data_table, username="Boost Bot", url=discord_url)
 

@@ -10,6 +10,7 @@ from badger_api.requests import fetch_token
 import config.constants.addresses as addresses
 from config.constants.chain_mappings import BOOSTED_EMISSION_TOKENS
 from config.constants.emissions import (
+    MAX_BOOST,
     NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS,
     NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS,
 )
@@ -221,7 +222,7 @@ class RewardsManager:
                 if boost == 1:
                     user_sett_multiplier = min_mult
                 else:
-                    user_sett_multiplier = min_mult + (boost / 2000) * diff
+                    user_sett_multiplier = min_mult + (boost / MAX_BOOST) * diff
                 user_multipliers[user][sett] = user_sett_multiplier
 
         return user_multipliers

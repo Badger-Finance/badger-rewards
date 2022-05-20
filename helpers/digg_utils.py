@@ -18,9 +18,3 @@ class DiggUtils:
         if fragments == 0:
             return 0
         return fragments * self.shares_per_fragment
-
-    def get_shares(self, address) -> int:
-        return self.digg.sharesOf(address).call()
-
-
-digg_utils = DiggUtils()

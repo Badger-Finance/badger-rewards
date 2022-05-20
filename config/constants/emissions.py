@@ -104,6 +104,8 @@ DIGG_SETTS = [addresses.BDIGG, addresses.REM_DIGG]
 
 BOOST_CHAINS = [Network.Ethereum, Network.Polygon, Network.Arbitrum]
 
+MAX_BOOST = 3000
+
 SANITY_TOKEN_AMOUNT = 4000 * 1e18
 BOOST_BLOCK_DELAY = 10
 

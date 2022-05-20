@@ -67,7 +67,13 @@ def mock_fetch_sett_balances(mocker):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_chain_snapshot__happy(mock_fetch_ch_balances, chain, responses_mock_token_balance):
+def test_chain_snapshot__happy(
+    mock_fetch_ch_balances,
+    chain,
+    mocker,
+    responses_mock_token_balance,
+    mock_get_token_weight,
+):
     snapshot = chain_snapshot(chain, 123123)
     native = snapshot[BBADGER]
     assert native.type == BalanceType.Native
@@ -115,7 +121,7 @@ def test_chain_snapshot__raises(mocker, chain):
     "chain",
     [Network.Ethereum, Network.Arbitrum, Network.Fantom]
 )
-def test_parse_sett_balances(chain):
+def test_parse_sett_balances(chain, mock_get_token_weight):
     snapshot = parse_sett_balances(
         BBADGER,
         balances={
@@ -296,7 +302,7 @@ def test_sett_snapshot__raises(mocker, chain, mock_get_token_weight):
     [Network.Ethereum, Network.Arbitrum]
 )
 def test_chain_snapshot_usd__happy(
-        chain, mock_fetch_ch_balances, mocker, responses_mock_token_balance
+        chain, mock_fetch_ch_balances, mocker, responses_mock_token_balance,
 ):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_unboosted_vaults",
@@ -335,7 +341,7 @@ def test_chain_snapshot_usd__happy(
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_chain_snapshot_usd__no_boost(chain, mock_fetch_ch_balances, mocker):
+def test_chain_snapshot_usd__no_boost(chain, mock_fetch_ch_balances, mocker, mock_get_token_weight):
     # Make sure setts are excluded in case 'no_boost' variable contains them
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_unboosted_vaults",
@@ -348,7 +354,7 @@ def test_chain_snapshot_usd__no_boost(chain, mock_fetch_ch_balances, mocker):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_chain_snapshot_usd__empty(chain, mock_fetch_ch_balances, mocker):
+def test_chain_snapshot_usd__empty(chain, mock_fetch_ch_balances, mocker, mock_get_token_weight):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_chain_balances",
         return_value={}
@@ -364,7 +370,7 @@ def test_chain_snapshot_usd__empty(chain, mock_fetch_ch_balances, mocker):
     "chain",
     [Network.Ethereum, Network.Arbitrum]
 )
-def test_chain_snapshot_usd__raises(mocker, chain):
+def test_chain_snapshot_usd__raises(mocker, chain, mock_get_token_weight):
     mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_chain_balances",
         side_effect=Exception,

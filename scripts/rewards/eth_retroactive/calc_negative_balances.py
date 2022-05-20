@@ -24,7 +24,6 @@ def negative_balances(tree):
                     if user not in affected_users:
                         affected_users[user] = {}
                     affected_users[user][token] = abs(claimable_amount)
-    print(len(affected_users))
     with open("affected_users.json", "w") as fp:
         json.dump(affected_users, fp)
 
