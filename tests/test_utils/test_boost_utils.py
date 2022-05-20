@@ -27,7 +27,7 @@ def mock_claims_and_ppfs(mocker):
     )
 
 
-def test_calc_boost_balances(mocker, chain, mock_snapshots, mock_claims_snapshot, fetch_token_mock):
+def test_calc_boost_balances(mocker, chain, mock_snapshots, mock_claims_and_ppfs, fetch_token_mock):
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ratio", return_value=1)
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ppfs", return_value=1)
 

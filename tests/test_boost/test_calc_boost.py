@@ -1,8 +1,6 @@
 import math
 from decimal import Decimal
-
 import pytest
-
 from helpers.enums import Network
 from rewards.boost.calc_boost import allocate_bvecvx_to_users, allocate_digg_to_users
 from rewards.boost.calc_boost import allocate_nft_balances_to_users
@@ -202,6 +200,8 @@ def test_badger_boost__happy(
     fetch_token_mock,
     mock_get_token_weight
 ):
+    mocker.patch("rewards.classes.Snapshot.fetch_ppfs", return_value=(1.2, 1.2))
+
     mocker.patch(
         "rewards.boost.boost_utils.claims_snapshot",
         return_value=({}),
