@@ -4,7 +4,7 @@ from decimal import Decimal
 import pytest
 
 from helpers.enums import Network
-from rewards.boost.calc_boost import allocate_bvecvx_to_users
+from rewards.boost.calc_boost import allocate_bvecvx_to_users, allocate_digg_to_users
 from rewards.boost.calc_boost import allocate_nft_balances_to_users
 from rewards.boost.calc_boost import allocate_nft_to_users
 from rewards.boost.calc_boost import assign_native_balances_to_users

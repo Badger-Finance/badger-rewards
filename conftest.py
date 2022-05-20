@@ -123,6 +123,8 @@ def mock_get_flat_emssion_rate(mocker):
     mocker.patch(
         "rewards.classes.RewardsManager.get_flat_emission_rate",
         return_value=0
+    )
+
 
 @pytest.fixture(scope="function")
 def aws_credentials():
