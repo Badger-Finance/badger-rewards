@@ -18,7 +18,9 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
         return
     badger = [sett for sett in setts if sett["asset"] == "BADGER"][0]
     digg = [sett for sett in setts if sett["asset"] == "DIGG"][0]
-    return badger["ppfs"], digg["ppfs"]
+    badger_ppfs = badger["ppfs"] if "ppfs" in badger else 0
+    digg_ppfs = digg["ppfs"] if "ppfs" in digg else 0
+    return badger_ppfs, digg_ppfs
 
 
 @lru_cache
