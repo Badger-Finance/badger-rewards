@@ -325,7 +325,6 @@ def test_calculate_sett_rewards__check_analytics(
     __, analytics = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
-    print(analytics)
     for sett, data in analytics.items():
         assert data['sett_name'] is not None
         assert data['boosted_rewards'][BADGER] is not None
@@ -435,7 +434,6 @@ def test_calculate_sett_rewards__call_custom_handler(
     rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
-    print(RewardsManager.CUSTOM_BEHAVIOUR)
     assert mock_handler.called
 
 

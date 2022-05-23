@@ -107,6 +107,6 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     native = filter_dust(dict(native), 1)
     non_native = filter_dust(dict(non_native), 1)
     bvecvx_usd = filter_dust(dict(bvecvx_usd), 1)
-    digg_usd = filter_dust(dict(bvecvx_usd), 1)
+    digg_usd = filter_dust(dict(digg_usd), 1)
 
     return BoostBalances(native, non_native, bvecvx_usd, nft_balances, digg_usd)
