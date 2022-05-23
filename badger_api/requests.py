@@ -8,6 +8,9 @@ from helpers.http_client import http_client
 
 badger_api = get_api_base_path()
 
+class InvalidAPIKeyException(Exception):
+    pass
+
 
 def fetch_ppfs() -> Optional[Tuple[float, float]]:
     """
@@ -18,8 +21,12 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
         return
     badger = [sett for sett in setts if sett["asset"] == "BADGER"][0]
     digg = [sett for sett in setts if sett["asset"] == "DIGG"][0]
-    badger_ppfs = badger["pricePerFullShare"] if "pricePerFullShare" in badger else 1
-    digg_ppfs = digg["pricePerFullShare"] if "pricePerFullShare" in digg else 1
+    if "pricePerFullShare" not in badger or "pricePerFullShare" not in digg:
+        raise InvalidAPIKeyException()
+
+    badger_ppfs = badger["pricePerFullShare"]
+    digg_ppfs = digg["pricePerFullShare"]
+
     return badger_ppfs, digg_ppfs
 
 
