@@ -24,7 +24,7 @@ console = Console()
 
 def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal) -> Decimal:
     """
-    Calculate the amoutn of bvecvx to add to a user's native balance
+    Calculate the amount of bvecvx to add to a user's native balance
     :param native_balance: user's current native balance
     :param bvecvx_balance: user's total bvecvx balance
     """
@@ -55,8 +55,9 @@ def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> Decimal:
     non_native_balance = Decimal(boost_bals.non_native.get(address, 0))
     bvecvx_balance = Decimal(boost_bals.bvecvx.get(address, 0))
     digg_balance = Decimal(boost_bals.digg.get(address, 0))
-    native_balance += calc_bvecvx_native_balance(native_balance, bvecvx_balance)
-    native_balance += calc_digg_native_balance(native_balance, digg_balance)
+    native_from_bvecvx = calc_bvecvx_native_balance(native_balance, bvecvx_balance)
+    native_from_digg = calc_digg_native_balance(native_balance, digg_balance)
+    native_balance += native_from_bvecvx + native_from_digg
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
