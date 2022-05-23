@@ -2,6 +2,7 @@ FROM python:3.9
 
 WORKDIR /boost
 
+RUN apt-get update
 RUN apt-get remove libexpat1 libexpat1-dev -y
 RUN apt-get remove libsasl2-2 libsasl2-modules-db -y
 RUN apt-get remove linux-libc-dev -y
