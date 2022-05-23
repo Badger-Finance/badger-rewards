@@ -8,6 +8,7 @@ from helpers.http_client import http_client
 
 badger_api = get_api_base_path()
 
+
 class InvalidAPIKeyException(Exception):
     pass
 

@@ -1,7 +1,7 @@
 import pytest
 import responses
 
-from badger_api.requests import badger_api
+from badger_api.requests import InvalidAPIKeyException, badger_api
 from badger_api.requests import fetch_ppfs
 from badger_api.requests import fetch_token
 from badger_api.requests import fetch_token_names
@@ -42,6 +42,97 @@ def test_fetch_ppfs_handled(mock_discord):
 
 
 @responses.activate
+def test_fetch_ppfs__happy():
+    responses.add(
+        responses.GET,
+        f"{badger_api}/setts",
+        json=[
+            {
+                "name": "Digg",
+                "asset": "DIGG",
+                "pricePerFullShare": 0.19232275284091518,
+            },
+            {
+                "name": "Badger",
+                "asset": "BADGER",
+                "pricePerFullShare": 1.2348816886763505,
+            },
+        ],
+        status=200,
+    )
+
+    badger_ppfs, digg_ppfs = fetch_ppfs()
+
+    assert badger_ppfs > 0
+    assert digg_ppfs > 0
+
+
+@responses.activate
+def test_fetch_ppfs__unhappy_no_badger_ppfs():
+    responses.add(
+        responses.GET,
+        f"{badger_api}/setts",
+        json=[
+            {
+                "name": "Digg",
+                "asset": "DIGG",
+                "pricePerFullShare": 0.19232275284091518,
+            },
+            {
+                "name": "Badger",
+                "asset": "BADGER",
+            },
+        ],
+        status=200,
+    )
+    with pytest.raises(InvalidAPIKeyException):
+        fetch_ppfs()
+
+
+@responses.activate
+def test_fetch_ppfs__unhappy_no_digg_ppfs():
+    responses.add(
+        responses.GET,
+        f"{badger_api}/setts",
+        json=[
+            {
+                "name": "Digg",
+                "asset": "DIGG",
+            },
+            {
+                "name": "Badger",
+                "asset": "BADGER",
+                "pricePerFullShare": 1.2348816886763505,
+            },
+        ],
+        status=200,
+    )
+    with pytest.raises(InvalidAPIKeyException):
+        fetch_ppfs()
+
+
+@responses.activate
+def test_fetch_ppfs__unhappy_neither_ppfs():
+    responses.add(
+        responses.GET,
+        f"{badger_api}/setts",
+        json=[
+            {
+                "name": "Digg",
+                "asset": "DIGG",
+            },
+            {
+                "name": "Badger",
+                "asset": "BADGER",
+            },
+        ],
+        status=200,
+    )
+    with pytest.raises(InvalidAPIKeyException):
+        fetch_ppfs()
+
+
+@responses.activate
 def test_fetch_token_prices_handled(mock_discord):
     for chain in BOOST_CHAINS:
         responses.add(
@@ -66,8 +157,7 @@ def test_fetch_token_names_handled(mock_discord):
 
 
 @pytest.mark.parametrize(
-    "chain",
-    [Network.Polygon, Network.Fantom, Network.Arbitrum, Network.Ethereum]
+    "chain", [Network.Polygon, Network.Fantom, Network.Arbitrum, Network.Ethereum]
 )
 @responses.activate
 def test_get_block_by_timestamp(mock_discord, chain):
@@ -79,10 +169,7 @@ def test_get_block_by_timestamp(mock_discord, chain):
             responses.GET,
             f"https://api.{CHAIN_EXPLORER_URLS[chain]}/api?module=block&action="
             f"getblocknobytime&timestamp={timestamp}&closest=before&apikey=",
-            json={
-                'status': "1",
-                'result': f"{block}"
-            },
+            json={"status": "1", "result": f"{block}"},
             status=200,
         )
     else:
@@ -90,7 +177,7 @@ def test_get_block_by_timestamp(mock_discord, chain):
             responses.POST,
             "https://api.thegraph.com/subgraphs/name/elkfinance/ftm-blocks",
             json={
-                'data': {'blocks': [{'timestamp': '1439799138', 'number': '100000'}]}
+                "data": {"blocks": [{"timestamp": "1439799138", "number": "100000"}]}
             },
             status=200,
         )
@@ -98,10 +185,7 @@ def test_get_block_by_timestamp(mock_discord, chain):
     assert data == block
 
 
-@pytest.mark.parametrize(
-    "chain",
-    [Network.Ethereum, Network.Polygon, Network.Arbitrum]
-)
+@pytest.mark.parametrize("chain", [Network.Ethereum, Network.Polygon, Network.Arbitrum])
 def test_get_explorer_url(chain):
     assert get_explorer_url(chain, "0x123123") == (
         f"https://{CHAIN_EXPLORER_URLS[chain]}/tx/0x123123"
