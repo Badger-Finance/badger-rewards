@@ -133,7 +133,7 @@ NETWORK_TO_BADGER_TOKEN = {
 
 CLAIMABLE_TOKENS = {
     Network.Ethereum: {
-        BalanceType.Native: [addresses.BADGER, addresses.DIGG],
+        BalanceType.Native: [addresses.BADGER],
         BalanceType.NonNative: [addresses.BCVXCRV],
     },
     Network.Arbitrum: {BalanceType.Native: [addresses.ARB_BADGER], BalanceType.NonNative: []},

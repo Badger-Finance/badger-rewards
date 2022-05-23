@@ -360,6 +360,15 @@ def test_calculate_sett_rewards__equal_balances_for_period(
     rewards, __ = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
+
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 1636827265}, {"timestamp": 1636828771}]
+            )
+        )
+    )
+
     # First user has boost = 1, so they get smallest amount of rewards because of unboosted balance
     assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(0.033322225924691)
@@ -425,7 +434,6 @@ def test_calculate_sett_rewards__call_custom_handler(
     rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
-    print(RewardsManager.CUSTOM_BEHAVIOUR)
     assert mock_handler.called
 
 

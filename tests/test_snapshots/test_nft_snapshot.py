@@ -3,7 +3,7 @@ from unittest import TestCase
 
 import pytest
 
-from config.constants.addresses import BADGER
+from config.constants.addresses import BADGER, WBTC, DIGG
 from helpers.enums import Network
 from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 
@@ -45,7 +45,7 @@ def mock_fetch_nfts(chain: str, block: int):
 
 
 def mock_fetch_token_prices():
-    return {BADGER: 10}
+    return {BADGER: 10, WBTC: 0, DIGG: 0}
 
 
 def mock_send_message_to_discord(
