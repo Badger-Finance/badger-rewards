@@ -24,10 +24,7 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
     if "pricePerFullShare" not in badger or "pricePerFullShare" not in digg:
         raise InvalidAPIKeyException()
 
-    badger_ppfs = badger["pricePerFullShare"]
-    digg_ppfs = digg["pricePerFullShare"]
-
-    return badger_ppfs, digg_ppfs
+    return badger["pricePerFullShare"], digg["pricePerFullShare"]
 
 
 @lru_cache
