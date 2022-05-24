@@ -22,8 +22,10 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
         return
     badger = [sett for sett in setts if sett["asset"] == "BADGER"][0]
     digg = [sett for sett in setts if sett["asset"] == "DIGG"][0]
-    if "pricePerFullShare" not in badger or "pricePerFullShare" not in digg:
-        raise InvalidAPIKeyException()
+    if "pricePerFullShare" not in badger:
+        raise InvalidAPIKeyException("BADGER missing pricePerFullShare key")
+    if "pricePerFullShare" not in digg:
+        raise InvalidAPIKeyException("DIGG missing pricePerFullShare key")
 
     return badger["pricePerFullShare"], digg["pricePerFullShare"]
 
