@@ -92,7 +92,7 @@ DISABLED_VAULTS = [
     addresses.BDIGG,
     addresses.BSLP_DIGG_WBTC,
     addresses.BUNI_BADGER_WBTC,
-    addresses.REM_DIGG
+    # addresses.REM_DIGG
 ]
 
 PRO_RATA_VAULTS = [

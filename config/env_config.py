@@ -67,8 +67,8 @@ class EnvConfig:
             Network.Ethereum: [
                 self.make_provider("quiknode/eth-node-url", "NODE_URL"),
                 self.make_provider("alchemy/eth-node-url", "NODE_URL"),
-                Web3(Web3.HTTPProvider("https://main-light.eth.linkpool.io")),
                 Web3(Web3.HTTPProvider("https://rpc.flashbots.net/")),
+                Web3(Web3.HTTPProvider("https://main-light.eth.linkpool.io")),
             ],
             Network.Arbitrum: [
                 Web3(Web3.HTTPProvider("https://arb1.arbitrum.io/rpc")),
