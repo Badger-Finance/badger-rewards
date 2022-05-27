@@ -4,6 +4,7 @@ from typing import Dict
 from typing import List
 
 from rich.console import Console
+
 from config.constants import addresses
 from helpers.enums import Abi
 from helpers.enums import Network
@@ -15,7 +16,8 @@ from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot_usd
 from rewards.snapshot.nft_snapshot import nft_snapshot_usd
-from rewards.snapshot.token_snapshot import token_snapshot_usd, fuse_snapshot_of_token
+from rewards.snapshot.token_snapshot import fuse_snapshot_of_token
+from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rewards.utils.snapshot_utils import digg_snapshot_usd
 
 console = Console()
@@ -84,7 +86,7 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
 
     bvecvx_usd = {}
     digg_usd = {}
-    
+
     digg_claimable = Snapshot(addresses.DIGG, {})
     bvecvx_claimable = Snapshot(addresses.BVECVX, {})
     if chain == Network.Ethereum:
