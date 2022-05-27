@@ -64,6 +64,8 @@ if __name__ == "__main__":
     claimable_bvecvx = all_claims[addresses.BVECVX]
     ratio = get_bvecvx_lp_ratio()
     ppfs = get_bvecvx_lp_ppfs()
+    # For each address holding the LP, multiply their holdings by the current ratio of bveCVX :
+    # CVX and the pricePerFullShare of the vault to determine underlying holdings
     for addr, value in lp_bvecvx:
         lp_bvecvx.boost_balance(addr, ratio)
         lp_bvecvx.boost_balance(addr, ppfs)
