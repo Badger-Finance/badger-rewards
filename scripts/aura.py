@@ -22,7 +22,7 @@ from rewards.snapshot.token_snapshot import fuse_snapshot_of_token
 console = Console()
 
 
-AURA_SNAPSHOT_BLOCK = 14848251
+AURA_SNAPSHOT_BLOCK = 14829454
 MAX_TOLERANCE_THRESHOLD = Decimal(0.00001)
 
 
@@ -80,4 +80,4 @@ if __name__ == "__main__":
     assert does_snapshot_percentages_sum_up(bvecvx_data, addresses.BVECVX_CVX_LP_SETT)
 
     with open('aura.json', 'w') as fp:
-        json.dump(bvecvx_data, fp, use_decimal=True)
+        json.dump(bvecvx_data, fp, use_decimal=True, indent=4)
