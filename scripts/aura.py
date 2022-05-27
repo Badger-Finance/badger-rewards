@@ -1,5 +1,10 @@
+import math
+from typing import Dict
+
+from rich.console import Console
+
 from config.constants import addresses
-import decimal
+from decimal import Decimal
 from helpers.enums import Network
 from rewards.boost.boost_utils import get_bvecvx_lp_ppfs, get_bvecvx_lp_ratio
 from rewards.classes.Snapshot import Snapshot
@@ -9,12 +14,28 @@ from rewards.snapshot.token_snapshot import fuse_snapshot_of_token
 import json
 
 
+console = Console()
+
+
 def snapshot_to_percentages(snapshot: Snapshot):
     percentages = {}
-    print(snapshot.total_balance())
+    console.print(snapshot.total_balance())
     for addr, number in snapshot:
-        percentages[addr] = snapshot.percentage_of_total(addr)
+        percentages[addr] = snapshot.percentage_of_total(addr) * 100
     return dict(sorted(percentages.items(), key=lambda item: item[1], reverse=True))
+
+
+def does_snapshot_percentages_sum_up(bvecvx_snap_data: Dict, address: str) -> bool:
+    """
+    Function to make sure that all percentages add up to 100%
+    """
+    wallets = bvecvx_snap_data[address]
+    accumulated = Decimal(0)
+    for wallet_percentage in wallets.values():
+        accumulated += Decimal(wallet_percentage)
+    console.print(f"Accumulated {accumulated} for {address}")
+    return math.isclose(Decimal(100), accumulated)
+
 
 if __name__ == "__main__":
     bvecvx_data = {}
@@ -31,15 +52,15 @@ if __name__ == "__main__":
         lp_bvecvx.boost_balance(addr, ppfs)
 
     bvecvx_data[addresses.FBVECVX] = snapshot_to_percentages(fuse_bvecvx)
-    print("rari")
     bvecvx_data[addresses.BVECVX_CVX_LP_SETT] = snapshot_to_percentages(lp_bvecvx)
-    print("lp sett")
     bvecvx_data[addresses.ETH_BADGER_TREE] = snapshot_to_percentages(claimable_bvecvx)
-    print("badger tree")
+    assert does_snapshot_percentages_sum_up(bvecvx_data, addresses.ETH_BADGER_TREE)
+    assert does_snapshot_percentages_sum_up(bvecvx_data, addresses.FBVECVX)
+    assert does_snapshot_percentages_sum_up(bvecvx_data, addresses.BVECVX_CVX_LP_SETT)
 
     class DecimalEncoder(json.JSONEncoder):
         def default(self, o):
-            if isinstance(o, decimal.Decimal):
+            if isinstance(o, Decimal):
                 return str(o)
             return super(DecimalEncoder, self).default(o)
         
