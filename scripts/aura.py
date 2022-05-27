@@ -22,13 +22,12 @@ from rewards.snapshot.token_snapshot import fuse_snapshot_of_token
 console = Console()
 
 
-STARTING_BLOCK = 14848251
+AURA_SNAPSHOT_BLOCK = 14848251
 MAX_TOLERANCE_THRESHOLD = Decimal(0.00001)
 
 
 def snapshot_to_percentages(snapshot: Snapshot):
     percentages = {}
-    console.print(snapshot.total_balance())
     for address, number in snapshot:
         percentage = snapshot.percentage_of_total(address) * 100
         # Filter out very small amounts
@@ -59,9 +58,9 @@ if __name__ == "__main__":
         Then: $ python -m scripts.aura
     """
     chain = Network.Ethereum
-    all_claims = claims_snapshot(chain, STARTING_BLOCK)
-    fuse_bvecvx = fuse_snapshot_of_token(chain, STARTING_BLOCK, addresses.BVECVX)
-    lp_bvecvx = sett_snapshot(chain, STARTING_BLOCK, addresses.BVECVX_CVX_LP_SETT)
+    all_claims = claims_snapshot(chain, AURA_SNAPSHOT_BLOCK)
+    fuse_bvecvx = fuse_snapshot_of_token(chain, AURA_SNAPSHOT_BLOCK, addresses.BVECVX)
+    lp_bvecvx = sett_snapshot(chain, AURA_SNAPSHOT_BLOCK, addresses.BVECVX_CVX_LP_SETT)
     claimable_bvecvx = all_claims[addresses.BVECVX]
     ratio = get_bvecvx_lp_ratio()
     ppfs = get_bvecvx_lp_ppfs()
