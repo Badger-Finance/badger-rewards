@@ -25,3 +25,4 @@ requests==2.26.0
 rich==9.3.0
 tabulate==0.8.7
 badger-utils==0.2.5
+simplejson==3.17.6
