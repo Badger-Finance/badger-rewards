@@ -23,15 +23,15 @@ console = Console()
 
 
 AURA_SNAPSHOT_BLOCK = 14829454
-MAX_TOLERANCE_THRESHOLD = Decimal(0.00001)
+MAX_TOLERANCE_THRESHOLD = Decimal(0.001)
 
 
 def snapshot_to_percentages(snapshot: Snapshot):
     percentages = {}
     for address, number in snapshot:
-        percentage = snapshot.percentage_of_total(address) * 100
+        percentage = snapshot.percentage_of_total(address)
         # Filter out very small amounts
-        if percentage > Decimal(0.0000001):
+        if percentage > Decimal(0.000001):
             percentages[address] = percentage
     # Sort by biggest balance
     return dict(sorted(percentages.items(), key=lambda item: item[1], reverse=True))
@@ -46,9 +46,9 @@ def does_snapshot_percentages_sum_up(bvecvx_snap_data: Dict, address: str) -> bo
     for wallet_percentage in wallets.values():
         accumulated += Decimal(wallet_percentage)
     console.print(f"Accumulated {accumulated}% for {address}")
-    # Make sure values are different no more than by 0.00001% because we filter out some small
-    # balances
-    return math.isclose(Decimal(100), accumulated, abs_tol=MAX_TOLERANCE_THRESHOLD)
+    # Make sure values are different no more than by MAX_TOLERANCE_THRESHOLD%
+    # because we filter out some small balances
+    return math.isclose(Decimal(1), accumulated, abs_tol=MAX_TOLERANCE_THRESHOLD)
 
 
 if __name__ == "__main__":
