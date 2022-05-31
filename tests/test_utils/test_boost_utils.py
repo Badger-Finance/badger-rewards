@@ -13,6 +13,7 @@ from conftest import (
     CHAIN_SETT_SNAPSHOT_DATA,
     NFT_SNAPSHOT_DATA,
 )
+from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
 
 
 @pytest.fixture
@@ -57,6 +58,9 @@ def test_calc_boost_balances(mocker, chain, mock_snapshots, mock_claims_and_ppfs
 
     for addr, balance in NFT_SNAPSHOT_DATA.items():
         assert boost_balances.nfts[addr] == balance
+
+    if not flags.flag_enabled(DIGG_BOOST):
+        assert boost_balances.digg == {}
 
 
 def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_and_ppfs, fetch_token_mock):
