@@ -22,10 +22,10 @@ def test_convert_to_usd_no_digg_boost():
             },
             status=200,
         )
-    ADDRESS = "0x00192Fb10dF37c9FB26829eb2CC623cd1BF599E8"
-    snapshot = Snapshot(DIGG, {ADDRESS: 1}, ratio=1)
+    address = "0x00192Fb10dF37c9FB26829eb2CC623cd1BF599E8"
+    snapshot = Snapshot(DIGG, {address: 1}, ratio=1)
     usd_bals = snapshot.convert_to_usd(chain).balances
-    assert usd_bals[ADDRESS] == 100
+    assert usd_bals[address] == 100
 
 
 @responses.activate
@@ -43,10 +43,10 @@ def test_convert_to_usd_digg_boost():
             },
             status=200,
         )
-    ADDRESS = "0x00192Fb10dF37c9FB26829eb2CC623cd1BF599E8"
-    lp_snapshot = Snapshot(BUNI_DIGG_WBTC, {ADDRESS: 1})
-    digg_snapshot = Snapshot(DIGG, {ADDRESS: 1})
+    address = "0x00192Fb10dF37c9FB26829eb2CC623cd1BF599E8"
+    lp_snapshot = Snapshot(BUNI_DIGG_WBTC, {address: 1})
+    digg_snapshot = Snapshot(DIGG, {address: 1})
     digg_usd = digg_snapshot.convert_to_usd(chain).balances
-    assert digg_usd[ADDRESS] == 50
+    assert digg_usd[address] == 50
     lp_bals = lp_snapshot.convert_to_usd(chain).balances
-    assert lp_bals[ADDRESS] == 1500
+    assert lp_bals[address] == 1500
