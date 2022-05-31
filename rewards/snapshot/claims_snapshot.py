@@ -9,7 +9,7 @@ from typing import (
 from badger_api.claimable import get_claimable_data
 from badger_api.requests import fetch_token_decimals
 from config.constants.addresses import DIGG
-from config.constants.chain_mappings import CLAIMABLE_TOKENS
+from config.constants.chain_mappings import CLAIMABLE_TOKENS, CLAIMABLE_WHITELIST
 from helpers.digg_utils import DiggUtils
 from helpers.discord import console_and_discord
 from helpers.enums import (
@@ -32,6 +32,8 @@ def claims_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
 
     for user_claim_snapshot in all_claims:
         address = user_claim_snapshot["address"]
+        if address in CLAIMABLE_WHITELIST[chain]:
+            continue
         claimable_balances = user_claim_snapshot["claimableBalances"]
         for claimable_bal in claimable_balances:
             token = claimable_bal["address"]

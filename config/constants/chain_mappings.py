@@ -144,6 +144,13 @@ CLAIMABLE_TOKENS = {
     }
 }
 
+CLAIMABLE_WHITELIST = {
+    Network.Ethereum: [addresses.ETH_BADGER_TREE],
+    Network.Arbitrum: [],
+    Network.Fantom: [],
+    Network.Polygon: []
+}
+
 UNCLAIMED_REWARDS_TOKENS = {
     Network.Ethereum: [addresses.BCVXCRV, addresses.BVECVX]
 }
