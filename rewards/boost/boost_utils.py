@@ -17,6 +17,7 @@ from rewards.snapshot.claims_snapshot import claims_snapshot_usd
 from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 from rewards.snapshot.token_snapshot import token_snapshot_usd, fuse_snapshot_of_token
 from rewards.utils.snapshot_utils import digg_snapshot_usd
+from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
 
 console = Console()
 
@@ -102,7 +103,9 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
         bvecvx_usd = bvecvx.convert_to_usd(chain).balances
 
     digg_claimable_usd = Counter(digg_claimable.convert_to_usd(chain).balances)
-    digg_usd = digg_claimable_usd + Counter(digg_tokens) + Counter(digg_snapshot_usd(chain, block))
+    if flags.flag_enabled(DIGG_BOOST):
+        digg_usd = digg_claimable_usd + Counter(digg_tokens) + \
+            Counter(digg_snapshot_usd(chain, block))
 
     native = filter_dust(dict(native), 1)
     non_native = filter_dust(dict(non_native), 1)
