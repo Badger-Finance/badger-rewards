@@ -11,6 +11,8 @@ from config.constants.addresses import BDIGG, BSLP_DIGG_WBTC, BUNI_DIGG_WBTC, DI
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
 from config.constants.emissions import DIGG_LP_PRICE_RATIO
+from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
+
 console = Console()
 
 
@@ -87,6 +89,8 @@ class Snapshot:
                 "Boost Bot",
                 url=discord_url,
             )
+        elif not flags.flag_enabled(DIGG_BOOST):
+            price = Decimal(prices[self.token]) * self.ratio
         elif self.token == DIGG:
             price = Decimal(wbtc_price)
         elif self.token == BDIGG:

@@ -103,9 +103,12 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
         bvecvx_usd = bvecvx.convert_to_usd(chain).balances
 
     digg_claimable_usd = Counter(digg_claimable.convert_to_usd(chain).balances)
+    digg_native_usd = digg_claimable_usd + Counter(digg_tokens) + \
+        Counter(digg_snapshot_usd(chain, block))
     if flags.flag_enabled(DIGG_BOOST):
-        digg_usd = digg_claimable_usd + Counter(digg_tokens) + \
-            Counter(digg_snapshot_usd(chain, block))
+        digg_usd = digg_native_usd
+    else:
+        native += digg_native_usd
 
     native = filter_dust(dict(native), 1)
     non_native = filter_dust(dict(non_native), 1)
