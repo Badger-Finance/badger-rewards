@@ -6,10 +6,12 @@ from typing import Dict, Tuple, Optional
 
 from rich.console import Console
 from web3 import Web3
-
-from badger_api.requests import fetch_token_prices
+from badger_api.requests import fetch_ppfs, fetch_token_prices
+from config.constants.addresses import BDIGG, BSLP_DIGG_WBTC, BUNI_DIGG_WBTC, DIGG, WBTC
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
+from config.constants.emissions import DIGG_LP_PRICE_RATIO
+from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
 
 console = Console()
 
@@ -64,11 +66,19 @@ class Snapshot:
 
         return Snapshot(self.token, new_bals, self.ratio, self.type)
 
+    def __radd__(self, other):
+        if other == 0:
+            return self
+        else:
+            return self.__add__(other)
+
     def convert_to_usd(
         self, chain: Network, bot_type: BotType = BotType.Boost
     ) -> Snapshot:
         discord_url = get_discord_url(chain, bot_type)
         prices = fetch_token_prices()
+        wbtc_price = prices[WBTC]
+        digg_price = prices[DIGG]
         if self.token not in prices:
             price = Decimal(0)
             console.log(f"CANT FIND PRICING FOR {self.token}")
@@ -79,6 +89,16 @@ class Snapshot:
                 "Boost Bot",
                 url=discord_url,
             )
+        elif not flags.flag_enabled(DIGG_BOOST):
+            price = Decimal(prices[self.token]) * self.ratio
+        elif self.token == DIGG:
+            price = Decimal(wbtc_price)
+        elif self.token == BDIGG:
+            _, digg_ppfs = fetch_ppfs()
+            price = Decimal(wbtc_price * digg_ppfs)
+        elif self.token in [BUNI_DIGG_WBTC, BSLP_DIGG_WBTC]:
+            digg_lp_price = prices[self.token]
+            price = Decimal(DIGG_LP_PRICE_RATIO * digg_lp_price + (digg_lp_price * DIGG_LP_PRICE_RATIO * (wbtc_price / digg_price)))  # noqa: E501
         else:
             price = Decimal(prices[self.token]) * self.ratio
 

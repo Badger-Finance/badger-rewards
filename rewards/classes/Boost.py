@@ -9,3 +9,4 @@ class BoostBalances:
     non_native: Dict[str, Decimal]
     bvecvx: Dict[str, Decimal] = field(default_factory=lambda: {})
     nfts: Dict[str, Decimal] = field(default_factory=lambda: {})
+    digg: Dict[str, Decimal] = field(default_factory=lambda: {})
