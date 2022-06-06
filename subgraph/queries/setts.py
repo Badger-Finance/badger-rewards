@@ -32,7 +32,7 @@ def last_synced_block(chain: Network) -> int:
                     number
                 }
             }
-        }}
+        }
         """
     )
     result = chain_client.execute(query)
