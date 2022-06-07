@@ -90,7 +90,7 @@ DISABLED_VAULTS = [
     addresses.BCRV_TRICRYPTO_1,
     addresses.BHARVEST_REN_WBTC,
     addresses.BDIGG,
-    addresses.BSLP_DIGG_WBTC,
+    # addresses.BSLP_DIGG_WBTC,
     addresses.BUNI_BADGER_WBTC,
     addresses.REM_DIGG
 ]
