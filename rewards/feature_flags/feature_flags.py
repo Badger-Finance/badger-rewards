@@ -20,7 +20,7 @@ class FeatureFlags:
         TEST_FLAG_ENABLED: True,
         TEST_FLAG_DISABLED: False,
         BOOST_STEP: True,
-        DIGG_BOOST: False
+        DIGG_BOOST: True
     }
 
     def flag_enabled(self, flag: str) -> bool:
