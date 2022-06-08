@@ -109,6 +109,8 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     if flags.flag_enabled(DIGG_BOOST):
         digg_usd = digg_claimable_usd + Counter(digg_tokens) + \
             Counter(digg_snapshot_usd(chain, block))
+    else:
+        native += Counter(digg_tokens)
 
     native = filter_dust(dict(native), 1)
     non_native = filter_dust(dict(non_native), 1)
