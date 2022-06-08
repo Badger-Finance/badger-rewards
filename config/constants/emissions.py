@@ -89,15 +89,16 @@ DISABLED_VAULTS = [
     # ethereum
     addresses.BCRV_TRICRYPTO_1,
     addresses.BHARVEST_REN_WBTC,
-    addresses.BDIGG,
-    # addresses.BSLP_DIGG_WBTC,
     addresses.BUNI_BADGER_WBTC,
-    addresses.REM_DIGG
 ]
 
-PRO_RATA_VAULTS = [
+NO_BOOST_VAULTS = [
     addresses.BVECVX,
     addresses.BVECVX_CVX_LP_SETT,
+    addresses.BDIGG,
+    addresses.BSLP_DIGG_WBTC,
+    addresses.BUNI_DIGG_WBTC,
+    addresses.REM_DIGG
 ]
 
 DIGG_SETTS = [addresses.BDIGG, addresses.REM_DIGG]
@@ -117,7 +118,7 @@ REWARD_ERROR_TOLERANCE = 0.01
 
 ZERO_CYCLE = 0
 
-NO_BOOST = [Network.Fantom]
+NO_BOOST_CHAINS = [Network.Fantom]
 
 FUSE_TOKEN_INFO = {
     addresses.BADGER: {
