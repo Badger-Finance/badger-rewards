@@ -13,7 +13,7 @@ from config.constants.chain_mappings import (
     CHAIN_IDS,
     EMISSIONS_CONTRACTS,
 )
-from config.constants.emissions import NO_BOOST
+from config.constants.emissions import NO_BOOST_CHAINS
 from config.rewards_config import rewards_config
 from config.singletons import env_config
 from helpers.discord import console_and_discord
@@ -106,7 +106,7 @@ def propose_root(
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
         console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
-    if chain in NO_BOOST:
+    if chain in NO_BOOST_CHAINS:
         boosts = {"userData": {}}
     else:
         boosts = download_boosts(chain)
@@ -142,7 +142,7 @@ def approve_root(
     :param current_rewards: past rewards merkle tree
     :param tree_manager: TreeManager object
     """
-    if chain in NO_BOOST:
+    if chain in NO_BOOST_CHAINS:
         boosts = {"userData": {}}
     else:
         boosts = download_proposed_boosts(chain)
@@ -165,7 +165,7 @@ def approve_root(
             rewards_data["multiplierData"],
             rewards_data["userMultipliers"],
         )
-        if chain not in NO_BOOST:
+        if chain not in NO_BOOST_CHAINS:
             upload_boosts(boosts, chain)
         return rewards_data
     if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
@@ -187,7 +187,7 @@ def approve_root(
                 rewards_data["multiplierData"],
                 rewards_data["userMultipliers"],
             )
-            if chain not in NO_BOOST:
+            if chain not in NO_BOOST_CHAINS:
                 upload_boosts(boosts, chain)
             put_rewards_data(
                 chain, tree_manager.next_cycle, start, end,
