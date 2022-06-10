@@ -1,11 +1,9 @@
 import json
-
 from decouple import config
 from eth_account import Account
 from rich.console import Console
-
-from helpers.discord import send_message_to_discord
-from helpers.enums import Network
+from helpers.discord import console_and_discord, send_message_to_discord
+from helpers.enums import DiscordRoles, Network
 from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import approve_root
 from rewards.classes.TreeManager import TreeManager
@@ -55,4 +53,9 @@ def approve_rewards(chain, kube):
 
 
 if __name__ == "__main__":
-    approve_rewards(Network.Ethereum, kube=False)
+    try:
+        approve_rewards(Network.Ethereum, kube=False)
+    except Exception as e:
+        console_and_discord(
+            f"Propose Error: \n {e}", Network.Ethereum, mentions=DiscordRoles.RewardsPod
+        )
