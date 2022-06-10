@@ -69,11 +69,7 @@ NATIVE = [
     addresses.BBADGER,
     addresses.BUNI_BADGER_WBTC,
     addresses.BSLP_BADGER_WBTC,
-    addresses.BDIGG,
-    addresses.BUNI_DIGG_WBTC,
-    addresses.BSLP_DIGG_WBTC,
     addresses.REM_BADGER,
-    addresses.REM_DIGG,
     addresses.BCRV_BADGER_WBTC,
     # arbitrum
     addresses.ARB_BSWAPR_WETH_BADGER,
