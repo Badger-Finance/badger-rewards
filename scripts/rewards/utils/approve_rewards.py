@@ -1,6 +1,6 @@
+import traceback
 from eth_account import Account
 from rich.console import Console
-
 from config.singletons import env_config
 from helpers.discord import console_and_discord, get_discord_url, send_message_to_discord
 from helpers.enums import BotType, DiscordRoles
@@ -41,5 +41,5 @@ def approve_rewards(chain):
             url=discord_url,
         )
         return approve_root(chain, start_block, end_block, current_rewards, tree_manager)
-    except Exception as e:
-        console_and_discord(f"Approve Error \n {e}", chain, mentions=DiscordRoles.RewardsPod)
+    except Exception:
+        console_and_discord(f"Approve Error \n {traceback.format_exc()}", chain, mentions=DiscordRoles.RewardsPod)
