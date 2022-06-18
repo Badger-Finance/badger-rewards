@@ -26,5 +26,5 @@ spec:
                               - name: KUBE
                                 value: 'True'
                               - name: FIX_CYCLE
-                                value: 'True'
+                                value: 'False'
                     restartPolicy: OnFailure
