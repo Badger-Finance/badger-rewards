@@ -9,7 +9,7 @@ subgraph_urls = {
         Network.BinanceSmartChain: (
             "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-bsc"
         ),
-        Network.Ethereum: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao",
+        Network.Ethereum: "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts",
         Network.Polygon: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-polygon",
         Network.Arbitrum: "https://api.thegraph.com/subgraphs/name/axejintao/badger-dao-arbitrum",
         Network.Fantom: (
