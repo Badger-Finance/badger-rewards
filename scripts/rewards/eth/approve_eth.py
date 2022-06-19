@@ -57,5 +57,6 @@ if __name__ == "__main__":
         approve_rewards(Network.Ethereum, kube=False)
     except Exception:
         console_and_discord(
-            f"Approve Error: \n {traceback.format_exc()}", Network.Ethereum, mentions=DiscordRoles.RewardsPod
+            f"Approve Error: \n {traceback.format_exc()}", Network.Ethereum,
+            mentions=DiscordRoles.RewardsPod
         )

@@ -42,4 +42,7 @@ def approve_rewards(chain):
         )
         return approve_root(chain, start_block, end_block, current_rewards, tree_manager)
     except Exception:
-        console_and_discord(f"Approve Error \n {traceback.format_exc()}", chain, mentions=DiscordRoles.RewardsPod)
+        console_and_discord(
+            f"Approve Error \n {traceback.format_exc()}", chain,
+            mentions=DiscordRoles.RewardsPod
+        )
