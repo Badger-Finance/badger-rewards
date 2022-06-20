@@ -7,7 +7,7 @@ from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.rewards_utils import combine_rewards, merkle_tree_to_rewards_list
 
-START = 14973719
+START = 14980504
 # First graviaura deposit
 END = 14987641
 # block when graviaura rewards resumed
