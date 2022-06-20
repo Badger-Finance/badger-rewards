@@ -8,6 +8,7 @@ from tabulate import tabulate
 from config.constants.emissions import (
     BOOST_BLOCK_DELAY,
     BVECVX_BOOST_WEIGHT,
+    DIGG_BOOST_WEIGHT,
     STAKE_RATIO_RANGES,
 )
 from helpers.discord import get_discord_url, send_code_block_to_discord
@@ -23,7 +24,7 @@ console = Console()
 
 def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal) -> Decimal:
     """
-    Calculate the amoutn of bvecvx to add to a user's native balance
+    Calculate the amount of bvecvx to add to a user's native balance
     :param native_balance: user's current native balance
     :param bvecvx_balance: user's total bvecvx balance
     """
@@ -31,6 +32,15 @@ def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal)
         return min(
             Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance,
             Decimal(BVECVX_BOOST_WEIGHT) * native_balance
+        )
+    return Decimal(0)
+
+
+def calc_digg_native_balance(native_balance: Decimal, digg_balance: Decimal) -> Decimal:
+    if digg_balance > 0 and native_balance > 0:
+        return min(
+            Decimal(DIGG_BOOST_WEIGHT) * digg_balance,
+            Decimal(DIGG_BOOST_WEIGHT) * native_balance
         )
     return Decimal(0)
 
@@ -44,8 +54,10 @@ def calc_stake_ratio(address: str, boost_bals: BoostBalances) -> Decimal:
     native_balance = Decimal(boost_bals.native.get(address, 0))
     non_native_balance = Decimal(boost_bals.non_native.get(address, 0))
     bvecvx_balance = Decimal(boost_bals.bvecvx.get(address, 0))
-    native_balance += calc_bvecvx_native_balance(
-        native_balance, bvecvx_balance)
+    digg_balance = Decimal(boost_bals.digg.get(address, 0))
+    native_from_bvecvx = calc_bvecvx_native_balance(native_balance, bvecvx_balance)
+    native_from_digg = calc_digg_native_balance(native_balance, digg_balance)
+    native_balance += native_from_bvecvx + native_from_digg
     if non_native_balance == 0 or native_balance == 0:
         stake_ratio = 0
     else:
@@ -92,6 +104,8 @@ def init_boost_data(addresses: List[str]) -> Dict[str, Any]:
             "nativeBalance": 0,
             "nonNativeBalance": 0,
             "stakeRatio": 0,
+            "bveCvxBalance": 0,
+            "diggBalance": 0,
             "nftBalance": 0,
             "nfts": [],
         }
@@ -114,6 +128,15 @@ def allocate_bvecvx_to_users(boost_info: Dict, bvecvx_balances: Dict):
             boost_info[user]["bveCvxBalance"] = calculated_bvecvx_balance
             boost_info[user]["nativeBalance"] = native_balance + \
                 calculated_bvecvx_balance
+
+
+def allocate_digg_to_users(boost_info: Dict, digg_balances: Dict):
+    for user, digg_balance in digg_balances.items():
+        native_balance = boost_info.get(user, {}).get("nativeBalance", Decimal(0))
+        calculated_digg_balance = calc_digg_native_balance(native_balance, digg_balance)
+        if user in boost_info:
+            boost_info[user]["diggBalance"] = calculated_digg_balance
+            boost_info[user]["nativeBalance"] = native_balance + calculated_digg_balance
 
 
 def allocate_nft_to_users(boost_info: Dict, addresses: List[str], nfts: Dict):
@@ -165,6 +188,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     assign_native_balances_to_users(boost_info, boost_bals.native)
     assign_non_native_balances_to_users(boost_info, boost_bals.non_native)
     allocate_bvecvx_to_users(boost_info, boost_bals.bvecvx)
+    allocate_digg_to_users(boost_info, boost_bals.digg)
 
     for addr, boost in badger_boost_data.items():
         boost_metadata = boost_info.get(addr, {})
@@ -173,6 +197,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
             "nativeBalance": boost_metadata.get("nativeBalance", 0),
             "nonNativeBalance": boost_metadata.get("nonNativeBalance", 0),
             "bveCvxBalance": boost_metadata.get("bveCvxBalance", 0),
+            "diggBalance": boost_metadata.get("diggBalance", 0),
             "nftBalance": boost_metadata.get("nftBalance", 0),
             "stakeRatio": boost_metadata.get("stakeRatio", 0),
             "multipliers": {},
@@ -185,7 +210,6 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
         [[rng, amount] for rng, amount in stake_data.items()],
         headers=["range", "amount of users"],
     )
-    print(stake_data_table)
     send_code_block_to_discord(
         stake_data_table, username="Boost Bot", url=discord_url)
 

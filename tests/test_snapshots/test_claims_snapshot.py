@@ -11,12 +11,13 @@ from config.constants.addresses import (
     BADGER,
     BCVXCRV,
     DIGG,
+    WBTC,
     POLY_SUSHI,
     XSUSHI,
 )
 from config.constants.chain_mappings import NETWORK_TO_BADGER_TOKEN
 from config.constants.emissions import BOOST_CHAINS
-from helpers.digg_utils import digg_utils
+from conftest import MockDiggUtils
 from helpers.enums import BalanceType, Network
 from rewards.snapshot.claims_snapshot import claims_snapshot, claims_snapshot_usd
 from tests.utils import (
@@ -32,6 +33,7 @@ XSUSHI_PRICE = 1.201460272851376
 CVX_CRV_PRICE = 12.411460272851376
 SWAPR_WETH_SWAPR_PRICE = 12312.201460272851376
 DIGG_PRICE = 50000
+WBTC_PRICE = 30000
 
 
 @pytest.fixture()
@@ -47,8 +49,14 @@ def claimable_block():
         (Network.Arbitrum, CLAIMABLE_BALANCES_DATA_ARB),
     ],
 )
-def test_claims_snapshot__happy(chain, data, claimable_block, monkeypatch, fetch_token_mock):
-    monkeypatch.setattr(
+def test_claims_snapshot__happy(
+    chain,
+    data,
+    claimable_block,
+    mocker,
+    fetch_token_mock,
+):
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     snapshots = claims_snapshot(chain, claimable_block)
@@ -87,15 +95,16 @@ def test_claims_snapshot__happy(chain, data, claimable_block, monkeypatch, fetch
             )
 
 
-def test_claims_snapshot_digg(claimable_block, monkeypatch, fetch_token_mock):
+def test_claims_snapshot_digg(claimable_block, mocker, fetch_token_mock):
     # Digg has different calculation algorithm hence separate test
     balance = "148480869281534217908"
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
+    digg_utils = MockDiggUtils()
     snapshots = claims_snapshot(Network.Ethereum, claimable_block)
     digg_snapshot = snapshots[DIGG]
-    assert digg_snapshot.type == BalanceType.Native
+    assert digg_snapshot.type == BalanceType.Excluded
     assert digg_snapshot.ratio == 1
     assert digg_snapshot.token == DIGG
     expected_digg_balance = digg_utils.shares_to_fragments(int(balance)) / math.pow(
@@ -107,8 +116,8 @@ def test_claims_snapshot_digg(claimable_block, monkeypatch, fetch_token_mock):
 
 
 @responses.activate
-def test_claims_snapshot_usd__happy(claimable_block, monkeypatch, fetch_token_mock):
-    monkeypatch.setattr(
+def test_claims_snapshot_usd__happy(claimable_block, mocker, fetch_token_mock):
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     # Make sure native and non-native balances are correcly calculated to usd
@@ -121,6 +130,7 @@ def test_claims_snapshot_usd__happy(claimable_block, monkeypatch, fetch_token_mo
                 BCVXCRV: CVX_CRV_PRICE,
                 XSUSHI: XSUSHI_PRICE,
                 DIGG: DIGG_PRICE,
+                WBTC: WBTC_PRICE,
                 ARB_BSWAPR_WETH_SWAPR: SWAPR_WETH_SWAPR_PRICE,
             },
             status=200,

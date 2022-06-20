@@ -133,7 +133,7 @@ NETWORK_TO_BADGER_TOKEN = {
 
 CLAIMABLE_TOKENS = {
     Network.Ethereum: {
-        BalanceType.Native: [addresses.BADGER, addresses.DIGG],
+        BalanceType.Native: [addresses.BADGER],
         BalanceType.NonNative: [addresses.BCVXCRV],
     },
     Network.Arbitrum: {BalanceType.Native: [addresses.ARB_BADGER], BalanceType.NonNative: []},
@@ -165,6 +165,11 @@ DECIMAL_MAPPING = {
     Network.Polygon: 1e18,
     Network.Arbitrum: 1e18,
     Network.Fantom: 1e18
+}
+
+TREE_ACTION_GAS = {
+    Network.Ethereum: 200000,
+    Network.Arbitrum: 3000000
 }
 
 CHAIN_EXPLORER_URLS = {

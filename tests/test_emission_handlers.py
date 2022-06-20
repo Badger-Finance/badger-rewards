@@ -15,8 +15,8 @@ from tests.utils import (
 from decimal import Decimal
 
 
-def test_unclaimed_rewards_handler(monkeypatch, fetch_token_mock):
-    monkeypatch.setattr(
+def test_unclaimed_rewards_handler(mocker, fetch_token_mock):
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     token = addresses.BCVXCRV
@@ -46,8 +46,8 @@ def test_unclaimed_rewards_handler(monkeypatch, fetch_token_mock):
     )
 
 
-def test_unclaimed_rewards_handler_no_claimable(monkeypatch, fetch_token_mock):
-    monkeypatch.setattr(
+def test_unclaimed_rewards_handler_no_claimable(mocker, fetch_token_mock):
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     rewards_list = unclaimed_rewards_handler(

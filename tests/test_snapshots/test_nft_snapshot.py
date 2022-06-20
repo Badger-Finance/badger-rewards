@@ -3,22 +3,22 @@ from unittest import TestCase
 
 import pytest
 
-from config.constants.addresses import BADGER
+from config.constants.addresses import BADGER, WBTC, DIGG
 from helpers.enums import Network
 from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 
 
 @pytest.fixture()
-def mock_fns(monkeypatch):
-    monkeypatch.setattr("rewards.snapshot.nft_snapshot.fetch_nfts", mock_fetch_nfts)
-    monkeypatch.setattr(
+def mock_fns(mocker):
+    mocker.patch("rewards.snapshot.nft_snapshot.fetch_nfts", mock_fetch_nfts)
+    mocker.patch(
         "rewards.snapshot.nft_snapshot.get_nft_weight", mock_get_nft_score
     )
 
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.classes.Snapshot.fetch_token_prices", mock_fetch_token_prices
     )
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.classes.Snapshot.send_message_to_discord", mock_send_message_to_discord
     )
 
@@ -45,7 +45,7 @@ def mock_fetch_nfts(chain: str, block: int):
 
 
 def mock_fetch_token_prices():
-    return {BADGER: 10}
+    return {BADGER: 10, WBTC: 0, DIGG: 0}
 
 
 def mock_send_message_to_discord(

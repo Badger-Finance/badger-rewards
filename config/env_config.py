@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from decouple import config
 from web3 import Web3
@@ -66,7 +67,7 @@ class EnvConfig:
             Network.Ethereum: [
                 self.make_provider("quiknode/eth-node-url", "NODE_URL"),
                 self.make_provider("alchemy/eth-node-url", "NODE_URL"),
-                Web3(Web3.HTTPProvider("https://main-rpc.linkpool.io/")),
+                Web3(Web3.HTTPProvider("https://main-light.eth.linkpool.io")),
                 Web3(Web3.HTTPProvider("https://rpc.flashbots.net/")),
             ],
             Network.Arbitrum: [
@@ -84,8 +85,9 @@ class EnvConfig:
         }
         self.is_valid_config()
 
-    def get_web3(self, chain: str = Network.Ethereum) -> Web3:
-        return self.get_healthy_node(chain)
+    def get_web3(self, chain: str = Network.Ethereum) -> Optional[Web3]:
+        if not self.test:
+            return self.get_healthy_node(chain)
 
     def get_healthy_node(self, chain: Network) -> Web3:
         for node in self.web3[chain]:

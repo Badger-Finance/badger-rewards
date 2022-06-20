@@ -19,7 +19,7 @@ from config.constants.emissions import (
     FUSE_TOKEN_BASE,
     FUSE_TOKEN_INFO
 )
-from helpers.digg_utils import digg_utils
+from helpers.digg_utils import DiggUtils
 from helpers.enums import (
     Abi,
     Network,
@@ -91,6 +91,7 @@ def fetch_token_balances(
         block_number: int, chain: Network
 ) -> Tuple[Dict[str, Number], Dict[str, Number]]:
     increment = 1000
+    digg_utils = DiggUtils()
     query = token_query()
     client = SubgraphClient(f"tokens-{chain}", chain)
 

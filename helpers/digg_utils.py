@@ -18,6 +18,3 @@ class DiggUtils:
         if fragments == 0:
             return 0
         return fragments * self.shares_per_fragment
-
-
-digg_utils = DiggUtils()

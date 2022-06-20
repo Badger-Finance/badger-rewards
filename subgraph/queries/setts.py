@@ -19,27 +19,24 @@ console = Console()
 
 
 @lru_cache
-def last_synced_block(chain: Network):
+def last_synced_block(chain: Network) -> int:
     """
     Return the last synced block of the setts subgraph of a chain
     """
-    thegraph_client = SubgraphClient("thegraph", Network.Ethereum)
-    deployment_id = fetch_deployment_id(chain, chain)
+    chain_client = SubgraphClient(chain, chain)
     query = gql(
-        f"""
-        query last_block {{
-            indexingStatuses(subgraphs: ["{deployment_id}"]) {{
-                chains {{
-                    latestBlock {{
-                        number
-                    }}
-                }}
-            }}
-        }}
-    """
+        """
+        query last_block {
+           _meta {
+                block {
+                    number
+                }
+            }
+        }
+        """
     )
-    result = thegraph_client.execute(query)
-    return int(result["indexingStatuses"][0]["chains"][0]["latestBlock"]["number"])
+    result = chain_client.execute(query)
+    return int(result["_meta"]["block"]["number"])
 
 
 def fetch_deployment_id(chain: Network, name: str) -> str:

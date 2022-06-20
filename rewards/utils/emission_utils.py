@@ -1,4 +1,3 @@
-import time
 from decimal import Decimal
 from functools import lru_cache
 from typing import Dict, List
@@ -16,7 +15,7 @@ from helpers.web3_utils import make_contract
 from rewards.classes.NftWeightSchedule import NFTWeightSchedule
 from rewards.classes.Schedule import Schedule
 from subgraph.queries.setts import list_setts
-
+from config.singletons import env_config
 console = Console()
 
 
@@ -76,19 +75,19 @@ def get_nft_weight(chain: str, nft_address: str, nft_id: int) -> Decimal:
         raise Exception
 
 
-def fetch_unboosted_vaults(chain) -> List[str]:
+def fetch_unboosted_vaults(chain: Network, block: int) -> List[str]:
     all_setts = fetch_setts(chain)
     logger = make_contract(
         EMISSIONS_CONTRACTS[chain]["RewardsLogger"], Abi.RewardsLogger, chain
     )
     unboosted_vaults = []
-    now = time.time()
+    time = env_config.get_web3(chain).eth.get_block(block)["timestamp"]
     for sett in all_setts:
         schedules = logger.getAllUnlockSchedulesFor(sett).call()
         has_active_schedule = False
         for schedule in schedules:
             schedule = parse_schedule(schedule)
-            if schedule.startTime < now < schedule.endTime:
+            if schedule.startTime < time < schedule.endTime:
                 has_active_schedule = True
         if not has_active_schedule and sett not in NATIVE:
             unboosted_vaults.append(sett)

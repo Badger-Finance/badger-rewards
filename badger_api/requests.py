@@ -9,6 +9,10 @@ from helpers.http_client import http_client
 badger_api = get_api_base_path()
 
 
+class InvalidAPIKeyException(Exception):
+    pass
+
+
 def fetch_ppfs() -> Optional[Tuple[float, float]]:
     """
     Fetch ppfs for bbadger and bdigg
@@ -18,7 +22,12 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
         return
     badger = [sett for sett in setts if sett["asset"] == "BADGER"][0]
     digg = [sett for sett in setts if sett["asset"] == "DIGG"][0]
-    return badger["ppfs"], digg["ppfs"]
+    if "pricePerFullShare" not in badger:
+        raise InvalidAPIKeyException("BADGER missing pricePerFullShare key")
+    if "pricePerFullShare" not in digg:
+        raise InvalidAPIKeyException("DIGG missing pricePerFullShare key")
+
+    return badger["pricePerFullShare"], digg["pricePerFullShare"]
 
 
 @lru_cache

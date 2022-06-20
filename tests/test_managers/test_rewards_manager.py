@@ -17,6 +17,7 @@ from config.constants.chain_mappings import DECIMAL_MAPPING, SETTS
 from helpers.enums import BalanceType, Network
 from rewards.classes.RewardsManager import InvalidRewardsTotalException
 from rewards.classes.Schedule import Schedule
+from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from tests.test_subgraph.test_data import BADGER_DISTRIBUTIONS_TEST_DATA
 from tests.utils import (
     mock_get_claimable_data,
@@ -36,7 +37,7 @@ set_env_vars()
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Snapshot import Snapshot
 from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewards
-from tests.test_utils.cycle_utils import mock_badger_tree, mock_tree_manager
+from tests.test_utils.cycle_utils import mock_tree_manager
 
 logger = logging.getLogger("test-rewards-manager")
 
@@ -95,11 +96,11 @@ def mock_send_message_to_discord(
 
 
 @pytest.fixture(autouse=True)
-def mock_fns(monkeypatch):
-    monkeypatch.setattr(
+def mock_fns(mocker):
+    mocker.patch(
         "helpers.discord.send_message_to_discord", mock_send_message_to_discord
     )
-    monkeypatch.setattr(
+    mocker.patch(
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
 
@@ -109,8 +110,6 @@ def rewards_manager(cycle, start, end, boosts, request) -> RewardsManager:
     rewards_manager = RewardsManager(
         request.param, cycle, start, end, boosts["userData"]
     )
-    rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
-
     return rewards_manager
 
 
@@ -119,8 +118,17 @@ def rewards_manager_split(cycle, start, end, boosts_split, request) -> RewardsMa
     rewards_manager_split = RewardsManager(
         request.param, cycle, start, end, boosts_split["userData"]
     )
+
     rewards_manager_split.fetch_sett_snapshot = mock_fetch_snapshot
     rewards_manager_split.get_sett_multipliers = mock_get_sett_multipliers_split
+    blocks = [*(12 * [{"timestamp": 1636827266}, {"timestamp": 1636828770}])]
+    rewards_manager_split.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=blocks
+            )
+        )
+    )
     rewards_manager_split.start = 13609200
     rewards_manager_split.end = 13609300
 
@@ -129,7 +137,7 @@ def rewards_manager_split(cycle, start, end, boosts_split, request) -> RewardsMa
 
 @pytest.fixture
 def tree_manager():
-    tree_manager = mock_tree_manager(Network.Ethereum, test_account, mock_badger_tree)
+    tree_manager = mock_tree_manager(Network.Ethereum, test_account)
     return tree_manager
 
 
@@ -181,9 +189,9 @@ THIRD_USER = "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0"
 def test_boost_sett(rewards_manager: RewardsManager, balances):
     sett = "0xd04c48A53c111300aD41190D63681ed3dAd998eC"
     boosted_bals = {
-        "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": 200000,
-        "0xbC641f6C6957096857358Cc70df3623715A2ae45": 50000,
-        "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0": 1600000,
+        "0xaffb3b889E48745Ce16E90433A61f4bCb95692Fd": 14000,
+        "0xbC641f6C6957096857358Cc70df3623715A2ae45": 3000000,
+        "0xA300a5816A53bb7e256f98bf31Cb1FE9a4bbcAf0": 1833000,
     }
     boosted = rewards_manager.boost_sett(
         sett, Snapshot(sett, balances, ratio=1, type=BalanceType.NonNative)
@@ -191,12 +199,12 @@ def test_boost_sett(rewards_manager: RewardsManager, balances):
     TestCase().assertDictEqual(d1=boosted.balances, d2=boosted_bals)
 
 
-@pytest.mark.parametrize(
-    "rewards_manager",
-    [Network.Ethereum],
-    indirect=True,
-)
-def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
+def test_get_user_multipliers(cycle, start, end, boosts):
+    rewards_manager = RewardsManager(
+        Network.Ethereum, cycle, start, end, boosts["userData"]
+    )
+
+    rewards_manager.get_sett_multipliers = mock_get_sett_multipliers
     user_multipliers = rewards_manager.get_user_multipliers()
     for user, data in user_multipliers.items():
         for sett, mult in data.items():
@@ -216,17 +224,16 @@ def test_get_user_multipliers(rewards_manager: RewardsManager, boosts):
 def test_splits(
     rewards_manager_split,
     schedule,
-    tree_manager,
     boosts_split,
-    monkeypatch,
     mocker,
     fetch_token_mock,
+    mock_get_token_weight
 ):
     rates = [Decimal(0), Decimal(0.5), Decimal(1)]
     user_data = {}
     discord = mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     for rate in rates:
-        monkeypatch.setattr(
+        mocker.patch(
             "rewards.classes.RewardsManager.get_flat_emission_rate",
             lambda s, c: rate,
         )
@@ -247,7 +254,7 @@ def test_splits(
 
         new_rewards = combine_rewards(rewards_list, rewards_manager_split.cycle)
         cumulative_rewards = process_cumulative_rewards(mock_tree, new_rewards)
-        merkle_tree = tree_manager.convert_to_merkle_tree(
+        merkle_tree = rewards_to_merkle_tree(
             cumulative_rewards, rewards_manager_split.start, rewards_manager_split.end
         )
 
@@ -285,6 +292,10 @@ def test_calculate_sett_rewards__check_analytics(
 ):
     mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     mocker.patch(
+        "rewards.classes.RewardsManager.get_flat_emission_rate",
+        return_value=Decimal(0.5)
+    )
+    mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         return_value={
             FIRST_USER: 1000,
@@ -294,10 +305,21 @@ def test_calculate_sett_rewards__check_analytics(
     )
     sett = SETTS[Network.Ethereum]["ibbtc_crv"]
     total_badger = 100
-    all_schedules = {sett: {BADGER: [schedule(sett, total_badger)]}}
+    badger_schedule = schedule(
+        sett, total_badger
+    )
+
+    all_schedules = {sett: {BADGER: [badger_schedule]}}
 
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
+    )
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 1636827265}, {"timestamp": 1636828771}]
+            )
+        )
     )
 
     __, analytics = rewards_manager.calculate_all_sett_rewards(
@@ -328,10 +350,25 @@ def test_calculate_sett_rewards__equal_balances_for_period(
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
     )
-
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 1636827265}, {"timestamp": 1636828771}]
+            )
+        )
+    )
     rewards, __ = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
+
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 1636827265}, {"timestamp": 1636828771}]
+            )
+        )
+    )
+
     # First user has boost = 1, so they get smallest amount of rewards because of unboosted balance
     assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(0.033322225924691)
@@ -362,7 +399,7 @@ def test_calculate_sett_rewards__equal_balances_for_period(
 )
 def test_calculate_sett_rewards__call_custom_handler(
         schedule, mocker, boosts_split, mock_discord, addr, setup_dynamodb,
-        fetch_token_mock,
+        fetch_token_mock
 ):
     patch_resource(dynamodb)
 
@@ -386,11 +423,17 @@ def test_calculate_sett_rewards__call_custom_handler(
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
     )
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 1636827265}, {"timestamp": 1636828771}]
+            )
+        )
+    )
 
     rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
-    print(RewardsManager.CUSTOM_BEHAVIOUR)
     assert mock_handler.called
 
 
@@ -426,10 +469,18 @@ def test_calculate_sett_rewards__balances_vary_for_period(
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 13609200, 13609300, boosts_split["userData"]
     )
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 1636827265}, {"timestamp": 1636828771}]
+            )
+        )
+    )
 
     rewards, __ = rewards_manager.calculate_all_sett_rewards(
         [sett], all_schedules,
     )
+
     assert rewards.claims[FIRST_USER][BADGER] / Decimal(1e18) == pytest.approx(
         Decimal(0.00264963832)
     )
@@ -447,7 +498,11 @@ def test_calculate_sett_rewards__balances_vary_for_period(
         + rewards.claims[THIRD_USER][BADGER]) / Decimal(1e18) == total_badger
 
 
-def test_calculate_tree_distributions__totals(mocker, boosts_split, fetch_token_mock):
+def test_calculate_tree_distributions__totals(
+    mocker,
+    boosts_split,
+    fetch_token_mock,
+):
     first_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f56")
     second_user = Web3.toChecksumAddress("0x0000000000007F150Bd6f54c40A34d7C3d5e9f57")
     token = Web3.toChecksumAddress('0x2B5455aac8d64C14786c3a29858E43b5945819C0')
@@ -472,6 +527,14 @@ def test_calculate_tree_distributions__totals(mocker, boosts_split, fetch_token_
     rewards_manager = RewardsManager(
         Network.Ethereum, 123, 12997653, 13331083, boosts_split["userData"]
     )
+    rewards_manager.web3 = MagicMock(
+        eth=MagicMock(
+            get_block=MagicMock(
+                side_effect=[{"timestamp": 0}, {"timestamp": 1633059635}]
+            )
+        )
+    )
+
     with mocker.patch(
         "rewards.snapshot.chain_snapshot.fetch_sett_balances",
         return_value={

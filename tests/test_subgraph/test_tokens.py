@@ -48,6 +48,11 @@ def test_fetch_across_balances_empty(mocker):
             {'tokenBalances': []}
         ],
     )
+    across_multiplier = 1.2
+    mocker.patch(
+        "subgraph.queries.tokens.get_across_lp_multiplier",
+        return_value=across_multiplier
+    )
     across_bals = fetch_across_balances(1728601720, Network.Ethereum)
     assert across_bals == {}
 

@@ -18,6 +18,11 @@ TREE_REWARDS_BLACKLIST = {
 BVECVX_VOTER_BLACKLIST = {
     addresses.BVECVX_VOTER: "Badger bveCVX Voter"
 }
+DIGG_BOOST_VAULTS = [
+    addresses.BDIGG,
+    addresses.BSLP_DIGG_WBTC,
+    addresses.BUNI_DIGG_WBTC
+]
 
 NATIVE_TOKEN_REWARDS = {
     Network.Ethereum: [addresses.BADGER, addresses.DIGG]
@@ -28,6 +33,8 @@ BVECVX_VOTER_BLACKLIST_TOKENS = {
 }
 
 BVECVX_BOOST_WEIGHT = 0.5
+DIGG_BOOST_WEIGHT = 1
+DIGG_LP_PRICE_RATIO = 0.5
 
 STAKE_RATIO_RANGES = list(
     [
@@ -62,11 +69,7 @@ NATIVE = [
     addresses.BBADGER,
     addresses.BUNI_BADGER_WBTC,
     addresses.BSLP_BADGER_WBTC,
-    addresses.BDIGG,
-    addresses.BUNI_DIGG_WBTC,
-    addresses.BSLP_DIGG_WBTC,
     addresses.REM_BADGER,
-    addresses.REM_DIGG,
     addresses.BCRV_BADGER_WBTC,
     # arbitrum
     addresses.ARB_BSWAPR_WETH_BADGER,
@@ -82,11 +85,16 @@ DISABLED_VAULTS = [
     # ethereum
     addresses.BCRV_TRICRYPTO_1,
     addresses.BHARVEST_REN_WBTC,
+    addresses.BUNI_BADGER_WBTC,
 ]
 
-PRO_RATA_VAULTS = [
+NO_BOOST_VAULTS = [
     addresses.BVECVX,
     addresses.BVECVX_CVX_LP_SETT,
+    addresses.BDIGG,
+    addresses.BSLP_DIGG_WBTC,
+    addresses.BUNI_DIGG_WBTC,
+    addresses.REM_DIGG
 ]
 
 DIGG_SETTS = [addresses.BDIGG, addresses.REM_DIGG]
@@ -106,7 +114,7 @@ REWARD_ERROR_TOLERANCE = 0.01
 
 ZERO_CYCLE = 0
 
-NO_BOOST = [Network.Fantom]
+NO_BOOST_CHAINS = [Network.Fantom]
 
 FUSE_TOKEN_INFO = {
     addresses.BADGER: {

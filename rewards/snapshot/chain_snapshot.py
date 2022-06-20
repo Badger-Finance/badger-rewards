@@ -8,8 +8,8 @@ from badger_api.requests import fetch_token
 from config.constants.emissions import (
     DISABLED_VAULTS,
     NATIVE,
-    NO_BOOST,
-    PRO_RATA_VAULTS,
+    NO_BOOST_CHAINS,
+    NO_BOOST_VAULTS,
 )
 from helpers.enums import BalanceType, Network
 from rewards.classes.Snapshot import Snapshot
@@ -95,7 +95,7 @@ def parse_sett_balances(
     :param chain: chain where balances come from
     """
     sett_type = BalanceType.Native if sett_address in NATIVE else BalanceType.NonNative
-    if chain in NO_BOOST:
+    if chain in NO_BOOST_CHAINS:
         sett_ratio = 1
     else:
         sett_ratio = get_token_weight(sett_address, chain)
@@ -110,7 +110,7 @@ def chain_snapshot_usd(chain: Network, block: int) -> Tuple[Counter, Counter]:
     total_snapshot = chain_snapshot(chain, block)
     native = Counter()
     non_native = Counter()
-    no_boost = DISABLED_VAULTS + fetch_unboosted_vaults(chain) + PRO_RATA_VAULTS
+    no_boost = DISABLED_VAULTS + fetch_unboosted_vaults(chain, block) + NO_BOOST_VAULTS
     for sett, snapshot in total_snapshot.items():
         if sett in no_boost:
             console.log(f"{sett} is disabled")
