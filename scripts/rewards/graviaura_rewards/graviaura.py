@@ -1,4 +1,4 @@
-from config.constants.addresses import BADGER, BSLP_DIGG_WBTC, DIGG, GRAVIAURA
+from config.constants.addresses import BADGER, GRAVIAURA
 from helpers.enums import Network
 from rewards.aws.boost import download_boosts
 from rewards.calc_rewards import fetch_all_schedules
@@ -6,6 +6,7 @@ from rewards.classes.RewardsList import RewardsList
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.rewards_utils import combine_rewards, merkle_tree_to_rewards_list
+
 START = 14973719
 # First graviaura deposit
 END = 14987641
@@ -30,6 +31,6 @@ def graviaura(tree, tree_manager: TreeManager) -> RewardsList:
 
 
 def graviaura_test(old_tree, new_tree) -> bool:
-    before_digg_total = old_tree["tokenTotals"][BADGER]
-    after_digg_total = new_tree["tokenTotals"][BADGER]
-    return after_digg_total > before_digg_total
+    before_badger_total = old_tree["tokenTotals"][BADGER]
+    after_badger_total = new_tree["tokenTotals"][BADGER]
+    return after_badger_total > before_badger_total
