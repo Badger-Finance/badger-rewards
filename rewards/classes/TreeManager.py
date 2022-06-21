@@ -12,7 +12,7 @@ from web3.contract import ContractFunction
 from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import BotType
+from helpers.enums import BotType, Network
 from helpers.web3_utils import get_badger_tree
 from rewards.aws.trees import download_latest_tree, download_tree
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
@@ -168,7 +168,9 @@ class TreeManager:
         assert tree["merkleRoot"] == merkle["root"]
         last_update_publish = int(merkle["blockNumber"])
         last_update = int(tree["endBlock"])
-        assert last_update_publish > last_update
+        # Arbitrum captures l1 blocks with block.timestamp causing an error
+        if self.chain != Network.Arbitrum:
+            assert last_update_publish > last_update
         # Ensure file tracks block within 1 day of upload
 
     def fetch_current_merkle_data(self):
