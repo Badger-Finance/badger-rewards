@@ -169,7 +169,7 @@ class TreeManager:
         last_update_publish = int(merkle["blockNumber"])
         last_update = int(tree["endBlock"])
         # Arbitrum captures l1 blocks with block.timestamp causing an error
-        if (self.chain != Network.Arbitrum):
+        if self.chain != Network.Arbitrum:
             assert last_update_publish > last_update
         # Ensure file tracks block within 1 day of upload
 
