@@ -21,7 +21,7 @@ subgraph_urls = {
         ),
         # Token graphs
         f"tokens-{Network.Ethereum}": (
-            "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens"
+            "https://api.thegraph.com/subgraphs/name/darruma/badger-tokens"
         ),
         f"tokens-{Network.BinanceSmartChain}": (
             "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-bsc"
