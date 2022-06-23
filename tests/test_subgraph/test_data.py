@@ -78,18 +78,18 @@ TOKEN_BALANCES_TEST_DATA = {
     'tokenBalances':
         [
             {
-                'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6'
-                      '-0x3472a5a71965499acd81997a54bba8d852c6e53d',
+                'id': '0x3472a5a71965499acd81997a54bba8d852c6e53d'
+                      '-0x43298F9f91a4545dF64748e78a2c777c580573d6',
                 'balance': '21000000000000000000000000', 'token': {'symbol': 'BADGER'}
             },
             {
-                'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6'
-                      '-0x798d1be841a82a273720ce31c822c61a67a601c3',
+                'id': '0x798d1be841a82a273720ce31c822c61a67a601c3'
+                      '-0x43298F9f91a4545dF64748e78a2c777c580573d6',
                 'balance': '1157920892373161954235709850086879078532699846656405640394575840040',
                 'token': {'symbol': 'DIGG'}},
             {
-                'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6'
-                      '-0xc4e15973e6ff2a35cc804c2cf9d2a1b817a8b40f',
+                'id': '0xc4e15973e6ff2a35cc804c2cf9d2a1b817a8b40f'
+                      '-0x43298F9f91a4545dF64748e78a2c777c580573d6',
                 'balance': '4842839650671116765534', 'token': {'symbol': 'ibBTC'}
             }
         ]
@@ -99,13 +99,13 @@ TOKEN_BALANCES_TEST_DATA_ZERO_BALANCES = {
     'tokenBalances':
         [
             {
-                'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6'
-                      '-0x3472a5a71965499acd81997a54bba8d852c6e53d',
+                'id': '0x3472a5a71965499acd81997a54bba8d852c6e53d'
+                      '-0x43298F9f91a4545dF64748e78a2c777c580573d6',
                 'balance': '0', 'token': {'symbol': 'BADGER'}
             },
             {
-                'id': '0x43298F9f91a4545dF64748e78a2c777c580573d6'
-                      '-0x798d1be841a82a273720ce31c822c61a67a601c3',
+                'id': '0x798d1be841a82a273720ce31c822c61a67a601c3'
+                      '-0x43298F9f91a4545dF64748e78a2c777c580573d6',
                 'balance': '0',
                 'token': {'symbol': 'DIGG'}
             },
