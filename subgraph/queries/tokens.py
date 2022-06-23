@@ -115,7 +115,7 @@ def fetch_token_balances(
                 f"Fetching {len(next_page['tokenBalances'])} token balances"
             )
             for entry in next_page["tokenBalances"]:
-                address = entry["id"].split("-")[1]
+                address = Web3.toChecksumAddress(entry["id"].split("-")[1])
                 amount = int(entry["balance"])
                 if amount > 0:
                     if entry["token"]["symbol"] == "BADGER":
