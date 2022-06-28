@@ -7,12 +7,14 @@ SCHEDULE_REWARDS_BLACKLIST = {
     addresses.TREASURY_OPS: "Badger Treasury Ops",
     addresses.TREASURY_VAULT: "Badger Treasury Vault",
     addresses.IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
+    addresses.BALANCER_VAULT: "Balancer Vault"
 }
 
 TREE_REWARDS_BLACKLIST = {
     addresses.CREAM_BBADGER: "Cream bBadger",
     addresses.SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     addresses.BBADGER: "Badger Vault",
+    addresses.BALANCER_VAULT: "Balancer Vault"
 }
 
 BVECVX_VOTER_BLACKLIST = {
