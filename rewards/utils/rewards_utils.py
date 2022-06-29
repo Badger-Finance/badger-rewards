@@ -1,4 +1,5 @@
 from collections import defaultdict
+from copy import deepcopy
 from decimal import Decimal
 from typing import (
     Callable,
@@ -72,6 +73,7 @@ def distribute_rewards_from_total_snapshot(
 ) -> RewardsList:
     rewards = RewardsList()
     custom_rewards_list = []
+    snapshot = deepcopy(snapshot)
     # Blacklist digg/badger rewards
     if token in NATIVE_TOKEN_REWARDS[snapshot.chain]:
         for addr in SCHEDULE_REWARDS_BLACKLIST.keys():
