@@ -73,6 +73,7 @@ def distribute_rewards_from_total_snapshot(
 ) -> RewardsList:
     rewards = RewardsList()
     custom_rewards_list = []
+    # create a copy of snapshot to prevent mutation
     snapshot = deepcopy(snapshot)
     # Blacklist digg/badger rewards
     if token in NATIVE_TOKEN_REWARDS[snapshot.chain]:
