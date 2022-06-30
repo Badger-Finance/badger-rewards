@@ -178,3 +178,7 @@ CHAIN_EXPLORER_URLS = {
     Network.Arbitrum: "arbiscan.io",
     Network.Fantom: "ftmscan.com"
 }
+
+BOOST_BUFFER = {
+    Network.Arbitrum: 1000
+}
