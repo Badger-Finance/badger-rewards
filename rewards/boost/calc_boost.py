@@ -6,7 +6,6 @@ from rich.console import Console
 from tabulate import tabulate
 
 from config.constants.emissions import (
-    BOOST_BLOCK_DELAY,
     BVECVX_BOOST_WEIGHT,
     DIGG_BOOST_WEIGHT,
     STAKE_RATIO_RANGES,
@@ -168,7 +167,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     """
     discord_url = get_discord_url(chain, BotType.Boost)
     console.log(f"Calculating boost at block {current_block} ...")
-    boost_bals = calc_boost_balances(current_block - BOOST_BLOCK_DELAY, chain)
+    boost_bals = calc_boost_balances(current_block, chain)
 
     all_addresses = calc_union_addresses(
         boost_bals.native, boost_bals.non_native)

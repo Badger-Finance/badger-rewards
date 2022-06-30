@@ -31,7 +31,8 @@ def mock_claims_and_ppfs(mocker):
 def test_calc_boost_balances(mocker, chain, mock_snapshots, mock_claims_and_ppfs, fetch_token_mock):
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ratio", return_value=1)
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ppfs", return_value=1)
-
+    snapshots = [Snapshot(addresses.BVECVX, {}), Snapshot(addresses.BVECVX_CVX_LP_SETT, {})]
+    mocker.patch("rewards.boost.boost_utils.sett_snapshot", side_effect=snapshots)
     boost_balances = calc_boost_balances(
         123, Network.Ethereum
     )
@@ -64,6 +65,8 @@ def test_calc_boost_balances(mocker, chain, mock_snapshots, mock_claims_and_ppfs
 
 
 def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_and_ppfs, fetch_token_mock):
+    snapshots = [Snapshot(addresses.BVECVX, {}), Snapshot(addresses.BVECVX_CVX_LP_SETT, {})]
+    mocker.patch("rewards.boost.boost_utils.sett_snapshot", side_effect=snapshots)
     mocker.patch(
         "rewards.boost.boost_utils.token_snapshot_usd",
         return_value=(
