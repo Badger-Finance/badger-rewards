@@ -1,6 +1,7 @@
 import math
 from decimal import Decimal
 import pytest
+from config.constants import addresses
 from helpers.enums import Network
 from rewards.boost.calc_boost import allocate_bvecvx_to_users, allocate_digg_to_users
 from rewards.boost.calc_boost import allocate_nft_balances_to_users
@@ -12,9 +13,9 @@ from rewards.boost.calc_boost import badger_boost
 from rewards.boost.calc_boost import calc_stake_ratio
 from rewards.boost.calc_boost import get_badger_boost_data
 from rewards.classes.Boost import BoostBalances
+from rewards.classes.Snapshot import Snapshot
 from rewards.feature_flags import flags
 from rewards.feature_flags.feature_flags import BOOST_STEP
-
 TEST_USER = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
 
 
@@ -201,6 +202,9 @@ def test_badger_boost__happy(
     mock_get_token_weight
 ):
     mocker.patch("rewards.classes.Snapshot.fetch_ppfs", return_value=(1.2, 1.2))
+    snapshots = [Snapshot(addresses.BVECVX, {}), Snapshot(addresses.BVECVX_CVX_LP_SETT, {})]
+    mocker.patch("rewards.boost.boost_utils.sett_snapshot", side_effect=snapshots)
+    mocker.patch("rewards.boost.boost_utils.digg_snapshot_usd", return_value={})
 
     mocker.patch(
         "rewards.boost.boost_utils.claims_snapshot",

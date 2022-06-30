@@ -61,9 +61,10 @@ def keccak(value: str):
 def combine_rewards(rewards_list: List[RewardsList], cycle) -> RewardsList:
     combined_rewards = RewardsList(cycle)
     for rewards in rewards_list:
-        for user, claims in rewards.claims.items():
-            for token, claim in claims.items():
-                combined_rewards.increase_user_rewards(user, token, claim)
+        if rewards.claims:
+            for user, claims in rewards.claims.items():
+                for token, claim in claims.items():
+                    combined_rewards.increase_user_rewards(user, token, claim)
     return combined_rewards
 
 
