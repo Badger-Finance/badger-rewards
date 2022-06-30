@@ -204,6 +204,7 @@ def test_badger_boost__happy(
     mocker.patch("rewards.classes.Snapshot.fetch_ppfs", return_value=(1.2, 1.2))
     snapshots = [Snapshot(addresses.BVECVX, {}), Snapshot(addresses.BVECVX_CVX_LP_SETT, {})]
     mocker.patch("rewards.boost.boost_utils.sett_snapshot", side_effect=snapshots)
+    mocker.patch("rewards.boost.boost_utils.digg_snapshot_usd", return_value={})
 
     mocker.patch(
         "rewards.boost.boost_utils.claims_snapshot",
