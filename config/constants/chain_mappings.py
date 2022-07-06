@@ -145,7 +145,7 @@ CLAIMABLE_TOKENS = {
 }
 
 UNCLAIMED_REWARDS_TOKENS = {
-    Network.Ethereum: [addresses.BCVXCRV, addresses.BVECVX, addresses.GRAVIAURA]
+    Network.Ethereum: [addresses.BCVXCRV, addresses.BVECVX, addresses.GRAVIAURA, addresses.BBB_A_USD, addresses.BAURABAL]
 }
 
 BOOSTED_EMISSION_TOKENS = {
