@@ -67,6 +67,9 @@ TOKENS_TO_CHECK = {
         "bCvxCrv": addresses.BCVXCRV,
         "bCvx": addresses.BCVX,
         "bveCVX": addresses.BVECVX,
+        "graviAura": addresses.GRAVIAURA,
+        "bauraBal": addresses.BAURABAL,
+        "bbb-a-USD": addresses.BBB_A_USD
     },
     Network.Arbitrum: {
         "Badger": addresses.ARB_BADGER,
@@ -145,7 +148,13 @@ CLAIMABLE_TOKENS = {
 }
 
 UNCLAIMED_REWARDS_TOKENS = {
-    Network.Ethereum: [addresses.BCVXCRV, addresses.BVECVX, addresses.GRAVIAURA]
+    Network.Ethereum: [
+        addresses.BCVXCRV,
+        addresses.BVECVX,
+        addresses.GRAVIAURA,
+        addresses.BBB_A_USD,
+        addresses.BAURABAL
+    ]
 }
 
 BOOSTED_EMISSION_TOKENS = {
