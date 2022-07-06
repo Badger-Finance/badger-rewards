@@ -68,7 +68,8 @@ TOKENS_TO_CHECK = {
         "bCvx": addresses.BCVX,
         "bveCVX": addresses.BVECVX,
         "graviAura": addresses.GRAVIAURA,
-        "bauraBal": addresses.BAURABAL
+        "bauraBal": addresses.BAURABAL,
+        "bbb-a-USD": addresses.BBB_A_USD
     },
     Network.Arbitrum: {
         "Badger": addresses.ARB_BADGER,
