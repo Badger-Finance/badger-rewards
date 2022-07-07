@@ -8,6 +8,7 @@ from typing import (
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
 from rich.console import Console
+from badger_api.claimable import get_claimable_rewards_data, get_tree_deficit
 
 from config.constants.chain_mappings import (
     CHAIN_IDS,
@@ -189,9 +190,12 @@ def approve_root(
             )
             if chain not in NO_BOOST_CHAINS:
                 upload_boosts(boosts, chain)
+            claimable_rewards_data = get_claimable_rewards_data(chain, end)
+            rewards_info = rewards_data["sett_rewards_analytics"]
+            rewards_info["claimable_rewards_data"] = claimable_rewards_data
             put_rewards_data(
                 chain, tree_manager.next_cycle, start, end,
-                rewards_data['sett_rewards_analytics']
+                rewards_info
             )
             return rewards_data
     else:
