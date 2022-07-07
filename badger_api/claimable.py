@@ -3,7 +3,6 @@ from typing import Dict
 
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
-from config.constants.addresses import ETH_BADGER_TREE
 from config.constants.chain_mappings import EMISSIONS_CONTRACTS
 
 from config.singletons import env_config
@@ -75,6 +74,7 @@ def get_claimable_data(chain: Network, block: int):
     metadata = get_claimable_metadata(chain, block)
     return get_claimable_balances(chain, metadata["chainStartBlock"])
 
+
 def get_claimable_rewards_data(chain: Network, block: int):
     snapshots = claims_snapshot(chain, block)
     deficits = {}
@@ -84,4 +84,3 @@ def get_claimable_rewards_data(chain: Network, block: int):
         claimable_balance = float(snapshot.total_balance())
         deficits[token] = tree_balance - claimable_balance
     return deficits
-        

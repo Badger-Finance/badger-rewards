@@ -8,7 +8,7 @@ from typing import (
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
 from rich.console import Console
-from badger_api.claimable import get_claimable_rewards_data, get_tree_deficit
+from badger_api.claimable import get_claimable_rewards_data
 
 from config.constants.chain_mappings import (
     CHAIN_IDS,
