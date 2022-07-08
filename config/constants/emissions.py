@@ -73,7 +73,7 @@ NATIVE = [
     addresses.BSLP_BADGER_WBTC,
     addresses.REM_BADGER,
     addresses.BCRV_BADGER_WBTC,
-    addresses.BAURA_BADGER_WBTC
+    addresses.BAURA_BADGER_WBTC,
     # arbitrum
     addresses.ARB_BSWAPR_WETH_BADGER,
 ]
