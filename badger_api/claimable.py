@@ -3,14 +3,11 @@ from typing import Dict
 
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
-from config.constants.chain_mappings import EMISSIONS_CONTRACTS
 
 from config.singletons import env_config
 from helpers.discord import send_error_to_discord
 from helpers.enums import Network
-from helpers.web3_utils import make_token
 from rewards.aws.helpers import dynamodb, get_metadata_table, get_snapshot_table
-from rewards.snapshot.claims_snapshot import claims_snapshot
 from subgraph.queries.setts import last_synced_block
 
 
@@ -73,14 +70,3 @@ def get_latest_claimable_snapshot(chain: Network):
 def get_claimable_data(chain: Network, block: int):
     metadata = get_claimable_metadata(chain, block)
     return get_claimable_balances(chain, metadata["chainStartBlock"])
-
-
-def get_claimable_rewards_data(chain: Network, block: int):
-    snapshots = claims_snapshot(chain, block)
-    deficits = {}
-    for token, snapshot in snapshots.items():
-        token_contract = make_token(token, chain)
-        tree_balance = token_contract.balanceOf(EMISSIONS_CONTRACTS[chain]["BadgerTree"])
-        claimable_balance = float(snapshot.total_balance())
-        deficits[token] = tree_balance - claimable_balance
-    return deficits
