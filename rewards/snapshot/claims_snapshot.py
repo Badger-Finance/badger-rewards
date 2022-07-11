@@ -76,6 +76,7 @@ def claims_snapshot_usd(chain: Network, block: int) -> Tuple[Counter, Counter]:
 
     return native, non_native
 
+
 def get_claimable_rewards_data(chain: Network, block: int) -> Dict[str, int]:
     snapshots = claims_snapshot(chain, block)
     deficits = {}

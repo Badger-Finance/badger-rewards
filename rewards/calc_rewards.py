@@ -8,7 +8,6 @@ from typing import (
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
 from rich.console import Console
-from badger_api.claimable import get_claimable_rewards_data
 
 from config.constants.chain_mappings import (
     CHAIN_IDS,
@@ -42,6 +41,7 @@ from rewards.utils.rewards_utils import (
     combine_rewards,
     process_cumulative_rewards,
 )
+from rewards.snapshot.claims_snapshot import get_claimable_rewards_data
 
 console = Console()
 
