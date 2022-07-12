@@ -9,7 +9,8 @@ from typing import (
 from badger_api.claimable import get_claimable_data
 from badger_api.requests import fetch_token_decimals
 from config.constants.addresses import DIGG
-from config.constants.chain_mappings import CLAIMABLE_TOKENS
+from config.constants.chain_mappings import CLAIMABLE_TOKENS, EMISSIONS_CONTRACTS
+from helpers.web3_utils import make_token
 from helpers.digg_utils import DiggUtils
 from helpers.discord import console_and_discord
 from helpers.enums import (
@@ -74,3 +75,16 @@ def claims_snapshot_usd(chain: Network, block: int) -> Tuple[Counter, Counter]:
             non_native += Counter(usd_claims.balances)
 
     return native, non_native
+
+
+def get_claimable_rewards_data(chain: Network, block: int) -> Dict[str, int]:
+    snapshots = claims_snapshot(chain, block)
+    deficits = {}
+    for token, snapshot in snapshots.items():
+        token_contract = make_token(token, chain)
+        numerator = token_contract.balanceOf(EMISSIONS_CONTRACTS[chain]["BadgerTree"]).call()
+        denominator = math.pow(10, token_contract.decimals().call())
+        tree_balance = numerator / denominator
+        claimable_balance = float(snapshot.total_balance())
+        deficits[token] = tree_balance - claimable_balance
+    return deficits
