@@ -82,7 +82,8 @@ def get_claimable_rewards_data(chain: Network, block: int) -> Dict[str, int]:
     deficits = {}
     for token, snapshot in snapshots.items():
         token_contract = make_token(token, chain)
-        tree_balance = token_contract.balanceOf(EMISSIONS_CONTRACTS[chain]["BadgerTree"])
+        denominator = math.pow(10, token_contract.decimals.call())
+        tree_balance = token_contract.balanceOf(EMISSIONS_CONTRACTS[chain]["BadgerTree"]) / denominator
         claimable_balance = float(snapshot.total_balance())
         deficits[token] = tree_balance - claimable_balance
     return deficits
