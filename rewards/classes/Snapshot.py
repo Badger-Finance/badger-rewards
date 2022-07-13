@@ -6,6 +6,7 @@ from typing import Dict, Tuple, Optional
 
 from rich.console import Console
 from web3 import Web3
+from badger_api.config import get_api_specific_path
 from badger_api.requests import fetch_ppfs, fetch_token_prices
 from config.constants.addresses import BDIGG, BSLP_DIGG_WBTC, BUNI_DIGG_WBTC, DIGG, WBTC
 from helpers.discord import get_discord_url, send_message_to_discord
@@ -77,18 +78,31 @@ class Snapshot:
     ) -> Snapshot:
         discord_url = get_discord_url(chain, bot_type)
         prices = fetch_token_prices()
+        staging_prices = fetch_token_prices(get_api_specific_path("staging"))
         wbtc_price = prices[WBTC]
         digg_price = prices[DIGG]
         if self.token not in prices:
-            price = Decimal(0)
-            console.log(f"CANT FIND PRICING FOR {self.token}")
+            # Try to fallback to staging for pricing
+            console.log(f"CANT FIND PRODUCTION PRICING FOR {self.token}")
             send_message_to_discord(
                 "**ERROR**",
-                f"Cannot find pricing for {self.token}",
+                f"Pricing for {self.token} not in production, checking staging",
                 [],
                 "Boost Bot",
                 url=discord_url,
             )
+            if self.token not in staging_prices:
+                price = Decimal(0)
+                console.log(f"CANT STAGING FIND PRICING FOR {self.token}")
+                send_message_to_discord(
+                    "**ERROR**",
+                    f"{self.token} is not in production or staging pricing",
+                    [],
+                    "Boost Bot",
+                    url=discord_url,
+                )
+            else:
+                prices[self.token] = staging_prices[self.token]
         elif not flags.flag_enabled(DIGG_BOOST):
             price = Decimal(prices[self.token]) * self.ratio
         elif self.token == DIGG:

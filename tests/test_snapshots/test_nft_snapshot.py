@@ -44,7 +44,7 @@ def mock_fetch_nfts(chain: str, block: int):
     }
 
 
-def mock_fetch_token_prices():
+def mock_fetch_token_prices(api_url: str = "https://fake.api.url/v2/prices"):
     return {BADGER: 10, WBTC: 0, DIGG: 0}
 
 
