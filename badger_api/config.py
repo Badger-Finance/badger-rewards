@@ -13,3 +13,12 @@ def get_api_base_path() -> str:
         return urls["prod"]
 
     raise EnvironmentError("invalid environment set")
+
+
+def get_api_specific_path(stage: str) -> str:
+    if stage == "staging" or stage == "test":
+        return urls["staging"]
+    elif stage == "prod":
+        return urls["prod"]
+
+    raise EnvironmentError("Invalid environment provided")
