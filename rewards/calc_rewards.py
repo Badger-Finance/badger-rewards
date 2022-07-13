@@ -1,4 +1,3 @@
-import imp
 import simplejson as json
 from typing import (
     Dict,
@@ -193,7 +192,9 @@ def approve_root(
                 upload_boosts(boosts, chain)
             claimable_rewards_data = get_claimable_rewards_deficits(chain, end)
             rewards_info = rewards_data["sett_rewards_analytics"]
-            rewards_info["claimable_rewards_data"] = json.dumps(claimable_rewards_data, use_decimal=True)
+            rewards_info["claimable_rewards_data"] = json.dumps(
+                claimable_rewards_data, use_decimal=True
+            )
             put_rewards_data(
                 chain, tree_manager.next_cycle, start, end,
                 rewards_info
