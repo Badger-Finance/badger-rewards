@@ -1,3 +1,4 @@
+from decimal import Decimal
 import math
 from collections import Counter
 from functools import lru_cache
@@ -77,14 +78,14 @@ def claims_snapshot_usd(chain: Network, block: int) -> Tuple[Counter, Counter]:
     return native, non_native
 
 
-def get_claimable_rewards_data(chain: Network, block: int) -> Dict[str, int]:
+def get_claimable_rewards_deficits(chain: Network, block: int) -> Dict[str, Decimal]:
     snapshots = claims_snapshot(chain, block)
     deficits = {}
     for token, snapshot in snapshots.items():
         token_contract = make_token(token, chain)
         numerator = token_contract.balanceOf(EMISSIONS_CONTRACTS[chain]["BadgerTree"]).call()
         denominator = math.pow(10, token_contract.decimals().call())
-        tree_balance = numerator / denominator
-        claimable_balance = float(snapshot.total_balance())
+        tree_balance = Decimal(numerator / denominator)
+        claimable_balance = snapshot.total_balance()
         deficits[token] = tree_balance - claimable_balance
     return deficits

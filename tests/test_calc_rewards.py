@@ -38,7 +38,7 @@ def test_approve_root__calls_analytics_store(mocker, prepare_approve_mocks):
         "rewards.calc_rewards.put_rewards_data",
     )
     mocker.patch(
-        "rewards.calc_rewards.get_claimable_rewards_data",
+        "rewards.calc_rewards.get_claimable_rewards_deficits", return_value={}
     )
     mocker.patch(
         "rewards.classes.TreeManager.env_config.get_web3",

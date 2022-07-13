@@ -1,4 +1,4 @@
-import json
+import simplejson as json
 from typing import (
     Dict,
     List,
@@ -41,7 +41,7 @@ from rewards.utils.rewards_utils import (
     combine_rewards,
     process_cumulative_rewards,
 )
-from rewards.snapshot.claims_snapshot import get_claimable_rewards_data
+from rewards.snapshot.claims_snapshot import get_claimable_rewards_deficits
 
 console = Console()
 
@@ -190,9 +190,11 @@ def approve_root(
             )
             if chain not in NO_BOOST_CHAINS:
                 upload_boosts(boosts, chain)
-            claimable_rewards_data = get_claimable_rewards_data(chain, end)
+            claimable_rewards_data = get_claimable_rewards_deficits(chain, end)
             rewards_info = rewards_data["sett_rewards_analytics"]
-            rewards_info["claimable_rewards_data"] = claimable_rewards_data
+            rewards_info["claimable_rewards_data"] = json.dumps(
+                claimable_rewards_data, use_decimal=True
+            )
             put_rewards_data(
                 chain, tree_manager.next_cycle, start, end,
                 rewards_info
