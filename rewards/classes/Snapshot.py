@@ -78,11 +78,11 @@ class Snapshot:
     ) -> Snapshot:
         discord_url = get_discord_url(chain, bot_type)
         prices = fetch_token_prices()
+        staging_prices = fetch_token_prices(get_api_specific_path("staging"))
         wbtc_price = prices[WBTC]
         digg_price = prices[DIGG]
         if self.token not in prices:
             # Try to fallback to staging for pricing
-            staging_prices = fetch_token_prices(get_api_specific_path("staging"))
             if self.token not in staging_prices:
                 price = Decimal(0)
                 console.log(f"CANT FIND PRICING FOR {self.token}")
