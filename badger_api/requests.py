@@ -31,7 +31,7 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
 
 
 @lru_cache
-def fetch_token_prices(api_url = badger_api) -> Dict[str, float]:
+def fetch_token_prices(api_url: str = badger_api) -> Dict[str, float]:
     """
     Fetch token prices for sett tokens
     """

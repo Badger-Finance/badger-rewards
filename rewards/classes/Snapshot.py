@@ -83,17 +83,26 @@ class Snapshot:
         digg_price = prices[DIGG]
         if self.token not in prices:
             # Try to fallback to staging for pricing
+            console.log(f"CANT FIND PRODUCTION PRICING FOR {self.token}")
+            send_message_to_discord(
+                "**ERROR**",
+                f"Pricing for {self.token} not in production, checking staging",
+                [],
+                "Boost Bot",
+                url=discord_url,
+            )
             if self.token not in staging_prices:
                 price = Decimal(0)
-                console.log(f"CANT FIND PRICING FOR {self.token}")
+                console.log(f"CANT STAGING FIND PRICING FOR {self.token}")
                 send_message_to_discord(
                     "**ERROR**",
-                    f"Cannot find pricing for {self.token}",
+                    f"{self.token} is not in production or staging pricing",
                     [],
                     "Boost Bot",
                     url=discord_url,
                 )
-            prices[self.token] = staging_prices[self.token]
+            else:
+                prices[self.token] = staging_prices[self.token]
         elif not flags.flag_enabled(DIGG_BOOST):
             price = Decimal(prices[self.token]) * self.ratio
         elif self.token == DIGG:
