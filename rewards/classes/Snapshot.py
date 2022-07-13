@@ -81,7 +81,9 @@ class Snapshot:
         staging_prices = fetch_token_prices(get_api_specific_path("staging"))
         wbtc_price = prices[WBTC]
         digg_price = prices[DIGG]
-        if self.token not in prices:
+        if self.token not in prices or prices[self.token] == 0:
+            price = Decimal(0)
+
             # Try to fallback to staging for pricing
             console.log(f"CANT FIND PRODUCTION PRICING FOR {self.token}")
             send_message_to_discord(
