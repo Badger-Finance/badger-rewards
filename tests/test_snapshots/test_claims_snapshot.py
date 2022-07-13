@@ -25,7 +25,7 @@ from rewards.classes.Snapshot import Snapshot
 from rewards.snapshot.claims_snapshot import (
     claims_snapshot,
     claims_snapshot_usd,
-    get_claimable_rewards_data
+    get_claimable_rewards_deficits
 )
 from tests.utils import (
     TEST_WALLET,
@@ -163,7 +163,7 @@ def test_claims_snapshot_usd__happy(claimable_block, mocker, fetch_token_mock):
     assert non_native[TEST_WALLET] == approx(Decimal(expected_non_native_balance))
 
 
-def test_get_claimable_rewards_data(mocker):
+def test_get_claimable_rewards_deficits(mocker):
     snapshots = {
         BADGER: Snapshot(BADGER, {
             TEST_WALLET: Decimal(10),
@@ -181,7 +181,7 @@ def test_get_claimable_rewards_data(mocker):
     mock_token.balanceOf.return_value.call.side_effect = [400e18, 200e18, 5000e18]
     mocker.patch("rewards.snapshot.claims_snapshot.claims_snapshot", return_value=snapshots)
     mocker.patch("rewards.snapshot.claims_snapshot.make_token", return_value=mock_token)
-    deficits = get_claimable_rewards_data(Network.Ethereum, 0)
-    assert deficits[BADGER] == 340
-    assert deficits[BVECVX] == -300
-    assert deficits[BCVXCRV] == 0
+    deficits = get_claimable_rewards_deficits(Network.Ethereum, 0)
+    assert deficits[BADGER] == Decimal(340)
+    assert deficits[BVECVX] == Decimal(-300)
+    assert deficits[BCVXCRV] == Decimal(0)
