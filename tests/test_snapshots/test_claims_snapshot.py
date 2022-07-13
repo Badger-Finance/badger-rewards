@@ -1,5 +1,6 @@
 import math
 from decimal import Decimal
+from unittest.mock import MagicMock
 
 import pytest
 import responses
@@ -10,6 +11,7 @@ from config.constants.addresses import (
     ARB_BSWAPR_WETH_SWAPR,
     BADGER,
     BCVXCRV,
+    BVECVX,
     DIGG,
     WBTC,
     POLY_SUSHI,
@@ -19,7 +21,12 @@ from config.constants.chain_mappings import NETWORK_TO_BADGER_TOKEN
 from config.constants.emissions import BOOST_CHAINS
 from conftest import MockDiggUtils
 from helpers.enums import BalanceType, Network
-from rewards.snapshot.claims_snapshot import claims_snapshot, claims_snapshot_usd
+from rewards.classes.Snapshot import Snapshot
+from rewards.snapshot.claims_snapshot import (
+    claims_snapshot,
+    claims_snapshot_usd,
+    get_claimable_rewards_deficits
+)
 from tests.utils import (
     TEST_WALLET,
     TEST_WALLET_ANOTHER,
@@ -154,3 +161,27 @@ def test_claims_snapshot_usd__happy(claimable_block, mocker, fetch_token_mock):
                 CVX_CRV_PRICE * int(claim["balance"]) / math.pow(10, 18)
             )
     assert non_native[TEST_WALLET] == approx(Decimal(expected_non_native_balance))
+
+
+def test_get_claimable_rewards_deficits(mocker):
+    snapshots = {
+        BADGER: Snapshot(BADGER, {
+            TEST_WALLET: Decimal(10),
+            TEST_WALLET_ANOTHER: Decimal(50)
+        }),
+        BVECVX: Snapshot(BVECVX, {
+            TEST_WALLET_ANOTHER: Decimal(500)
+        }),
+        BCVXCRV: Snapshot(BCVXCRV, {
+            TEST_WALLET: Decimal(5000)
+        })
+    }
+    mock_token = MagicMock()
+    mock_token.decimals.return_value.call.return_value = 18
+    mock_token.balanceOf.return_value.call.side_effect = [400e18, 200e18, 5000e18]
+    mocker.patch("rewards.snapshot.claims_snapshot.claims_snapshot", return_value=snapshots)
+    mocker.patch("rewards.snapshot.claims_snapshot.make_token", return_value=mock_token)
+    deficits = get_claimable_rewards_deficits(Network.Ethereum, 0)
+    assert deficits[BADGER] == Decimal(340)
+    assert deficits[BVECVX] == Decimal(-300)
+    assert deficits[BCVXCRV] == Decimal(0)

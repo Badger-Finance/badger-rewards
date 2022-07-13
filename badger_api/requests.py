@@ -31,14 +31,14 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
 
 
 @lru_cache
-def fetch_token_prices() -> Dict[str, float]:
+def fetch_token_prices(api_url: str = badger_api) -> Dict[str, float]:
     """
     Fetch token prices for sett tokens
     """
     chains = BOOST_CHAINS
     prices = {}
     for chain in chains:
-        chain_prices = http_client.get(f"{badger_api}/prices?chain={chain}")
+        chain_prices = http_client.get(f"{api_url}/prices?chain={chain}")
         if not chain_prices:
             continue
         prices = {**prices, **chain_prices}
