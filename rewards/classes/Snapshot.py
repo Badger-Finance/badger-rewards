@@ -104,7 +104,7 @@ class Snapshot:
                     url=discord_url,
                 )
             else:
-                price = staging_prices[self.token]
+                price = Decimal(staging_prices[self.token]) * self.ratio
         elif not flags.flag_enabled(DIGG_BOOST):
             price = Decimal(prices[self.token]) * self.ratio
         elif self.token == DIGG:
