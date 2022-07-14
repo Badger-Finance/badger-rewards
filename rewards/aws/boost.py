@@ -12,15 +12,15 @@ from rewards.aws.helpers import get_bucket, s3
 console = Console()
 
 
-def upload_boosts(boost_data, chain: str):
-    upload_boosts_to_aws(boost_data, chain, "badger-boosts")
+def upload_boosts(boost_data, chain: str, cycle: bool = False):
+    upload_boosts_to_aws(boost_data, chain, "badger-boosts", cycle)
 
 
 def upload_proposed_boosts(boost_data, chain: str):
     upload_boosts_to_aws(boost_data, chain, "propose-boosts")
 
 
-def upload_boosts_to_aws(boost_data, chain: str, file_name: str):
+def upload_boosts_to_aws(boost_data, chain: str, file_name: str, cycle: bool = False):
     """Upload boosts file to aws bucket
 
     :param test:
@@ -35,7 +35,8 @@ def upload_boosts_to_aws(boost_data, chain: str, file_name: str):
         with open('test_boost.json', 'w') as tree_file:
             json.dump(boost_data, tree_file, indent=4, sort_keys=True)
     elif env_config.production:
-        buckets.append("badger-staging-merkle-proofs")
+        if cycle:
+            buckets.append("badger-staging-merkle-proofs")
         buckets.append("badger-merkle-proofs")
 
     for b in buckets:
