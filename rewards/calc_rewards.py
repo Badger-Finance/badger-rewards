@@ -189,7 +189,7 @@ def approve_root(
                 rewards_data["userMultipliers"],
             )
             if chain not in NO_BOOST_CHAINS:
-                upload_boosts(boosts, chain)
+                upload_boosts(boosts, chain, True)
             claimable_rewards_data = get_claimable_rewards_deficits(chain, end)
             rewards_info = rewards_data["sett_rewards_analytics"]
             rewards_info["claimable_rewards_data"] = json.dumps(
