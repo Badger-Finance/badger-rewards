@@ -5,7 +5,7 @@ metadata:
     labels:
         app: approve-arb-cycle-bot
 spec:
-    schedule: '15 */2 * * *'
+    schedule: '15 13 * * *'
     startingDeadlineSeconds: 180
     suspend: false
     jobTemplate:
@@ -26,5 +26,5 @@ spec:
                               - name: KUBE
                                 value: 'True'
                               - name: 'FIX_CYCLE'
-                                value: 'False'
+                                value: 'True'
                     restartPolicy: OnFailure
