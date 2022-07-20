@@ -6,7 +6,6 @@ discord.py==1.7.3
 eip712==0.1.0
 eth-abi==2.1.1
 eth-account==0.5.6
-eth-brownie==1.17.0
 eth-event==1.2.3
 eth-hash==0.3.2
 eth-keyfile==0.5.1
