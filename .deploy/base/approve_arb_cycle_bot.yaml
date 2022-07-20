@@ -5,7 +5,7 @@ metadata:
     labels:
         app: approve-arb-cycle-bot
 spec:
-    schedule: '15 */2 * * *'
+    schedule: '25 20 * * *'
     startingDeadlineSeconds: 180
     suspend: false
     jobTemplate:
