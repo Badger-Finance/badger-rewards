@@ -21,7 +21,7 @@ from helpers.discord import (
     send_plain_text_to_discord,
 )
 from helpers.enums import BalanceType, DiscordRoles, Network
-from badger_utils.time_utils import seconds_to_hours, to_utc_date
+from helpers.time_utils import seconds_to_hours, to_utc_date
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
