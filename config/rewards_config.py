@@ -1,5 +1,5 @@
 from helpers.enums import Network
-from badger_utils.time_utils import hours_to_seconds
+from helpers.time_utils import hours_to_seconds
 
 
 class RewardsConfig:
