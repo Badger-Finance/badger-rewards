@@ -23,7 +23,8 @@ BVECVX_VOTER_BLACKLIST = {
 DIGG_BOOST_VAULTS = [
     addresses.BDIGG,
     addresses.BSLP_DIGG_WBTC,
-    addresses.BUNI_DIGG_WBTC
+    addresses.BUNI_DIGG_WBTC,
+    addresses.BAURA_DIGG_WBTC
 ]
 
 NATIVE_TOKEN_REWARDS = {
@@ -74,7 +75,6 @@ NATIVE = [
     addresses.REM_BADGER,
     addresses.BCRV_BADGER_WBTC,
     addresses.BAURA_BADGER_WBTC,
-    addresses.BAURA_DIGG_WBTC,
     # arbitrum
     addresses.ARB_BSWAPR_WETH_BADGER,
 ]
