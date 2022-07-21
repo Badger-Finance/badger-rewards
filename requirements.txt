@@ -24,3 +24,4 @@ requests==2.26.0
 rich==9.3.0
 tabulate==0.8.7
 simplejson==3.17.6
+web3>=5.24.0,<6
