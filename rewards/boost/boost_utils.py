@@ -33,7 +33,7 @@ def get_contributor_native_balance_usd(chain: Network) -> Dict[str, Decimal]:
         ratio=1,
         type=BalanceType.Native
     )
-    return snapshot.convert_to_usd(chain)
+    return snapshot.convert_to_usd(chain).balances
 
 
 def get_bvecvx_lp_ratio() -> Decimal:
