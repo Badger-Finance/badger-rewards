@@ -13,7 +13,6 @@ from rewards.boost.boost_utils import (
     filter_dust,
     get_contributor_native_balance_usd,
 )
-from badger_api.requests import badger_api
 from conftest import (
     CHAIN_CLAIMS_SNAPSHOT_DATA,
     CHAIN_SETT_SNAPSHOT_DATA,
@@ -113,6 +112,10 @@ def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_and_ppfs,
         return_value={
             "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.000001241234
         }
+    )
+    mocker.patch(
+        "rewards.boost.boost_utils.get_contributor_native_balance_usd",
+        return_value={}
     )
 
     boost_balances = calc_boost_balances(
