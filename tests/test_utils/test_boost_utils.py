@@ -1,4 +1,6 @@
+from decimal import Decimal
 import pytest
+import responses
 
 from rewards.classes.Snapshot import Snapshot
 from helpers.enums import Network
@@ -7,7 +9,9 @@ from rewards.boost.boost_utils import (
     calc_boost_balances,
     calc_union_addresses,
     filter_dust,
+    get_contributor_native_balance_usd,
 )
+from badger_api.requests import badger_api
 from conftest import (
     CHAIN_CLAIMS_SNAPSHOT_DATA,
     CHAIN_SETT_SNAPSHOT_DATA,
@@ -142,3 +146,19 @@ def test_calc_union_addresses():
         "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56",
         "0x0000000000007F150Bd6f54c40A34d7C3d5e9f561",
     }
+
+@responses.active
+def test_get_contributor_native_balance_usd(responses):
+    badger_price = 90
+    responses.add(
+        responses.GET,
+        f"{badger_api}/prices?chain=ethereum",
+        json={
+            addresses.BADGER: badger_price,
+        },
+        status=200,
+    )
+    expected_native_balance = badger_price * 450
+    native_balances_usd = get_contributor_native_balance_usd(Network.Ethereum)
+    for value in native_balances_usd.values():
+        assert value == Decimal(expected_native_balance)

@@ -6,7 +6,8 @@ from typing import List
 from rich.console import Console
 
 from config.constants import addresses
-from helpers.enums import Abi
+from config.constants.emissions import CONTRIBUTOR_BOOST
+from helpers.enums import Abi, BalanceType
 from helpers.enums import Network
 from helpers.web3_utils import make_contract
 from rewards.classes.Boost import BoostBalances
@@ -22,6 +23,17 @@ from rewards.utils.snapshot_utils import digg_snapshot_usd
 from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
 
 console = Console()
+
+
+def get_contributor_native_balance_usd(chain: Network) -> Dict[str, Decimal]:
+    contributor_badger_balances = CONTRIBUTOR_BOOST.get(chain, {})
+    snapshot = Snapshot(
+        addresses.BADGER,
+        contributor_badger_balances,
+        ratio=1,
+        type=BalanceType.Native
+    )
+    return snapshot.convert_to_usd(chain)
 
 
 def get_bvecvx_lp_ratio() -> Decimal:
@@ -84,6 +96,7 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     native_setts, non_native_setts = chain_snapshot_usd(chain, block)
     non_native += Counter(non_native_setts)
     native += Counter(native_setts)
+    native += get_contributor_native_balance_usd(chain)
 
     bvecvx_usd = {}
     digg_usd = {}
