@@ -3,11 +3,11 @@ from unittest.mock import MagicMock
 import pytest
 import responses
 from badger_api.config import get_api_specific_path
-from config.constants.emissions import CONTRIBUTOR_BOOST_END_TIMESTAMP
 
 from rewards.classes.Snapshot import Snapshot
 from helpers.enums import Network
 from config.constants import addresses
+from config.singletons import env_config
 from rewards.boost.boost_utils import (
     calc_boost_balances,
     calc_union_addresses,
@@ -160,14 +160,11 @@ def test_get_contributor_native_balance_usd(mocker):
     prod_api = get_api_specific_path("prod")
     staging_api = get_api_specific_path("staging")
     chain = Network.Ethereum
-    mocker.patch(
-        "rewards.utils.boost_utils.env_config.get_web3",
-        MagicMock(
-            return_value=MagicMock(
-                eth=MagicMock(
-                    get_block=MagicMock(
-                        return_value={"timestamp":1664582390}
-                    )
+    env_config.get_web3 = MagicMock(
+        return_value=MagicMock(
+            eth=MagicMock(
+                get_block=MagicMock(
+                    return_value={"timestamp": 664582390}
                 )
             )
         )
@@ -201,17 +198,14 @@ def test_get_contributor_native_balance_usd(mocker):
 
 def test_get_contributor_native_balance_usd_past_timestamp(mocker):
     chain = Network.Ethereum
-    native_balances_usd = get_contributor_native_balance_usd(chain, 0)
-    mocker.patch(
-        "rewards.utils.boost_utils.env_config.get_web3",
-        MagicMock(
-            return_value=MagicMock(
-                eth=MagicMock(
-                    get_block=MagicMock(
-                        return_value={"timestamp": 1664582400}
-                    )
+    env_config.get_web3 = MagicMock(
+        return_value=MagicMock(
+            eth=MagicMock(
+                get_block=MagicMock(
+                    return_value={"timestamp": 2664582390}
                 )
             )
         )
     )
+    native_balances_usd = get_contributor_native_balance_usd(chain, 100)
     assert native_balances_usd == {}

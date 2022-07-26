@@ -26,6 +26,8 @@ console = Console()
 
 def get_contributor_native_balance_usd(chain: Network, block: int) -> Dict[str, Decimal]:
     timestamp = env_config.get_web3(chain).eth.get_block(block)["timestamp"]
+    console.log(timestamp)
+    console.log(CONTRIBUTOR_BOOST_END_TIMESTAMP)
     if timestamp < CONTRIBUTOR_BOOST_END_TIMESTAMP:
         contributor_badger_balances = CONTRIBUTOR_BOOST.get(chain, {})
         snapshot = Snapshot(
@@ -99,7 +101,7 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     native_setts, non_native_setts = chain_snapshot_usd(chain, block)
     non_native += Counter(non_native_setts)
     native += Counter(native_setts)
-    native += get_contributor_native_balance_usd(chain)
+    native += get_contributor_native_balance_usd(chain, block)
 
     bvecvx_usd = {}
     digg_usd = {}

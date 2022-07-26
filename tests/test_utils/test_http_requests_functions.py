@@ -138,7 +138,7 @@ def test_fetch_token_prices_handled(mock_discord):
         responses.add(
             responses.GET, f"{badger_api}/prices?chain={chain}", json={}, status=404
         )
-        fetch_token_prices()
+        fetch_token_prices(chain)
 
         # Make sure discord message was sent
         assert mock_discord.called
