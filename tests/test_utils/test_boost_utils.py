@@ -39,6 +39,16 @@ def test_calc_boost_balances(mocker, chain, mock_snapshots, mock_claims_and_ppfs
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ppfs", return_value=1)
     mocker.patch("rewards.boost.boost_utils.digg_snapshot_usd", return_value={})
     snapshots = [Snapshot(addresses.BVECVX, {}), Snapshot(addresses.BVECVX_CVX_LP_SETT, {})]
+    env_config.get_web3 = MagicMock(
+        return_value=MagicMock(
+            eth=MagicMock(
+                get_block=MagicMock(
+                    return_value={"timestamp": 664582390}
+                )
+            )
+        )
+    )
+
     mocker.patch("rewards.boost.boost_utils.sett_snapshot", side_effect=snapshots)
     boost_balances = calc_boost_balances(
         123, Network.Ethereum

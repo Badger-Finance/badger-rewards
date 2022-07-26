@@ -213,6 +213,16 @@ def test_badger_boost__happy(
     mocker.patch("rewards.boost.calc_boost.fetch_nfts", return_value={})
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ratio", return_value=1)
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ppfs", return_value=1)
+    env_config.get_web3 = MagicMock(
+        return_value=MagicMock(
+            eth=MagicMock(
+                get_block=MagicMock(
+                    return_value={"timestamp": 664582390}
+                )
+            )
+        )
+    )
+
     result = badger_boost(123, Network.Ethereum)
     assert mock_discord_send_code.called
     # Check boosts for different data points
