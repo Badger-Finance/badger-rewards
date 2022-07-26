@@ -2,6 +2,7 @@ import math
 from decimal import Decimal
 import pytest
 from config.constants import addresses
+from config.singletons import env_config
 from helpers.enums import Network
 from rewards.boost.calc_boost import allocate_bvecvx_to_users, allocate_digg_to_users
 from rewards.boost.calc_boost import allocate_nft_balances_to_users
@@ -16,6 +17,8 @@ from rewards.classes.Boost import BoostBalances
 from rewards.classes.Snapshot import Snapshot
 from rewards.feature_flags import flags
 from rewards.feature_flags.feature_flags import BOOST_STEP
+from unittest.mock import MagicMock
+
 TEST_USER = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
 
 
