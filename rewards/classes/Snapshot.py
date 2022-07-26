@@ -77,10 +77,13 @@ class Snapshot:
         self, chain: Network, bot_type: BotType = BotType.Boost
     ) -> Snapshot:
         discord_url = get_discord_url(chain, bot_type)
-        prices = fetch_token_prices()
-        staging_prices = fetch_token_prices(get_api_specific_path("staging"))
-        wbtc_price = prices[WBTC]
-        digg_price = prices[DIGG]
+        prices = fetch_token_prices(chain)
+        staging_prices = fetch_token_prices(chain, get_api_specific_path("staging"))
+        wbtc_price = 0
+        digg_price = 0
+        if chain == Network.Ethereum:
+            wbtc_price = prices[WBTC]
+            digg_price = prices[DIGG]
         if self.token not in prices or prices[self.token] == 0:
             price = Decimal(0)
 

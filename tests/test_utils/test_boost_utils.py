@@ -158,28 +158,28 @@ def test_get_contributor_native_balance_usd():
     badger_price = 90
     prod_api = get_api_specific_path("prod")
     staging_api = get_api_specific_path("staging")
-    for boost_chain in BOOST_CHAINS:
-        responses.add(
-            responses.GET,
-            f"{prod_api}/prices?chain={boost_chain}",
-            json={
-                addresses.BADGER: badger_price,
-                addresses.WBTC: 0,
-                addresses.DIGG: 0
-            },
-            status=200,
-        )
-        responses.add(
-            responses.GET,
-            f"{staging_api}/prices?chain={boost_chain}",
-            json={
-                addresses.BADGER: badger_price,
-                addresses.WBTC: 0,
-                addresses.DIGG: 0
-            },
-            status=200,
-        )
+    chain = Network.Ethereum
+    responses.add(
+        responses.GET,
+        f"{prod_api}/prices?chain={chain}",
+        json={
+            addresses.BADGER: badger_price,
+            addresses.WBTC: 0,
+            addresses.DIGG: 0
+        },
+        status=200,
+    )
+    responses.add(
+        responses.GET,
+        f"{staging_api}/prices?chain={chain}",
+        json={
+            addresses.BADGER: badger_price,
+            addresses.WBTC: 0,
+            addresses.DIGG: 0
+        },
+        status=200,
+    )
     expected_native_balance = badger_price * 450
-    native_balances_usd = get_contributor_native_balance_usd(Network.Ethereum)
+    native_balances_usd = get_contributor_native_balance_usd(chain
     for value in native_balances_usd.values():
         assert value == Decimal(expected_native_balance)

@@ -128,20 +128,19 @@ def test_claims_snapshot_usd__happy(claimable_block, mocker, fetch_token_mock):
         "rewards.snapshot.claims_snapshot.get_claimable_data", mock_get_claimable_data
     )
     # Make sure native and non-native balances are correcly calculated to usd
-    for boost_chain in BOOST_CHAINS:
-        responses.add(
-            responses.GET,
-            f"{badger_api}/prices?chain={boost_chain}",
-            json={
-                BADGER: BADGER_PRICE,
-                BCVXCRV: CVX_CRV_PRICE,
-                XSUSHI: XSUSHI_PRICE,
-                DIGG: DIGG_PRICE,
-                WBTC: WBTC_PRICE,
-                ARB_BSWAPR_WETH_SWAPR: SWAPR_WETH_SWAPR_PRICE,
-            },
-            status=200,
-        )
+    responses.add(
+        responses.GET,
+        f"{badger_api}/prices?chain=ethereum",
+        json={
+            BADGER: BADGER_PRICE,
+            BCVXCRV: CVX_CRV_PRICE,
+            XSUSHI: XSUSHI_PRICE,
+            DIGG: DIGG_PRICE,
+            WBTC: WBTC_PRICE,
+            ARB_BSWAPR_WETH_SWAPR: SWAPR_WETH_SWAPR_PRICE,
+        },
+        status=200,
+    )
     responses.add_passthru("https://")
     native, non_native = claims_snapshot_usd(Network.Ethereum, claimable_block)
     expected_native_balance = 0

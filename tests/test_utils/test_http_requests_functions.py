@@ -138,11 +138,11 @@ def test_fetch_token_prices_handled(mock_discord):
         responses.add(
             responses.GET, f"{badger_api}/prices?chain={chain}", json={}, status=404
         )
-    fetch_token_prices()
+        fetch_token_prices()
 
-    # Make sure discord message was sent
-    assert mock_discord.called
-    # Make sure len(BOOST_CHAINS) messages were sent to discord: one for each BOOST chain
+        # Make sure discord message was sent
+        assert mock_discord.called
+        # Make sure len(BOOST_CHAINS) messages were sent to discord: one for each BOOST chain
     assert mock_discord.call_count == len(BOOST_CHAINS)
 
 
