@@ -18,7 +18,6 @@ from config.constants.addresses import (
     XSUSHI,
 )
 from config.constants.chain_mappings import NETWORK_TO_BADGER_TOKEN
-from config.constants.emissions import BOOST_CHAINS
 from conftest import MockDiggUtils
 from helpers.enums import BalanceType, Network
 from rewards.classes.Snapshot import Snapshot

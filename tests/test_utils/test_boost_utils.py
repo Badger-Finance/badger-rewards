@@ -2,7 +2,6 @@ from decimal import Decimal
 import pytest
 import responses
 from badger_api.config import get_api_specific_path
-from config.constants.emissions import BOOST_CHAINS
 
 from rewards.classes.Snapshot import Snapshot
 from helpers.enums import Network
@@ -180,6 +179,6 @@ def test_get_contributor_native_balance_usd():
         status=200,
     )
     expected_native_balance = badger_price * 450
-    native_balances_usd = get_contributor_native_balance_usd(chain
+    native_balances_usd = get_contributor_native_balance_usd(chain)
     for value in native_balances_usd.values():
         assert value == Decimal(expected_native_balance)
