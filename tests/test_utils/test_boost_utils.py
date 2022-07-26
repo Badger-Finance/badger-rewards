@@ -1,7 +1,9 @@
 from decimal import Decimal
+from unittest.mock import MagicMock
 import pytest
 import responses
 from badger_api.config import get_api_specific_path
+from config.constants.emissions import CONTRIBUTOR_BOOST_END_TIMESTAMP
 
 from rewards.classes.Snapshot import Snapshot
 from helpers.enums import Network
@@ -153,11 +155,24 @@ def test_calc_union_addresses():
 
 
 @responses.activate
-def test_get_contributor_native_balance_usd():
+def test_get_contributor_native_balance_usd(mocker):
     badger_price = 90
     prod_api = get_api_specific_path("prod")
     staging_api = get_api_specific_path("staging")
     chain = Network.Ethereum
+    mocker.patch(
+        "rewards.utils.boost_utils.env_config.get_web3",
+        MagicMock(
+            return_value=MagicMock(
+                eth=MagicMock(
+                    get_block=MagicMock(
+                        return_value={"timestamp":1664582390}
+                    )
+                )
+            )
+        )
+    )
+
     responses.add(
         responses.GET,
         f"{prod_api}/prices?chain={chain}",
@@ -179,6 +194,24 @@ def test_get_contributor_native_balance_usd():
         status=200,
     )
     expected_native_balance = badger_price * 450
-    native_balances_usd = get_contributor_native_balance_usd(chain)
+    native_balances_usd = get_contributor_native_balance_usd(chain, 0)
     for value in native_balances_usd.values():
         assert value == Decimal(expected_native_balance)
+
+
+def test_get_contributor_native_balance_usd_past_timestamp(mocker):
+    chain = Network.Ethereum
+    native_balances_usd = get_contributor_native_balance_usd(chain, 0)
+    mocker.patch(
+        "rewards.utils.boost_utils.env_config.get_web3",
+        MagicMock(
+            return_value=MagicMock(
+                eth=MagicMock(
+                    get_block=MagicMock(
+                        return_value={"timestamp": 1664582400}
+                    )
+                )
+            )
+        )
+    )
+    assert native_balances_usd == {}
