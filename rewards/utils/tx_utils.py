@@ -207,6 +207,7 @@ def create_tx_options(address: str, w3: Web3, chain: Network) -> Dict:
         options["gas"] = TREE_ACTION_GAS[chain]
     elif chain == Network.Arbitrum:
         options["gas"] = TREE_ACTION_GAS[chain]
+        options["gasPrice"] = get_effective_gas_price(w3, chain)
     else:
         options["gasPrice"] = get_effective_gas_price(w3, chain)
     return options
