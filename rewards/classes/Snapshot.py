@@ -8,10 +8,12 @@ from rich.console import Console
 from web3 import Web3
 from badger_api.config import get_api_specific_path
 from badger_api.requests import fetch_ppfs, fetch_token_prices
-from config.constants.addresses import BDIGG, BSLP_DIGG_WBTC, BUNI_DIGG_WBTC, DIGG, WBTC
+from config.constants.addresses import (
+    BAURA_DIGG_WBTC, BDIGG, BSLP_DIGG_WBTC, BUNI_DIGG_WBTC, DIGG, WBTC
+)
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
-from config.constants.emissions import DIGG_LP_PRICE_RATIO
+from config.constants.emissions import DIGG_AURA_LP_PRICE_RATIO, DIGG_LP_PRICE_RATIO
 from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
 
 console = Console()
@@ -115,6 +117,8 @@ class Snapshot:
         elif self.token in [BUNI_DIGG_WBTC, BSLP_DIGG_WBTC]:
             digg_lp_price = prices[self.token]
             price = Decimal(DIGG_LP_PRICE_RATIO * digg_lp_price + (digg_lp_price * DIGG_LP_PRICE_RATIO * (wbtc_price / digg_price)))  # noqa: E501
+        elif self.token == BAURA_DIGG_WBTC:
+            price = Decimal(prices[self.token] * DIGG_AURA_LP_PRICE_RATIO * (wbtc_price / digg_price))  # noqa: E501
         else:
             price = Decimal(prices[self.token]) * self.ratio
 
