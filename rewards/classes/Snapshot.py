@@ -114,7 +114,7 @@ class Snapshot:
             _, digg_ppfs = fetch_ppfs()
             price = Decimal(wbtc_price * digg_ppfs)
         elif self.token in [BUNI_DIGG_WBTC, BSLP_DIGG_WBTC, BAURA_DIGG_WBTC]:
-            price = Decimal(prices[self.token] * self.ratio * (wbtc_price / digg_price))  # noqa: E501
+            price = Decimal(prices[self.token] * float(self.ratio) * (wbtc_price / digg_price))  # noqa: E501
         else:
             price = Decimal(prices[self.token]) * self.ratio
 
