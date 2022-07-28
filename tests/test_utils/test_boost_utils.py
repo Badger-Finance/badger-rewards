@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 import responses
 from badger_api.config import get_api_specific_path
+from config.constants.emissions import CONTRIBUTOR_BOOST
 
 from rewards.classes.Snapshot import Snapshot
 from helpers.enums import Network
@@ -200,9 +201,9 @@ def test_get_contributor_native_balance_usd(mocker):
         },
         status=200,
     )
-    expected_native_balance = badger_price * 450
     native_balances_usd = get_contributor_native_balance_usd(chain, 0)
-    for value in native_balances_usd.values():
+    for addr, value in native_balances_usd.items():
+        expected_native_balance = badger_price * CONTRIBUTOR_BOOST[chain][addr]
         assert value == Decimal(expected_native_balance)
 
 
