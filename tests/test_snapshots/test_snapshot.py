@@ -1,5 +1,5 @@
 from badger_api.config import get_api_base_path
-from config.constants.addresses import BUNI_DIGG_WBTC, DIGG, WBTC
+from config.constants.addresses import BAURA_DIGG_WBTC, BUNI_DIGG_WBTC, DIGG, WBTC
 from config.constants.emissions import BOOST_CHAINS
 from helpers.enums import Network
 from rewards.classes.Snapshot import Snapshot
@@ -39,14 +39,18 @@ def test_convert_to_usd_digg_boost():
             json={
                 WBTC: 50,
                 DIGG: 10,
-                BUNI_DIGG_WBTC: 500
+                BUNI_DIGG_WBTC: 500,
+                BAURA_DIGG_WBTC: 100,
             },
             status=200,
         )
     address = "0x00192Fb10dF37c9FB26829eb2CC623cd1BF599E8"
-    lp_snapshot = Snapshot(BUNI_DIGG_WBTC, {address: 1})
+    lp_snapshot = Snapshot(BUNI_DIGG_WBTC, {address: 1}, ratio=0.5)
+    aura_lp_snapshot = Snapshot(BAURA_DIGG_WBTC, {address: 1}, ratio=0.4)
     digg_snapshot = Snapshot(DIGG, {address: 1})
     digg_usd = digg_snapshot.convert_to_usd(chain).balances
-    assert digg_usd[address] == 50
     lp_bals = lp_snapshot.convert_to_usd(chain).balances
-    assert lp_bals[address] == 1250
+    aura_lp_usd = aura_lp_snapshot.convert_to_usd(chain).balances
+    assert digg_usd[address] == 50
+    assert lp_bals[address] == 1500
+    assert lp_bals[aura_lp_usd] == 240

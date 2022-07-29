@@ -9,7 +9,12 @@ from web3 import Web3
 from badger_api.config import get_api_specific_path
 from badger_api.requests import fetch_ppfs, fetch_token_prices
 from config.constants.addresses import (
-    BAURA_DIGG_WBTC, BDIGG, BSLP_DIGG_WBTC, BUNI_DIGG_WBTC, DIGG, WBTC
+    BAURA_DIGG_WBTC,
+    BDIGG,
+    BSLP_DIGG_WBTC,
+    BUNI_DIGG_WBTC,
+    DIGG,
+    WBTC
 )
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import BotType, Network
@@ -114,7 +119,8 @@ class Snapshot:
             _, digg_ppfs = fetch_ppfs()
             price = Decimal(wbtc_price * digg_ppfs)
         elif self.token in [BUNI_DIGG_WBTC, BSLP_DIGG_WBTC, BAURA_DIGG_WBTC]:
-            price = Decimal(prices[self.token] * float(self.ratio) * (wbtc_price / digg_price))  # noqa: E501
+            digg_lp_price = prices[self.token]
+            price = Decimal(self.ratio * digg_lp_price + (digg_lp_price * self.ratio * (wbtc_price / digg_price)))  # noqa: E501
         else:
             price = Decimal(prices[self.token]) * self.ratio
 
