@@ -49,4 +49,4 @@ def test_convert_to_usd_digg_boost():
     digg_usd = digg_snapshot.convert_to_usd(chain).balances
     assert digg_usd[address] == 50
     lp_bals = lp_snapshot.convert_to_usd(chain).balances
-    assert lp_bals[address] == 1500
+    assert lp_bals[address] == 1250
