@@ -36,7 +36,7 @@ class TreeManager:
         self.next_cycle = self.get_current_cycle() + 1
         self.propose_account = cycle_account
         self.approve_account = cycle_account
-        self.discord_url = get_discord_url(chain, BotType.Cycle)
+        self.discord_url = get_discord_url(chain)
 
     def convert_to_merkle_tree(self, rewardsList: RewardsList, start: int, end: int):
         return rewards_to_merkle_tree(rewardsList, start, end)

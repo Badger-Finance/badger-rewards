@@ -74,9 +74,9 @@ class Snapshot:
             return self.__add__(other)
 
     def convert_to_usd(
-        self, chain: Network, bot_type: BotType = BotType.Boost
+        self, chain: Network
     ) -> Snapshot:
-        discord_url = get_discord_url(chain, bot_type)
+        discord_url = get_discord_url(chain)
         prices = fetch_token_prices(chain)
         staging_prices = fetch_token_prices(chain, get_api_specific_path("staging"))
         wbtc_price = 0

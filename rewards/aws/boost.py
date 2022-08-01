@@ -26,7 +26,7 @@ def upload_boosts_to_aws(boost_data, chain: str, file_name: str, cycle: bool = F
     :param test:
     :param boost_data: calculated boost information
     """
-    discord_url = get_discord_url(chain, BotType.Boost)
+    discord_url = get_discord_url(chain)
     chain_id = CHAIN_IDS[chain]
     boost_file_name = f"{file_name}-{chain_id}.json"
     buckets = []

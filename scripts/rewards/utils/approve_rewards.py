@@ -14,7 +14,7 @@ console = Console()
 
 def approve_rewards(chain):
     try:
-        discord_url = get_discord_url(chain, BotType.Cycle)
+        discord_url = get_discord_url(chain)
         cycle_key = get_secret(
             "arn:aws:secretsmanager:us-west-1:747584148381:secret:/botsquad/cycle_0/private",
             "private",

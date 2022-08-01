@@ -95,5 +95,5 @@ def verify_rewards(past_tree, new_tree, chain: Network):
         table.append(table_item)
     send_code_block_to_discord(
         msg=tabulate(table, headers=["token", "before", "after", "diff"]),
-        username="Rewards Bot", url=get_discord_url(chain, BotType.Cycle)
+        username="Rewards Bot", url=get_discord_url(chain)
     )

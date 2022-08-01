@@ -70,7 +70,7 @@ def get_nft_weight(chain: str, nft_address: str, nft_id: int) -> Decimal:
             "**ERROR**" f"Cannot find weights for {key}",
             [],
             "Boost Bot",
-            url=get_discord_url(chain, bot_type=BotType.Boost),
+            url=get_discord_url(chain),
         )
         raise Exception
 

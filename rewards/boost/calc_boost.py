@@ -165,7 +165,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     :param current_block: block to calculate boost at
     :param chain: target chain
     """
-    discord_url = get_discord_url(chain, BotType.Boost)
+    discord_url = get_discord_url(chain)
     console.log(f"Calculating boost at block {current_block} ...")
     boost_bals = calc_boost_balances(current_block, chain)
 
