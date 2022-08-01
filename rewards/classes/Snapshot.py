@@ -10,7 +10,7 @@ from badger_api.config import get_api_specific_path
 from badger_api.requests import fetch_ppfs, fetch_token_prices
 from config.constants.addresses import BDIGG, BSLP_DIGG_WBTC, BUNI_DIGG_WBTC, DIGG, WBTC
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import BotType, Network
+from helpers.enums import Network
 from config.constants.emissions import DIGG_LP_PRICE_RATIO
 from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
 
@@ -74,9 +74,9 @@ class Snapshot:
             return self.__add__(other)
 
     def convert_to_usd(
-        self, chain: Network, bot_type: BotType = BotType.Boost
+        self, chain: Network
     ) -> Snapshot:
-        discord_url = get_discord_url(chain, bot_type)
+        discord_url = get_discord_url(chain)
         prices = fetch_token_prices(chain)
         staging_prices = fetch_token_prices(chain, get_api_specific_path("staging"))
         wbtc_price = 0

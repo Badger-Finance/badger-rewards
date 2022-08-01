@@ -10,7 +10,7 @@ from config.constants.addresses import ACROSS_BRIDGE
 from config.constants.chain_mappings import EMISSIONS_CONTRACTS
 from config.constants.emissions import DISABLED_VAULTS, NATIVE
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import Abi, BotType, Network
+from helpers.enums import Abi, Network
 from helpers.web3_utils import make_contract
 from rewards.classes.NftWeightSchedule import NFTWeightSchedule
 from rewards.classes.Schedule import Schedule
@@ -70,7 +70,7 @@ def get_nft_weight(chain: str, nft_address: str, nft_id: int) -> Decimal:
             "**ERROR**" f"Cannot find weights for {key}",
             [],
             "Boost Bot",
-            url=get_discord_url(chain, bot_type=BotType.Boost),
+            url=get_discord_url(chain),
         )
         raise Exception
 
