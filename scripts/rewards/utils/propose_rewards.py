@@ -3,7 +3,7 @@ from rich.console import Console
 import traceback
 from config.singletons import env_config
 from helpers.discord import console_and_discord, get_discord_url, send_message_to_discord
-from helpers.enums import BotType, DiscordRoles
+from helpers.enums import DiscordRoles
 from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import propose_root
 from rewards.classes.TreeManager import TreeManager

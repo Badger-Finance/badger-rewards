@@ -11,7 +11,6 @@ from config.constants.emissions import (
     STAKE_RATIO_RANGES,
 )
 from helpers.discord import get_discord_url, send_code_block_to_discord
-from helpers.enums import BotType
 from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses
 from rewards.classes.Boost import BoostBalances
 from rewards.feature_flags import flags

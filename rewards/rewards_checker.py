@@ -13,7 +13,7 @@ from helpers.discord import (
     send_code_block_to_discord,
     send_error_to_discord,
 )
-from helpers.enums import BotType, Network
+from helpers.enums import Network
 from rewards.snapshot.claims_snapshot import claims_snapshot
 
 console = Console()

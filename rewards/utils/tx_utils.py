@@ -9,7 +9,7 @@ from web3 import Web3, exceptions, contract
 from config.constants import GAS_BUFFER
 from config.constants.chain_mappings import DECIMAL_MAPPING, EMISSIONS_CONTRACTS, TREE_ACTION_GAS
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import Abi, BotType, Network
+from helpers.enums import Abi, Network
 from helpers.http_client import http_client
 from helpers.web3_utils import make_contract
 
