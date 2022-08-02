@@ -1,12 +1,19 @@
+from decimal import Decimal
+from unittest.mock import MagicMock
 import pytest
+import responses
+from badger_api.config import get_api_specific_path
+from config.constants.emissions import CONTRIBUTOR_BOOST
 
 from rewards.classes.Snapshot import Snapshot
 from helpers.enums import Network
 from config.constants import addresses
+from config.singletons import env_config
 from rewards.boost.boost_utils import (
     calc_boost_balances,
     calc_union_addresses,
     filter_dust,
+    get_contributor_native_balance_usd,
 )
 from conftest import (
     CHAIN_CLAIMS_SNAPSHOT_DATA,
@@ -33,6 +40,16 @@ def test_calc_boost_balances(mocker, chain, mock_snapshots, mock_claims_and_ppfs
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ppfs", return_value=1)
     mocker.patch("rewards.boost.boost_utils.digg_snapshot_usd", return_value={})
     snapshots = [Snapshot(addresses.BVECVX, {}), Snapshot(addresses.BVECVX_CVX_LP_SETT, {})]
+    env_config.get_web3 = MagicMock(
+        return_value=MagicMock(
+            eth=MagicMock(
+                get_block=MagicMock(
+                    return_value={"timestamp": 664582390}
+                )
+            )
+        )
+    )
+
     mocker.patch("rewards.boost.boost_utils.sett_snapshot", side_effect=snapshots)
     boost_balances = calc_boost_balances(
         123, Network.Ethereum
@@ -108,6 +125,10 @@ def test_calc_boost_balances__dust_filtered(chain, mocker, mock_claims_and_ppfs,
             "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": 0.000001241234
         }
     )
+    mocker.patch(
+        "rewards.boost.boost_utils.get_contributor_native_balance_usd",
+        return_value={}
+    )
 
     boost_balances = calc_boost_balances(
         123, Network.Ethereum
@@ -142,3 +163,60 @@ def test_calc_union_addresses():
         "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56",
         "0x0000000000007F150Bd6f54c40A34d7C3d5e9f561",
     }
+
+
+@responses.activate
+def test_get_contributor_native_balance_usd(mocker):
+    badger_price = 90
+    prod_api = get_api_specific_path("prod")
+    staging_api = get_api_specific_path("staging")
+    chain = Network.Ethereum
+    env_config.get_web3 = MagicMock(
+        return_value=MagicMock(
+            eth=MagicMock(
+                get_block=MagicMock(
+                    return_value={"timestamp": 664582390}
+                )
+            )
+        )
+    )
+
+    responses.add(
+        responses.GET,
+        f"{prod_api}/prices?chain={chain}",
+        json={
+            addresses.BADGER: badger_price,
+            addresses.WBTC: 0,
+            addresses.DIGG: 0
+        },
+        status=200,
+    )
+    responses.add(
+        responses.GET,
+        f"{staging_api}/prices?chain={chain}",
+        json={
+            addresses.BADGER: badger_price,
+            addresses.WBTC: 0,
+            addresses.DIGG: 0
+        },
+        status=200,
+    )
+    native_balances_usd = get_contributor_native_balance_usd(chain, 0)
+    for addr, value in native_balances_usd.items():
+        expected_native_balance = badger_price * CONTRIBUTOR_BOOST[chain][addr]
+        assert value == Decimal(expected_native_balance)
+
+
+def test_get_contributor_native_balance_usd_past_timestamp(mocker):
+    chain = Network.Ethereum
+    env_config.get_web3 = MagicMock(
+        return_value=MagicMock(
+            eth=MagicMock(
+                get_block=MagicMock(
+                    return_value={"timestamp": 2664582390}
+                )
+            )
+        )
+    )
+    native_balances_usd = get_contributor_native_balance_usd(chain, 100)
+    assert native_balances_usd == {}

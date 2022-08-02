@@ -4,9 +4,10 @@ from typing import Dict
 from typing import List
 
 from rich.console import Console
-
 from config.constants import addresses
-from helpers.enums import Abi
+from config.constants.emissions import CONTRIBUTOR_BOOST, CONTRIBUTOR_BOOST_END_TIMESTAMP
+from config.singletons import env_config
+from helpers.enums import Abi, BalanceType
 from helpers.enums import Network
 from helpers.web3_utils import make_contract
 from rewards.classes.Boost import BoostBalances
@@ -20,8 +21,22 @@ from rewards.snapshot.token_snapshot import fuse_snapshot_of_token
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rewards.utils.snapshot_utils import digg_snapshot_usd
 from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
-
 console = Console()
+
+
+def get_contributor_native_balance_usd(chain: Network, block: int) -> Dict[str, Decimal]:
+    timestamp = env_config.get_web3(chain).eth.get_block(block)["timestamp"]
+    if timestamp < CONTRIBUTOR_BOOST_END_TIMESTAMP:
+        contributor_badger_balances = CONTRIBUTOR_BOOST.get(chain, {})
+        snapshot = Snapshot(
+            addresses.BADGER,
+            contributor_badger_balances,
+            ratio=1,
+            type=BalanceType.Native
+        )
+        return snapshot.convert_to_usd(chain).balances
+    else:
+        return {}
 
 
 def get_bvecvx_lp_ratio() -> Decimal:
@@ -84,6 +99,7 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     native_setts, non_native_setts = chain_snapshot_usd(chain, block)
     non_native += Counter(non_native_setts)
     native += Counter(native_setts)
+    native += get_contributor_native_balance_usd(chain, block)
 
     bvecvx_usd = {}
     digg_usd = {}

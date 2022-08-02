@@ -1,3 +1,5 @@
+import os
+
 from rich.console import Console
 from config.constants.chain_mappings import BOOST_BUFFER
 
@@ -11,9 +13,10 @@ console = Console()
 
 
 def generate_boosts(chain: Network):
+    os.environ["BOT_TYPE"] = BotType.Boost
     current_block = env_config.get_web3(chain).eth.block_number
     current_block = current_block - BOOST_BUFFER.get(chain, 0)
-    discord_url = get_discord_url(chain, BotType.Boost)
+    discord_url = get_discord_url(chain)
     send_message_to_discord(
         f"**CALCULATING NEW BOOST ({chain})**",
         "Pulling data from the graph",

@@ -6,7 +6,6 @@ from rich.console import Console
 from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import BotType
 from rewards.aws.helpers import get_bucket, s3
 
 console = Console()
@@ -26,7 +25,7 @@ def upload_boosts_to_aws(boost_data, chain: str, file_name: str, cycle: bool = F
     :param test:
     :param boost_data: calculated boost information
     """
-    discord_url = get_discord_url(chain, BotType.Boost)
+    discord_url = get_discord_url(chain)
     chain_id = CHAIN_IDS[chain]
     boost_file_name = f"{file_name}-{chain_id}.json"
     buckets = []

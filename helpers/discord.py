@@ -1,3 +1,5 @@
+import os
+
 from discord import Embed, RequestsWebhookAdapter, Webhook
 from rich.console import Console
 
@@ -15,7 +17,6 @@ def send_error_to_discord(
     error_msg: str,
     error_type: str,
     chain: Network,
-    bot_type: BotType = BotType.Cycle
 ):
     send_message_to_discord(
         f"**{error_type}**",
@@ -33,7 +34,7 @@ def send_error_to_discord(
             },
         ],
         "Error Bot",
-        get_discord_url(chain, bot_type),
+        get_discord_url(chain),
     )
 
 
@@ -82,7 +83,8 @@ def send_code_block_to_discord(
     webhook.send(username=username, content=msg)
 
 
-def get_discord_url(chain: str, bot_type: str = BotType.Cycle) -> str:
+def get_discord_url(chain: str) -> str:
+    bot_type = os.getenv("BOT_TYPE", BotType.Cycle)
     environment = env_config.get_environment()
     return get_secret(
         MONITORING_SECRET_NAMES[environment][chain][bot_type],
@@ -92,9 +94,9 @@ def get_discord_url(chain: str, bot_type: str = BotType.Cycle) -> str:
 
 
 def console_and_discord(
-        msg: str, chain: str, bot_type: BotType = BotType.Cycle, mentions: str = ""
+        msg: str, chain: str, mentions: str = ""
 ):
-    url = get_discord_url(chain, bot_type)
+    url = get_discord_url(chain)
     console.log(msg)
     if len(mentions) > 0:
         send_plain_text_to_discord(mentions, "Rewards Bot", url=url)

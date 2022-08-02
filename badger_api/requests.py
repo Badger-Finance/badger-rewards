@@ -2,7 +2,6 @@ from functools import lru_cache
 from typing import Dict, Optional, Tuple
 
 from badger_api.config import get_api_base_path
-from config.constants.emissions import BOOST_CHAINS
 from helpers.enums import Network
 from helpers.http_client import http_client
 
@@ -31,19 +30,11 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
 
 
 @lru_cache
-def fetch_token_prices(api_url: str = badger_api) -> Dict[str, float]:
+def fetch_token_prices(chain: Network, api_url: str = badger_api) -> Dict[str, float]:
     """
-    Fetch token prices for sett tokens
+    Fetch token prices for sett tokens for a specific chain
     """
-    chains = BOOST_CHAINS
-    prices = {}
-    for chain in chains:
-        chain_prices = http_client.get(f"{api_url}/prices?chain={chain}")
-        if not chain_prices:
-            continue
-        prices = {**prices, **chain_prices}
-
-    return prices
+    return http_client.get(f"{api_url}/prices?chain={chain}")
 
 
 @lru_cache

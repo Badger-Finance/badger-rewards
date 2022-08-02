@@ -2,6 +2,7 @@ import math
 from decimal import Decimal
 import pytest
 from config.constants import addresses
+from config.singletons import env_config
 from helpers.enums import Network
 from rewards.boost.calc_boost import allocate_bvecvx_to_users, allocate_digg_to_users
 from rewards.boost.calc_boost import allocate_nft_balances_to_users
@@ -16,6 +17,8 @@ from rewards.classes.Boost import BoostBalances
 from rewards.classes.Snapshot import Snapshot
 from rewards.feature_flags import flags
 from rewards.feature_flags.feature_flags import BOOST_STEP
+from unittest.mock import MagicMock
+
 TEST_USER = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
 
 
@@ -213,6 +216,16 @@ def test_badger_boost__happy(
     mocker.patch("rewards.boost.calc_boost.fetch_nfts", return_value={})
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ratio", return_value=1)
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ppfs", return_value=1)
+    env_config.get_web3 = MagicMock(
+        return_value=MagicMock(
+            eth=MagicMock(
+                get_block=MagicMock(
+                    return_value={"timestamp": 664582390}
+                )
+            )
+        )
+    )
+
     result = badger_boost(123, Network.Ethereum)
     assert mock_discord_send_code.called
     # Check boosts for different data points
