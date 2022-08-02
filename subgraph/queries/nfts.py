@@ -28,7 +28,7 @@ def fetch_nfts(chain: str, block: int) -> Dict:
     )
     nft_balances = {}
     variables = {
-        "block_number": {"number": block},
+        "block_number": {"number": block - 500},
         "nft_filter": {"id_gt": last_nft_id, "amount_gt": 0},
     }
     while True:
