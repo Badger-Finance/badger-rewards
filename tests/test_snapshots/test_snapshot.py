@@ -1,5 +1,5 @@
 from badger_api.config import get_api_base_path
-from config.constants.addresses import BUNI_DIGG_WBTC, DIGG, WBTC
+from config.constants.addresses import BAURA_DIGG_WBTC, BUNI_DIGG_WBTC, DIGG, WBTC
 from helpers.enums import Network
 from rewards.classes.Snapshot import Snapshot
 import responses
