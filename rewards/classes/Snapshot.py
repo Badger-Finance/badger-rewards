@@ -84,6 +84,22 @@ class Snapshot:
             return self.__add__(other)
 
     def convert_to_usd(self, chain: Network) -> Snapshot:
+        """Converts token prices to USD. Special case is for boosted LP tokens and Digg.
+        LP tokens that count towards boost will return the USD amount that counts towards boost.
+
+        Ex 1. Badger/WBTC bSLP is $10k per token. Token counts 50% towards boost (just Badger half).
+        Calculated USD value is $5k.
+
+        Ex 2. 40/40/20 Digg/WBTC/graviAURA bSLP is $10k per token. Token counts 40% towards boost
+        (just Digg portion). Digg is trading at half the price of BTC (and priced as price of BTC in boost).
+        Calculated USD value is $8k. ($10k * .4 * 2 BTC / 1 DIGG)
+
+        Args:
+            chain (Network): Blockchain identifier
+
+        Returns:
+            Snapshot: Snapshot with updated USD balances
+        """
         discord_url = get_discord_url(chain)
         prices = fetch_token_prices(chain)
         staging_prices = fetch_token_prices(chain, get_api_specific_path("staging"))
@@ -125,9 +141,7 @@ class Snapshot:
             price = Decimal(wbtc_price * digg_ppfs)
         elif self.token in [BUNI_DIGG_WBTC, BSLP_DIGG_WBTC, BAURA_DIGG_WBTC]:
             digg_lp_price = Decimal(prices[self.token])
-            price = (1 - self.ratio) * digg_lp_price + (
-                digg_lp_price * self.ratio * wbtc_price / digg_price
-            )  # noqa: E501
+            price = digg_lp_price * self.ratio * wbtc_price / digg_price  # noqa: E501
         else:
             price = Decimal(prices[self.token]) * self.ratio
 
