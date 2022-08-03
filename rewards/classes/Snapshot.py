@@ -91,8 +91,8 @@ class Snapshot:
         Calculated USD value is $5k.
 
         Ex 2. 40/40/20 Digg/WBTC/graviAURA bSLP is $10k per token. Token counts 40% towards boost
-        (just Digg portion). Digg is trading at half the price of BTC (and priced as price of BTC in boost).
-        Calculated USD value is $8k. ($10k * .4 * 2 BTC / 1 DIGG)
+        (just Digg portion). Digg is trading at half the price of BTC (and priced as price of BTC 
+        in boost). Calculated USD value is $8k. ($10k * .4 * 2 BTC / 1 DIGG)
 
         Args:
             chain (Network): Blockchain identifier
