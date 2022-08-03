@@ -1,3 +1,4 @@
+from decimal import Decimal
 from functools import lru_cache
 from typing import Dict, Optional, Tuple
 
@@ -12,7 +13,7 @@ class InvalidAPIKeyException(Exception):
     pass
 
 
-def fetch_ppfs() -> Optional[Tuple[float, float]]:
+def fetch_ppfs() -> Optional[Tuple[Decimal, Decimal]]:
     """
     Fetch ppfs for bbadger and bdigg
     """
@@ -26,7 +27,9 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
     if "pricePerFullShare" not in digg:
         raise InvalidAPIKeyException("DIGG missing pricePerFullShare key")
 
-    return badger["pricePerFullShare"], digg["pricePerFullShare"]
+    return Decimal(str(badger["pricePerFullShare"])), Decimal(
+        str(digg["pricePerFullShare"])
+    )
 
 
 @lru_cache
