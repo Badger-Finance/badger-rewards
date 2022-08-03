@@ -49,4 +49,4 @@ def test_convert_to_usd_digg_boost():
     aura_lp_usd = aura_lp_snapshot.convert_to_usd(chain).balances
     assert digg_usd[address] == 50
     assert lp_bals[address] == 1500
-    assert lp_bals[aura_lp_usd] == 240
+    assert aura_lp_usd[address] == 240
