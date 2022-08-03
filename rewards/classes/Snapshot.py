@@ -14,7 +14,7 @@ from config.constants.addresses import (
     BSLP_DIGG_WBTC,
     BUNI_DIGG_WBTC,
     DIGG,
-    WBTC
+    WBTC,
 )
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Network
@@ -25,11 +25,15 @@ console = Console()
 
 class Snapshot:
     def __init__(
-        self, token, balances, ratio=1, type="none",
-        chain: Optional[Network] = Network.Ethereum
+        self,
+        token,
+        balances,
+        ratio=1,
+        type="none",
+        chain: Optional[Network] = Network.Ethereum,
     ):
         self.type = type
-        self.ratio = Decimal(ratio)
+        self.ratio = Decimal(str(ratio))
         self.token = Web3.toChecksumAddress(token)
         self.balances = self.parse_balances(balances)
         self.chain = chain
@@ -79,9 +83,7 @@ class Snapshot:
         else:
             return self.__add__(other)
 
-    def convert_to_usd(
-        self, chain: Network
-    ) -> Snapshot:
+    def convert_to_usd(self, chain: Network) -> Snapshot:
         discord_url = get_discord_url(chain)
         prices = fetch_token_prices(chain)
         staging_prices = fetch_token_prices(chain, get_api_specific_path("staging"))
@@ -123,7 +125,9 @@ class Snapshot:
             price = Decimal(wbtc_price * digg_ppfs)
         elif self.token in [BUNI_DIGG_WBTC, BSLP_DIGG_WBTC, BAURA_DIGG_WBTC]:
             digg_lp_price = Decimal(prices[self.token])
-            price = (1 - self.ratio) * digg_lp_price + (digg_lp_price * self.ratio * wbtc_price / digg_price)  # noqa: E501
+            price = (1 - self.ratio) * digg_lp_price + (
+                digg_lp_price * self.ratio * wbtc_price / digg_price
+            )  # noqa: E501
         else:
             price = Decimal(prices[self.token]) * self.ratio
 
