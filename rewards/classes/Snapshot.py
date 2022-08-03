@@ -85,11 +85,11 @@ class Snapshot:
         discord_url = get_discord_url(chain)
         prices = fetch_token_prices(chain)
         staging_prices = fetch_token_prices(chain, get_api_specific_path("staging"))
-        wbtc_price = 0
-        digg_price = 0
+        wbtc_price = Decimal(0)
+        digg_price = Decimal(0)
         if chain == Network.Ethereum:
-            wbtc_price = prices[WBTC]
-            digg_price = prices[DIGG]
+            wbtc_price = Decimal(prices[WBTC])
+            digg_price = Decimal(prices[DIGG])
         if self.token not in prices or prices[self.token] == 0:
             price = Decimal(0)
 
@@ -122,8 +122,8 @@ class Snapshot:
             _, digg_ppfs = fetch_ppfs()
             price = Decimal(wbtc_price * digg_ppfs)
         elif self.token in [BUNI_DIGG_WBTC, BSLP_DIGG_WBTC, BAURA_DIGG_WBTC]:
-            digg_lp_price = prices[self.token]
-            price = Decimal(self.ratio * digg_lp_price + (digg_lp_price * self.ratio * (wbtc_price / digg_price)))  # noqa: E501
+            digg_lp_price = Decimal(prices[self.token])
+            price = self.ratio * digg_lp_price + (digg_lp_price * self.ratio * wbtc_price / digg_price)  # noqa: E501
         else:
             price = Decimal(prices[self.token]) * self.ratio
 
