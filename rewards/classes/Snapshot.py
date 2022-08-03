@@ -17,7 +17,8 @@ from config.constants.addresses import (
     WBTC
 )
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import BotType, Network
+from helpers.enums import Network
+from config.constants.emissions import DIGG_LP_PRICE_RATIO
 from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
 
 console = Console()
@@ -80,13 +81,16 @@ class Snapshot:
             return self.__add__(other)
 
     def convert_to_usd(
-        self, chain: Network, bot_type: BotType = BotType.Boost
+        self, chain: Network
     ) -> Snapshot:
-        discord_url = get_discord_url(chain, bot_type)
-        prices = fetch_token_prices()
-        staging_prices = fetch_token_prices(get_api_specific_path("staging"))
-        wbtc_price = prices[WBTC]
-        digg_price = prices[DIGG]
+        discord_url = get_discord_url(chain)
+        prices = fetch_token_prices(chain)
+        staging_prices = fetch_token_prices(chain, get_api_specific_path("staging"))
+        wbtc_price = 0
+        digg_price = 0
+        if chain == Network.Ethereum:
+            wbtc_price = prices[WBTC]
+            digg_price = prices[DIGG]
         if self.token not in prices or prices[self.token] == 0:
             price = Decimal(0)
 
