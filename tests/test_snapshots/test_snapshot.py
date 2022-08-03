@@ -32,7 +32,7 @@ def test_convert_to_usd_digg_boost():
     flags.FLAGS[DIGG_BOOST] = True
     responses.add(
         responses.GET,
-          f"{badger_api}/prices?chain={chain}",
+        f"{badger_api}/prices?chain={chain}",
         json={
             WBTC: 50,
             DIGG: 10,
