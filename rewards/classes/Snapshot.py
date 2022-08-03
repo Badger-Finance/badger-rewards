@@ -18,7 +18,6 @@ from config.constants.addresses import (
 )
 from helpers.discord import get_discord_url, send_message_to_discord
 from helpers.enums import Network
-from config.constants.emissions import DIGG_LP_PRICE_RATIO
 from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
 
 console = Console()
