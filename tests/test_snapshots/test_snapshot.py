@@ -1,4 +1,3 @@
-import pytest
 import responses
 
 from badger_api.config import get_api_base_path
