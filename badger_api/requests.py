@@ -27,8 +27,9 @@ def fetch_ppfs() -> Optional[Tuple[Decimal, Decimal]]:
     if "pricePerFullShare" not in digg:
         raise InvalidAPIKeyException("DIGG missing pricePerFullShare key")
 
-    return Decimal(str(badger["pricePerFullShare"])), Decimal(
-        str(digg["pricePerFullShare"])
+    return (
+        Decimal(str(badger["pricePerFullShare"])),
+        Decimal(str(digg["pricePerFullShare"])),
     )
 
 
