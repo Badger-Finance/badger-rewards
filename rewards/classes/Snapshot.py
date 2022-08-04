@@ -8,10 +8,16 @@ from rich.console import Console
 from web3 import Web3
 from badger_api.config import get_api_specific_path
 from badger_api.requests import fetch_ppfs, fetch_token_prices
-from config.constants.addresses import BDIGG, BSLP_DIGG_WBTC, BUNI_DIGG_WBTC, DIGG, WBTC
+from config.constants.addresses import (
+    BAURA_DIGG_WBTC,
+    BDIGG,
+    BSLP_DIGG_WBTC,
+    BUNI_DIGG_WBTC,
+    DIGG,
+    WBTC,
+)
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import BotType, Network
-from config.constants.emissions import DIGG_LP_PRICE_RATIO
+from helpers.enums import Network
 from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
 
 console = Console()
@@ -19,11 +25,15 @@ console = Console()
 
 class Snapshot:
     def __init__(
-        self, token, balances, ratio=1, type="none",
-        chain: Optional[Network] = Network.Ethereum
+        self,
+        token,
+        balances,
+        ratio=1,
+        type="none",
+        chain: Optional[Network] = Network.Ethereum,
     ):
         self.type = type
-        self.ratio = Decimal(ratio)
+        self.ratio = Decimal(str(ratio))
         self.token = Web3.toChecksumAddress(token)
         self.balances = self.parse_balances(balances)
         self.chain = chain
@@ -73,14 +83,31 @@ class Snapshot:
         else:
             return self.__add__(other)
 
-    def convert_to_usd(
-        self, chain: Network, bot_type: BotType = BotType.Boost
-    ) -> Snapshot:
-        discord_url = get_discord_url(chain, bot_type)
-        prices = fetch_token_prices()
-        staging_prices = fetch_token_prices(get_api_specific_path("staging"))
-        wbtc_price = prices[WBTC]
-        digg_price = prices[DIGG]
+    def convert_to_usd(self, chain: Network) -> Snapshot:
+        """Converts token prices to USD. Special case is for boosted LP tokens and Digg.
+        LP tokens that count towards boost will return the USD amount that counts towards boost.
+
+        Ex 1. Badger/WBTC bSLP is $10k per token. Token counts 50% towards boost (just Badger half).
+        Calculated USD value is $5k.
+
+        Ex 2. 40/40/20 Digg/WBTC/graviAURA bSLP is $10k per token. Token counts 40% towards boost
+        (just Digg portion). Digg is trading at half the price of BTC (and priced as price of BTC
+        in boost). Calculated USD value is $8k. ($10k * .4 * 2 BTC / 1 DIGG)
+
+        Args:
+            chain (Network): Blockchain identifier
+
+        Returns:
+            Snapshot: Snapshot with updated USD balances
+        """
+        discord_url = get_discord_url(chain)
+        prices = fetch_token_prices(chain)
+        staging_prices = fetch_token_prices(chain, get_api_specific_path("staging"))
+        wbtc_price = Decimal(0)
+        digg_price = Decimal(0)
+        if chain == Network.Ethereum:
+            wbtc_price = Decimal(prices[WBTC])
+            digg_price = Decimal(prices[DIGG])
         if self.token not in prices or prices[self.token] == 0:
             price = Decimal(0)
 
@@ -112,9 +139,9 @@ class Snapshot:
         elif self.token == BDIGG:
             _, digg_ppfs = fetch_ppfs()
             price = Decimal(wbtc_price * digg_ppfs)
-        elif self.token in [BUNI_DIGG_WBTC, BSLP_DIGG_WBTC]:
-            digg_lp_price = prices[self.token]
-            price = Decimal(DIGG_LP_PRICE_RATIO * digg_lp_price + (digg_lp_price * DIGG_LP_PRICE_RATIO * (wbtc_price / digg_price)))  # noqa: E501
+        elif self.token in [BUNI_DIGG_WBTC, BSLP_DIGG_WBTC, BAURA_DIGG_WBTC]:
+            digg_lp_price = Decimal(prices[self.token])
+            price = digg_lp_price * self.ratio * wbtc_price / digg_price  # noqa: E501
         else:
             price = Decimal(prices[self.token]) * self.ratio
 

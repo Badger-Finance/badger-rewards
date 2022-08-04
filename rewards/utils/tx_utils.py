@@ -9,7 +9,7 @@ from web3 import Web3, exceptions, contract
 from config.constants import GAS_BUFFER
 from config.constants.chain_mappings import DECIMAL_MAPPING, EMISSIONS_CONTRACTS, TREE_ACTION_GAS
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import Abi, BotType, Network
+from helpers.enums import Abi, Network
 from helpers.http_client import http_client
 from helpers.web3_utils import make_contract
 
@@ -36,7 +36,7 @@ def get_gas_price_of_tx(
         Decimal: USD value of gas used in tx
     """
     tx, tx_receipt = get_transaction(
-        web3, tx_hash, timeout, chain, bot_type=BotType.Cycle, tries=retries_on_failure
+        web3, tx_hash, timeout, chain, tries=retries_on_failure
     )
     logger.info(f"tx: {tx_receipt}")
     total_gas_used = Decimal(tx_receipt.get("gasUsed", 0))
@@ -131,11 +131,10 @@ def get_transaction(
     timeout: int,
     chain: str,
     tries: int = 5,
-    bot_type: BotType = BotType.Cycle,
 ) -> Tuple[dict, dict]:
     attempt = 0
     error = None
-    discord_url = get_discord_url(chain, bot_type)
+    discord_url = get_discord_url(chain)
     while attempt < tries:
         try:
             receipt = web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)

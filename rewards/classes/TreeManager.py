@@ -12,7 +12,7 @@ from web3.contract import ContractFunction
 from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
 from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import BotType, Network
+from helpers.enums import Network
 from helpers.web3_utils import get_badger_tree
 from rewards.aws.trees import download_latest_tree, download_tree
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
@@ -36,7 +36,7 @@ class TreeManager:
         self.next_cycle = self.get_current_cycle() + 1
         self.propose_account = cycle_account
         self.approve_account = cycle_account
-        self.discord_url = get_discord_url(chain, BotType.Cycle)
+        self.discord_url = get_discord_url(chain)
 
     def convert_to_merkle_tree(self, rewardsList: RewardsList, start: int, end: int):
         return rewards_to_merkle_tree(rewardsList, start, end)

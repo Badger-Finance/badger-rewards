@@ -11,7 +11,6 @@ from config.constants.emissions import (
     STAKE_RATIO_RANGES,
 )
 from helpers.discord import get_discord_url, send_code_block_to_discord
-from helpers.enums import BotType
 from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses
 from rewards.classes.Boost import BoostBalances
 from rewards.feature_flags import flags
@@ -165,7 +164,7 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     :param current_block: block to calculate boost at
     :param chain: target chain
     """
-    discord_url = get_discord_url(chain, BotType.Boost)
+    discord_url = get_discord_url(chain)
     console.log(f"Calculating boost at block {current_block} ...")
     boost_bals = calc_boost_balances(current_block, chain)
 

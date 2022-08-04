@@ -1,8 +1,8 @@
+from decimal import Decimal
 from functools import lru_cache
 from typing import Dict, Optional, Tuple
 
 from badger_api.config import get_api_base_path
-from config.constants.emissions import BOOST_CHAINS
 from helpers.enums import Network
 from helpers.http_client import http_client
 
@@ -13,7 +13,7 @@ class InvalidAPIKeyException(Exception):
     pass
 
 
-def fetch_ppfs() -> Optional[Tuple[float, float]]:
+def fetch_ppfs() -> Optional[Tuple[Decimal, Decimal]]:
     """
     Fetch ppfs for bbadger and bdigg
     """
@@ -27,23 +27,18 @@ def fetch_ppfs() -> Optional[Tuple[float, float]]:
     if "pricePerFullShare" not in digg:
         raise InvalidAPIKeyException("DIGG missing pricePerFullShare key")
 
-    return badger["pricePerFullShare"], digg["pricePerFullShare"]
+    return (
+        Decimal(str(badger["pricePerFullShare"])),
+        Decimal(str(digg["pricePerFullShare"])),
+    )
 
 
 @lru_cache
-def fetch_token_prices(api_url: str = badger_api) -> Dict[str, float]:
+def fetch_token_prices(chain: Network, api_url: str = badger_api) -> Dict[str, float]:
     """
-    Fetch token prices for sett tokens
+    Fetch token prices for sett tokens for a specific chain
     """
-    chains = BOOST_CHAINS
-    prices = {}
-    for chain in chains:
-        chain_prices = http_client.get(f"{api_url}/prices?chain={chain}")
-        if not chain_prices:
-            continue
-        prices = {**prices, **chain_prices}
-
-    return prices
+    return http_client.get(f"{api_url}/prices?chain={chain}")
 
 
 @lru_cache
