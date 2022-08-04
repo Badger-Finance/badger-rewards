@@ -30,112 +30,128 @@ def mock_discord_send_code(mocker):
 
 def test_calc_stake_ratio__happy():
     target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.1)}
-    assert (
-        calc_stake_ratio(TEST_USER, BoostBalances(target, target))
-        == pytest.approx(list(target.values())[0] / list(target.values())[0])
+    assert calc_stake_ratio(TEST_USER, BoostBalances(target, target)) == pytest.approx(
+        list(target.values())[0] / list(target.values())[0]
     )
 
 
 def test_allocate_bvecvx_to_users():
     user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    base_native_balances = {user: Decimal(10)}
     bve_balances = {user: Decimal(100)}
-    boost_info = {
-        user: {
-            'nativeBalance': Decimal(10)
-        }
-    }
+    boost_info = {user: {"nativeBalance": Decimal(10)}}
     allocate_bvecvx_to_users(
         boost_info,
         bve_balances,
+        base_native_balances,
     )
-    assert boost_info[user]['nativeBalance'] == Decimal(15)
-    assert boost_info[user]['bveCvxBalance'] == Decimal(5)
+    assert boost_info[user]["nativeBalance"] == Decimal(15)
+    assert boost_info[user]["bveCvxBalance"] == Decimal(5)
 
 
 def test_allocate_bvecvx_to_users__no_user_boost():
     user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    base_native_balances = {}
     bve_balances = {user: Decimal(100)}
     boost_info = {}
     allocate_bvecvx_to_users(
         boost_info,
         bve_balances,
+        base_native_balances,
     )
     assert boost_info.get(user) is None
 
 
 def test_allocate_digg_to_users():
     user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    base_native_balances = {user: Decimal(10)}
     digg_balances = {user: Decimal(100)}
-    boost_info = {
-        user: {
-            'nativeBalance': Decimal(10)
-        }
-    }
+    boost_info = {user: {"nativeBalance": Decimal(10)}}
     allocate_digg_to_users(
         boost_info,
         digg_balances,
+        base_native_balances,
     )
-    assert boost_info[user]['nativeBalance'] == Decimal(20)
-    assert boost_info[user]['diggBalance'] == Decimal(10)
+    assert boost_info[user]["nativeBalance"] == Decimal(20)
+    assert boost_info[user]["diggBalance"] == Decimal(10)
 
 
 def test_allocate_digg_to_users__no_user_boost():
     user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    base_native_balances = {}
     digg_balances = {user: Decimal(100)}
     boost_info = {}
     allocate_digg_to_users(
         boost_info,
         digg_balances,
+        base_native_balances,
     )
     assert boost_info.get(user) is None
 
 
 def test_allocate_digg_to_users_equal_balance():
     user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    base_native_balances = {user: Decimal(100)}
     digg_balances = {user: Decimal(100)}
-    boost_info = {
-        user: {
-            'nativeBalance': Decimal(100)
-        }
-    }
+    boost_info = {user: {"nativeBalance": Decimal(100)}}
     allocate_digg_to_users(
         boost_info,
         digg_balances,
+        base_native_balances,
     )
-    assert boost_info[user]['nativeBalance'] == Decimal(200)
-    assert boost_info[user]['diggBalance'] == Decimal(100)
+    assert boost_info[user]["nativeBalance"] == Decimal(200)
+    assert boost_info[user]["diggBalance"] == Decimal(100)
 
 
 def test_allocate_digg_to_users_no_digg():
     user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    base_native_balances = {user: Decimal(100)}
     digg_balances = {}
-    boost_info = {
-        user: {
-            'nativeBalance': Decimal(100)
-        }
-    }
+    boost_info = {user: {"nativeBalance": Decimal(100)}}
     allocate_digg_to_users(
         boost_info,
         digg_balances,
+        base_native_balances,
     )
-    assert boost_info[user]['nativeBalance'] == Decimal(100)
-    assert 'diggBalance' not in boost_info[user]
+    assert boost_info[user]["nativeBalance"] == Decimal(100)
+    assert "diggBalance" not in boost_info[user]
 
 
 def test_allocate_digg_to_users_less_digg():
     user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    base_native_balances = {user: Decimal(100)}
     digg_balances = {user: Decimal(50)}
-    boost_info = {
-        user: {
-            'nativeBalance': Decimal(100)
-        }
-    }
+    boost_info = {user: {"nativeBalance": Decimal(100)}}
     allocate_digg_to_users(
         boost_info,
         digg_balances,
+        base_native_balances,
     )
-    assert boost_info[user]['nativeBalance'] == Decimal(150)
-    assert boost_info[user]['diggBalance'] == Decimal(50)
+    assert boost_info[user]["nativeBalance"] == Decimal(150)
+    assert boost_info[user]["diggBalance"] == Decimal(50)
+
+
+def test_allocate_no_mutate():
+    user = "0x0000000000007F150Bd6f54c40A34d7C3d5e9f56"
+    base_native_balances = {user: Decimal(100)}
+    digg_balances = {user: Decimal(1000)}
+    bve_balances = {user: Decimal(100)}
+    boost_info = {user: {"nativeBalance": Decimal(100)}}
+    allocate_bvecvx_to_users(
+        boost_info,
+        bve_balances,
+        base_native_balances,
+    )
+    assert boost_info[user]["nativeBalance"] == Decimal(150)
+    assert boost_info[user]["bveCvxBalance"] == Decimal(50)
+
+    allocate_digg_to_users(
+        boost_info,
+        digg_balances,
+        base_native_balances,
+    )
+    assert boost_info[user]["nativeBalance"] == Decimal(250)
+    assert boost_info[user]["diggBalance"] == Decimal(100)
 
 
 def test_calc_stake_ratio__zero_native():
@@ -144,9 +160,8 @@ def test_calc_stake_ratio__zero_native():
         calc_stake_ratio(
             TEST_USER,
             BoostBalances(
-                {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.0)},
-                target
-            )
+                {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.0)}, target
+            ),
         )
         == 0
     )
@@ -156,9 +171,10 @@ def test_calc_stake_ratio__zero_non_native():
     target = {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.1)}
     assert (
         calc_stake_ratio(
-            TEST_USER, BoostBalances(
+            TEST_USER,
+            BoostBalances(
                 target, {"0x0000000000007F150Bd6f54c40A34d7C3d5e9f56": Decimal(0.0)}
-            )
+            ),
         )
         == 0
     )
@@ -175,7 +191,7 @@ def test_get_badger_boost_data():
             "0x285C39e344179C253a75761C6737dE92183fA1F2": Decimal(1.25),
             "0x0069f94C6Ef196cf54b2f0746dE92D40a83D41A5": Decimal(1.75),
             "0x5E9F7E92e742F73b990dCa63c88325eD24666E84": Decimal(2.5),
-            "0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8": Decimal(3.5)
+            "0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8": Decimal(3.5),
         }
     )
     assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f1111"] == 1
@@ -183,7 +199,9 @@ def test_get_badger_boost_data():
     if flags.flag_enabled(BOOST_STEP):
         assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7900"] == 551
         assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f1111"] == 1
-        assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909"] == math.floor(0.9 * 2000)
+        assert data["0x1f3e2aB8FE0C6E1f47acDcaa0b3B9db4044f7909"] == math.floor(
+            0.9 * 2000
+        )
         assert data["0x285C39e344179C253a75761C6737dE92183fA1F2"] == 2250
         assert data["0x0069f94C6Ef196cf54b2f0746dE92D40a83D41A5"] == 2625
         assert data["0x5E9F7E92e742F73b990dCa63c88325eD24666E84"] == 2875
@@ -202,10 +220,13 @@ def test_badger_boost__happy(
     mock_snapshots,
     mocker,
     fetch_token_mock,
-    mock_get_token_weight
+    mock_get_token_weight,
 ):
     mocker.patch("rewards.classes.Snapshot.fetch_ppfs", return_value=(1.2, 1.2))
-    snapshots = [Snapshot(addresses.BVECVX, {}), Snapshot(addresses.BVECVX_CVX_LP_SETT, {})]
+    snapshots = [
+        Snapshot(addresses.BVECVX, {}),
+        Snapshot(addresses.BVECVX_CVX_LP_SETT, {}),
+    ]
     mocker.patch("rewards.boost.boost_utils.sett_snapshot", side_effect=snapshots)
     mocker.patch("rewards.boost.boost_utils.digg_snapshot_usd", return_value={})
 
@@ -218,11 +239,7 @@ def test_badger_boost__happy(
     mocker.patch("rewards.boost.boost_utils.get_bvecvx_lp_ppfs", return_value=1)
     env_config.get_web3 = MagicMock(
         return_value=MagicMock(
-            eth=MagicMock(
-                get_block=MagicMock(
-                    return_value={"timestamp": 664582390}
-                )
-            )
+            eth=MagicMock(get_block=MagicMock(return_value={"timestamp": 664582390}))
         )
     )
 
