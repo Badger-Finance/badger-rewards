@@ -20,7 +20,9 @@ from subgraph.queries.nfts import fetch_nfts
 console = Console()
 
 
-def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal) -> Decimal:
+def calc_bvecvx_native_balance(
+    native_balance: Decimal, bvecvx_balance: Decimal
+) -> Decimal:
     """
     Calculate the amount of bvecvx to add to a user's native balance
     :param native_balance: user's current native balance
@@ -29,7 +31,7 @@ def calc_bvecvx_native_balance(native_balance: Decimal, bvecvx_balance: Decimal)
     if bvecvx_balance > 0 and native_balance > 0:
         return min(
             Decimal(BVECVX_BOOST_WEIGHT) * bvecvx_balance,
-            Decimal(BVECVX_BOOST_WEIGHT) * native_balance
+            Decimal(BVECVX_BOOST_WEIGHT) * native_balance,
         )
     return Decimal(0)
 
@@ -38,7 +40,7 @@ def calc_digg_native_balance(native_balance: Decimal, digg_balance: Decimal) -> 
     if digg_balance > 0 and native_balance > 0:
         return min(
             Decimal(DIGG_BOOST_WEIGHT) * digg_balance,
-            Decimal(DIGG_BOOST_WEIGHT) * native_balance
+            Decimal(DIGG_BOOST_WEIGHT) * native_balance,
         )
     return Decimal(0)
 
@@ -74,14 +76,13 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
             elif stake_ratio <= 1:
                 user_boost = min(math.floor(stake_ratio * 2000), 2000)
             elif 1.0 < stake_ratio <= 1.5:
-                user_boost = 2000 + \
-                    math.floor((stake_ratio - Decimal(1)) * 1000)
+                user_boost = 2000 + math.floor((stake_ratio - Decimal(1)) * 1000)
             elif 1.5 < stake_ratio <= 2:
-                user_boost = 2500 + \
-                    math.floor((stake_ratio - Decimal(1.5)) * 500)
+                user_boost = 2500 + math.floor((stake_ratio - Decimal(1.5)) * 500)
             elif stake_ratio > 2:
                 user_boost = min(
-                    2750 + math.floor((stake_ratio - Decimal(2)) * 250), 3000)
+                    2750 + math.floor((stake_ratio - Decimal(2)) * 250), 3000
+                )
         else:
             user_boost = 1
         for stake_range, multiplier in STAKE_RATIO_RANGES:
@@ -89,8 +90,9 @@ def get_badger_boost_data(stake_ratios: Dict) -> Tuple[Dict, Dict]:
                 if not flags.flag_enabled(BOOST_STEP):
                     user_boost = multiplier
                 user_stake_range = stake_range
-        stake_data_ranges[user_stake_range] = stake_data_ranges.get(
-            user_stake_range, 0) + 1
+        stake_data_ranges[user_stake_range] = (
+            stake_data_ranges.get(user_stake_range, 0) + 1
+        )
         badger_boost_data[addr] = user_boost
     return badger_boost_data, stake_data_ranges
 
@@ -116,25 +118,42 @@ def allocate_nft_balances_to_users(boost_info: Dict, nft_balances: Dict) -> None
         boost_info[user]["nftBalance"] = nft_balance
 
 
-def allocate_bvecvx_to_users(boost_info: Dict, bvecvx_balances: Dict):
+def allocate_bvecvx_to_users(
+    boost_info: Dict, bvecvx_balances: Dict, base_native_balances: Dict
+):
     for user, bvecvx_balance in bvecvx_balances.items():
-        native_balance = boost_info.get(
-            user, {}).get("nativeBalance", Decimal(0))
+        base_native_balance = base_native_balances.get(user, Decimal(0))
         calculated_bvecvx_balance = calc_bvecvx_native_balance(
-            native_balance, bvecvx_balance)
+            base_native_balance, bvecvx_balance
+        )
+
+        cumulative_native_balance = boost_info.get(user, {}).get(
+            "nativeBalance", Decimal(0)
+        )
         if user in boost_info:
             boost_info[user]["bveCvxBalance"] = calculated_bvecvx_balance
-            boost_info[user]["nativeBalance"] = native_balance + \
-                calculated_bvecvx_balance
+            boost_info[user]["nativeBalance"] = (
+                cumulative_native_balance + calculated_bvecvx_balance
+            )
 
 
-def allocate_digg_to_users(boost_info: Dict, digg_balances: Dict):
+def allocate_digg_to_users(
+    boost_info: Dict, digg_balances: Dict, base_native_balances: Dict
+):
     for user, digg_balance in digg_balances.items():
-        native_balance = boost_info.get(user, {}).get("nativeBalance", Decimal(0))
-        calculated_digg_balance = calc_digg_native_balance(native_balance, digg_balance)
+        base_native_balance = base_native_balances.get(user, Decimal(0))
+        calculated_digg_balance = calc_digg_native_balance(
+            base_native_balance, digg_balance
+        )
+
+        cumulative_native_balance = boost_info.get(user, {}).get(
+            "nativeBalance", Decimal(0)
+        )
         if user in boost_info:
             boost_info[user]["diggBalance"] = calculated_digg_balance
-            boost_info[user]["nativeBalance"] = native_balance + calculated_digg_balance
+            boost_info[user]["nativeBalance"] = (
+                cumulative_native_balance + calculated_digg_balance
+            )
 
 
 def allocate_nft_to_users(boost_info: Dict, addresses: List[str], nfts: Dict):
@@ -168,13 +187,11 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     console.log(f"Calculating boost at block {current_block} ...")
     boost_bals = calc_boost_balances(current_block, chain)
 
-    all_addresses = calc_union_addresses(
-        boost_bals.native, boost_bals.non_native)
+    all_addresses = calc_union_addresses(boost_bals.native, boost_bals.non_native)
     console.log(f"{len(all_addresses)} addresses fetched")
     boost_data = {}
 
-    stake_ratios_list = [calc_stake_ratio(
-        addr, boost_bals) for addr in all_addresses]
+    stake_ratios_list = [calc_stake_ratio(addr, boost_bals) for addr in all_addresses]
     stake_ratios = dict(zip(all_addresses, stake_ratios_list))
     badger_boost_data, stake_data = get_badger_boost_data(stake_ratios)
     nfts = fetch_nfts(chain, current_block)
@@ -185,8 +202,13 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     assign_stake_ratio_to_users(boost_info, stake_ratios)
     assign_native_balances_to_users(boost_info, boost_bals.native)
     assign_non_native_balances_to_users(boost_info, boost_bals.non_native)
-    allocate_bvecvx_to_users(boost_info, boost_bals.bvecvx)
-    allocate_digg_to_users(boost_info, boost_bals.digg)
+
+    base_native_balances = {}
+    for user, native_usd in boost_bals.native.items():
+        base_native_balances[user] = native_usd
+
+    allocate_bvecvx_to_users(boost_info, boost_bals.bvecvx, base_native_balances)
+    allocate_digg_to_users(boost_info, boost_bals.digg, base_native_balances)
 
     for addr, boost in badger_boost_data.items():
         boost_metadata = boost_info.get(addr, {})
@@ -208,7 +230,6 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
         [[rng, amount] for rng, amount in stake_data.items()],
         headers=["range", "amount of users"],
     )
-    send_code_block_to_discord(
-        stake_data_table, username="Boost Bot", url=discord_url)
+    send_code_block_to_discord(stake_data_table, username="Boost Bot", url=discord_url)
 
     return boost_data
