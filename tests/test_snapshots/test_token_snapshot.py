@@ -1,4 +1,7 @@
 import pytest
+
+from config.constants.addresses import ARB_BADGER
+from config.constants.addresses import BADGER
 from helpers.enums import Network
 from rewards.snapshot.token_snapshot import token_snapshot
 from tests.utils import TEST_WALLET, TEST_WALLET_ANOTHER
@@ -43,3 +46,8 @@ def test_token_snapshot(chain, mock_fns):
     badger_snapshot, digg_snapshot = token_snapshot(chain, 100)
     assert badger_snapshot.balances == expected_badger_bals
     assert digg_snapshot.balances == expected_digg_bals
+
+    if chain == Network.Ethereum:
+        assert badger_snapshot.token == BADGER
+    if chain == Network.Arbitrum:
+        assert badger_snapshot.token == ARB_BADGER
