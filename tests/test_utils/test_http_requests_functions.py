@@ -32,7 +32,7 @@ def test_fetch_block_by_timestamp_handled(mock_discord):
 
 @responses.activate
 def test_fetch_ppfs_handled(mock_discord):
-    responses.add(responses.GET, f"{badger_api}/setts", json={}, status=404)
+    responses.add(responses.GET, f"{badger_api}/vaults", json={}, status=404)
     fetch_ppfs()
 
     # Make sure discord message was sent
@@ -45,7 +45,7 @@ def test_fetch_ppfs_handled(mock_discord):
 def test_fetch_ppfs__happy():
     responses.add(
         responses.GET,
-        f"{badger_api}/setts",
+        f"{badger_api}/vaults",
         json=[
             {
                 "name": "Digg",
@@ -71,7 +71,7 @@ def test_fetch_ppfs__happy():
 def test_fetch_ppfs__unhappy_no_badger_ppfs():
     responses.add(
         responses.GET,
-        f"{badger_api}/setts",
+        f"{badger_api}/vaults",
         json=[
             {
                 "name": "Digg",
@@ -93,7 +93,7 @@ def test_fetch_ppfs__unhappy_no_badger_ppfs():
 def test_fetch_ppfs__unhappy_no_digg_ppfs():
     responses.add(
         responses.GET,
-        f"{badger_api}/setts",
+        f"{badger_api}/vaults",
         json=[
             {
                 "name": "Digg",
@@ -115,7 +115,7 @@ def test_fetch_ppfs__unhappy_no_digg_ppfs():
 def test_fetch_ppfs__unhappy_neither_ppfs():
     responses.add(
         responses.GET,
-        f"{badger_api}/setts",
+        f"{badger_api}/vaults",
         json=[
             {
                 "name": "Digg",

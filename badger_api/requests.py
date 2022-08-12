@@ -17,7 +17,7 @@ def fetch_ppfs() -> Optional[Tuple[Decimal, Decimal]]:
     """
     Fetch ppfs for bbadger and bdigg
     """
-    setts = http_client.get(f"{badger_api}/setts")
+    setts = http_client.get(f"{badger_api}/vaults")
     if not setts:
         return
     badger = [sett for sett in setts if sett["asset"] == "BADGER"][0]
