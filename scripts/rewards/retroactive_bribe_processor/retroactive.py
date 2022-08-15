@@ -12,23 +12,11 @@ from rewards.utils.rewards_utils import (
 
 distributions = [
     {
-        "sett": addresses.BVECVX,
-        "block": 14806809,
-        "amount": Decimal("9041178891053935509633"),
+        "sett": addresses.GRAVIAURA,
+        "block": 15344809,
+        "amount": Decimal("1928771715566995688546"),
         "token": addresses.BADGER
     },
-    {
-        "sett": addresses.BVECVX,
-        "block": 14806809,
-        "amount": Decimal("12179126369595468422025 "),
-        "token": addresses.BVECVX
-    },
-    {
-        "sett": addresses.BVECVX_CVX_LP_SETT,
-        "block": 14806809,
-        "amount": Decimal("2009150864678652273513"),
-        "token": addresses.BADGER
-    }
 ]
 
 
@@ -47,7 +35,7 @@ def retroactive_func(tree, tree_manager) -> RewardsList:
             distro["token"],
             block
         ))
-    return combine_rewards([*retro_rewards, rewards_list], 5269)
+    return combine_rewards([*retro_rewards, rewards_list], 6152)
 
 
 def test_retroactive_func(old_tree, new_tree):
