@@ -44,7 +44,7 @@ def test_retroactive_func(old_tree, new_tree):
         token = distro["token"]
         token_agg[token] = token_agg.get(token, 0) + int(distro["amount"])
     for token, amount in old_tree["tokenTotals"].items():
-        if token in [addresses.BVECVX, addresses.BADGER]:
+        if token in [addresses.BADGER]:
             if not new_tree["tokenTotals"][token] > amount:
                 return False
     return True
