@@ -35,7 +35,7 @@ def retroactive_func(tree, tree_manager) -> RewardsList:
             distro["token"],
             block
         ))
-    return combine_rewards([*retro_rewards, rewards_list], 5269)
+    return combine_rewards([*retro_rewards, rewards_list], 6152)
 
 
 def test_retroactive_func(old_tree, new_tree):
