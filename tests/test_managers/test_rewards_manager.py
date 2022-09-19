@@ -1,36 +1,39 @@
-import logging
 from copy import deepcopy
 from decimal import Decimal
 from math import isclose
 from unittest import TestCase
 from unittest.mock import MagicMock
-from moto.core import patch_resource
-from rewards.aws.helpers import dynamodb
+
 import pytest
+from moto.core import patch_resource
 from web3 import Web3
+
 from config.constants import addresses
-from config.constants.addresses import BADGER, TECH_OPS
+from config.constants.addresses import BADGER
 from config.constants.addresses import BVECVX_CVX_LP
 from config.constants.addresses import ETH_BADGER_TREE
 from config.constants.addresses import IBBTC_PEAK
-from config.constants.chain_mappings import DECIMAL_MAPPING, SETTS
-from helpers.enums import BalanceType, Network
+from config.constants.addresses import TECH_OPS
+from config.constants.chain_mappings import DECIMAL_MAPPING
+from config.constants.chain_mappings import SETTS
+from helpers.enums import BalanceType
+from helpers.enums import Network
+from logging_utils.logger import logger
+from rewards.aws.helpers import dynamodb
+from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.classes.RewardsManager import InvalidRewardsTotalException
 from rewards.classes.Schedule import Schedule
-from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from tests.test_subgraph.test_data import BADGER_DISTRIBUTIONS_TEST_DATA
-from tests.utils import (
-    mock_get_claimable_data,
-    mock_balances,
-    mock_boosts,
-    mock_boosts_split,
-    mock_tree,
-    set_env_vars,
-    test_account,
-    test_cycle,
-    test_end,
-    test_start,
-)
+from tests.utils import mock_balances
+from tests.utils import mock_boosts
+from tests.utils import mock_boosts_split
+from tests.utils import mock_get_claimable_data
+from tests.utils import mock_tree
+from tests.utils import set_env_vars
+from tests.utils import test_account
+from tests.utils import test_cycle
+from tests.utils import test_end
+from tests.utils import test_start
 
 set_env_vars()
 
@@ -38,8 +41,6 @@ from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Snapshot import Snapshot
 from rewards.utils.rewards_utils import combine_rewards, process_cumulative_rewards
 from tests.test_utils.cycle_utils import mock_tree_manager
-
-logger = logging.getLogger("test-rewards-manager")
 
 
 @pytest.fixture

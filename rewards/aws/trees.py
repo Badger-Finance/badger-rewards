@@ -7,6 +7,7 @@ from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
 from helpers.discord import console_and_discord
 from helpers.enums import DiscordRoles, Network
+from logging_utils import logger
 from rewards.aws.helpers import get_bucket, s3
 
 console = Console()
@@ -25,7 +26,7 @@ def download_latest_tree(chain: Network) -> Dict:
         "key": key,
     }  # badger-api production
 
-    console.print("Downloading latest rewards file from s3: " + target["bucket"])
+    logger.info("Downloading latest rewards file from s3: " + target["bucket"])
     s3_clientobj = s3.get_object(Bucket=target["bucket"], Key=target["key"])
     s3_clientdata = s3_clientobj["Body"].read().decode("utf-8")
     return json.loads(s3_clientdata)
@@ -44,7 +45,7 @@ def download_tree(file_name: str, chain: Network) -> str:
 
     tree_file_key = "rewards/" + file_name
 
-    console.print("Downloading file from s3: " + tree_file_key)
+    logger.info("Downloading file from s3: " + tree_file_key)
 
     s3_clientobj = s3.get_object(Bucket=tree_bucket, Key=tree_file_key)
     s3_clientdata = s3_clientobj["Body"].read().decode("utf-8")

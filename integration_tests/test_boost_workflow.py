@@ -1,19 +1,15 @@
-import logging
 from collections import Counter
 from decimal import Decimal
+
 from config.singletons import env_config
 from helpers.enums import Network
 from rewards.aws.boost import add_user_data
 from rewards.boost.calc_boost import badger_boost
 from tests.test_utils.cycle_utils import mock_upload_boosts
-from tests.utils import (
-    mock_boosts,
-    mock_send_code_block_to_discord,
-    mock_send_message_to_discord_prod,
-    set_env_vars,
-)
-
-logger = logging.getLogger("test-boost")
+from tests.utils import mock_boosts
+from tests.utils import mock_send_code_block_to_discord
+from tests.utils import mock_send_message_to_discord_prod
+from tests.utils import set_env_vars
 
 set_env_vars()
 

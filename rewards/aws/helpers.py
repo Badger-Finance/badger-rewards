@@ -1,14 +1,12 @@
 import base64
 import json
-import logging
-from helpers.enums import Environment
 
 import boto3
 from botocore.exceptions import ClientError
 from decouple import config
 
-
-logger = logging.getLogger("aws-helpers")
+from helpers.enums import Environment
+from logging_utils.logger import logger
 
 DYNAMO_ASSUME_ROLE = "arn:aws:iam::784874126256:role/k8s-bots"
 
