@@ -3,15 +3,19 @@ from decimal import Decimal
 from typing import Dict
 from typing import List
 
-from rich.console import Console
 from config.constants import addresses
-from config.constants.emissions import CONTRIBUTOR_BOOST, CONTRIBUTOR_BOOST_END_TIMESTAMP
+from config.constants.emissions import CONTRIBUTOR_BOOST
+from config.constants.emissions import CONTRIBUTOR_BOOST_END_TIMESTAMP
 from config.singletons import env_config
-from helpers.enums import Abi, BalanceType
+from helpers.enums import Abi
+from helpers.enums import BalanceType
 from helpers.enums import Network
 from helpers.web3_utils import make_contract
+from logging_utils import logger
 from rewards.classes.Boost import BoostBalances
 from rewards.classes.Snapshot import Snapshot
+from rewards.feature_flags.feature_flags import DIGG_BOOST
+from rewards.feature_flags.feature_flags import flags
 from rewards.snapshot.chain_snapshot import chain_snapshot_usd
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot
@@ -20,8 +24,6 @@ from rewards.snapshot.nft_snapshot import nft_snapshot_usd
 from rewards.snapshot.token_snapshot import fuse_snapshot_of_token
 from rewards.snapshot.token_snapshot import token_snapshot_usd
 from rewards.utils.snapshot_utils import digg_snapshot_usd
-from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
-console = Console()
 
 
 def get_contributor_native_balance_usd(chain: Network, block: int) -> Dict[str, Decimal]:
@@ -83,19 +85,19 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     native = Counter()
     non_native = Counter()
 
-    console.log(f"\n === Taking nft snapshot on {chain} === \n")
+    logger.info(f"\n === Taking nft snapshot on {chain} === \n")
     nft_balances = nft_snapshot_usd(chain, block)
-    console.log(f"\n === Taking claims snapshot on {chain} === \n")
+    logger.info(f"\n === Taking claims snapshot on {chain} === \n")
     native_claimable, non_native_claimable = claims_snapshot_usd(chain, block)
     native += Counter(native_claimable)
     non_native += Counter(non_native_claimable)
 
-    console.log(f"\n === Taking token snapshot on {chain} === \n")
+    logger.info(f"\n === Taking token snapshot on {chain} === \n")
     badger_tokens, digg_tokens = token_snapshot_usd(chain, block)
 
     native += Counter(badger_tokens) + Counter(nft_balances)
 
-    console.log(f"\n === Taking chain snapshot on {chain} === \n")
+    logger.info(f"\n === Taking chain snapshot on {chain} === \n")
     native_setts, non_native_setts = chain_snapshot_usd(chain, block)
     non_native += Counter(non_native_setts)
     native += Counter(native_setts)

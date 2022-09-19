@@ -1,16 +1,14 @@
 import json
 from typing import Dict
 
-from rich.console import Console
-
 from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
 from helpers.discord import console_and_discord
-from helpers.enums import DiscordRoles, Network
+from helpers.enums import DiscordRoles
+from helpers.enums import Network
 from logging_utils import logger
-from rewards.aws.helpers import get_bucket, s3
-
-console = Console()
+from rewards.aws.helpers import get_bucket
+from rewards.aws.helpers import s3
 
 
 def download_latest_tree(chain: Network) -> Dict:
@@ -90,7 +88,7 @@ def upload_tree(file_name: str, data: Dict, chain: str, staging: bool = False):
 
     for target in upload_targets:
         try:
-            console.print(
+            logger.info(
                 "Uploading file to s3://" + target["bucket"] + "/" + target["key"]
             )
             s3.put_object(
@@ -99,10 +97,14 @@ def upload_tree(file_name: str, data: Dict, chain: str, staging: bool = False):
                 Key=target["key"],
                 ACL="bucket-owner-full-control",
             )
-            console.print(
+            logger.info(
                 "✅ Uploaded file to s3://" + target["bucket"] + "/" + target["key"]
             )
         except Exception as e:
+            logger.error(
+                "Error uploading approval file to bucket",
+                extra={'bucket': target["bucket"], 'chain': chain}
+            )
             console_and_discord(f'Error uploading approval file to bucket {target["bucket"]}, '
                                 f'temp file saved: {e}', chain, mentions=DiscordRoles.RewardsPod)
             with open('./temp_data/temp_tree.json', 'w') as outfile:

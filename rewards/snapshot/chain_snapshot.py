@@ -1,22 +1,22 @@
 from collections import Counter
-from typing import Dict, Tuple
+from typing import Dict
+from typing import Tuple
 
-from rich.console import Console
 from web3 import Web3
 
 from badger_api.requests import fetch_token
-from config.constants.emissions import (
-    DISABLED_VAULTS,
-    NATIVE,
-    NO_BOOST_CHAINS,
-    NO_BOOST_VAULTS,
-)
-from helpers.enums import BalanceType, Network
+from config.constants.emissions import DISABLED_VAULTS
+from config.constants.emissions import NATIVE
+from config.constants.emissions import NO_BOOST_CHAINS
+from config.constants.emissions import NO_BOOST_VAULTS
+from helpers.enums import BalanceType
+from helpers.enums import Network
+from logging_utils import logger
 from rewards.classes.Snapshot import Snapshot
-from rewards.utils.emission_utils import fetch_unboosted_vaults, get_token_weight
-from subgraph.queries.setts import fetch_chain_balances, fetch_sett_balances
-
-console = Console()
+from rewards.utils.emission_utils import fetch_unboosted_vaults
+from rewards.utils.emission_utils import get_token_weight
+from subgraph.queries.setts import fetch_chain_balances
+from subgraph.queries.setts import fetch_sett_balances
 
 
 def chain_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
@@ -34,7 +34,7 @@ def chain_snapshot(chain: Network, block: int) -> Dict[str, Snapshot]:
         sett_balances = parse_sett_balances(sett_addr, balances, chain)
         token = fetch_token(chain, sett_addr)
         name = token.get("name", "")
-        console.log(f"Fetched {len(balances)} balances for sett {name}")
+        logger.info(f"Fetched {len(balances)} balances for sett {name}")
         balances_by_sett[sett_addr] = sett_balances
 
     return balances_by_sett
@@ -78,7 +78,7 @@ def sett_snapshot(chain: Network, block: int, sett: str) -> Snapshot:
     """
     token = fetch_token(chain, sett)
     name = token.get("name", "")
-    console.log(f"Taking snapshot on {chain} of {name} ({sett}) at {block}\n")
+    logger.info(f"Taking snapshot on {chain} of {name} ({sett}) at {block}\n")
     sett_balances = fetch_sett_balances(chain, block, sett)
     return parse_sett_balances(sett, sett_balances, chain)
 
@@ -100,7 +100,7 @@ def parse_sett_balances(
     else:
         sett_ratio = get_token_weight(sett_address, chain)
 
-    console.log(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
+    logger.info(f"Sett {sett_address} has type {sett_type} and ratio {sett_ratio} \n")
 
     return Snapshot(sett_address, balances, sett_ratio, sett_type)
 
@@ -113,7 +113,7 @@ def chain_snapshot_usd(chain: Network, block: int) -> Tuple[Counter, Counter]:
     no_boost = DISABLED_VAULTS + fetch_unboosted_vaults(chain, block) + NO_BOOST_VAULTS
     for sett, snapshot in total_snapshot.items():
         if sett in no_boost:
-            console.log(f"{sett} is disabled")
+            logger.info(f"{sett} is disabled")
             continue
         usd_snapshot = snapshot.convert_to_usd(chain)
         balances = Counter(usd_snapshot.balances)
