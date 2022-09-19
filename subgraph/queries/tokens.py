@@ -54,7 +54,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
     continue_fetching = True
     last_id = "0x0000000000000000000000000000000000000000"
     multiplier = get_across_lp_multiplier()
-    logger.log(f"Across lp multiplier {multiplier}")
+    logger.info(f"Across lp multiplier {multiplier}")
     across_balances = {}
     client = SubgraphClient("across", chain)
     while continue_fetching:
