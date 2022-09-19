@@ -1,5 +1,4 @@
 import os
-import os
 
 import pytest
 from brownie import accounts
