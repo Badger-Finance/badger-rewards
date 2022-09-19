@@ -1,16 +1,10 @@
-import logging
-
 import pytest
 from brownie import web3
 
-from tests.utils import (
-    mock_boosts,
-    mock_send_message_to_discord_prod,
-    mock_send_message_to_discord_stg,
-    set_env_vars,
-)
-
-logger = logging.getLogger("test-boost")
+from tests.utils import mock_boosts
+from tests.utils import mock_send_message_to_discord_prod
+from tests.utils import mock_send_message_to_discord_stg
+from tests.utils import set_env_vars
 
 set_env_vars()
 

@@ -1,22 +1,23 @@
 import json
-import logging
 from decimal import Decimal
 from typing import Dict
 
 from brownie import Contract
 from brownie import web3
 from eth_account import Account
+
 from config.constants.chain_mappings import EMISSIONS_CONTRACTS
-from helpers.enums import Network, Abi
-from helpers.web3_utils import load_abi, make_contract_w3
+from helpers.enums import Abi
+from helpers.enums import Network
+from helpers.web3_utils import load_abi
+from helpers.web3_utils import make_contract_w3
+from logging_utils.logger import logger
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.tree_utils import get_last_proposed_cycle
 from scripts.rewards.utils.approve_rewards import approve_root
 from scripts.rewards.utils.propose_rewards import propose_root
 from tests.utils import mock_boosts
 from tests.utils import mock_tree
-
-logger = logging.getLogger("cycle-utils")
 
 
 def mock_fetch_current_tree(*args, **kwargs):

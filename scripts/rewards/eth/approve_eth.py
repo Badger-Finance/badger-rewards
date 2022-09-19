@@ -1,15 +1,18 @@
 import json
-from decouple import config
 import traceback
+
+from decouple import config
 from eth_account import Account
-from rich.console import Console
-from helpers.discord import console_and_discord, send_message_to_discord
-from helpers.enums import DiscordRoles, Network
+
+from helpers.discord import console_and_discord
+from helpers.discord import send_message_to_discord
+from helpers.enums import DiscordRoles
+from helpers.enums import Network
+from logging_utils import logger
 from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import approve_root
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.tree_utils import get_last_proposed_cycle
-console = Console()
 
 
 def approve_rewards(chain, kube):
@@ -28,14 +31,14 @@ def approve_rewards(chain, kube):
     cycle_account = Account.from_key(cycle_key)
     tree_manager = TreeManager(chain, cycle_account)
     if tree_manager.has_pending_root():
-        console.log("pending root, start approve rewards")
+        logger.info("pending root, start approve rewards")
         currentRewards, startBlock, endBlock = get_last_proposed_cycle(
             chain, tree_manager
         )
         if not currentRewards:
             return
 
-        console.log(
+        logger.info(
             "Generating rewards between {} and {} on {} chain".format(
                 startBlock, endBlock, chain
             )
@@ -49,7 +52,7 @@ def approve_rewards(chain, kube):
         )
         return approve_root(chain, startBlock, endBlock, currentRewards, tree_manager)
     else:
-        console.log("no pending root, exiting")
+        logger.info("no pending root, exiting")
 
 
 if __name__ == "__main__":

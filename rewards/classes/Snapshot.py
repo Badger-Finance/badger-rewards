@@ -2,25 +2,27 @@ from __future__ import annotations
 
 import json
 from decimal import Decimal
-from typing import Dict, Tuple, Optional
+from typing import Dict
+from typing import Optional
+from typing import Tuple
 
-from rich.console import Console
 from web3 import Web3
-from badger_api.config import get_api_specific_path
-from badger_api.requests import fetch_ppfs, fetch_token_prices
-from config.constants.addresses import (
-    BAURA_DIGG_WBTC,
-    BDIGG,
-    BSLP_DIGG_WBTC,
-    BUNI_DIGG_WBTC,
-    DIGG,
-    WBTC,
-)
-from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import Network
-from rewards.feature_flags.feature_flags import DIGG_BOOST, flags
 
-console = Console()
+from badger_api.config import get_api_specific_path
+from badger_api.requests import fetch_ppfs
+from badger_api.requests import fetch_token_prices
+from config.constants.addresses import BAURA_DIGG_WBTC
+from config.constants.addresses import BDIGG
+from config.constants.addresses import BSLP_DIGG_WBTC
+from config.constants.addresses import BUNI_DIGG_WBTC
+from config.constants.addresses import DIGG
+from config.constants.addresses import WBTC
+from helpers.discord import get_discord_url
+from helpers.discord import send_message_to_discord
+from helpers.enums import Network
+from logging_utils import logger
+from rewards.feature_flags.feature_flags import DIGG_BOOST
+from rewards.feature_flags.feature_flags import flags
 
 
 class Snapshot:
@@ -112,7 +114,7 @@ class Snapshot:
             price = Decimal(0)
 
             # Try to fallback to staging for pricing
-            console.log(f"CANT FIND PRODUCTION PRICING FOR {self.token}")
+            logger.warning(f"CANT FIND PRODUCTION PRICING FOR {self.token}")
             send_message_to_discord(
                 "**ERROR**",
                 f"Pricing for {self.token} not in production, checking staging",
@@ -122,7 +124,7 @@ class Snapshot:
             )
             if self.token not in staging_prices:
                 price = Decimal(0)
-                console.log(f"CANT STAGING FIND PRICING FOR {self.token}")
+                logger.warning(f"CANT STAGING FIND PRICING FOR {self.token}")
                 send_message_to_discord(
                     "**ERROR**",
                     f"{self.token} is not in production or staging pricing",

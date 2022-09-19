@@ -1,49 +1,37 @@
-import simplejson as json
-from typing import (
-    Dict,
-    List,
-    Tuple,
-)
+from typing import Dict
+from typing import List
+from typing import Tuple
 
+import simplejson as json
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
-from rich.console import Console
 
-from config.constants.chain_mappings import (
-    CHAIN_IDS,
-    EMISSIONS_CONTRACTS,
-)
+from config.constants.chain_mappings import CHAIN_IDS
+from config.constants.chain_mappings import EMISSIONS_CONTRACTS
 from config.constants.emissions import NO_BOOST_CHAINS
 from config.rewards_config import rewards_config
 from config.singletons import env_config
 from helpers.discord import console_and_discord
 from helpers.enums import Abi
 from helpers.web3_utils import make_contract
-from rewards.aws.boost import (
-    add_multipliers,
-    download_boosts,
-    download_proposed_boosts,
-    upload_boosts,
-    upload_proposed_boosts,
-)
+from rewards.aws.boost import add_multipliers
+from rewards.aws.boost import download_boosts
+from rewards.aws.boost import download_proposed_boosts
+from rewards.aws.boost import upload_boosts
+from rewards.aws.boost import upload_proposed_boosts
 from rewards.aws.trees import upload_tree
 from rewards.classes.RewardsManager import RewardsManager
 from rewards.classes.Schedule import Schedule
 from rewards.classes.TreeManager import TreeManager
 from rewards.dynamo_handlers import put_rewards_data
 from rewards.rewards_checker import verify_rewards
-from rewards.utils.emission_utils import (
-    fetch_setts,
-    get_schedules_by_token,
-    parse_schedule,
-)
-from rewards.utils.rewards_utils import (
-    combine_rewards,
-    process_cumulative_rewards,
-)
 from rewards.snapshot.claims_snapshot import get_claimable_rewards_deficits
-
-console = Console()
+from logging_utils import logger as log
+from rewards.utils.emission_utils import fetch_setts
+from rewards.utils.emission_utils import get_schedules_by_token
+from rewards.utils.emission_utils import parse_schedule
+from rewards.utils.rewards_utils import combine_rewards
+from rewards.utils.rewards_utils import process_cumulative_rewards
 
 
 def fetch_all_schedules(
@@ -76,7 +64,7 @@ def fetch_all_schedules(
         if len(schedules) > 0 and has_active_schedule:
             setts_with_schedules.append(sett)
         all_schedules[sett] = get_schedules_by_token(schedules)
-    console.log(f"Fetched {len(all_schedules)} schedules")
+    log.info(f"Fetched {len(all_schedules)} schedules")
     return all_schedules, setts_with_schedules
 
 
@@ -106,7 +94,7 @@ def propose_root(
     time_since_last_update = current_time - current_merkle_data["lastUpdateTime"]
 
     if time_since_last_update < rewards_config.root_update_interval(chain):
-        console.log("[bold yellow]===== Last update too recent () =====[/bold yellow]")
+        log.info("Last update too recent")
     if chain in NO_BOOST_CHAINS:
         boosts = {"userData": {}}
     else:
@@ -120,9 +108,9 @@ def propose_root(
         tree_manager=tree_manager,
         boosts=boosts,
     )
-    console.log("Generated rewards")
+    log.info("Generated rewards")
 
-    console.log(
+    log.info(
         f"\n==== Proposing root with rootHash {rewards_data['rootHash']} ====\n"
     )
     if env_config.production or env_config.test:
@@ -158,7 +146,7 @@ def approve_root(
         boosts=boosts,
     )
     if env_config.test or env_config.staging:
-        console.log(
+        log.info(
             f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
         )
         boosts = add_multipliers(
@@ -170,7 +158,7 @@ def approve_root(
             upload_boosts(boosts, chain)
         return rewards_data
     if tree_manager.matches_pending_hash(rewards_data["rootHash"]):
-        console.log(
+        log.info(
             f"\n==== Approving root with rootHash {rewards_data['rootHash']} ====\n"
         )
 
@@ -241,11 +229,11 @@ def generate_rewards_in_range(
         chain, tree_manager.next_cycle, start, end, boosts["userData"]
     )
 
-    console.log("Calculating Tree Rewards...")
+    log.info("Calculating Tree Rewards...")
     tree_rewards = rewards_manager.calculate_tree_distributions()
     rewards_list.append(tree_rewards)
 
-    console.log("Calculating Sett Rewards...")
+    log.info("Calculating Sett Rewards...")
     sett_rewards, sett_rewards_analytics = rewards_manager.calculate_all_sett_rewards(
         setts, all_schedules
     )
@@ -253,10 +241,10 @@ def generate_rewards_in_range(
 
     new_rewards = combine_rewards(rewards_list, rewards_manager.cycle)
 
-    console.log("Combining cumulative rewards... \n")
+    log.info("Combining cumulative rewards... \n")
     cumulative_rewards = process_cumulative_rewards(past_tree, new_rewards)
 
-    console.log("Converting to merkle tree... \n")
+    log.info("Converting to merkle tree... \n")
     merkle_tree = tree_manager.convert_to_merkle_tree(cumulative_rewards, start, end)
     root_hash = rewards_manager.web3.keccak(text=merkle_tree["merkleRoot"])
     chain_id = CHAIN_IDS[chain]

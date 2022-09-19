@@ -1,12 +1,17 @@
-import logging
 import os
+
 import pytest
-from brownie import accounts, web3
+from brownie import accounts
+from brownie import web3
 from eth_account import Account
-from rewards.aws.helpers import dynamodb
 from moto.core import patch_resource
 
-from tests.utils import mock_get_claimable_data, set_env_vars, test_address, test_key
+from rewards.aws.helpers import dynamodb
+from tests.utils import mock_get_claimable_data
+from tests.utils import set_env_vars
+from tests.utils import test_address
+from tests.utils import test_key
+
 set_env_vars()
 os.environ["private"] = test_key
 
@@ -21,8 +26,6 @@ from tests.test_utils.cycle_utils import (
     mock_upload_boosts,
     mock_upload_tree,
 )
-
-logger = logging.getLogger("test-cycles-eth")
 
 
 @pytest.fixture(autouse=True)

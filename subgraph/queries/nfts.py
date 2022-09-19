@@ -2,13 +2,11 @@ from functools import lru_cache
 from typing import Dict
 
 from gql import gql
-from rich.console import Console
 from web3.main import Web3
 
 from helpers.enums import Network
+from logging_utils import logger
 from subgraph.subgraph_utils import SubgraphClient
-
-console = Console()
 
 
 @lru_cache
@@ -47,6 +45,6 @@ def fetch_nfts(chain: str, block: int) -> Dict:
         if len(nft_data) == 0:
             break
         else:
-            console.log(f"Fetching {len(nft_data)} nft balances")
+            logger.info(f"Fetching {len(nft_data)} nft balances")
             last_nft_id = nft_data[-1]["id"]
     return nft_balances

@@ -1,15 +1,14 @@
 import json
 from typing import Dict
 
-from rich.console import Console
-
 from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
 from helpers.discord import console_and_discord
-from helpers.enums import DiscordRoles, Network
-from rewards.aws.helpers import get_bucket, s3
-
-console = Console()
+from helpers.enums import DiscordRoles
+from helpers.enums import Network
+from logging_utils import logger
+from rewards.aws.helpers import get_bucket
+from rewards.aws.helpers import s3
 
 
 def download_latest_tree(chain: Network) -> Dict:
@@ -25,7 +24,7 @@ def download_latest_tree(chain: Network) -> Dict:
         "key": key,
     }  # badger-api production
 
-    console.print("Downloading latest rewards file from s3: " + target["bucket"])
+    logger.info("Downloading latest rewards file from s3: " + target["bucket"])
     s3_clientobj = s3.get_object(Bucket=target["bucket"], Key=target["key"])
     s3_clientdata = s3_clientobj["Body"].read().decode("utf-8")
     return json.loads(s3_clientdata)
@@ -44,7 +43,7 @@ def download_tree(file_name: str, chain: Network) -> str:
 
     tree_file_key = "rewards/" + file_name
 
-    console.print("Downloading file from s3: " + tree_file_key)
+    logger.info("Downloading file from s3: " + tree_file_key)
 
     s3_clientobj = s3.get_object(Bucket=tree_bucket, Key=tree_file_key)
     s3_clientdata = s3_clientobj["Body"].read().decode("utf-8")
@@ -89,7 +88,7 @@ def upload_tree(file_name: str, data: Dict, chain: str, staging: bool = False):
 
     for target in upload_targets:
         try:
-            console.print(
+            logger.info(
                 "Uploading file to s3://" + target["bucket"] + "/" + target["key"]
             )
             s3.put_object(
@@ -98,10 +97,14 @@ def upload_tree(file_name: str, data: Dict, chain: str, staging: bool = False):
                 Key=target["key"],
                 ACL="bucket-owner-full-control",
             )
-            console.print(
+            logger.info(
                 "✅ Uploaded file to s3://" + target["bucket"] + "/" + target["key"]
             )
         except Exception as e:
+            logger.error(
+                "Error uploading approval file to bucket",
+                extra={'bucket': target["bucket"], 'chain': chain}
+            )
             console_and_discord(f'Error uploading approval file to bucket {target["bucket"]}, '
                                 f'temp file saved: {e}', chain, mentions=DiscordRoles.RewardsPod)
             with open('./temp_data/temp_tree.json', 'w') as outfile:

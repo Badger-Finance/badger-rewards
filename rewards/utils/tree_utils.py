@@ -1,21 +1,21 @@
-from typing import Dict, Tuple
-from rich.console import Console
-from config.singletons import env_config
+from typing import Dict
+from typing import Tuple
+
 from badger_api.claimable import get_claimable_metadata
+from config.singletons import env_config
+from logging_utils import logger
 from rewards.classes.TreeManager import TreeManager
 from subgraph.queries.setts import last_synced_block
-
-console = Console()
 
 
 def get_last_proposed_cycle(
     chain: str, tree_manager: TreeManager
 ) -> Tuple[Dict, int, int]:
     if not tree_manager.has_pending_root():
-        console.log("[bold yellow]===== No pending root, exiting =====[/bold yellow]")
+        logger.info("No pending root, exiting")
         return {}, 0, 0
 
-    console.log("Pending root found.. approving")
+    logger.info("Pending root found.. approving")
 
     # Fetch the appropriate file
     current_rewards = tree_manager.fetch_current_tree()

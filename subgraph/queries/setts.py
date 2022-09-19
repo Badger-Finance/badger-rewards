@@ -1,21 +1,17 @@
 import math
 from functools import lru_cache
-from typing import (
-    Dict,
-    List,
-)
+from typing import Dict
+from typing import List
 
 from gql import gql
 from graphql.language.ast import DocumentNode
-from rich.console import Console
 from web3 import Web3
 
 from config.constants.chain_mappings import SETTS
 from config.constants.emissions import DIGG_SETTS
 from helpers.enums import Network
+from logging_utils import logger
 from subgraph.subgraph_utils import SubgraphClient
-
-console = Console()
 
 
 @lru_cache
@@ -136,9 +132,9 @@ def fetch_chain_balances(chain: Network, block: int) -> Dict[str, Dict[str, int]
         if len(balance_data) == 0:
             break
         else:
-            console.log(f"Fetching {len(balance_data)} sett balances")
+            logger.info(f"Fetching {len(balance_data)} sett balances")
             last_id = balance_data[-1]["id"]
-    console.log(f"Fetched {len(balances)} total setts")
+    logger.info(f"Fetched {len(balances)} total setts")
     return balances
 
 
@@ -177,8 +173,8 @@ def fetch_sett_balances(chain: Network, block: int, sett: str):
         if len(balance_data) == 0:
             break
         else:
-            console.log(f"Fetching {len(balance_data)} sett balances")
+            logger.info(f"Fetching {len(balance_data)} sett balances")
             last_id = balance_data[-1]["id"]
 
-    console.log(f"Fetched {len(balances)} total sett balances")
+    logger.info(f"Fetched {len(balances)} total sett balances")
     return balances
