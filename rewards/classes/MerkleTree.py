@@ -1,11 +1,10 @@
 from itertools import zip_longest
 
 from eth_utils import encode_hex
-from rich.console import Console
 from web3 import Web3
-from rewards.classes.RewardsList import RewardsList
 
-console = Console()
+from logging_utils import logger
+from rewards.classes.RewardsList import RewardsList
 
 """
 Convert merkle_tree
@@ -89,6 +88,6 @@ def rewards_to_merkle_tree(rewards: RewardsList, startBlock, endBlock):
             "proof": tree.get_proof(encodedNodes[node["index"]]),
             "node": encoded,
         }
-    console.print(f"merkle root: {encode_hex(tree.root)}")
+    logger.info(f"merkle root: {encode_hex(tree.root)}")
 
     return distribution

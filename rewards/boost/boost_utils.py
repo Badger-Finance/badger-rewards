@@ -85,14 +85,14 @@ def calc_boost_balances(block: int, chain: str) -> BoostBalances:
     native = Counter()
     non_native = Counter()
 
-    logger.info(f"\n === Taking nft snapshot on {chain} === \n")
+    logger.info(f"Taking nft snapshot on {chain}")
     nft_balances = nft_snapshot_usd(chain, block)
-    logger.info(f"\n === Taking claims snapshot on {chain} === \n")
+    logger.info(f"Taking claims snapshot on {chain}")
     native_claimable, non_native_claimable = claims_snapshot_usd(chain, block)
     native += Counter(native_claimable)
     non_native += Counter(non_native_claimable)
 
-    logger.info(f"\n === Taking token snapshot on {chain} === \n")
+    logger.info(f"Taking token snapshot on {chain}")
     badger_tokens, digg_tokens = token_snapshot_usd(chain, block)
 
     native += Counter(badger_tokens) + Counter(nft_balances)

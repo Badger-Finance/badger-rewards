@@ -1,12 +1,11 @@
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict
+from typing import List
 
 from gql import gql
-from rich.console import Console
 from web3 import Web3
-from subgraph.subgraph_utils import SubgraphClient
 
-console = Console()
+from subgraph.subgraph_utils import SubgraphClient
 
 
 def _populate_end_of_previous_harvest(tree_distributions: List[Dict]) -> Dict[str, List]:

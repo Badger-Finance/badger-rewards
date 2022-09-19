@@ -1,22 +1,24 @@
 from decimal import Decimal
 from functools import lru_cache
-from typing import Dict, List
+from typing import Dict
+from typing import List
 
-from rich.console import Console
 from web3 import Web3
 from web3.contract import ContractFunctions
 
 from config.constants.addresses import ACROSS_BRIDGE
 from config.constants.chain_mappings import EMISSIONS_CONTRACTS
-from config.constants.emissions import DISABLED_VAULTS, NATIVE
-from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import Abi, Network
+from config.constants.emissions import DISABLED_VAULTS
+from config.constants.emissions import NATIVE
+from config.singletons import env_config
+from helpers.discord import get_discord_url
+from helpers.discord import send_message_to_discord
+from helpers.enums import Abi
+from helpers.enums import Network
 from helpers.web3_utils import make_contract
 from rewards.classes.NftWeightSchedule import NFTWeightSchedule
 from rewards.classes.Schedule import Schedule
 from subgraph.queries.setts import list_setts
-from config.singletons import env_config
-console = Console()
 
 
 @lru_cache
