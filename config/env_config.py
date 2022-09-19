@@ -1,4 +1,3 @@
-import logging
 from typing import Optional
 
 from decouple import config
@@ -9,11 +8,8 @@ from helpers.enums import (
     Environment,
     Network,
 )
+from logging_utils.logger import logger
 from rewards.aws.helpers import get_secret
-
-logging.getLogger("gql.transport.aiohttp").setLevel(logging.WARNING)
-
-logging.getLogger("gql.transport.aiohttp").setLevel("WARNING")
 
 
 class NoHealthyNode(Exception):
@@ -21,7 +17,6 @@ class NoHealthyNode(Exception):
 
 
 class EnvConfig:
-    rpc_logger = logging.getLogger("rpc-logger")
 
     def __init__(self):
         environment = config("ENV", "").lower()
@@ -95,8 +90,8 @@ class EnvConfig:
                 node.eth.get_block_number()
                 return node
             except Exception as e:
-                self.rpc_logger.info(f"{node.provider.endpoint_uri} unhealthy")
-                self.rpc_logger.info(e)
+                logger.info(f"{node.provider.endpoint_uri} unhealthy")
+                logger.info(e)
 
         raise NoHealthyNode(f"No healthy nodes for chain: {chain}")
 

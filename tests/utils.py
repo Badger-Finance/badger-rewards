@@ -27,8 +27,12 @@ def set_env_vars():
 
 
 def get_mock_json(name):
-    file_name = f"tests/mock_files/{name}.json"
-    return json.load(open(file_name))
+    file_name = f"mock_files/{name}.json"
+    path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        file_name
+    )
+    return json.load(open(path))
 
 
 test_key = "0f0bdc830bde4be43c3a54c369c6f6a94ac9071911dc3913e35ce5ed8fe955b9"
