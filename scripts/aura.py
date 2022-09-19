@@ -42,7 +42,7 @@ def does_snapshot_percentages_sum_up(bvecvx_snap_data: Dict, address: str) -> bo
     accumulated = Decimal(0)
     for wallet_percentage in wallets.values():
         accumulated += Decimal(wallet_percentage)
-    logger.print(f"Accumulated {accumulated}% for {address}")
+    logger.info(f"Accumulated {accumulated}% for {address}")
     # Make sure values are different no more than by MAX_TOLERANCE_THRESHOLD%
     # because we filter out some small balances
     return math.isclose(Decimal(1), accumulated, abs_tol=MAX_TOLERANCE_THRESHOLD)
