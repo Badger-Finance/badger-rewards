@@ -1,19 +1,25 @@
-import logging
 import time
 from decimal import Decimal
-from typing import Optional, Tuple, Dict
+from typing import Dict
+from typing import Optional
+from typing import Tuple
 
 from eth_typing import HexStr
-from web3 import Web3, exceptions, contract
+from web3 import Web3
+from web3 import contract
+from web3 import exceptions
 
 from config.constants import GAS_BUFFER
-from config.constants.chain_mappings import DECIMAL_MAPPING, EMISSIONS_CONTRACTS, TREE_ACTION_GAS
-from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import Abi, Network
+from config.constants.chain_mappings import DECIMAL_MAPPING
+from config.constants.chain_mappings import EMISSIONS_CONTRACTS
+from config.constants.chain_mappings import TREE_ACTION_GAS
+from helpers.discord import get_discord_url
+from helpers.discord import send_message_to_discord
+from helpers.enums import Abi
+from helpers.enums import Network
 from helpers.http_client import http_client
 from helpers.web3_utils import make_contract
-
-logger = logging.getLogger("tx-utils")
+from logging_utils.logger import logger
 
 
 def get_gas_price_of_tx(

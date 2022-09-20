@@ -1,23 +1,24 @@
-from decimal import Decimal
 import math
-from typing import Any, Dict, List, Tuple
+from decimal import Decimal
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Tuple
 
-from rich.console import Console
 from tabulate import tabulate
 
-from config.constants.emissions import (
-    BVECVX_BOOST_WEIGHT,
-    DIGG_BOOST_WEIGHT,
-    STAKE_RATIO_RANGES,
-)
-from helpers.discord import get_discord_url, send_code_block_to_discord
-from rewards.boost.boost_utils import calc_boost_balances, calc_union_addresses
+from config.constants.emissions import BVECVX_BOOST_WEIGHT
+from config.constants.emissions import DIGG_BOOST_WEIGHT
+from config.constants.emissions import STAKE_RATIO_RANGES
+from helpers.discord import get_discord_url
+from helpers.discord import send_code_block_to_discord
+from logging_utils import logger
+from rewards.boost.boost_utils import calc_boost_balances
+from rewards.boost.boost_utils import calc_union_addresses
 from rewards.classes.Boost import BoostBalances
 from rewards.feature_flags import flags
 from rewards.feature_flags.feature_flags import BOOST_STEP
 from subgraph.queries.nfts import fetch_nfts
-
-console = Console()
 
 
 def calc_bvecvx_native_balance(
@@ -184,11 +185,11 @@ def badger_boost(current_block: int, chain: str) -> Dict[str, Any]:
     :param chain: target chain
     """
     discord_url = get_discord_url(chain)
-    console.log(f"Calculating boost at block {current_block} ...")
+    logger.info(f"Calculating boost at block {current_block} ...")
     boost_bals = calc_boost_balances(current_block, chain)
 
     all_addresses = calc_union_addresses(boost_bals.native, boost_bals.non_native)
-    console.log(f"{len(all_addresses)} addresses fetched")
+    logger.info(f"{len(all_addresses)} addresses fetched")
     boost_data = {}
 
     stake_ratios_list = [calc_stake_ratio(addr, boost_bals) for addr in all_addresses]

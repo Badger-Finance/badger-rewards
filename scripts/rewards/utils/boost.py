@@ -1,15 +1,13 @@
 import os
 
-from rich.console import Console
 from config.constants.chain_mappings import BOOST_BUFFER
-
 from config.singletons import env_config
-from helpers.discord import get_discord_url, send_message_to_discord
-from helpers.enums import BotType, Network
+from helpers.discord import get_discord_url
+from helpers.discord import send_message_to_discord
+from helpers.enums import BotType
+from helpers.enums import Network
 from rewards.aws.boost import add_user_data
 from rewards.boost.calc_boost import badger_boost
-
-console = Console()
 
 
 def generate_boosts(chain: Network):

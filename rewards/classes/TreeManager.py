@@ -1,31 +1,30 @@
 import json
 import time
-from typing import List, Tuple
+from typing import List
+from typing import Tuple
 
 from eth_account import Account
 from eth_utils import to_bytes
 from eth_utils.hexadecimal import encode_hex
 from hexbytes import HexBytes
-from rich.console import Console
 from web3.contract import ContractFunction
 
 from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
-from helpers.discord import get_discord_url, send_message_to_discord
+from helpers.discord import get_discord_url
+from helpers.discord import send_message_to_discord
 from helpers.enums import Network
 from helpers.web3_utils import get_badger_tree
-from rewards.aws.trees import download_latest_tree, download_tree
+from logging_utils import logger
+from rewards.aws.trees import download_latest_tree
+from rewards.aws.trees import download_tree
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
 from rewards.classes.RewardsList import RewardsList
 from rewards.explorer import get_explorer_url
-from rewards.utils.tx_utils import (
-    build_and_send,
-    confirm_transaction,
-    create_tx_options,
-    get_gas_price_of_tx,
-)
-
-console = Console()
+from rewards.utils.tx_utils import build_and_send
+from rewards.utils.tx_utils import confirm_transaction
+from rewards.utils.tx_utils import create_tx_options
+from rewards.utils.tx_utils import get_gas_price_of_tx
 
 
 class TreeManager:
@@ -46,11 +45,11 @@ class TreeManager:
         return build_and_send(func, options, self.w3, account.key)
 
     def approve_root(self, rewards) -> Tuple[str, bool]:
-        console.log("Approving root")
+        logger.info("Approving root")
         return self.manage_root(rewards, self.badger_tree.approveRoot, action="Approve")
 
     def propose_root(self, rewards):
-        console.log("Proposing root")
+        logger.info("Proposing root")
         return self.manage_root(rewards, self.badger_tree.proposeRoot, action="Propose")
 
     def manage_root(self, rewards, contract_function: ContractFunction, action: str):
@@ -78,11 +77,11 @@ class TreeManager:
                            f"Root: {merkle_root} \n\n Content Hash: {root_hash} \n\n"
             description = f"Calculated rewards between {start_block} " \
                           f"and {end_block} \n\n {approve_info} "
-            console.log(f"Cycle {action.lower()} : {tx_hash}")
+            logger.info(f"Cycle {action.lower()} : {tx_hash}")
 
             if succeeded:
                 gas_price_of_tx = get_gas_price_of_tx(self.w3, self.chain, tx_hash)
-                console.log(f"got gas price of tx: {gas_price_of_tx}")
+                logger.info(f"got gas price of tx: {gas_price_of_tx}")
                 send_message_to_discord(
                     title,
                     description,
@@ -118,7 +117,7 @@ class TreeManager:
                     url=self.discord_url,
                 )
         except Exception as e:
-            console.log(f"Error processing harvest tx: {e}")
+            logger.error(f"Error processing harvest tx: {e}")
             send_message_to_discord(
                 f"**FAILED {action} Rewards on {self.chain}**",
                 e,
@@ -155,12 +154,12 @@ class TreeManager:
         if env_config.fix_cycle:
             return download_latest_tree(self.chain)
         current_merkle = self.fetch_current_merkle_data()
-        console.log(f"Current Merkle \n {current_merkle}")
+        logger.info(f"Current Merkle \n {current_merkle}")
         return self.fetch_tree(current_merkle)
 
     def fetch_pending_tree(self):
         pending_merkle = self.fetch_pending_merkle_data()
-        console.log(f"Pending Merkle \n {pending_merkle}")
+        logger.info(f"Pending Merkle \n {pending_merkle}")
         return self.fetch_tree(pending_merkle)
 
     def validate_tree(self, merkle, tree):

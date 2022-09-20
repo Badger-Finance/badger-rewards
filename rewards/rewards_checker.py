@@ -1,22 +1,20 @@
 import json
 from typing import Dict
-from typing import List, Optional, Tuple
+from typing import List
+from typing import Optional
+from typing import Tuple
 
-from rich.console import Console
 from tabulate import tabulate
 
 from badger_api.requests import fetch_token
 from config.constants.chain_mappings import TOKENS_TO_CHECK
 from helpers.digg_utils import DiggUtils
-from helpers.discord import (
-    get_discord_url,
-    send_code_block_to_discord,
-    send_error_to_discord,
-)
+from helpers.discord import get_discord_url
+from helpers.discord import send_code_block_to_discord
+from helpers.discord import send_error_to_discord
 from helpers.enums import Network
+from logging_utils import logger
 from rewards.snapshot.claims_snapshot import claims_snapshot
-
-console = Console()
 
 
 def assert_claims_increase(past_tree: Dict, new_tree: Dict):
@@ -48,7 +46,7 @@ def token_diff_table_item(
     name: str, before: float, after: float, decimals: Optional[int] = 18
 ) -> Tuple[float, List]:
     diff = after - before
-    console.print(f"Diff for {name} \n")
+    logger.info(f"Diff for {name}")
     table_item = [
         name,
         val(before, decimals=decimals),
@@ -60,7 +58,7 @@ def token_diff_table_item(
 
 def verify_rewards(past_tree, new_tree, chain: Network):
     digg_utils = DiggUtils()
-    console.log("Verifying Rewards ... \n")
+    logger.info("Verifying Rewards ...")
     claim_snapshot = claims_snapshot(chain, block=int(new_tree["endBlock"]))
     negative_claimable = []
     for token, snapshot in claim_snapshot.items():
@@ -85,7 +83,10 @@ def verify_rewards(past_tree, new_tree, chain: Network):
         total_after_token = int(new_tree["tokenTotals"].get(token, 0))
         token_info = fetch_token(chain, token)
         decimals = token_info.get("decimals", 18)
-        console.log(name, total_before_token, total_after_token)
+        logger.info(
+            f"Checked token: {name}",
+            extra={'total_before': total_before_token, 'total_after': total_after_token}
+        )
         if name == "Digg":
             total_before_token = digg_utils.shares_to_fragments(total_before_token)
             total_after_token = digg_utils.shares_to_fragments(total_after_token)

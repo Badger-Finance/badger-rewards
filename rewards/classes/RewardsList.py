@@ -1,18 +1,18 @@
 import json
 from decimal import Decimal
-from typing import Any, Dict, List, Tuple
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Tuple
 
 from dotmap import DotMap
 from eth_abi import encode_abi
 from eth_utils.address import to_checksum_address
 from eth_utils.hexadecimal import encode_hex
-from rich.console import Console
 
 from badger_api.requests import fetch_token
 from helpers.enums import Network
 from rewards.utils.token_utils import token_amount_base_10
-
-console = Console()
 
 
 class RewardsList:

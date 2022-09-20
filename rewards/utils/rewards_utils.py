@@ -1,34 +1,27 @@
 from collections import defaultdict
 from copy import deepcopy
 from decimal import Decimal
-from typing import (
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
 from typing import Sequence
+from typing import Tuple
+from typing import Union
 
-from rich.console import Console
 from web3 import Web3
 
-from config.constants.emissions import (
-    BVECVX_VOTER_BLACKLIST,
-    BVECVX_VOTER_BLACKLIST_TOKENS,
-    REWARD_ERROR_TOLERANCE,
-    ZERO_CYCLE,
-    NATIVE_TOKEN_REWARDS,
-    SCHEDULE_REWARDS_BLACKLIST,
-    TREE_REWARDS_BLACKLIST
-)
+from config.constants.emissions import BVECVX_VOTER_BLACKLIST
+from config.constants.emissions import BVECVX_VOTER_BLACKLIST_TOKENS
+from config.constants.emissions import NATIVE_TOKEN_REWARDS
+from config.constants.emissions import REWARD_ERROR_TOLERANCE
+from config.constants.emissions import SCHEDULE_REWARDS_BLACKLIST
+from config.constants.emissions import TREE_REWARDS_BLACKLIST
+from config.constants.emissions import ZERO_CYCLE
 from helpers.enums import Network
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Snapshot import Snapshot
 from rewards.utils.token_utils import token_amount_base_10
-
-console = Console()
 
 
 def get_cumulative_claimable_for_token(claim: Dict, token: str) -> int:
@@ -96,7 +89,6 @@ def distribute_rewards_from_total_snapshot(
         assert reward_amount >= 0
         if addr in custom_rewards:
             custom_rewards_calc = custom_rewards[addr]
-            console.log(token, amount, snapshot.token)
             custom_rewards_list.append(
                 custom_rewards_calc(reward_amount, token, snapshot.token, block)
             )

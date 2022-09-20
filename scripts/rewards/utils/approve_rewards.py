@@ -1,15 +1,17 @@
 import traceback
+
 from eth_account import Account
-from rich.console import Console
+
 from config.singletons import env_config
-from helpers.discord import console_and_discord, get_discord_url, send_message_to_discord
+from helpers.discord import console_and_discord
+from helpers.discord import get_discord_url
+from helpers.discord import send_message_to_discord
 from helpers.enums import DiscordRoles
+from logging_utils import logger
 from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import approve_root
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.tree_utils import get_last_proposed_cycle
-
-console = Console()
 
 
 def approve_rewards(chain):
@@ -30,7 +32,7 @@ def approve_rewards(chain):
         if not current_rewards:
             return
 
-        console.log(
+        logger.info(
             f"Generating rewards between {start_block} and {end_block} on {chain} chain"
         )
         send_message_to_discord(

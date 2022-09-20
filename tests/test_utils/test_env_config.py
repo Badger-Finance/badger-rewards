@@ -1,4 +1,3 @@
-import logging
 import os
 
 import pytest
@@ -11,8 +10,6 @@ os.environ["AWS_SECRET_ACCESS_KEY"] = ""
 
 from config.env_config import EnvConfig, NoHealthyNode
 from helpers.enums import Environment, Network
-
-logger = logging.getLogger("test-env-config")
 
 
 def test_valid_environment():

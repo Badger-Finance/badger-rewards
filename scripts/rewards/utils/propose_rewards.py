@@ -1,15 +1,17 @@
-from eth_account import Account
-from rich.console import Console
 import traceback
+
+from eth_account import Account
+
 from config.singletons import env_config
-from helpers.discord import console_and_discord, get_discord_url, send_message_to_discord
+from helpers.discord import console_and_discord
+from helpers.discord import get_discord_url
+from helpers.discord import send_message_to_discord
 from helpers.enums import DiscordRoles
+from logging_utils import logger
 from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import propose_root
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.tree_utils import calc_next_cycle_range
-
-console = Console()
 
 
 def propose_rewards(chain):
@@ -26,7 +28,7 @@ def propose_rewards(chain):
         tree_manager = TreeManager(chain, cycle_account)
         past_rewards, start_block, end_block = calc_next_cycle_range(chain, tree_manager)
 
-        console.log(
+        logger.info(
             f"Generating rewards between {start_block} and {end_block} on {chain} chain"
         )
         send_message_to_discord(

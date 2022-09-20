@@ -8,19 +8,16 @@ from decimal import Decimal
 from typing import Dict
 
 import simplejson as json
-from rich.console import Console
 
 from config.constants import addresses
 from helpers.enums import Network
+from logging_utils import logger
 from rewards.boost.boost_utils import get_bvecvx_lp_ppfs
 from rewards.boost.boost_utils import get_bvecvx_lp_ratio
 from rewards.classes.Snapshot import Snapshot
 from rewards.snapshot.chain_snapshot import sett_snapshot
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from rewards.snapshot.token_snapshot import fuse_snapshot_of_token
-
-console = Console()
-
 
 AURA_SNAPSHOT_BLOCK = 14829454
 MAX_TOLERANCE_THRESHOLD = Decimal(0.001)
@@ -45,7 +42,7 @@ def does_snapshot_percentages_sum_up(bvecvx_snap_data: Dict, address: str) -> bo
     accumulated = Decimal(0)
     for wallet_percentage in wallets.values():
         accumulated += Decimal(wallet_percentage)
-    console.print(f"Accumulated {accumulated}% for {address}")
+    logger.info(f"Accumulated {accumulated}% for {address}")
     # Make sure values are different no more than by MAX_TOLERANCE_THRESHOLD%
     # because we filter out some small balances
     return math.isclose(Decimal(1), accumulated, abs_tol=MAX_TOLERANCE_THRESHOLD)

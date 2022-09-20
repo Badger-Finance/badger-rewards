@@ -1,14 +1,13 @@
 import json
 from typing import Dict
 
-from rich.console import Console
-
 from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
-from helpers.discord import get_discord_url, send_message_to_discord
-from rewards.aws.helpers import get_bucket, s3
-
-console = Console()
+from helpers.discord import get_discord_url
+from helpers.discord import send_message_to_discord
+from logging_utils import logger
+from rewards.aws.helpers import get_bucket
+from rewards.aws.helpers import s3
 
 
 def upload_boosts(boost_data, chain: str, cycle: bool = False):
@@ -39,14 +38,14 @@ def upload_boosts_to_aws(boost_data, chain: str, file_name: str, cycle: bool = F
         buckets.append("badger-merkle-proofs")
 
     for b in buckets:
-        console.log(f"Uploading file to s3://{b}/{boost_file_name}")
+        logger.info(f"Uploading file to s3://{b}/{boost_file_name}")
         s3.put_object(
             Body=str(json.dumps(boost_data)),
             Bucket=b,
             Key=boost_file_name,
             ACL="bucket-owner-full-control",
         )
-        console.log(f"✅ Uploaded file to s3://{b}/{boost_file_name}")
+        logger.info(f"✅ Uploaded file to s3://{b}/{boost_file_name}")
         send_message_to_discord(
             "**BADGER BOOST UPDATED**",
             f"✅ Uploaded file to s3://{b}/{boost_file_name}",
@@ -67,26 +66,26 @@ def download_boosts(chain: str) -> Dict:
 
     :param test:
     """
-    console.log("Downloading boosts ...")
+    logger.info("Downloading boosts ...")
     chain_id = CHAIN_IDS[chain]
 
     boost_file_name = f"badger-boosts-{chain_id}.json"
     bucket = get_bucket(env_config.production)
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boost_file_name)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
-    console.log(f"Fetched {len(data['userData'])} boosts")
+    logger.info(f"Fetched {len(data['userData'])} boosts")
     return data
 
 
 def download_proposed_boosts(chain: str) -> Dict:
-    console.log("Downloading boosts ...")
+    logger.info("Downloading boosts ...")
     chain_id = CHAIN_IDS[chain]
 
     boost_file_name = f"propose-boosts-{chain_id}.json"
     bucket = get_bucket(env_config.production)
     s3ClientObj = s3.get_object(Bucket=bucket, Key=boost_file_name)
     data = json.loads(s3ClientObj["Body"].read().decode("utf-8"))
-    console.log(f"Fetched {len(data['userData'])} boosts")
+    logger.info(f"Fetched {len(data['userData'])} boosts")
     return data
 
 

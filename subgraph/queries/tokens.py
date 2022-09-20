@@ -1,34 +1,27 @@
 import math
-from functools import lru_cache
 from decimal import Decimal
+from functools import lru_cache
 from numbers import Number
-from typing import (
-    Dict,
-    Tuple,
-)
+from typing import Dict
+from typing import Tuple
 
 from gql import (
     gql,
 )
-from rich.console import Console
 from web3 import Web3
-from config.constants.chain_mappings import DECIMAL_MAPPING
-from config.constants.emissions import (
-    FTOKEN_DECIMALS,
-    FUSE_MANTISSA,
-    FUSE_TOKEN_BASE,
-    FUSE_TOKEN_INFO
-)
-from helpers.digg_utils import DiggUtils
-from helpers.enums import (
-    Abi,
-    Network,
-)
-from helpers.web3_utils import make_contract
-from subgraph.subgraph_utils import SubgraphClient
-from rewards.utils.emission_utils import get_across_lp_multiplier
 
-console = Console()
+from config.constants.chain_mappings import DECIMAL_MAPPING
+from config.constants.emissions import FTOKEN_DECIMALS
+from config.constants.emissions import FUSE_MANTISSA
+from config.constants.emissions import FUSE_TOKEN_BASE
+from config.constants.emissions import FUSE_TOKEN_INFO
+from helpers.digg_utils import DiggUtils
+from helpers.enums import Abi
+from helpers.enums import Network
+from helpers.web3_utils import make_contract
+from logging_utils import logger
+from rewards.utils.emission_utils import get_across_lp_multiplier
+from subgraph.subgraph_utils import SubgraphClient
 
 
 def token_query():
@@ -61,7 +54,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
     continue_fetching = True
     last_id = "0x0000000000000000000000000000000000000000"
     multiplier = get_across_lp_multiplier()
-    console.log(f"Across lp multiplier {multiplier}")
+    logger.info(f"Across lp multiplier {multiplier}")
     across_balances = {}
     client = SubgraphClient("across", chain)
     while continue_fetching:
@@ -75,7 +68,7 @@ def fetch_across_balances(block_number: int, chain: Network) -> Dict[str, int]:
             continue_fetching = False
         else:
             last_id = next_page["tokenBalances"][-1]["id"]
-            console.log(
+            logger.info(
                 f"Fetching {len(next_page['tokenBalances'])} across balances"
             )
             for entry in next_page["tokenBalances"]:
@@ -111,7 +104,7 @@ def fetch_token_balances(
             continue_fetching = False
         else:
             last_id = next_page["tokenBalances"][-1]["id"]
-            console.log(
+            logger.info(
                 f"Fetching {len(next_page['tokenBalances'])} token balances"
             )
             for entry in next_page["tokenBalances"]:
@@ -137,7 +130,7 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
     if token not in FUSE_TOKEN_INFO:
         return {}
     token_info = FUSE_TOKEN_INFO[token]
-    console.log(f"Fetching {token_info['symbol']} token from fuse pool")
+    logger.info(f"Fetching {token_info['symbol']} token from fuse pool")
     ftoken = make_contract(
         Web3.toChecksumAddress(token_info["contract"]),
         abi_name=Abi.CErc20Delegator,
@@ -190,7 +183,7 @@ def fetch_fuse_pool_token(chain: Network, block: int, token: str) -> Dict[str, D
         if len(results["accountCTokens"]) == 0:
             break
         else:
-            console.log(f"Fetching {len(results['accountCTokens'])} fuse balances")
+            logger.info(f"Fetching {len(results['accountCTokens'])} fuse balances")
 
-    console.log(f"Fetched {len(balances)} total fuse balances")
+    logger.info(f"Fetched {len(balances)} total fuse balances")
     return balances

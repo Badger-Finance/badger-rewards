@@ -1,48 +1,43 @@
 from collections import defaultdict
 from copy import deepcopy
 from decimal import Decimal
-from typing import Dict, List, Tuple
+from typing import Dict
+from typing import List
+from typing import Tuple
 
-from rich.console import Console
 from tabulate import tabulate
 
-from badger_api.requests import fetch_token
 import config.constants.addresses as addresses
+from badger_api.requests import fetch_token
 from config.constants.chain_mappings import BOOSTED_EMISSION_TOKENS
-from config.constants.emissions import (
-    MAX_BOOST,
-    NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS,
-    NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS,
-)
+from config.constants.emissions import MAX_BOOST
+from config.constants.emissions import NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_SETT_REWARDS
+from config.constants.emissions import NUMBER_OF_HISTORICAL_SNAPSHOTS_FOR_TREE_REWARDS
 from config.singletons import env_config
-from helpers.discord import (
-    get_discord_url,
-    send_code_block_to_discord,
-    send_plain_text_to_discord,
-)
-from helpers.enums import BalanceType, DiscordRoles, Network
-from helpers.time_utils import seconds_to_hours, to_utc_date
+from helpers.discord import get_discord_url
+from helpers.discord import send_code_block_to_discord
+from helpers.discord import send_plain_text_to_discord
+from helpers.enums import BalanceType
+from helpers.enums import DiscordRoles
+from helpers.enums import Network
+from helpers.time_utils import seconds_to_hours
+from helpers.time_utils import to_utc_date
+from logging_utils import logger
 from rewards.classes.RewardsList import RewardsList
 from rewards.classes.Schedule import Schedule
 from rewards.classes.Snapshot import Snapshot
-from rewards.emission_handlers import (
-    ibbtc_peak_handler,
-    bvecvx_lp_handler,
-    unclaimed_rewards_handler,
-    treasury_handler,
-    fuse_pool_handler
-)
+from rewards.emission_handlers import bvecvx_lp_handler
+from rewards.emission_handlers import fuse_pool_handler
+from rewards.emission_handlers import ibbtc_peak_handler
+from rewards.emission_handlers import treasury_handler
+from rewards.emission_handlers import unclaimed_rewards_handler
 from rewards.explorer import get_block_by_timestamp
 from rewards.snapshot.chain_snapshot import total_twap_sett_snapshot
 from rewards.utils.emission_utils import get_flat_emission_rate
-from rewards.utils.rewards_utils import (
-    check_token_totals_in_range,
-    combine_rewards,
-    distribute_rewards_from_total_snapshot,
-)
+from rewards.utils.rewards_utils import check_token_totals_in_range
+from rewards.utils.rewards_utils import combine_rewards
+from rewards.utils.rewards_utils import distribute_rewards_from_total_snapshot
 from subgraph.queries.harvests import fetch_tree_distributions
-
-console = Console()
 
 
 class InvalidRewardsTotalException(Exception):
@@ -151,7 +146,7 @@ class RewardsManager:
         for sett in setts:
             sett_token = fetch_token(self.chain, sett)
             sett_name = sett_token.get("name", "")
-            console.log(f"Calculating rewards for {sett_name}")
+            logger.info(f"Calculating rewards for {sett_name}")
             rewards, flat, boosted, expected = self.calculate_sett_rewards(
                 sett, all_schedules[sett]
             )
@@ -234,7 +229,7 @@ class RewardsManager:
         for index, schedule in enumerate(schedules):
             if end_time < schedule.startTime:
                 to_distribute = Decimal(0)
-                console.log(f"\nSchedule {index} for {token} completed\n")
+                logger.info(f"\nSchedule {index} for {token} completed\n")
             else:
                 range_duration = end_time - schedule.startTime
                 if schedule.initialTokensLocked == 0:
@@ -261,7 +256,7 @@ class RewardsManager:
                         if schedule.duration > 0
                         else 0
                     )
-                    console.log(
+                    logger.info(
                         (
                             f"Token {token} distributed by schedule {index}"
                             f"at {to_utc_date(schedule.startTime)}"
@@ -269,7 +264,7 @@ class RewardsManager:
                         )
                     )
 
-                    console.log(
+                    logger.info(
                         f"Total duration of schedule elapsed is {seconds_to_hours(range_duration)}"
                         f" hours out of {seconds_to_hours(schedule.duration)} hours"
                         f" or {percentage_total_duration}% of total duration.",
@@ -305,7 +300,7 @@ class RewardsManager:
             self.web3.eth.get_block(self.end)["timestamp"],
             self.chain,
         )
-        console.log(
+        logger.info(
             f"Fetched {len(tree_distributions)} "
             f"tree distributions between {self.start} and {self.end}"
         )
