@@ -68,7 +68,7 @@ class Abi(str, Enum):
 
 
 class DiscordRoles(str, Enum):
-    RewardsPod = "<@&804147406043086850>"
+    RewardsPod = "<@&1011789957918105670>"
 
     def __str__(self) -> str:
         return self.value
