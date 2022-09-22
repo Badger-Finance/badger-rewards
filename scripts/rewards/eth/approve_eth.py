@@ -1,4 +1,5 @@
 import json
+import sys
 import traceback
 
 from decouple import config
@@ -9,10 +10,13 @@ from helpers.discord import send_message_to_discord
 from helpers.enums import DiscordRoles
 from helpers.enums import Network
 from logging_utils import logger
+from logging_utils.logger import exception_logging
 from rewards.aws.helpers import get_secret
 from rewards.calc_rewards import approve_root
 from rewards.classes.TreeManager import TreeManager
 from rewards.utils.tree_utils import get_last_proposed_cycle
+
+sys.excepthook = exception_logging
 
 
 def approve_rewards(chain, kube):
