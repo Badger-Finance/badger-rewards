@@ -55,7 +55,7 @@ def get_secret(
 
     # Create a Secrets Manager client
     if assume_role_arn:
-        logger.error("assume role given, try to get assume role creds")
+        logger.info("assume role given, try to get assume role creds")
         credentials = get_assume_role_credentials(assume_role_arn)
         # Use the temporary credentials that AssumeRole returns to create session
         session = boto3.session.Session(
@@ -83,7 +83,7 @@ def get_secret(
 
     try:
         get_secret_value_response = client.get_secret_value(SecretId=secret_name)
-        logger.error("get secret value response no error")
+        logger.info("get secret value response no error")
     except ClientError as e:
         logger.error(f"get secret value response error: {e}")
         if e.response["Error"]["Code"] == "DecryptionFailureException":
