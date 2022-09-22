@@ -5,16 +5,18 @@ from decimal import Decimal
 from eth_account import Account
 from hexbytes import HexBytes
 
-from config.constants.addresses import ARB_BADGER
-from config.constants.addresses import ARB_BSWAPR_WETH_SWAPR
-from config.constants.addresses import BADGER
-from config.constants.addresses import BCVXCRV
-from config.constants.addresses import BVECVX
-from config.constants.addresses import DIGG
-from config.constants.addresses import POLY_BADGER
-from config.constants.addresses import POLY_SUSHI
-from config.constants.addresses import XSUSHI
 from helpers.enums import Network
+from config.constants.addresses import (
+    ARB_BADGER,
+    ARB_BSWAPR_WETH_SWAPR,
+    BADGER,
+    BCVXCRV,
+    DIGG,
+    POLY_BADGER,
+    POLY_SUSHI,
+    XSUSHI,
+    BVECVX
+)
 
 
 def set_env_vars():
@@ -25,12 +27,8 @@ def set_env_vars():
 
 
 def get_mock_json(name):
-    file_name = f"mock_files/{name}.json"
-    path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        file_name
-    )
-    return json.load(open(path))
+    file_name = f"tests/mock_files/{name}.json"
+    return json.load(open(file_name))
 
 
 test_key = "0f0bdc830bde4be43c3a54c369c6f6a94ac9071911dc3913e35ce5ed8fe955b9"
