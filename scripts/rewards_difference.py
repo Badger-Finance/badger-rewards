@@ -1,10 +1,15 @@
 import json
+import sys
 
 from helpers.enums import Network
+from logging_utils.logger import exception_logging
 from rewards.aws.boost import download_boosts
 from rewards.calc_rewards import generate_rewards_in_range
 from rewards.utils.rewards_utils import get_cumulative_claimable_for_token
 from scripts.rewards.utils.managers import get_tree_manager
+
+sys.excepthook = exception_logging
+
 
 if __name__ == "__main__":
     chain = Network.Ethereum
