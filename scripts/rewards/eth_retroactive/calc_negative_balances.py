@@ -1,9 +1,14 @@
 import json
+import sys
 
-from config.constants.addresses import BADGER, DIGG
+from config.constants.addresses import BADGER
+from config.constants.addresses import DIGG
 from helpers.enums import Network
+from logging_utils.logger import exception_logging
 from rewards.aws.trees import download_latest_tree
 from scripts.rewards.utils.managers import get_tree_manager
+
+sys.excepthook = exception_logging
 
 
 def negative_balances(tree):

@@ -1,10 +1,15 @@
 import json
+import sys
 
 from config.constants.addresses import DIGG
 from helpers.digg_utils import DiggUtils
 from helpers.enums import Network
+from logging_utils.logger import exception_logging
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from subgraph.queries.setts import last_synced_block
+
+sys.excepthook = exception_logging
+
 
 if __name__ == "__main__":
     digg_utils = DiggUtils()
