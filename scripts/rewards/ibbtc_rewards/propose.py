@@ -1,11 +1,17 @@
+import sys
+
 from eth_account import Account
 
 from config.singletons import env_config
 from helpers.enums import Network
+from logging_utils.logger import exception_logging
 from rewards.aws.helpers import get_secret
 from rewards.aws.trees import download_latest_tree
 from rewards.classes.TreeManager import TreeManager
 from scripts.rewards.ibbtc_rewards.move_ibbtc import move_ibbtc
+
+sys.excepthook = exception_logging
+
 
 if __name__ == "__main__":
     chain = Network.Ethereum

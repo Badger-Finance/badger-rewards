@@ -1,11 +1,16 @@
 import json
+import sys
 
 from config.constants.addresses import ETH_BADGER_TREE
 from helpers.enums import Network
 from helpers.web3_utils import make_token
 from logging_utils import logger
+from logging_utils.logger import exception_logging
 from rewards.snapshot.claims_snapshot import claims_snapshot
 from subgraph.queries.setts import last_synced_block
+
+sys.excepthook = exception_logging
+
 
 if __name__ == "__main__":
     chain = Network.Ethereum
