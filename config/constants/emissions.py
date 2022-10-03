@@ -1,3 +1,4 @@
+import datetime
 import config.constants.addresses as addresses
 from helpers.enums import Network
 
@@ -7,33 +8,27 @@ SCHEDULE_REWARDS_BLACKLIST = {
     addresses.TREASURY_OPS: "Badger Treasury Ops",
     addresses.TREASURY_VAULT: "Badger Treasury Vault",
     addresses.IBBTC_Y_PEAK: "IBBTC ywBTC Peak",
-    addresses.BALANCER_VAULT: "Balancer Vault"
+    addresses.BALANCER_VAULT: "Balancer Vault",
 }
 
 TREE_REWARDS_BLACKLIST = {
     addresses.CREAM_BBADGER: "Cream bBadger",
     addresses.SUSHI_BBADGER_WETH: "Sushiswap bBadger/Weth",
     addresses.BBADGER: "Badger Vault",
-    addresses.BALANCER_VAULT: "Balancer Vault"
+    addresses.BALANCER_VAULT: "Balancer Vault",
 }
 
-BVECVX_VOTER_BLACKLIST = {
-    addresses.BVECVX_VOTER: "Badger bveCVX Voter"
-}
+BVECVX_VOTER_BLACKLIST = {addresses.BVECVX_VOTER: "Badger bveCVX Voter"}
 DIGG_BOOST_VAULTS = [
     addresses.BDIGG,
     addresses.BSLP_DIGG_WBTC,
     addresses.BUNI_DIGG_WBTC,
-    addresses.BAURA_DIGG_WBTC
+    addresses.BAURA_DIGG_WBTC,
 ]
 
-NATIVE_TOKEN_REWARDS = {
-    Network.Ethereum: [addresses.BADGER, addresses.DIGG]
-}
+NATIVE_TOKEN_REWARDS = {Network.Ethereum: [addresses.BADGER, addresses.DIGG]}
 
-BVECVX_VOTER_BLACKLIST_TOKENS = {
-    Network.Ethereum: [addresses.BVECVX, addresses.BADGER]
-}
+BVECVX_VOTER_BLACKLIST_TOKENS = {Network.Ethereum: [addresses.BVECVX, addresses.BADGER]}
 
 BVECVX_BOOST_WEIGHT = 0.5
 DIGG_BOOST_WEIGHT = 1
@@ -97,7 +92,7 @@ NO_BOOST_VAULTS = [
     addresses.BDIGG,
     addresses.BSLP_DIGG_WBTC,
     addresses.BUNI_DIGG_WBTC,
-    addresses.REM_DIGG
+    addresses.REM_DIGG,
 ]
 
 DIGG_SETTS = [addresses.BDIGG, addresses.REM_DIGG]
@@ -127,25 +122,56 @@ FUSE_TOKEN_INFO = {
     addresses.DIGG: {
         "underlying": addresses.DIGG,
         "symbol": "fDIGG-22",
-        "contract": addresses.FDIGG
+        "contract": addresses.FDIGG,
     },
     addresses.BVECVX: {
         "underlying": addresses.BVECVX,
         "symbol": "fbveCVX-22",
-        "contract": addresses.FBVECVX
-    }
+        "contract": addresses.FBVECVX,
+    },
 }
 FUSE_MANTISSA = 18
 FUSE_TOKEN_BASE = 10
 FTOKEN_DECIMALS = 8
 
+NOW = datetime.datetime.now()
+
+# Boost for Standard Councilors increases 115 per month
+STANDARD_COUNCILOR_BOOST = 115
+# Boost for Committee Councilors increases 430 per month
+COMMITEE_COUNCILOR_BOOST = 546
+
+COUNCILOR_MONTHS_ACCRUED = {
+    "0xD798428e860465E08B522f8440f707593E6d22C6": NOW.month
+    - datetime.datetime(2022, 7, 1).month,
+    "0xc9049cB9aB542D0Bd0fA099ff8E3e8b3FCa13b13": NOW.month
+    - datetime.datetime(2022, 7, 1).month,
+    "0xB5c46131B4d8d13e4c0E476B9A2Ea5b43945891e": NOW.month
+    - datetime.datetime(2022, 7, 1).month,
+    "0x567244C8E8dff152bE7A276DCD05AA332767386E": NOW.month
+    - datetime.datetime(2022, 7, 1).month,
+}
+
 CONTRIBUTOR_BOOST = {
     Network.Ethereum: {
-        "0xD798428e860465E08B522f8440f707593E6d22C6": 230,
-        "0xc9049cB9aB542D0Bd0fA099ff8E3e8b3FCa13b13": 1092,
-        "0xB5c46131B4d8d13e4c0E476B9A2Ea5b43945891e": 230,
-        "0x567244C8E8dff152bE7A276DCD05AA332767386E": 230
+        "0xD798428e860465E08B522f8440f707593E6d22C6": COUNCILOR_MONTHS_ACCRUED[
+            "0xD798428e860465E08B522f8440f707593E6d22C6"
+        ]
+        * STANDARD_COUNCILOR_BOOST,
+        "0xc9049cB9aB542D0Bd0fA099ff8E3e8b3FCa13b13": COUNCILOR_MONTHS_ACCRUED[
+            "0xc9049cB9aB542D0Bd0fA099ff8E3e8b3FCa13b13"
+        ]
+        * COMMITEE_COUNCILOR_BOOST,
+        "0xB5c46131B4d8d13e4c0E476B9A2Ea5b43945891e": COUNCILOR_MONTHS_ACCRUED[
+            "0xB5c46131B4d8d13e4c0E476B9A2Ea5b43945891e"
+        ]
+        * STANDARD_COUNCILOR_BOOST,
+        "0x567244C8E8dff152bE7A276DCD05AA332767386E": COUNCILOR_MONTHS_ACCRUED[
+            "0x567244C8E8dff152bE7A276DCD05AA332767386E"
+        ]
+        * STANDARD_COUNCILOR_BOOST,
     }
 }
 
-CONTRIBUTOR_BOOST_END_TIMESTAMP = 1664582399
+# March 31, 2023 23:59:59 - End of next council ratification
+CONTRIBUTOR_BOOST_END_TIMESTAMP = 1680321599
