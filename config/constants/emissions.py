@@ -138,8 +138,8 @@ NOW = datetime.datetime.now()
 
 # Boost for Standard Councilors increases 115 per month
 STANDARD_COUNCILOR_BOOST = 115
-# Boost for Committee Councilors increases 430 per month
-COMMITEE_COUNCILOR_BOOST = 546
+# Boost for Committee Councilors increases 430 per month + standard
+COMMITEE_COUNCILOR_BOOST = 430 + STANDARD_COUNCILOR_BOOST
 
 COUNCILOR_MONTHS_ACCRUED = {
     "0xD798428e860465E08B522f8440f707593E6d22C6": NOW.month
