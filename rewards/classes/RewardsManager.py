@@ -55,7 +55,8 @@ class RewardsManager:
         addresses.TEST_MULTISIG: treasury_handler,
         addresses.BADGER_PAYMENTS: treasury_handler,
         addresses.OPS_MULTISIG_OLD: treasury_handler,
-        addresses.TREASURY_VAULT: treasury_handler
+        addresses.TREASURY_VAULT: treasury_handler,
+        addresses.BVECVX_VOTER: treasury_handler
     }
 
     def __init__(self, chain: Network, cycle: int, start: int, end: int, boosts):
