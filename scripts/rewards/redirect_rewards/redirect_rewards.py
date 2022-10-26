@@ -49,7 +49,7 @@ def redirect_rewards_test(old_tree, new_tree) -> bool:
         new_claimable_for_voter, addresses.BCVXCRV
     )
     new_gravi_claimable_voter = get_cumulative_claimable_for_token(
-        new_claimable_for_voter, addresses.BCVXCRV
+        new_claimable_for_voter, addresses.GRAVIAURA
     )
     return (bcvxcrv_diff == BCVXCRV_AMOUNT
             and gravi_diff == GRAVIAURA_AMOUNT
