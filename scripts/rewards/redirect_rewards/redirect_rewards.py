@@ -10,12 +10,12 @@ GRAVIAURA_AMOUNT = 64711263876046333872
 def redirect_rewards_func(tree, tree_manager) -> RewardsList:
 
     rewards_list = merkle_tree_to_rewards_list(tree)
-    rewards_list.increase_user_rewards(
+    rewards_list.decrease_user_rewards(
         addresses.BVECVX_VOTER,
         addresses.BCVXCRV,
         BCVXCRV_AMOUNT
     )
-    rewards_list.increase_user_rewards(
+    rewards_list.decrease_user_rewards(
         addresses.BVECVX_VOTER,
         addresses.GRAVIAURA,
         GRAVIAURA_AMOUNT
