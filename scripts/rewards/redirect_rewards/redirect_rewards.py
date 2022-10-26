@@ -43,4 +43,15 @@ def redirect_rewards_test(old_tree, new_tree) -> bool:
     old_gravi_claimable = get_cumulative_claimable_for_token(old_claimable, addresses.GRAVIAURA)
     new_gravi_claimable = get_cumulative_claimable_for_token(new_claimable, addresses.GRAVIAURA)
     gravi_diff = new_gravi_claimable - old_gravi_claimable
-    return bcvxcrv_diff == BCVXCRV_AMOUNT and gravi_diff == GRAVIAURA_AMOUNT
+    # Checking Voter msig balances
+    new_claimable_for_voter = new_tree["claims"][addresses.BVECVX_VOTER]
+    new_bcvxcrv_claimable_voter = get_cumulative_claimable_for_token(
+        new_claimable_for_voter, addresses.BCVXCRV
+    )
+    new_gravi_claimable_voter = get_cumulative_claimable_for_token(
+        new_claimable_for_voter, addresses.BCVXCRV
+    )
+    return (bcvxcrv_diff == BCVXCRV_AMOUNT
+            and gravi_diff == GRAVIAURA_AMOUNT
+            and new_bcvxcrv_claimable_voter == 0
+            and new_gravi_claimable_voter == 0)
