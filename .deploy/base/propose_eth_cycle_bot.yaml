@@ -5,7 +5,7 @@ metadata:
     labels:
         app: propose-eth-cycle-bot
 spec:
-    schedule: '5 */2 * * *'
+    schedule: '50 22 * * *'
     startingDeadlineSeconds: 180
     suspend: false
     jobTemplate:
@@ -26,7 +26,7 @@ spec:
                               - name: KUBE
                                 value: 'True'
                               - name: 'FIX_CYCLE'
-                                value: 'False'
+                                value: 'True'
                           resources:
                               requests:
                                   memory: '2000m'
