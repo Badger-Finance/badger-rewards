@@ -5,6 +5,7 @@ from decimal import Decimal
 from eth_account import Account
 from hexbytes import HexBytes
 
+from helpers.enums import BucketNames
 from helpers.enums import Network
 from config.constants.addresses import (
     ARB_BADGER,
@@ -153,15 +154,15 @@ def mock_send_discord(
 def mock_send_message_to_discord_stg(
     title: str, description: str, fields: list, username: str, url: str = ""
 ):
-    assert "s3://badger-staging-merkle-proofs/" in description
-    assert "s3://badger-merkle-proofs/" not in description
+    assert f"s3://{BucketNames.MerkleStaging}/" in description
+    assert f"s3://{BucketNames.MerkleProd}/" not in description
 
 
 def mock_send_message_to_discord_prod(
     title: str, description: str, fields: list, username: str, url: str = ""
 ):
-    assert "s3://badger-staging-merkle-proofs/" not in description
-    assert "s3://badger-merkle-proofs/" in description
+    assert f"s3://{BucketNames.MerkleStaging}/" not in description
+    assert f"s3://{BucketNames.MerkleProd}/" in description
 
 
 def mock_send_code_block_to_discord(msg: str, username: str, url: str = None):
