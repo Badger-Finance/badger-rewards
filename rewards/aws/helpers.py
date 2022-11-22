@@ -5,6 +5,7 @@ import boto3
 from botocore.exceptions import ClientError
 from decouple import config
 
+from helpers.enums import BucketNames
 from helpers.enums import Environment
 from logging_utils.logger import logger
 
@@ -24,7 +25,7 @@ def get_snapshot_table(production: bool):
 
 
 def get_bucket(production: bool) -> str:
-    return "badger-merkle-proofs" if production else "badger-staging-merkle-proofs"
+    return BucketNames.MerkleProd if production else BucketNames.MerkleStaging
 
 
 def get_secret(
@@ -103,12 +104,16 @@ def get_secret(
         if "SecretString" in get_secret_value_response:
             return json.loads(get_secret_value_response["SecretString"])[secret_key]
         else:
-            return base64.b64decode(get_secret_value_response["SecretBinary"])[secret_key]
+            return base64.b64decode(get_secret_value_response["SecretBinary"])[
+                secret_key
+            ]
 
     return None
 
 
-def get_assume_role_credentials(assume_role_arn: str, session_name: str = "AssumeRoleSession1"):
+def get_assume_role_credentials(
+    assume_role_arn: str, session_name: str = "AssumeRoleSession1"
+):
     sts_client = boto3.client("sts")
 
     # Call the assume_role method of the STSConnection object and pass the role
@@ -125,7 +130,9 @@ def get_assume_role_credentials(assume_role_arn: str, session_name: str = "Assum
 
 
 if config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]:
-    credentials = get_assume_role_credentials(DYNAMO_ASSUME_ROLE, session_name="AssumeDynamoRole")
+    credentials = get_assume_role_credentials(
+        DYNAMO_ASSUME_ROLE, session_name="AssumeDynamoRole"
+    )
     session = boto3.session.Session(
         aws_access_key_id=credentials["AccessKeyId"],
         aws_secret_access_key=credentials["SecretAccessKey"],
@@ -134,16 +141,12 @@ if config("KUBE", "True").lower() in ["true", "1", "t", "y", "yes"]:
     s3 = boto3.client("s3")
     dynamodb = session.resource("dynamodb", region_name="us-west-1")
 elif config("ENV", "") == Environment.Test:
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id='',
-        aws_secret_access_key=''
-    )
+    s3 = boto3.client("s3", aws_access_key_id="", aws_secret_access_key="")
     dynamodb = boto3.resource(
         "dynamodb",
         region_name="us-west-1",
-        aws_access_key_id='',
-        aws_secret_access_key=''
+        aws_access_key_id="",
+        aws_secret_access_key="",
     )
 else:
     s3 = boto3.client(

@@ -5,6 +5,7 @@ from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
 from helpers.discord import get_discord_url
 from helpers.discord import send_message_to_discord
+from helpers.enums import BucketNames
 from logging_utils import logger
 from rewards.aws.helpers import get_bucket
 from rewards.aws.helpers import s3
@@ -29,13 +30,13 @@ def upload_boosts_to_aws(boost_data, chain: str, file_name: str, cycle: bool = F
     boost_file_name = f"{file_name}-{chain_id}.json"
     buckets = []
     if env_config.test or env_config.staging:
-        buckets.append("badger-staging-merkle-proofs")
-        with open('test_boost.json', 'w') as tree_file:
+        buckets.append(BucketNames.MerkleStaging)
+        with open("test_boost.json", "w") as tree_file:
             json.dump(boost_data, tree_file, indent=4, sort_keys=True)
     elif env_config.production:
         if cycle:
-            buckets.append("badger-staging-merkle-proofs")
-        buckets.append("badger-merkle-proofs")
+            buckets.append(BucketNames.MerkleStaging)
+        buckets.append(BucketNames.MerkleProd)
 
     for b in buckets:
         logger.info(f"Uploading file to s3://{b}/{boost_file_name}")

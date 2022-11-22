@@ -72,3 +72,11 @@ class DiscordRoles(str, Enum):
 
     def __str__(self) -> str:
         return self.value
+
+
+class BucketNames(str, Enum):
+    MerkleStaging = "badger-staging-merkle-proofs-v2"
+    MerkleProd = "badger-merkle-proofs-v2"
+
+    def __str__(self) -> str:
+        return self.value
