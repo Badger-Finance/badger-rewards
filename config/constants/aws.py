@@ -1,4 +1,4 @@
-from helpers.enums import BotType, BucketType, Environment, Network
+from helpers.enums import BotType, BucketNames, BucketType, Environment, Network
 
 MONITORING_SECRET_NAMES = {
     Environment.Production: {
@@ -59,7 +59,7 @@ MONITORING_SECRET_NAMES = {
 
 S3_BUCKETS = {
     BucketType.Merkle: {
-        Environment.Staging: "badger-staging-merkle-proofs",
-        Environment.Production: "badger-merkle-proofs",
+        Environment.Staging: BucketNames.MerkleStaging,
+        Environment.Production: BucketNames.MerkleProd,
     }
 }

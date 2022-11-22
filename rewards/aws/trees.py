@@ -4,6 +4,7 @@ from typing import Dict
 from config.constants.chain_mappings import CHAIN_IDS
 from config.singletons import env_config
 from helpers.discord import console_and_discord
+from helpers.enums import BucketNames
 from helpers.enums import DiscordRoles
 from helpers.enums import Network
 from logging_utils import logger
@@ -66,7 +67,7 @@ def upload_tree(file_name: str, data: Dict, chain: str, staging: bool = False):
 
     upload_targets = [
         {
-            "bucket": "badger-staging-merkle-proofs",
+            "bucket": BucketNames.MerkleStaging,
             "key": key,
         }  # badger-api staging no matter what
     ]
@@ -81,7 +82,7 @@ def upload_tree(file_name: str, data: Dict, chain: str, staging: bool = False):
 
         upload_targets.append(
             {
-                "bucket": "badger-merkle-proofs",
+                "bucket": BucketNames.MerkleProd,
                 "key": key,
             }  # badger-api production
         )
@@ -103,10 +104,14 @@ def upload_tree(file_name: str, data: Dict, chain: str, staging: bool = False):
         except Exception as e:
             logger.error(
                 "Error uploading approval file to bucket",
-                extra={'bucket': target["bucket"], 'chain': chain}
+                extra={"bucket": target["bucket"], "chain": chain},
             )
-            console_and_discord(f'Error uploading approval file to bucket {target["bucket"]}, '
-                                f'temp file saved: {e}', chain, mentions=DiscordRoles.RewardsPod)
-            with open('./temp_data/temp_tree.json', 'w') as outfile:
+            console_and_discord(
+                f'Error uploading approval file to bucket {target["bucket"]}, '
+                f"temp file saved: {e}",
+                chain,
+                mentions=DiscordRoles.RewardsPod,
+            )
+            with open("./temp_data/temp_tree.json", "w") as outfile:
                 outfile.write(str(json.dumps(data)))
             raise e
