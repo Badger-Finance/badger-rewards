@@ -134,22 +134,19 @@ FUSE_MANTISSA = 18
 FUSE_TOKEN_BASE = 10
 FTOKEN_DECIMALS = 8
 
-NOW = datetime.datetime.now()
+NOW = datetime.date.today()
 
 # Boost for Standard Councilors increases 115 per month
 STANDARD_COUNCILOR_BOOST = 115
 # Boost for Committee Councilors increases 430 per month + standard
 COMMITEE_COUNCILOR_BOOST = 430 + STANDARD_COUNCILOR_BOOST
 
+# TODO: !!!!
 COUNCILOR_MONTHS_ACCRUED = {
-    "0xD798428e860465E08B522f8440f707593E6d22C6": NOW.month
-    - datetime.datetime(2022, 7, 1).month,
-    "0xc9049cB9aB542D0Bd0fA099ff8E3e8b3FCa13b13": NOW.month
-    - datetime.datetime(2022, 7, 1).month,
-    "0xB5c46131B4d8d13e4c0E476B9A2Ea5b43945891e": NOW.month
-    - datetime.datetime(2022, 7, 1).month,
-    "0x567244C8E8dff152bE7A276DCD05AA332767386E": NOW.month
-    - datetime.datetime(2022, 7, 1).month,
+    "0xD798428e860465E08B522f8440f707593E6d22C6": (NOW - datetime.date(2022, 7, 1)).days // 30,
+    "0xc9049cB9aB542D0Bd0fA099ff8E3e8b3FCa13b13": (NOW - datetime.date(2022, 7, 1)).days // 30,
+    "0xB5c46131B4d8d13e4c0E476B9A2Ea5b43945891e": (NOW - datetime.date(2022, 7, 1)).days // 30,
+    "0x567244C8E8dff152bE7A276DCD05AA332767386E": (NOW - datetime.date(2022, 7, 1)).days // 30,
 }
 
 COUNCILOR_RATE = {
