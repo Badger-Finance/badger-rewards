@@ -102,7 +102,7 @@ class EnvConfig:
         return Web3(
             Web3.HTTPProvider(get_secret(secret_name, secret_key, kube=self.kube))
         )
-    
+
     def get_graph_api_key(self, secret_name: str, secret_key: str) -> str:
         return get_secret(secret_name, secret_key, kube=self.kube)
 
