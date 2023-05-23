@@ -11,7 +11,7 @@ from subgraph.config import subgraph_urls
 from helpers.discord import send_error_to_discord
 
 
-def subgraph_url(name: str) -> str:
+def subgraph_url(name: str) -> dict[str, str]:
     prod_urls = subgraph_urls[Environment.Production]
     staging_urls = subgraph_urls[Environment.Staging]
     if env_config.production:
@@ -21,9 +21,14 @@ def subgraph_url(name: str) -> str:
 
 def make_gql_client(name: str) -> Optional[Client]:
     requests_logger.setLevel(logging.WARNING)
-    url = subgraph_url(name)
-    if not url:
+    urlDict = subgraph_url(name)
+    url = ""
+    if not urlDict:
         return
+    if "raw" in urlDict:
+        url = urlDict["raw"]
+    elif "secret" in urlDict:
+        url = env_config.get_graph_api_key(urlDict["secret"], "NODE_URL")
     transport = RequestsHTTPTransport(url=url, retries=3)
     return Client(
         transport=transport, fetch_schema_from_transport=True, execute_timeout=60

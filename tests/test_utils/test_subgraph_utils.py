@@ -8,16 +8,10 @@ from subgraph.subgraph_utils import make_gql_client, subgraph_url
 
 
 def test_subgraph_url__happy_path():
-    url = subgraph_url("nfts")
+    urlDict = subgraph_url("thegraph")
+    url = urlDict["raw"]
     host = urlparse(url).hostname
-    assert url in subgraph_urls[Environment.Production].values()
-    assert host.endswith(".thegraph.com")
-
-
-def test_subgraph_url__happy_path_from_urls():
-    url = subgraph_url("thegraph")
-    host = urlparse(url).hostname
-    assert url in subgraph_urls[Environment.Production].values()
+    assert urlDict in subgraph_urls[Environment.Production].values()
     assert host.endswith(".thegraph.com")
 
 
