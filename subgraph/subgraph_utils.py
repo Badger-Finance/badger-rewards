@@ -6,12 +6,12 @@ from gql.transport.requests import RequestsHTTPTransport
 from gql.transport.requests import log as requests_logger
 
 from config.singletons import env_config
-from helpers.enums import Environment, Network
+from helpers.enums import Environment, Network, SubgraphUrlType
 from subgraph.config import subgraph_urls
 from helpers.discord import send_error_to_discord
 
 
-def subgraph_url(name: str) -> str:
+def subgraph_url(name: str) -> dict[SubgraphUrlType, str]:
     prod_urls = subgraph_urls[Environment.Production]
     staging_urls = subgraph_urls[Environment.Staging]
     if env_config.production:
@@ -21,9 +21,14 @@ def subgraph_url(name: str) -> str:
 
 def make_gql_client(name: str) -> Optional[Client]:
     requests_logger.setLevel(logging.WARNING)
-    url = subgraph_url(name)
-    if not url:
+    urlDict = subgraph_url(name)
+    url = ""
+    if not urlDict:
         return
+    if SubgraphUrlType.Plain in urlDict:
+        url = urlDict[SubgraphUrlType.Plain]
+    elif SubgraphUrlType.AWS in urlDict:
+        url = env_config.get_graph_api_key(urlDict[SubgraphUrlType.AWS], "NODE_URL")
     transport = RequestsHTTPTransport(url=url, retries=3)
     return Client(
         transport=transport, fetch_schema_from_transport=True, execute_timeout=60
