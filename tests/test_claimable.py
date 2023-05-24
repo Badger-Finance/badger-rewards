@@ -38,7 +38,7 @@ def test_get_latest_claimable_snapshot(chain, setup_dynamodb, mocker):
     url = f"https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-{chain}"
     if (chain == Network.Ethereum):
         url = "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts"
-    mocker.patch("subgraph.subgraph_utils.subgraph_url",
+    mocker.patch("subgraph.subgraph_utils.subgraph_url_from_config",
                  return_value={SubgraphUrlType.Plain: url})
     patch_resource(dynamodb)
     cb_snapshot = get_latest_claimable_snapshot(chain)

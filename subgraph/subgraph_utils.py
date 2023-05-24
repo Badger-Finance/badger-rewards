@@ -1,4 +1,5 @@
 import logging
+from decouple import config
 from typing import Optional
 
 from gql import Client
@@ -11,7 +12,7 @@ from subgraph.config import subgraph_urls
 from helpers.discord import send_error_to_discord
 
 
-def subgraph_url(name: str) -> dict[SubgraphUrlType, str]:
+def subgraph_url_from_config(name: str) -> dict[SubgraphUrlType, str]:
     prod_urls = subgraph_urls[Environment.Production]
     staging_urls = subgraph_urls[Environment.Staging]
     if env_config.production:
@@ -19,16 +20,28 @@ def subgraph_url(name: str) -> dict[SubgraphUrlType, str]:
     return staging_urls.get(name, prod_urls.get(name, ""))
 
 
-def make_gql_client(name: str) -> Optional[Client]:
-    requests_logger.setLevel(logging.WARNING)
-    urlDict = subgraph_url(name)
-    url = ""
+def subgraph_url(name: str) -> Optional[str]:
+    env_url = config(f"SUBGRAPH_URL_{name}", None)
+    urlDict = subgraph_url_from_config(name)
     if not urlDict:
         return
-    if SubgraphUrlType.Plain in urlDict:
-        url = urlDict[SubgraphUrlType.Plain]
+    if env_url is not None:
+        return env_url
+    elif SubgraphUrlType.Plain in urlDict:
+        return urlDict[SubgraphUrlType.Plain]
     elif SubgraphUrlType.AWS in urlDict:
-        url = env_config.get_graph_api_key(urlDict[SubgraphUrlType.AWS], "NODE_URL")
+        return env_config.get_graph_api_key(urlDict[SubgraphUrlType.AWS], "SUBGRAPH_URL")
+    else:
+        logging.error(f"Failed to grab subgraph url for {name}")
+        return
+
+
+def make_gql_client(name: str) -> Optional[Client]:
+    requests_logger.setLevel(logging.WARNING)
+
+    url = subgraph_url(name)
+    if not url:
+        logging.error(f"Failed to create subgraph client for {name}")
     transport = RequestsHTTPTransport(url=url, retries=3)
     return Client(
         transport=transport, fetch_schema_from_transport=True, execute_timeout=60

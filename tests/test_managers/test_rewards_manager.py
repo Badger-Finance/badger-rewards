@@ -234,7 +234,7 @@ def test_splits(
     user_data = {}
     discord = mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
     url = "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts"
-    mocker.patch("subgraph.subgraph_utils.subgraph_url",
+    mocker.patch("subgraph.subgraph_utils.subgraph_url_from_config",
                  return_value={SubgraphUrlType.Plain: url})
     for rate in rates:
         mocker.patch(
