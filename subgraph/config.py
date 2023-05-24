@@ -1,25 +1,27 @@
 from helpers.enums import (
     Environment,
     Network,
+    SubgraphUrlType,
 )
 
-subgraph_urls: dict[Environment, dict[str, dict[str, str]]] = {
+subgraph_urls: dict[Environment, dict[str, dict[SubgraphUrlType, str]]] = {
     Environment.Production: {
         # Chain graphs
         Network.BinanceSmartChain: (
-            {"raw": "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-bsc"}
+            {SubgraphUrlType.Plain:
+                "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-bsc"}
         ),
-        Network.Ethereum: ({"secret": "badger-rewards/badger-vaults-ethereum-gql-url"}),
+        Network.Ethereum: ({SubgraphUrlType.AWS: "badger-rewards/badger-vaults-ethereum-gql-url"}),
         Network.Polygon: (
-            {"raw":
+            {SubgraphUrlType.Plain:
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-polygon"}
         ),
         Network.Arbitrum: (
-            {"raw":
+            {SubgraphUrlType.Plain:
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-arbitrum"}
         ),
         Network.Fantom: (
-            {"raw":
+            {SubgraphUrlType.Plain:
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-fantom"}
         ),
         # Token graphs
@@ -27,24 +29,25 @@ subgraph_urls: dict[Environment, dict[str, dict[str, str]]] = {
             {"secret": "badger-rewards/badger-erc20s-ethereum-gql-url"}
         ),
         f"tokens-{Network.BinanceSmartChain}": (
-            {"raw": "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-bsc"}
+            {SubgraphUrlType.Plain:
+                "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-bsc"}
         ),
         f"tokens-{Network.Polygon}": (
             {"raw":
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-polygon"}
         ),
         f"tokens-{Network.Arbitrum}": (
-            {"raw":
+            {SubgraphUrlType.Plain:
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-arbitrum"}
         ),
         f"tokens-{Network.Fantom}": (
-            {"raw":
+            {SubgraphUrlType.Plain:
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-fantom"}
         ),
-        "fuse": {"secret": "badger-rewards/badger-fuse-gql-url"},
-        "thegraph": {"raw": "https://api.thegraph.com/index-node/graphql"},
-        "nfts": {"secret": "badger-rewards/badger-nfts-gql-url"},
-        "across": {"secret": "badger-rewards/badger-across-gql-url"}
+        "fuse": {SubgraphUrlType.AWS: "badger-rewards/badger-fuse-gql-url"},
+        "thegraph": {SubgraphUrlType.Plain: "https://api.thegraph.com/index-node/graphql"},
+        "nfts": {SubgraphUrlType.AWS: "badger-rewards/badger-nfts-gql-url"},
+        "across": {SubgraphUrlType.AWS: "badger-rewards/badger-across-gql-url"}
     },
     Environment.Staging: {
     }

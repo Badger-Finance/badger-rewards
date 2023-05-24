@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 from moto.core import patch_resource
 
 from badger_api.claimable import get_latest_claimable_snapshot
-from helpers.enums import Network
+from helpers.enums import Network, SubgraphUrlType
 from rewards.aws.helpers import dynamodb
 from tests.utils import chains
 from tests.utils import mock_tree
@@ -34,7 +34,12 @@ def tokens_to_check(tree):
 
 
 @pytest.mark.parametrize("chain", chains)
-def test_get_latest_claimable_snapshot(chain, setup_dynamodb):
+def test_get_latest_claimable_snapshot(chain, setup_dynamodb, mocker):
+    url = f"https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-{chain}"
+    if (chain == Network.Ethereum):
+        url = "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts"
+    mocker.patch("subgraph.subgraph_utils.subgraph_url",
+                 return_value={SubgraphUrlType.Plain: url})
     patch_resource(dynamodb)
     cb_snapshot = get_latest_claimable_snapshot(chain)
     assert len(cb_snapshot) > 0
