@@ -86,7 +86,7 @@ def fetch_token_balances(
     increment = 1000
     digg_utils = DiggUtils()
     query = token_query()
-    client = SubgraphClient(f"tokens-{chain}", chain)
+    client = SubgraphClient(f"tokens_{chain}", chain)
 
     continue_fetching = True
     last_id = "0x0000000000000000000000000000000000000000"

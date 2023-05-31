@@ -25,22 +25,22 @@ subgraph_urls: dict[Environment, dict[str, dict[SubgraphUrlType, str]]] = {
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts-fantom"}
         ),
         # Token graphs
-        f"tokens-{Network.Ethereum}": (
+        f"tokens_{Network.Ethereum}": (
             {"secret": "badger-rewards/badger-erc20s-ethereum-gql-url"}
         ),
-        f"tokens-{Network.BinanceSmartChain}": (
+        f"tokens_{Network.BinanceSmartChain}": (
             {SubgraphUrlType.Plain:
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-bsc"}
         ),
-        f"tokens-{Network.Polygon}": (
+        f"tokens_{Network.Polygon}": (
             {"raw":
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-polygon"}
         ),
-        f"tokens-{Network.Arbitrum}": (
+        f"tokens_{Network.Arbitrum}": (
             {SubgraphUrlType.Plain:
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-arbitrum"}
         ),
-        f"tokens-{Network.Fantom}": (
+        f"tokens_{Network.Fantom}": (
             {SubgraphUrlType.Plain:
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-fantom"}
         ),
