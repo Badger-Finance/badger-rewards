@@ -32,14 +32,6 @@ class Environment(str, Enum):
         return self.value
 
 
-class SubgraphUrlType(str, Enum):
-    Plain = "plain"
-    AWS = "aws"
-
-    def __str__(self):
-        return self.value
-
-
 class BotType(str, Enum):
     Cycle = "cycle"
     Boost = "boost"

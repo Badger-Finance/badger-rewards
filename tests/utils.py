@@ -25,7 +25,6 @@ def set_env_vars():
     os.environ["KUBE"] = "False"
     os.environ["AWS_SECRET_ACCESS_KEY"] = ""
     os.environ["AWS_ACCESS_KEY_ID"] = ""
-    os.environ["SUBGRAPH_URL_tokens_ethereum"] = "www.thegraph.com/test/value"
 
 
 def get_mock_json(name):
