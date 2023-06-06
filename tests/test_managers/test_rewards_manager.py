@@ -17,7 +17,7 @@ from config.constants.addresses import TECH_OPS
 from config.constants.chain_mappings import DECIMAL_MAPPING
 from config.constants.chain_mappings import SETTS
 from helpers.enums import BalanceType
-from helpers.enums import Network
+from helpers.enums import Network, SubgraphUrlType
 from logging_utils.logger import logger
 from rewards.aws.helpers import dynamodb
 from rewards.classes.MerkleTree import rewards_to_merkle_tree
@@ -233,6 +233,9 @@ def test_splits(
     rates = [Decimal(0), Decimal(0.5), Decimal(1)]
     user_data = {}
     discord = mocker.patch("rewards.classes.RewardsManager.send_code_block_to_discord")
+    url = "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-setts"
+    mocker.patch("subgraph.subgraph_utils.subgraph_url_from_config",
+                 return_value={SubgraphUrlType.Plain: url})
     for rate in rates:
         mocker.patch(
             "rewards.classes.RewardsManager.get_flat_emission_rate",

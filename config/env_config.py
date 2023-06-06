@@ -60,8 +60,8 @@ class EnvConfig:
 
         self.web3 = {
             Network.Ethereum: [
-                self.make_provider("quiknode/eth-node-url", "NODE_URL"),
-                self.make_provider("alchemy/eth-node-url", "NODE_URL"),
+                self.make_provider(
+                    "rewards-bots/web3_ethereum_mainnet_alchemy_api_key", "NODE_URL"),
                 Web3(Web3.HTTPProvider("https://main-light.eth.linkpool.io")),
                 Web3(Web3.HTTPProvider("https://rpc.flashbots.net/")),
             ],
@@ -102,6 +102,9 @@ class EnvConfig:
         return Web3(
             Web3.HTTPProvider(get_secret(secret_name, secret_key, kube=self.kube))
         )
+
+    def get_graph_api_key(self, secret_name: str, secret_key: str) -> str:
+        return get_secret(secret_name, secret_key, kube=self.kube)
 
     def get_webhook_url(self) -> str:
         if self.test:
