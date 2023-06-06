@@ -26,14 +26,14 @@ subgraph_urls: dict[Environment, dict[str, dict[SubgraphUrlType, str]]] = {
         ),
         # Token graphs
         f"tokens_{Network.Ethereum}": (
-            {"secret": "badger-rewards/badger-erc20s-ethereum-gql-url"}
+            {SubgraphUrlType.AWS: "badger-rewards/badger-erc20s-ethereum-gql-url"}
         ),
         f"tokens_{Network.BinanceSmartChain}": (
             {SubgraphUrlType.Plain:
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-bsc"}
         ),
         f"tokens_{Network.Polygon}": (
-            {"raw":
+            {SubgraphUrlType.Plain:
                 "https://api.thegraph.com/subgraphs/name/badger-finance/badger-dao-tokens-polygon"}
         ),
         f"tokens_{Network.Arbitrum}": (
